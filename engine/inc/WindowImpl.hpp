@@ -10,6 +10,7 @@ namespace Rasterizer
     {
     public:
         virtual void show() = 0;
+        virtual bool popEvent(Event& event) = 0;
 
     protected:
         friend struct std::default_delete<WindowImpl>; // Allow default delete access to the protected destructor.

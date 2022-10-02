@@ -1,23 +1,24 @@
 cmake_minimum_required( VERSION 3.23.0 )
 
-set( SRC_FILES
-    Engine.cpp
-    Window.cpp
+set( INC_FILES
+    inc/Events.hpp
+    inc/KeyCodes.hpp
+    inc/Window.hpp
 )
 
-set( INC_FILES
-    Engine.hpp
-    Window.hpp
+set( SRC_FILES
+    src/Window.cpp
 )
 
 if(WIN32)
-    list( APPEND SRC_FILES
-        WindowWin32.cpp
+    list(APPEND INC_FILES
+        inc/WindowWin32.hpp
     )
 
-    list(APPEND INC_FILES
-        WindowWin32.hpp
+    list( APPEND SRC_FILES
+        src/WindowWin32.cpp
     )
+
 endif(WIN32)
 
 set( ALL_FILES ${SRC_FILES} ${INC_FILES} )
@@ -37,5 +38,5 @@ if(BUILD_SHARED_LIBS)
 endif(BUILD_SHARED_LIBS)
 
 target_include_directories( Engine
-    PUBLIC .
+    PUBLIC inc
 )

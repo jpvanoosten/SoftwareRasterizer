@@ -15,7 +15,7 @@ set( SR_VERSION ${SR_VERSION_MAJOR}.${SR_VERSION_MINOR}.${SR_VERSION_PATCH})
 project( SoftwareRasterizer VERSION ${SR_VERSION} LANGUAGES CXX )
 
 option( BUILD_SHARED_LIBS "Global flag to cause add_library to create shared libraries." ON )
-option( SR_BUILD_SAMPLES "Compile samples." OFF )
+option( SR_BUILD_SAMPLES "Compile samples." ON )
 
 add_subdirectory(engine)
 
