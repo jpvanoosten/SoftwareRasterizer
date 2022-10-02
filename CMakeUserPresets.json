@@ -2,13 +2,27 @@
   "version": 3,
   "configurePresets": [
     {
-      "name": "x64-debug-samples",
-      "displayName": "x64 Debug (Samples)",
-      "description": "Target Windows (64-bit) with the Visual Studio development environment. (Debug)",
-      "inherits": "x64-debug",
+      "name": "x64-samples",
+      "displayName": "x64 (Samples)",
+      "description": "Target Windows (64-bit) with the Visual Studio development environment.",
+      "inherits": "x64",
       "cacheVariables": {
-        "SR_SAMPLES":  "ON"
+        "SR_BUILD_SAMPLES": "ON"
       }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "x64-samples-debug",
+      "displayName": "Debug Samples",
+      "configurePreset": "x64-samples",
+      "configuration": "Debug"
+    },
+    {
+      "name": "x64-samples-release",
+      "displayName": "Release Samples",
+      "configurePreset": "x64-samples",
+      "configuration": "Release"
     }
   ]
 }
