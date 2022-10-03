@@ -1,5 +1,8 @@
 cmake_minimum_required( VERSION 3.23.0 )
 
+option( BUILD_SHARED_LIBS "Global flag to cause add_library to create shared libraries." ON )
+option( SR_BUILD_SAMPLES "Compile samples." ON )
+
 # Make sure DLL and EXE targets go to the same directory.
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
@@ -10,12 +13,11 @@ set( SR_VERSION_MINOR 0 )
 set( SR_VERSION_PATCH 1 )
 set( SR_VERSION ${SR_VERSION_MAJOR}.${SR_VERSION_MINOR}.${SR_VERSION_PATCH})
 
+# Use solution folders.
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 
 project( SoftwareRasterizer VERSION ${SR_VERSION} LANGUAGES CXX )
-
-option( BUILD_SHARED_LIBS "Global flag to cause add_library to create shared libraries." ON )
-option( SR_BUILD_SAMPLES "Compile samples." ON )
 
 add_subdirectory(engine)
 

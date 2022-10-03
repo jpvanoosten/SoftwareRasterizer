@@ -5,7 +5,7 @@
 
 #include <iostream>
 
-using namespace Rasterizer;
+using namespace sr;
 
 constexpr const wchar_t* WINDOW_CLASS_NAME = L"RasterizerWindow";
 
@@ -48,12 +48,6 @@ WindowWin32::WindowWin32(std::wstring_view title, int width, int height)
     height = windowRect.bottom - windowRect.top;
 
     m_hWnd = ::CreateWindowExW(0, WINDOW_CLASS_NAME, title.data(), WS_OVERLAPPEDWINDOW, 0, 0, width, height, NULL, NULL, ::GetModuleHandleW(nullptr), this);
-
-    if(!m_hWnd)
-    {
-        ReportError();
-    }
-
 }
 
 WindowWin32::~WindowWin32()
@@ -107,6 +101,35 @@ void WindowWin32::init()
 void WindowWin32::show()
 {
     ::ShowWindow(m_hWnd, SW_SHOW);
+}
+
+void WindowWin32::present(const Image& image)
+{
+    // Invalidate the window's client rectangle so it gets repainted.
+    RECT clientRect;
+    ::GetClientRect(m_hWnd, &clientRect);
+    ::InvalidateRect(m_hWnd, &clientRect, FALSE);
+
+    PAINTSTRUCT ps;
+    HDC hdc = ::BeginPaint(m_hWnd, &ps);
+    if (hdc == nullptr) return;
+
+    BITMAPINFO bi {
+        .bmiHeader{
+            .biSize = sizeof(BITMAPINFOHEADER),
+            .biWidth = static_cast<LONG>(image.getWidth()),
+            .biHeight = static_cast<LONG>(image.getHeight()),
+            .biPlanes = 1,
+            .biBitCount = 32,
+            .biCompression = BI_RGB,
+            .biSizeImage = static_cast<DWORD>(image.getWidth() * image.getHeight() * sizeof(Color))
+        }
+    };
+
+    ::SetStretchBltMode(hdc, HALFTONE);
+    ::StretchDIBits(hdc, 0, clientRect.bottom, clientRect.right, -clientRect.bottom, 0, 0, static_cast<int>(image.getWidth()), static_cast<int>(image.getHeight()), image.data(), &bi, DIB_RGB_COLORS, SRCCOPY);
+
+    ::EndPaint(m_hWnd, &ps);
 }
 
 void WindowWin32::pushEvent(const Event& e)

@@ -14,7 +14,7 @@
 // Forward declaration of Windows callback function.
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
-namespace Rasterizer
+namespace sr
 {
     class ENGINE_API WindowWin32 : public WindowImpl
     {
@@ -23,6 +23,7 @@ namespace Rasterizer
         ~WindowWin32();
 
         void show() override;
+        void present(const Image& image) override;
 
         bool popEvent(Event& event) override;
 
@@ -40,7 +41,6 @@ namespace Rasterizer
         friend LRESULT CALLBACK ::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
         HWND m_hWnd;
-
         std::queue<Event> m_eventQueue;
     };
 }

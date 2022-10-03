@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-namespace Rasterizer
+namespace sr
 {
     enum class KeyCode : uint8_t
     {

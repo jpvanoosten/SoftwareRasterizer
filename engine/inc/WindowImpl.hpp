@@ -1,15 +1,17 @@
 #pragma once
 
 #include "Config.hpp"
+#include "Image.hpp"
 
 #include <memory>
 
-namespace Rasterizer
+namespace sr
 {
     class ENGINE_API WindowImpl
     {
     public:
         virtual void show() = 0;
+        virtual void present(const Image& image) = 0;
         virtual bool popEvent(Event& event) = 0;
 
     protected:

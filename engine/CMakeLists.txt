@@ -1,12 +1,16 @@
 cmake_minimum_required( VERSION 3.23.0 )
 
 set( INC_FILES
+    inc/Color.hpp
     inc/Events.hpp
+    inc/Image.hpp
     inc/KeyCodes.hpp
     inc/Window.hpp
 )
 
 set( SRC_FILES
+    src/Color.cpp
+    src/Image.cpp
     src/Window.cpp
 )
 

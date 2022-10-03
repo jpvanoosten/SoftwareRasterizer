@@ -1,6 +1,6 @@
 #include "Window.hpp"
 
-using namespace Rasterizer;
+using namespace sr;
 
 #if defined(_WIN32)
 #include "WindowWin32.hpp"
@@ -23,6 +23,11 @@ bool Window::popEvent(Event& event)
 void Window::show()
 {
     pImpl->show();
+}
+
+void Window::present(const Image& image)
+{
+    pImpl->present(image);
 }
 
 void Window::destroy()

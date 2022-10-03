@@ -2,7 +2,7 @@
 
 #include "KeyCodes.hpp"
 
-namespace Rasterizer
+namespace sr
 {
     enum class KeyState
     {

@@ -2,11 +2,12 @@
 
 #include "Config.hpp"
 #include "Events.hpp"
+#include "Image.hpp"
 
 #include <memory>
 #include <string>
 
-namespace Rasterizer
+namespace sr
 {
     class WindowImpl;
 
@@ -19,6 +20,7 @@ namespace Rasterizer
         bool popEvent(Event& event);
 
         void show();
+        void present(const Image& image);
         void destroy();
 
         /// <summary>
