@@ -20,5 +20,5 @@ set_target_properties( ${TARGET_NAME}
 )
 
 target_link_libraries( ${TARGET_NAME} 
-    PUBLIC Engine
+    PUBLIC SoftwareRasterizer
 )

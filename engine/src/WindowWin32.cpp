@@ -114,20 +114,31 @@ void WindowWin32::present(const Image& image)
     HDC hdc = ::BeginPaint(m_hWnd, &ps);
     if (hdc == nullptr) return;
 
-    BITMAPINFO bi {
+    int srcWidth = static_cast<int>(image.getWidth());
+    int srcHeight = static_cast<int>(image.getHeight());
+    int dstWidth = clientRect.right - clientRect.left;
+    int dstHeight = clientRect.bottom - clientRect.top;
+
+    BITMAPINFO bmi {
         .bmiHeader{
             .biSize = sizeof(BITMAPINFOHEADER),
-            .biWidth = static_cast<LONG>(image.getWidth()),
-            .biHeight = static_cast<LONG>(image.getHeight()),
+            .biWidth = srcWidth,
+            .biHeight = -srcHeight, // If biHeight is negative, the bitmap is a top-down DIB and its origin is the upper-left corner.
             .biPlanes = 1,
             .biBitCount = 32,
             .biCompression = BI_RGB,
-            .biSizeImage = static_cast<DWORD>(image.getWidth() * image.getHeight() * sizeof(Color))
         }
     };
 
-    ::SetStretchBltMode(hdc, HALFTONE);
-    ::StretchDIBits(hdc, 0, clientRect.bottom, clientRect.right, -clientRect.bottom, 0, 0, static_cast<int>(image.getWidth()), static_cast<int>(image.getHeight()), image.data(), &bi, DIB_RGB_COLORS, SRCCOPY);
+    if(srcWidth == dstWidth && srcHeight == dstHeight)
+    {
+        ::SetDIBitsToDevice(hdc, 0, 0, srcWidth, srcHeight, 0, 0, 0, srcHeight, image.data(), &bmi, DIB_RGB_COLORS);
+    }
+    else
+    {
+        ::SetStretchBltMode(hdc, HALFTONE);
+        ::StretchDIBits(hdc, 0, 0, dstWidth, dstHeight, 0, 0, srcWidth, srcHeight, image.data(), &bmi, DIB_RGB_COLORS, SRCCOPY);
+    }
 
     ::EndPaint(m_hWnd, &ps);
 }

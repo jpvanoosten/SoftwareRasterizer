@@ -9,7 +9,7 @@
 
 namespace sr
 {
-    struct ENGINE_API alignas(4) Color
+    struct SR_API alignas(4) Color
     {
     public:
         constexpr Color() noexcept;

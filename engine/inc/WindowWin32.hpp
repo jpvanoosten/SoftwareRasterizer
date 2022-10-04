@@ -16,7 +16,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 namespace sr
 {
-    class ENGINE_API WindowWin32 : public WindowImpl
+    class SR_API WindowWin32 : public WindowImpl
     {
     public:
         WindowWin32(std::wstring_view title, int width, int height);

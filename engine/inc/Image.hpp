@@ -4,17 +4,32 @@
 #include "Color.hpp"
 
 #include <memory>
+#include <cassert>
 
 namespace sr
 {
-    struct ENGINE_API Image
+    struct SR_API Image
     {
         Image(uint32_t width, uint32_t height);
         ~Image() = default;
         
         void clear(const Color& color);
 
-        inline void set(uint32_t x, uint32_t y, const Color& color);
+        const Color& operator()(uint32_t x, uint32_t y) const
+        {
+            assert(x < m_width);
+            assert(y < m_height);
+
+            return m_data[y * m_width + x];
+        }
+
+        Color& operator()(uint32_t x, uint32_t y)
+        {
+            assert(x < m_width);
+            assert(y < m_height);
+
+            return m_data[y * m_width + x];
+        }
 
         uint32_t getWidth() const noexcept
         {
@@ -41,14 +56,4 @@ namespace sr
         uint32_t m_height;
         std::unique_ptr<Color[]> m_data;
     };
-
-    inline void Image::set(uint32_t x, uint32_t y, const Color& color)
-    {
-        assert(x < m_width);
-        assert(y < m_height);
-
-        const uint32_t i = y * m_width + x;
-
-        m_data[i] = color;
-    }
 }

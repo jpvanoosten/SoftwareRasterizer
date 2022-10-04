@@ -1,17 +1,17 @@
 #pragma once
 
 #if defined(_WIN32)
-    #define RS_ENGINE_IMPORT __declspec( dllimport )
-    #define RS_ENGINE_EXPORT __declspec( dllexport )
+    #define SR_IMPORT __declspec( dllimport )
+    #define SR_EXPORT __declspec( dllexport )
 #endif
 
-#if defined( Engine_EXPORTS )
-    #define ENGINE_API RS_ENGINE_EXPORT
-    #define ENGINE_EXTERN
-#elif defined( Engine_IMPORTS )
-    #define ENGINE_API RS_ENGINE_IMPORT
-    #define ENGINE_EXTERN extern
+#if defined( SoftwareRasterizer_EXPORTS )
+    #define SR_API SR_EXPORT
+    #define SR_EXTERN
+#elif defined( SoftwareRasterizer_IMPORTS )
+    #define SR_API SR_IMPORT
+    #define SR_EXTERN extern
 #else
-    #define ENGINE_API
-    #define ENGINE_EXTERN
+    #define SR_API
+    #define SR_EXTERN
 #endif

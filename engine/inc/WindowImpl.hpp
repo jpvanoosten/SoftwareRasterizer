@@ -7,7 +7,7 @@
 
 namespace sr
 {
-    class ENGINE_API WindowImpl
+    class SR_API WindowImpl
     {
     public:
         virtual void show() = 0;
