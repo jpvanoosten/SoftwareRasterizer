@@ -28,7 +28,11 @@ if(WIN32)
 
 endif(WIN32)
 
-set( ALL_FILES ${SRC_FILES} ${INC_FILES} )
+set( ALL_FILES 
+    ${SRC_FILES} 
+    ${INC_FILES} 
+    ../.clang-format
+)
 
 add_library( SoftwareRasterizer ${ALL_FILES} )
 

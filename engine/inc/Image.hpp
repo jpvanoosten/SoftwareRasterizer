@@ -12,7 +12,9 @@ namespace sr
     {
         Image(uint32_t width, uint32_t height);
         ~Image() = default;
-        
+
+        void resize( uint32_t width, uint32_t height );
+
         void clear(const Color& color);
 
         const Color& operator()(uint32_t x, uint32_t y) const
@@ -20,7 +22,7 @@ namespace sr
             assert(x < m_width);
             assert(y < m_height);
 
-            return m_data[y * m_width + x];
+            return m_data[static_cast<uint64_t>(y) * m_width + x];
         }
 
         Color& operator()(uint32_t x, uint32_t y)
@@ -28,7 +30,7 @@ namespace sr
             assert(x < m_width);
             assert(y < m_height);
 
-            return m_data[y * m_width + x];
+            return m_data[static_cast<uint64_t>(y) * m_width + x];
         }
 
         uint32_t getWidth() const noexcept

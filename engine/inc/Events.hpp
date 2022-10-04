@@ -21,6 +21,21 @@ namespace sr
         bool super;
     };
 
+    enum class WindowState
+    {
+        Resized = 0,
+        Restored = 1,
+        Minimized = 2,
+        Maximized = 3
+    };
+
+    struct ResizeEventArgs
+    {
+        int width;
+        int height;
+        WindowState state;
+    };
+
     struct Event
     {
         enum Type
@@ -29,6 +44,7 @@ namespace sr
             Close,
             KeyPressed,
             KeyReleased,
+            Resize,
         };
 
         Type type = Event::None;
@@ -36,7 +52,7 @@ namespace sr
         union
         {
             KeyEventArgs key;
+            ResizeEventArgs resize;
         };
-
     };
 }

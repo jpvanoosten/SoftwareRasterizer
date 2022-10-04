@@ -34,8 +34,9 @@ namespace sr
         void pushEvent(const Event& e);
 
         void onClose();
-        void onKeyPressed(KeyEventArgs& kea);
-        void onKeyReleased(KeyEventArgs& kea);
+        void onKeyPressed(KeyEventArgs& e);
+        void onKeyReleased(KeyEventArgs& e);
+        void onResize(ResizeEventArgs& e);
 
     private:
         friend LRESULT CALLBACK ::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
