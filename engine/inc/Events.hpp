@@ -45,6 +45,7 @@ namespace sr
             KeyPressed,
             KeyReleased,
             Resize,
+            EndResize,
         };
 
         Type type = Event::None;

@@ -184,6 +184,21 @@ void WindowWin32::onResize( ResizeEventArgs& e )
     pushEvent( event );
 }
 
+void WindowWin32::onEndResize()
+{
+    RECT clientRect;
+    ::GetClientRect( m_hWnd, &clientRect );
+
+    const Event event {
+        .type = Event::EndResize,
+        .resize {
+            .width  = clientRect.right - clientRect.left,
+            .height = clientRect.bottom - clientRect.top }
+    };
+
+    pushEvent( event );
+}
+
 bool WindowWin32::popEvent( Event& event )
 {
     if ( m_eventQueue.empty() )
@@ -254,6 +269,69 @@ LRESULT CALLBACK WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
         case WM_CLOSE:
             window->onClose();
             break;
+        case WM_SYSKEYDOWN:
+        case WM_KEYDOWN:
+        {
+            MSG charMsg;
+
+            // Get the Unicode character (UTF-16)
+            unsigned int c = 0;
+            // For printable characters, the next message will be WM_CHAR.
+            // This message contains the character code we need to send the
+            // KeyPressed event. Inspired by the SDL 1.2 implementation.
+            if ( PeekMessage( &charMsg, hWnd, 0, 0, PM_NOREMOVE ) && charMsg.message == WM_CHAR )
+            {
+                c = static_cast<unsigned int>( charMsg.wParam );
+            }
+
+            KeyEventArgs e {
+                .code      = static_cast<KeyCode>( wParam ),
+                .character = c,
+                .state     = KeyState::Pressed,
+                .ctrl      = ( GetAsyncKeyState( VK_CONTROL ) & 0x8000 ) != 0,
+                .shift     = ( GetAsyncKeyState( VK_SHIFT ) & 0x8000 ) != 0,
+                .alt       = ( GetAsyncKeyState( VK_MENU ) & 0x8000 ) != 0,
+                .super     = ( GetAsyncKeyState( VK_APPS ) & 0x8000 ) != 0,
+            };
+            window->onKeyPressed( e );
+        }
+        break;
+        case WM_SYSKEYUP:
+        case WM_KEYUP:
+        {
+            unsigned int c        = 0;
+            unsigned int scanCode = ( lParam & 0x00FF0000 ) >> 16;
+
+            // Determine which key was released by converting the key code and
+            // the scan code to a printable character (if possible). Inspired by
+            // the SDL 1.2 implementation.
+            unsigned char keyboardState[256];
+            std::ignore = GetKeyboardState( keyboardState );
+
+            wchar_t translatedCharacters[4];
+            if ( int result = ToUnicodeEx( static_cast<UINT>( wParam ), scanCode, keyboardState, translatedCharacters,
+                                           4, 0, nullptr ) > 0 )
+            {
+                c = translatedCharacters[0];
+            }
+
+            KeyEventArgs e {
+                .code      = static_cast<KeyCode>( wParam ),
+                .character = c,
+                .state     = KeyState::Released,
+                .ctrl      = ( GetAsyncKeyState( VK_CONTROL ) & 0x8000 ) != 0,
+                .shift     = ( GetAsyncKeyState( VK_SHIFT ) & 0x8000 ) != 0,
+                .alt       = ( GetAsyncKeyState( VK_MENU ) & 0x8000 ) != 0,
+                .super     = ( GetAsyncKeyState( VK_APPS ) & 0x8000 ) != 0,
+            };
+            window->onKeyReleased( e );
+        }
+        break;
+        // The default window procedure will play a system notification sound
+        // when pressing the Alt+Enter keyboard combination if this message is
+        // not handled.
+        case WM_SYSCHAR:
+            break;
         case WM_SIZE:
         {
             ResizeEventArgs e {
@@ -265,6 +343,9 @@ LRESULT CALLBACK WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
             window->onResize( e );
         }
         break;
+        case WM_EXITSIZEMOVE:
+            window->onEndResize();
+            break;
         default:
             return ::DefWindowProcW( hWnd, msg, wParam, lParam );
         }

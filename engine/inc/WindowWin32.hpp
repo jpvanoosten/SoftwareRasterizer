@@ -37,6 +37,7 @@ namespace sr
         void onKeyPressed(KeyEventArgs& e);
         void onKeyReleased(KeyEventArgs& e);
         void onResize(ResizeEventArgs& e);
+        void onEndResize();
 
     private:
         friend LRESULT CALLBACK ::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);

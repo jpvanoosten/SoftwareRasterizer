@@ -1,61 +1,71 @@
 #pragma once
 
-#include "Config.hpp"
 #include "Color.hpp"
+#include "Config.hpp"
 
-#include <memory>
 #include <cassert>
+#include <filesystem>
+#include <memory>
 
 namespace sr
 {
-    struct SR_API Image
+struct SR_API Image
+{
+    static Image fromFile( const std::filesystem::path& fileName );
+    static Image fromMemory( const Color* data, uint32_t width, uint32_t height );
+
+    Image();
+    Image( uint32_t width, uint32_t height );
+    Image( const Image& copy );
+    Image( Image&& move ) noexcept;
+    ~Image() = default;
+
+    Image& operator=( const Image& image );
+    Image& operator=( Image&& image ) noexcept;
+
+    void resize( uint32_t width, uint32_t height );
+
+    void clear( const Color& color );
+
+    const Color& operator()( uint32_t x, uint32_t y ) const
     {
-        Image(uint32_t width, uint32_t height);
-        ~Image() = default;
+        assert( x < m_width );
+        assert( y < m_height );
 
-        void resize( uint32_t width, uint32_t height );
+        return m_data[static_cast<uint64_t>( y ) * m_width + x];
+    }
 
-        void clear(const Color& color);
+    Color& operator()( uint32_t x, uint32_t y )
+    {
+        assert( x < m_width );
+        assert( y < m_height );
 
-        const Color& operator()(uint32_t x, uint32_t y) const
-        {
-            assert(x < m_width);
-            assert(y < m_height);
+        return m_data[static_cast<uint64_t>( y ) * m_width + x];
+    }
 
-            return m_data[static_cast<uint64_t>(y) * m_width + x];
-        }
+    uint32_t getWidth() const noexcept
+    {
+        return m_width;
+    }
 
-        Color& operator()(uint32_t x, uint32_t y)
-        {
-            assert(x < m_width);
-            assert(y < m_height);
+    uint32_t getHeight() const noexcept
+    {
+        return m_height;
+    }
 
-            return m_data[static_cast<uint64_t>(y) * m_width + x];
-        }
+    Color* data() noexcept
+    {
+        return m_data.get();
+    }
 
-        uint32_t getWidth() const noexcept
-        {
-            return m_width;
-        }
+    const Color* data() const noexcept
+    {
+        return m_data.get();
+    }
 
-        uint32_t getHeight() const noexcept
-        {
-            return m_height;
-        }
-
-        Color* data() noexcept
-        {
-            return m_data.get();
-        }
-
-        const Color* data() const noexcept
-        {
-            return m_data.get();
-        }
-
-    private:
-        uint32_t m_width;
-        uint32_t m_height;
-        std::unique_ptr<Color[]> m_data;
-    };
-}
+private:
+    uint32_t                 m_width  = 0u;
+    uint32_t                 m_height = 0u;
+    std::unique_ptr<Color[]> m_data;
+};
+}  // namespace sr

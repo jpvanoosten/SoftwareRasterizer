@@ -8,13 +8,25 @@ using namespace sr;
 
 int main( int argc, char* argv[] )
 {
+    // Parse command-line arguments.
+    if ( argc > 1 )
+    {
+        for ( int i = 0; i < argc; ++i )
+        {
+            if ( strcmp( argv[i], "-cwd" ) == 0 )
+            {
+                std::string workingDirectory = argv[++i];
+                std::filesystem::current_path( workingDirectory );
+            }
+        }
+    }
+
     const int WINDOW_WIDTH  = 800;
     const int WINDOW_HEIGHT = 600;
 
     Window window { L"01-ClearScreen", WINDOW_WIDTH, WINDOW_HEIGHT };
 
-    Image image { WINDOW_WIDTH, WINDOW_HEIGHT };
-    image.clear( Color::Black );
+    Image image = Image::fromFile( "assets/textures/Mona_Lisa.jpg" );
 
     window.show();
 
@@ -41,11 +53,6 @@ int main( int argc, char* argv[] )
                     window.destroy();
                     break;
                 }
-                break;
-            case Event::EndResize:
-                std::cout << std::format( "Resize: {},{}\n", e.resize.width, e.resize.height );
-                image.resize( e.resize.width, e.resize.height );
-                image.clear( Color::Black );
                 break;
             }
         }

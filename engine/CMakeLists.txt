@@ -6,6 +6,7 @@ set( INC_FILES
     inc/Events.hpp
     inc/Image.hpp
     inc/KeyCodes.hpp
+    inc/stb_image.h
     inc/Timer.hpp
     inc/Window.hpp
 )
@@ -13,6 +14,7 @@ set( INC_FILES
 set( SRC_FILES
     src/Color.cpp
     src/Image.cpp
+    src/stb_image.cpp
     src/Timer.cpp
     src/Window.cpp
 )
