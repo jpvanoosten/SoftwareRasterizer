@@ -24,9 +24,9 @@ int main( int argc, char* argv[] )
     const int WINDOW_WIDTH  = 800;
     const int WINDOW_HEIGHT = 600;
 
-    Window window { L"01-ClearScreen", WINDOW_WIDTH, WINDOW_HEIGHT };
+    Window window { L"02 - Triangle", WINDOW_WIDTH, WINDOW_HEIGHT };
 
-    Image image = Image::fromFile( "assets/textures/Mona_Lisa.jpg" );
+    Image image { WINDOW_WIDTH, WINDOW_HEIGHT };
 
     window.show();
 
@@ -36,6 +36,14 @@ int main( int argc, char* argv[] )
 
     while ( window )
     {
+        image.clear( Color::Black );
+
+        image.line( 0, 0, WINDOW_WIDTH - 1, WINDOW_HEIGHT - 1, Color::White );
+        image.line( 0, WINDOW_HEIGHT - 1, WINDOW_WIDTH - 1, 0, Color::White );
+        image.line( WINDOW_WIDTH / 2, 0, WINDOW_WIDTH / 2, WINDOW_HEIGHT - 1, Color::White );
+        image.line( 0, WINDOW_HEIGHT / 2, WINDOW_WIDTH - 1, WINDOW_HEIGHT / 2, Color::White );
+
+
         window.present( image );
 
         Event e;

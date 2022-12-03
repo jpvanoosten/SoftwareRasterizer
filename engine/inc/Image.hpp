@@ -7,6 +7,8 @@
 #include <filesystem>
 #include <memory>
 
+#include <glm/vec2.hpp>
+
 namespace sr
 {
 struct SR_API Image
@@ -26,6 +28,23 @@ struct SR_API Image
     void resize( uint32_t width, uint32_t height );
 
     void clear( const Color& color );
+
+    void line( int x0, int y0, int x1, int y1, const Color& color );
+
+    void line( const glm::ivec2& p0, const glm::ivec2& p1, const Color& color )
+    {
+        line( p0.x, p0.y, p1.x, p1.y, color );
+    }
+
+
+
+    void plot( uint32_t x, uint32_t y, const Color& color )
+    {
+        assert( x < m_width );
+        assert( y < m_height );
+
+        m_data[static_cast<uint64_t>( y ) * m_width + x] = color;
+    }
 
     const Color& operator()( uint32_t x, uint32_t y ) const
     {

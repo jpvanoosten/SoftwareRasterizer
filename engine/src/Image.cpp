@@ -6,14 +6,14 @@ using namespace sr;
 
 Image Image::fromFile( const std::filesystem::path& fileName )
 {
-    int x, y, n;
+    int            x, y, n;
     unsigned char* data = stbi_load( fileName.string().c_str(), &x, &y, &n, STBI_rgb_alpha );
     if ( !data )
         return {};
 
     // Convert ARGB
     unsigned char* p = data;
-    for (size_t i = 0; i < x * y; ++i)
+    for ( size_t i = 0; i < x * y; ++i )
     {
         unsigned char c = p[0];
         p[0]            = p[2];
@@ -96,4 +96,39 @@ void Image::clear( const Color& color )
     Color* p = m_data.get();
     for ( uint32_t i = 0; i < m_width * m_height; ++i )
         p[i] = color;
+}
+
+
+void Image::line( int x0, int y0, int x1, int y1, const Color& color )
+{
+
+    const int dx = std::abs( x1 - x0 );
+    const int dy = -std::abs( y1 - y0 );
+    const int sx = x0 < x1 ? 1 : -1;
+    const int sy = y0 < y1 ? 1 : -1;
+
+    int err = dx + dy;
+
+    while ( true )
+    {
+        plot( x0, y0, color );
+        const int e2 = err * 2;
+
+        if (e2 >= dy)
+        {
+            if ( x0 == x1 )
+                break;
+
+            err += dy;
+            x0 += sx;
+        }
+        if (e2 <= dx)
+        {
+            if ( y0 == y1 )
+                break;
+
+            err += dx;
+            y0 += sy;
+        }
+    }
 }

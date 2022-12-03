@@ -53,3 +53,7 @@ endif(BUILD_SHARED_LIBS)
 target_include_directories( SoftwareRasterizer
     PUBLIC inc
 )
+
+target_link_libraries( SoftwareRasterizer
+    PUBLIC glm
+)
