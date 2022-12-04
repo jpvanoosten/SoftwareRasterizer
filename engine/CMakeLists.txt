@@ -6,8 +6,10 @@ set( INC_FILES
     inc/Events.hpp
     inc/Image.hpp
     inc/KeyCodes.hpp
+    inc/Sprite.hpp
     inc/stb_image.h
     inc/Timer.hpp
+    inc/Vertex.hpp
     inc/Window.hpp
 )
 

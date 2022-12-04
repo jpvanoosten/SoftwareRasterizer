@@ -3,10 +3,12 @@ cmake_minimum_required( VERSION 3.23.0 )
 set( INC_FILES
     inc/Math/AABB.hpp
     inc/Math/Math.hpp
+    inc/Math/Transform2D.hpp
 )
 
 set( SRC_FILES
     src/Math.cpp
+    src/Transform2D.cpp
 )
 
 set( ALL_FILES 

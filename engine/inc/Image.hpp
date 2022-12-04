@@ -4,6 +4,7 @@
 #include "Config.hpp"
 
 #include <Math/AABB.hpp>
+#include <Math/Transform2D.hpp>
 
 #include <cassert>
 #include <filesystem>
@@ -13,6 +14,7 @@
 
 namespace sr
 {
+class Sprite;
 
 /// <summary>
 /// Address modes used for texture sampling.
@@ -66,6 +68,13 @@ struct SR_API Image
     /// <param name="p2">The third triangle coordinate.</param>
     /// <param name="color">The triangle color.</param>
     void triangle( const glm::vec2& p0, const glm::vec2& p1, const glm::vec2& p2, const Color& color ) noexcept;
+    
+    /// <summary>
+    /// Draw a sprite on the screen using the given transform.
+    /// </summary>
+    /// <param name="sprite">The sprite to draw.</param>
+    /// <param name="transform">The transform to apply to the sprite.</param>
+    void sprite( const Sprite& sprite, const Math::Transform2D& transform ) noexcept;
 
     /// <summary>
     /// Plot a single pixel to the image. Out-of-bounds coordinates are discarded.

@@ -40,8 +40,6 @@ namespace sr
         /// </summary>
         explicit operator bool() const;
 
-    protected:
-
     private:
         std::unique_ptr<WindowImpl> pImpl;
     };

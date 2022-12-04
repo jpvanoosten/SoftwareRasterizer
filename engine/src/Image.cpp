@@ -1,4 +1,7 @@
 #include "Image.hpp"
+
+#include "Sprite.hpp"
+#include "Vertex.hpp"
 #include "stb_image.h"
 
 #include <Math/AABB.hpp>
@@ -151,18 +154,82 @@ void Image::triangle( const glm::vec2& p0, const glm::vec2& p1, const glm::vec2&
     // Clamp the triangle AABB to the screen bounds.
     aabb.clamp( m_AABB );
 
-    glm::vec3 p = aabb.min;
-    while ( p.y <= aabb.max.y )
+    glm::vec3 p;
+    for ( p.y = aabb.min.y; p.y <= aabb.max.y; p.y += 1.0f )
     {
-        p.x = aabb.min.x;
-        while ( p.x <= aabb.max.x )
+        for ( p.x = aabb.min.x; p.x <= aabb.max.x; p.x += 1.0f )
         {
             if ( pointInsideTriangle( p, p0, p1, p2 ) )
                 plot( static_cast<uint32_t>( p.x ), static_cast<uint32_t>( p.y ), color );
-
-            p.x += 1.0f;
         }
-        p.y += 1.0f;
+    }
+}
+
+void Image::sprite( const Sprite& sprite, const Math::Transform2D& transform ) noexcept
+{
+    const Image* image = sprite.getImage();
+    if ( !image )
+        return;
+
+    const Color&      color = sprite.getColor();
+    const glm::ivec2& uv    = sprite.getUV();
+    const glm::ivec2& size  = sprite.getSize();
+
+    const glm::mat3& matrix = transform.getTransform();
+
+    Vertex verts[] = {
+        Vertex { { 0, 0 }, { uv.x, uv.y }, color },                             // Top-left
+        Vertex { { size.x, 0 }, { uv.x + size.x, 0 }, color },                  // Top-right
+        Vertex { { 0, size.y }, { 0, uv.y + size.y }, color },                  // Bottom-left
+        Vertex { { size.x, size.y }, { uv.x + size.x, uv.y + size.y }, color }  // Bottom-right
+    };
+
+    // Transform verts.
+    for ( Vertex& v: verts )
+    {
+        v.position = matrix * glm::vec3 { v.position, 1.0f };
+    }
+
+    // Compute an AABB over the sprite quad.
+    AABB aabb {
+        { verts[0].position, 0.0f },
+        { verts[1].position, 0.0f },
+        { verts[2].position, 0.0f },
+        { verts[3].position, 0.0f }
+    };
+    // Clamp to the size of the screen.
+    aabb.clamp( m_AABB );
+
+
+    // Index buffer for the two triangles of the quad.
+    uint32_t indicies[] = {
+        0, 1, 2,
+        1, 3, 2
+    };
+
+    glm::vec3 p;
+    for ( p.y = aabb.min.y; p.y <= aabb.max.y; p.y += 1.0f )
+    {
+        for ( p.x = aabb.min.x; p.x <= aabb.max.x; p.x += 1.0f )
+        {
+            for ( uint32_t i = 0; i < std::size(indicies); i += 3 )
+            {
+                uint32_t i0 = indicies[i + 0];
+                uint32_t i1 = indicies[i + 1];
+                uint32_t i2 = indicies[i + 2];
+
+                glm::vec3 bc = barycentric( verts[i0].position, verts[i1].position, verts[i2].position, p );
+                if ( barycentricInside( bc ) )
+                {
+                    // Compute interpolated UV
+                    const glm::ivec2 texCoord = verts[i0].texCoord * bc.x + verts[i1].texCoord * bc.y + verts[i2].texCoord * bc.z;
+                    // Sample the sprite's texture.
+                    const Color c = image->sample( texCoord.x, texCoord.y ) * color;
+                    // Plot.
+                    plot( static_cast<uint32_t>( p.x ), static_cast<uint32_t>( p.y ), c );
+                }
+            }
+        }
     }
 }
 
@@ -196,8 +263,8 @@ const Color& Image::sample( int u, int v, AddressMode addressMode ) const noexce
     break;
     }
 
-    assert( u > 0 && u < w );
-    assert( v > 0 && v < h );
+    assert( u >= 0 && u < w );
+    assert( v >= 0 && v < h );
 
     return m_data[static_cast<uint64_t>( v ) * m_width + u];
 }

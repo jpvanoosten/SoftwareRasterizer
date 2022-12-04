@@ -106,6 +106,16 @@ inline glm::vec3 barycentric( const glm::vec2& a, const glm::vec2& b, const glm:
 }
 
 /// <summary>
+/// Check to see if the barycentric coordinates are inside or outside of the triangle.
+/// </summary>
+/// <param name="barycentric">The barycentric coordinates to check.</param>
+/// <returns>true if the barycentric coordinates are inside the triangle, false otherwise.</returns>
+inline bool barycentricInside( const glm::vec3& barycentric )
+{
+    return barycentric.y >= 0.0f && barycentric.z >= 0.0f && ( barycentric.y + barycentric.z ) <= 1.0f;
+}
+
+/// <summary>
 /// Test to see if a point p is contained in a triangle (a, b, c).
 /// </summary>
 /// <param name="p">The point to test for containment.</param>
@@ -115,15 +125,15 @@ inline glm::vec3 barycentric( const glm::vec2& a, const glm::vec2& b, const glm:
 /// <returns>true if the point is contained in the triangle, false otherwise.</returns>
 inline bool pointInsideTriangle( const glm::vec3& p, const glm::vec3& a, const glm::vec3& b, const glm::vec3& c ) noexcept
 {
-    glm::vec3 bc = barycentric( a, b, c, p );
-    return bc.y >= 0.0f && bc.z >= 0.0f && ( bc.y + bc.z ) <= 1.0f;
+    const glm::vec3 bc = barycentric( a, b, c, p );
+    return barycentricInside(bc);
 }
 
 
 inline bool pointInsideTriangle( const glm::vec2& p, const glm::vec2& a, const glm::vec2& b, const glm::vec2& c ) noexcept
 {
-    glm::vec3 bc = barycentric( a, b, c, p );
-    return bc.y >= 0.0f && bc.z >= 0.0f && ( bc.y + bc.z ) <= 1.0f;
+    const glm::vec3 bc = barycentric( a, b, c, p );
+    return barycentricInside( bc );
 }
 
 }  // namespace Math

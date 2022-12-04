@@ -41,6 +41,20 @@ namespace Math
         }
 
         /// <summary>
+        /// Construct an axis-aligned bounding box from 4 points.
+        /// </summary>
+        /// <param name="a">The first point.</param>
+        /// <param name="b">The second point.</param>
+        /// <param name="c">The third point.</param>
+        /// <param name="d">The fourth point.</param>
+        /// <returns></returns>
+        AABB(const glm::vec3& a, const glm::vec3& b, const glm::vec3& c, const glm::vec3& d ) noexcept
+        {
+            min = glm::min( glm::min( a, b ), glm::min( c, d ) );
+            max = glm::max( glm::max( a, b ), glm::max( c, d ) );
+        }
+
+        /// <summary>
         /// Compute the center point of the AABB.
         /// </summary>
         /// <returns>The center point of the AABB.</returns>
