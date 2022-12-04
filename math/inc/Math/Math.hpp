@@ -97,32 +97,12 @@ inline glm::vec3 barycentric( const glm::vec3& a, const glm::vec3& b, const glm:
 /// <returns></returns>
 inline glm::vec3 barycentric( const glm::vec2& a, const glm::vec2& b, const glm::vec2& c, const glm::vec2& p )
 {
-    // Compute the total triangle area.
-    float A = triangleArea2D( a, b, c );
+    glm::vec3 u = cross( glm::vec3{ c.x - a.x, b.x - a.x, a.x - p.x }, glm::vec3{ c.y - a.y, b.y - a.y, a.y - p.y } );
 
-    if (A > 0.0f)
-    {
-        A = 1.0f / A;
+    if ( glm::abs( u.z ) < 1.0f )
+        return { -1, -1, -1 };
 
-        float u = triangleArea2D( b, c, p ) * A;
-        float v = triangleArea2D( a, c, p ) * A;
-        float w = 1.0f - u - v;
-
-        return { u, v, w };
-    }
-    if (A < 0.0f)
-    {
-        A = 1.0f / A;
-
-        float u = triangleArea2D( b, c, p ) * A;
-        float v = triangleArea2D( c, a, p ) * A;
-        float w = 1.0f - u - v;
-
-        return { u, v, w };
-    }
-
-    // Just return a vector where all components are negative.
-    return { -1, -1, -1 };
+    return { 1.0f - ( u.x + u.y ) / u.z, u.y / u.z, u.x / u.z };
 }
 
 /// <summary>

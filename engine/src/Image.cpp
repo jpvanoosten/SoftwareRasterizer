@@ -152,10 +152,10 @@ void Image::triangle( const glm::vec2& p0, const glm::vec2& p1, const glm::vec2&
     aabb.clamp( m_AABB );
 
     glm::vec3 p = aabb.min;
-    while ( p.y < aabb.max.y )
+    while ( p.y <= aabb.max.y )
     {
         p.x = aabb.min.x;
-        while ( p.x < aabb.max.x )
+        while ( p.x <= aabb.max.x )
         {
             if ( pointInsideTriangle( p, p0, p1, p2 ) )
                 plot( static_cast<uint32_t>( p.x ), static_cast<uint32_t>( p.y ), color );
