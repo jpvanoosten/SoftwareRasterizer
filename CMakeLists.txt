@@ -24,6 +24,7 @@ endif(MSVC)
 project( SoftwareRasterizer VERSION ${SR_VERSION} LANGUAGES CXX )
 
 add_subdirectory(externals)
+add_subdirectory(math)
 add_subdirectory(engine)
 
 if(SR_BUILD_SAMPLES)

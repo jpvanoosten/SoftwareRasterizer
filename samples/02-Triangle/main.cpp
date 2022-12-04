@@ -26,6 +26,8 @@ int main( int argc, char* argv[] )
 
     Window window { L"02 - Triangle", WINDOW_WIDTH, WINDOW_HEIGHT };
 
+    Image monaLisa = Image::fromFile( "assets/textures/Mona_Lisa.jpg" );
+
     Image image { WINDOW_WIDTH, WINDOW_HEIGHT };
 
     window.show();
@@ -38,12 +40,13 @@ int main( int argc, char* argv[] )
     {
         image.clear( Color::Black );
 
-        image.line( 0, 0, WINDOW_WIDTH - 1, WINDOW_HEIGHT - 1, Color::White );
-        image.line( 0, WINDOW_HEIGHT - 1, WINDOW_WIDTH - 1, 0, Color::White );
-        image.line( WINDOW_WIDTH / 2, 0, WINDOW_WIDTH / 2, WINDOW_HEIGHT - 1, Color::White );
-        image.line( 0, WINDOW_HEIGHT / 2, WINDOW_WIDTH - 1, WINDOW_HEIGHT / 2, Color::White );
-
-
+        //image.line( 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, Color::White );
+        //image.line( 0, WINDOW_HEIGHT, WINDOW_WIDTH, 0, Color::White );
+        //image.line( WINDOW_WIDTH / 2, 0, WINDOW_WIDTH / 2, WINDOW_HEIGHT, Color::White );
+        //image.line( 0, WINDOW_HEIGHT / 2, WINDOW_WIDTH, WINDOW_HEIGHT / 2, Color::White );
+        image.triangle( { WINDOW_WIDTH * 0.5f, WINDOW_HEIGHT * 0.25 }, { WINDOW_WIDTH * 0.75f, WINDOW_HEIGHT * 0.75f }, { WINDOW_WIDTH * 0.25f, WINDOW_HEIGHT * 0.75f }, Color::Yellow );
+        //image.triangle( { 0, 0 }, { WINDOW_WIDTH * 2.0f, 0.0f }, { 0.0f, WINDOW_HEIGHT * 2.0f }, Color::Yellow );
+        
         window.present( image );
 
         Event e;

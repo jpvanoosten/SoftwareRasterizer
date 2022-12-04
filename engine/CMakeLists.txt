@@ -55,5 +55,5 @@ target_include_directories( SoftwareRasterizer
 )
 
 target_link_libraries( SoftwareRasterizer
-    PUBLIC glm
+    PUBLIC Math
 )
