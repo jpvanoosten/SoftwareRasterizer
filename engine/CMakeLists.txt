@@ -59,3 +59,14 @@ target_include_directories( SoftwareRasterizer
 target_link_libraries( SoftwareRasterizer
     PUBLIC Math
 )
+
+find_package(OpenMP)
+if(OpenMP_FOUND)
+    target_include_directories( SoftwareRasterizer
+        PRIVATE ${OpenMP_CXX_INCLUDE_DIRS}
+    )
+
+    target_link_libraries( SoftwareRasterizer
+        PUBLIC OpenMP::OpenMP_CXX
+    )
+endif(OpenMP_FOUND)

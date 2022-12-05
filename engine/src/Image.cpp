@@ -8,6 +8,7 @@
 #include <Math/Math.hpp>
 
 #include <algorithm>
+#include <omp.h>
 
 using namespace sr;
 using namespace Math;
@@ -200,23 +201,22 @@ void Image::sprite( const Sprite& sprite, const Math::Transform2D& transform ) n
     // Clamp to the size of the screen.
     aabb.clamp( m_AABB );
 
-
     // Index buffer for the two triangles of the quad.
     uint32_t indicies[] = {
         0, 1, 2,
         1, 3, 2
     };
 
-    glm::vec3 p;
-    for ( p.y = aabb.min.y; p.y <= aabb.max.y; p.y += 1.0f )
+    glm::ivec3 p;
+    for ( p.y = static_cast<int>( aabb.min.y ); p.y <= static_cast<int>( aabb.max.y ); ++p.y )
     {
-        for ( p.x = aabb.min.x; p.x <= aabb.max.x; p.x += 1.0f )
+        for ( p.x = static_cast<int>( aabb.min.x ); p.x <= static_cast<int>( aabb.max.x ); ++p.x )
         {
-            for ( uint32_t i = 0; i < std::size(indicies); i += 3 )
+            for ( uint32_t i = 0; i < std::size( indicies ); i += 3 )
             {
-                uint32_t i0 = indicies[i + 0];
-                uint32_t i1 = indicies[i + 1];
-                uint32_t i2 = indicies[i + 2];
+                const uint32_t i0 = indicies[i + 0];
+                const uint32_t i1 = indicies[i + 1];
+                const uint32_t i2 = indicies[i + 2];
 
                 glm::vec3 bc = barycentric( verts[i0].position, verts[i1].position, verts[i2].position, p );
                 if ( barycentricInside( bc ) )
