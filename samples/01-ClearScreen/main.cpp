@@ -14,7 +14,6 @@ int main( int argc, char* argv[] )
     Window window { L"01-ClearScreen", WINDOW_WIDTH, WINDOW_HEIGHT };
 
     Image image { WINDOW_WIDTH, WINDOW_HEIGHT };
-    image.clear( Color::Black );
 
     window.show();
 
@@ -24,6 +23,7 @@ int main( int argc, char* argv[] )
 
     while ( window )
     {
+        image.clear( Color::Black );
         window.present( image );
 
         Event e;

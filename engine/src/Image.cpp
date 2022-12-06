@@ -111,8 +111,13 @@ void Image::resize( uint32_t width, uint32_t height )
 void Image::clear( const Color& color ) noexcept
 {
     Color* p = m_data.get();
-    for ( uint32_t i = 0; i < m_width * m_height; ++i )
-        p[i] = color;
+
+    #pragma omp parallel
+    {
+        #pragma omp parallel for
+        for ( int i = 0; i < static_cast<int>(m_width * m_height); ++i )
+            p[i] = color;
+    }
 }
 
 void Image::line( int x0, int y0, int x1, int y1, const Color& color ) noexcept
@@ -155,13 +160,12 @@ void Image::triangle( const glm::vec2& p0, const glm::vec2& p1, const glm::vec2&
     // Clamp the triangle AABB to the screen bounds.
     aabb.clamp( m_AABB );
 
-    glm::vec3 p;
-    for ( p.y = aabb.min.y; p.y <= aabb.max.y; p.y += 1.0f )
+    for ( int y = static_cast<int>( aabb.min.y ); y <= static_cast<int>( aabb.max.y ); ++y )
     {
-        for ( p.x = aabb.min.x; p.x <= aabb.max.x; p.x += 1.0f )
+        for ( int x = static_cast<int>( aabb.min.x ); x <= static_cast<int>( aabb.max.x ); ++x )
         {
-            if ( pointInsideTriangle( p, p0, p1, p2 ) )
-                plot( static_cast<uint32_t>( p.x ), static_cast<uint32_t>( p.y ), color );
+            if ( pointInsideTriangle( { x, y }, p0, p1, p2 ) )
+                plot( static_cast<uint32_t>( x ), static_cast<uint32_t>( y ), color );
         }
     }
 }
