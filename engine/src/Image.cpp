@@ -112,12 +112,9 @@ void Image::clear( const Color& color ) noexcept
 {
     Color* p = m_data.get();
 
-    #pragma omp parallel
-    {
-        #pragma omp parallel for
-        for ( int i = 0; i < static_cast<int>(m_width * m_height); ++i )
-            p[i] = color;
-    }
+#pragma omp parallel for
+    for ( int i = 0; i < static_cast<int>( m_width * m_height ); ++i )
+        p[i] = color;
 }
 
 void Image::line( int x0, int y0, int x1, int y1, const Color& color ) noexcept
@@ -160,6 +157,7 @@ void Image::triangle( const glm::vec2& p0, const glm::vec2& p1, const glm::vec2&
     // Clamp the triangle AABB to the screen bounds.
     aabb.clamp( m_AABB );
 
+#pragma omp parallel for firstprivate( aabb )
     for ( int y = static_cast<int>( aabb.min.y ); y <= static_cast<int>( aabb.max.y ); ++y )
     {
         for ( int x = static_cast<int>( aabb.min.x ); x <= static_cast<int>( aabb.max.x ); ++x )
@@ -176,7 +174,7 @@ void Image::sprite( const Sprite& sprite, const Math::Transform2D& transform ) n
     if ( !image )
         return;
 
-    const Color&      color = sprite.getColor();
+    const Color       color = sprite.getColor();
     const glm::ivec2& uv    = sprite.getUV();
     const glm::ivec2& size  = sprite.getSize();
 
@@ -206,15 +204,15 @@ void Image::sprite( const Sprite& sprite, const Math::Transform2D& transform ) n
     aabb.clamp( m_AABB );
 
     // Index buffer for the two triangles of the quad.
-    uint32_t indicies[] = {
+    const uint32_t indicies[] = {
         0, 1, 2,
         1, 3, 2
     };
 
-    glm::ivec3 p;
-    for ( p.y = static_cast<int>( aabb.min.y ); p.y <= static_cast<int>( aabb.max.y ); ++p.y )
+    #pragma omp parallel for schedule( dynamic ) firstprivate( aabb, indicies, verts, color )
+    for ( int y = static_cast<int>( aabb.min.y ); y <= static_cast<int>( aabb.max.y ); ++y )
     {
-        for ( p.x = static_cast<int>( aabb.min.x ); p.x <= static_cast<int>( aabb.max.x ); ++p.x )
+        for ( int x = static_cast<int>( aabb.min.x ); x <= static_cast<int>( aabb.max.x ); ++x )
         {
             for ( uint32_t i = 0; i < std::size( indicies ); i += 3 )
             {
@@ -222,7 +220,7 @@ void Image::sprite( const Sprite& sprite, const Math::Transform2D& transform ) n
                 const uint32_t i1 = indicies[i + 1];
                 const uint32_t i2 = indicies[i + 2];
 
-                glm::vec3 bc = barycentric( verts[i0].position, verts[i1].position, verts[i2].position, p );
+                glm::vec3 bc = barycentric( verts[i0].position, verts[i1].position, verts[i2].position, { x, y } );
                 if ( barycentricInside( bc ) )
                 {
                     // Compute interpolated UV
@@ -230,7 +228,7 @@ void Image::sprite( const Sprite& sprite, const Math::Transform2D& transform ) n
                     // Sample the sprite's texture.
                     const Color c = image->sample( texCoord.x, texCoord.y ) * color;
                     // Plot.
-                    plot( static_cast<uint32_t>( p.x ), static_cast<uint32_t>( p.y ), c );
+                    plot( static_cast<uint32_t>( x ), static_cast<uint32_t>( y ), c );
                 }
             }
         }
