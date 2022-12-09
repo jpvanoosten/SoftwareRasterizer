@@ -117,7 +117,7 @@ void Image::clear( const Color& color ) noexcept
         p[i] = color;
 }
 
-void Image::line( int x0, int y0, int x1, int y1, const Color& color ) noexcept
+void Image::drawLine( int x0, int y0, int x1, int y1, const Color& color, const BlendMode& blendMode ) noexcept
 {
     const int dx = std::abs( x1 - x0 );
     const int dy = -std::abs( y1 - y0 );
@@ -128,7 +128,7 @@ void Image::line( int x0, int y0, int x1, int y1, const Color& color ) noexcept
 
     while ( true )
     {
-        plot( x0, y0, color );
+        plot( x0, y0, color, blendMode );
         const int e2 = err * 2;
 
         if ( e2 >= dy )
@@ -150,7 +150,7 @@ void Image::line( int x0, int y0, int x1, int y1, const Color& color ) noexcept
     }
 }
 
-void Image::triangle( const glm::vec2& p0, const glm::vec2& p1, const glm::vec2& p2, const Color& color ) noexcept
+void Image::drawTriangle( const glm::vec2& p0, const glm::vec2& p1, const glm::vec2& p2, const Color& color, const BlendMode& blendMode ) noexcept
 {
     // Create an AABB for the triangle.
     AABB aabb = AABB::fromTriangle( { p0, 0 }, { p1, 0 }, { p2, 0 } );
@@ -163,20 +163,33 @@ void Image::triangle( const glm::vec2& p0, const glm::vec2& p1, const glm::vec2&
         for ( int x = static_cast<int>( aabb.min.x ); x <= static_cast<int>( aabb.max.x ); ++x )
         {
             if ( pointInsideTriangle( { x, y }, p0, p1, p2 ) )
-                plot( static_cast<uint32_t>( x ), static_cast<uint32_t>( y ), color );
+                plot( static_cast<uint32_t>( x ), static_cast<uint32_t>( y ), color, blendMode );
         }
     }
 }
 
-void Image::sprite( const Sprite& sprite, const Math::Transform2D& transform ) noexcept
+void Image::drawAABB( const Math::AABB& aabb, const Color& color, const BlendMode& blendMode ) noexcept
+{
+    #pragma omp parallel for
+    for ( int y = static_cast<int>( aabb.min.y ); y <= static_cast<int>( aabb.max.y ); ++y )
+    {
+        for ( int x = static_cast<int>( aabb.min.x ); x <= static_cast<int>( aabb.max.x ); ++x )
+        {
+            plot( static_cast<uint32_t>( x ), static_cast<uint32_t>( y ), color, blendMode );
+        }
+    }
+}
+
+void Image::drawSprite( const Sprite& sprite, const Math::Transform2D& transform ) noexcept
 {
     const Image* image = sprite.getImage();
     if ( !image )
         return;
 
-    const Color       color = sprite.getColor();
-    const glm::ivec2& uv    = sprite.getUV();
-    const glm::ivec2& size  = sprite.getSize();
+    const Color       color     = sprite.getColor();
+    const BlendMode   blendMode = sprite.getBlendMode();
+    const glm::ivec2& uv        = sprite.getUV();
+    const glm::ivec2& size      = sprite.getSize();
 
     const glm::mat3& matrix = transform.getTransform();
 
@@ -209,7 +222,7 @@ void Image::sprite( const Sprite& sprite, const Math::Transform2D& transform ) n
         1, 3, 2
     };
 
-    #pragma omp parallel for schedule( dynamic ) firstprivate( aabb, indicies, verts, color )
+#pragma omp parallel for schedule( dynamic ) firstprivate( aabb, indicies, verts, color, blendMode )
     for ( int y = static_cast<int>( aabb.min.y ); y <= static_cast<int>( aabb.max.y ); ++y )
     {
         for ( int x = static_cast<int>( aabb.min.x ); x <= static_cast<int>( aabb.max.x ); ++x )
@@ -228,7 +241,7 @@ void Image::sprite( const Sprite& sprite, const Math::Transform2D& transform ) n
                     // Sample the sprite's texture.
                     const Color c = image->sample( texCoord.x, texCoord.y ) * color;
                     // Plot.
-                    plot( static_cast<uint32_t>( x ), static_cast<uint32_t>( y ), c );
+                    plot( static_cast<uint32_t>( x ), static_cast<uint32_t>( y ), c, blendMode );
                 }
             }
         }

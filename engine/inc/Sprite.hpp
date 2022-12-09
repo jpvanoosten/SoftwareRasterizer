@@ -1,7 +1,10 @@
 #pragma once
 
+#include "BlendMode.hpp"
 #include "Config.hpp"
 #include "Image.hpp"
+
+#include <Math/Rect.hpp>
 
 #include <glm/vec2.hpp>
 
@@ -16,32 +19,33 @@ public:
     /// Construct a Sprite from an Image.
     /// </summary>
     /// <param name="image">The image to create the sprite from.</param>
-    explicit Sprite( const Image& image ) noexcept
+    /// <param name="blendMode">The blend mode to apply when rendering.</param>
+    explicit Sprite( const Image& image, const BlendMode& blendMode = {} ) noexcept
     : image { &image }
-    , uv { 0, 0 }
-    , size { image.getWidth(), image.getHeight() }
+    , rect { 0, 0, static_cast<int32_t>( image.getWidth() ), static_cast<int32_t>( image.getHeight() ) }
+    , blendMode { blendMode }
     {}
 
     /// <summary>
     /// Construct a sprite from a region of the image.
     /// </summary>
     /// <param name="image">The image that contains the sprite sheet.</param>
-    /// <param name="uv">The UV coordinates of the sprite in the image.</param>
-    /// <param name="size">The size of the sprite in the image.</param>
-    Sprite( const Image& image, const glm::ivec2& uv, const glm::ivec2& size ) noexcept
+    /// <param name="rect">The source rectangle of this sprite in the image.</param>
+    /// <param name="blendMode">The blend mode to apply when rendering.</param>
+    Sprite( const Image& image, const Math::RectI& rect, const BlendMode& blendMode = {} ) noexcept
     : image { &image }
-    , uv { uv }
-    , size { size }
+    , rect{rect}
+    , blendMode { blendMode }
     {}
 
-    const glm::ivec2& getUV() const noexcept
+    glm::ivec2 getUV() const noexcept
     {
-        return uv;
+        return { rect.left, rect.top };
     }
 
-    const glm::ivec2& getSize() const noexcept
+    glm::ivec2 getSize() const noexcept
     {
-        return size;
+        return { rect.width, rect.height };
     }
 
     const Image* getImage() const noexcept
@@ -54,21 +58,33 @@ public:
         return color;
     }
 
-    void setColor(const Color& _color) noexcept
+    void setColor( const Color& _color ) noexcept
     {
         color = _color;
+    }
+
+    const BlendMode& getBlendMode() const noexcept
+    {
+        return blendMode;
+    }
+
+    void setBlendMode( const BlendMode& _blendMode )
+    {
+        blendMode = _blendMode;
     }
 
 private:
     // The image that stores the pixels for this sprite.
     const Image* image = nullptr;
 
-    // The UV coords of the sprite in the image.
-    glm::ivec2 uv { 0 };
-    // The size of the sprite in the image.
-    glm::ivec2 size { 0 };
+    // The source rectangle of this sprite in the image.
+    Math::RectI rect;
+
     // The color to apply to the sprite.
     Color color { Color::White };
+
+    // The blend mode to apply when rendering.
+    BlendMode blendMode;
 };
 
 }  // namespace sr

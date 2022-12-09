@@ -1,6 +1,7 @@
 cmake_minimum_required( VERSION 3.23.0 )
 
 set( INC_FILES
+    inc/BlendMode.hpp
     inc/Config.hpp
     inc/Color.hpp
     inc/Events.hpp
@@ -14,6 +15,7 @@ set( INC_FILES
 )
 
 set( SRC_FILES
+    src/BlendMode.cpp
     src/Color.cpp
     src/Image.cpp
     src/stb_image.cpp

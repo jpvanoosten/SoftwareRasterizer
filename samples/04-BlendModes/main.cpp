@@ -1,10 +1,12 @@
 #include <Image.hpp>
+#include <Sprite.hpp>
 #include <Timer.hpp>
 #include <Window.hpp>
 
 #include <iostream>
 
 using namespace sr;
+using namespace Math;
 
 int main( int argc, char* argv[] )
 {
@@ -24,7 +26,19 @@ int main( int argc, char* argv[] )
     const int WINDOW_WIDTH  = 800;
     const int WINDOW_HEIGHT = 600;
 
-    Window window { L"02 - Triangle", WINDOW_WIDTH, WINDOW_HEIGHT };
+    Window window { L"04 - Blend Modes", WINDOW_WIDTH, WINDOW_HEIGHT };
+
+    Image       monaLisa = Image::fromFile( "assets/textures/Mona_Lisa.jpg" );
+    Sprite      sprite { monaLisa, BlendMode::AlphaBlend };
+    Transform2D transform;
+
+    // Rotate around the center of the screen.
+    transform.setAnchor( { monaLisa.getWidth() / 2.0f, monaLisa.getHeight() / 2.0f } );
+    transform.setPosition( { WINDOW_WIDTH / 2.0f, WINDOW_HEIGHT / 2.0f } );
+
+    transform.scale( { 0.1f, 0.1f } );
+
+    // Image to render to.
     Image image { WINDOW_WIDTH, WINDOW_HEIGHT };
 
     window.show();
@@ -37,9 +51,15 @@ int main( int argc, char* argv[] )
     {
         image.clear( Color::Black );
 
-        // Draw a red triangle in the middle of the screen.
-        image.drawTriangle( { WINDOW_WIDTH * 0.5f, WINDOW_HEIGHT * 0.25 }, { WINDOW_WIDTH * 0.25f, WINDOW_HEIGHT * 0.75f }, { WINDOW_WIDTH * 0.75f, WINDOW_HEIGHT * 0.75f }, Color::Red );
-        
+        // Rotate the sprite.
+        transform.rotate( timer.elapsedSeconds() );
+        image.drawSprite( sprite, transform );
+
+        // Draw a semi-transparent yellow AABB.
+        Color      color = Color::Yellow.withAlpha( ( static_cast<float>( std::sin( timer.totalSeconds() ) + 1.0f ) / 2.0f ) );
+        const AABB aabb { { WINDOW_WIDTH * 0.25f, WINDOW_HEIGHT * 0.25f, 0.0f }, { WINDOW_WIDTH * 0.75f, WINDOW_HEIGHT * 0.75f, 0.0f } };
+        image.drawAABB( aabb, color, BlendMode::AlphaBlend );
+
         window.present( image );
 
         Event e;

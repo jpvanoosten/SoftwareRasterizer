@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Rect.hpp"
+
 #include <glm/common.hpp>
 #include <glm/vec3.hpp>
 
@@ -160,6 +162,18 @@ namespace Math
         static AABB fromTriangle(const glm::vec3& a, const glm::vec3& b, const glm::vec3& c)
         {
             return { a, b, c };
+        }
+
+        /// <summary>
+        /// Construct an AABB from a rectangle.
+        /// </summary>
+        /// <typeparam name="T">The rectangle type.</typeparam>
+        /// <param name="rect">The rectangle to use to construct an AABB.</param>
+        /// <returns>The AABB that contains the rectangle.</returns>
+        template<typename T>
+        static AABB fromRect( const Rect<T>& rect )
+        {
+            return fromMinMax( { rect.topLeft(), 0.0f }, { rect.bottomRight(), 0.0f } );
         }
 
         /// <summary>

@@ -50,7 +50,7 @@ int main( int argc, char* argv[] )
         image.clear( Color::Black );
 
         transform.rotate( timer.elapsedSeconds() );
-        image.sprite( sprite, transform );
+        image.drawSprite( sprite, transform );
 
         window.present( image );
 

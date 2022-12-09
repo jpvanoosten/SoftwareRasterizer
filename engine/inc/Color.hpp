@@ -12,7 +12,7 @@ namespace sr
 struct SR_API alignas( 4 ) Color
 {
     constexpr Color() noexcept;
-    constexpr explicit Color( uint32_t rgba ) noexcept;
+    constexpr explicit Color( uint32_t argb ) noexcept;
     constexpr Color( uint8_t r, uint8_t g, uint8_t b, uint8_t a = 255u ) noexcept;
     constexpr ~Color() noexcept              = default;
     constexpr Color( const Color& ) noexcept = default;
@@ -34,6 +34,20 @@ struct SR_API alignas( 4 ) Color
     constexpr Color& operator*=( float rhs ) noexcept;
     constexpr Color  operator/( float rhs ) const noexcept;
     constexpr Color& operator/=( float rhs ) noexcept;
+
+    /// <summary>
+    /// Return this color with a specific alpha value.
+    /// </summary>
+    /// <param name="alpha">The alpha value.</param>
+    /// <returns>This color with a given alpha value.</returns>
+    constexpr Color withAlpha( float alpha ) const noexcept;
+
+    /// <summary>
+    /// Return this color with a specific alpha value.
+    /// </summary>
+    /// <param name="alpha">The alpha value.</param>
+    /// <returns>This color with a given alpha value.</returns>
+    constexpr Color withAlpha( uint8_t alpha ) const noexcept;
 
     union
     {
@@ -95,9 +109,9 @@ constexpr auto Color::operator<=>( const Color& rhs ) const noexcept
 constexpr Color Color::operator+( const Color& rhs ) const noexcept
 {
     return {
-        static_cast<uint8_t>( std::min<uint32_t>( b + rhs.b, 255u ) ),
-        static_cast<uint8_t>( std::min<uint32_t>( g + rhs.g, 255u ) ),
         static_cast<uint8_t>( std::min<uint32_t>( r + rhs.r, 255u ) ),
+        static_cast<uint8_t>( std::min<uint32_t>( g + rhs.g, 255u ) ),
+        static_cast<uint8_t>( std::min<uint32_t>( b + rhs.b, 255u ) ),
         static_cast<uint8_t>( std::min<uint32_t>( a + rhs.a, 255u ) ),
     };
 }
@@ -188,6 +202,48 @@ constexpr Color& Color::operator/=( float rhs ) noexcept
     rhs = 1.0f / rhs;
 
     return operator*=( rhs );
+}
+
+constexpr Color Color::withAlpha( float alpha ) const noexcept
+{
+    return withAlpha( static_cast<uint8_t>( alpha * 255 ) );
+}
+
+constexpr Color Color::withAlpha( uint8_t alpha ) const noexcept
+{
+    return { r, g, b, alpha };
+}
+
+/// <summary>
+/// Return the component-wise minimum of two colors.
+/// </summary>
+/// <param name="c1">The first color.</param>
+/// <param name="c2">The second color.</param>
+/// <returns>The component-wise minimum of the two colors.</returns>
+constexpr Color min(const Color& c1, const Color& c2)
+{
+    const auto b = std::min( c1.b, c2.b );
+    const auto g = std::min( c1.g, c2.g );
+    const auto r = std::min( c1.r, c2.r );
+    const auto a = std::min( c1.a, c2.a );
+
+    return { r, g, b, a };
+}
+
+/// <summary>
+/// Return the component-wise maximum of two colors.
+/// </summary>
+/// <param name="c1">The first color.</param>
+/// <param name="c2">The second color.</param>
+/// <returns>The component-wise minimum of the two colors.</returns>
+constexpr Color max( const Color& c1, const Color& c2 )
+{
+    const auto b = std::max( c1.b, c2.b );
+    const auto g = std::max( c1.g, c2.g );
+    const auto r = std::max( c1.r, c2.r );
+    const auto a = std::max( c1.a, c2.a );
+
+    return { r, g, b, a };
 }
 
 }  // namespace sr

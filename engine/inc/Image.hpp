@@ -1,5 +1,6 @@
 #pragma once
 
+#include "BlendMode.hpp"
 #include "Color.hpp"
 #include "Config.hpp"
 
@@ -48,16 +49,16 @@ struct SR_API Image
     /// <param name="color">The color to clear the screen to.</param>
     void clear( const Color& color ) noexcept;
 
-    void line( int x0, int y0, int x1, int y1, const Color& color ) noexcept;
+    void drawLine( int x0, int y0, int x1, int y1, const Color& color, const BlendMode& blendMode = {} ) noexcept;
 
-    void line( const glm::ivec2& p0, const glm::ivec2& p1, const Color& color ) noexcept
+    void drawLine( const glm::ivec2& p0, const glm::ivec2& p1, const Color& color, const BlendMode& blendMode = {} ) noexcept
     {
-        line( p0.x, p0.y, p1.x, p1.y, color );
+        drawLine( p0.x, p0.y, p1.x, p1.y, color, blendMode );
     }
 
-    void line( const glm::vec2& p0, const glm::vec2& p1, const Color& color ) noexcept
+    void drawLine( const glm::vec2& p0, const glm::vec2& p1, const Color& color, const BlendMode& blendMode ) noexcept
     {
-        line( static_cast<int>( p0.x ), static_cast<int>( p0.y ), static_cast<int>( p1.x ), static_cast<int>( p0.y ), color );
+        drawLine( static_cast<int>( p0.x ), static_cast<int>( p0.y ), static_cast<int>( p1.x ), static_cast<int>( p0.y ), color, blendMode );
     }
 
     /// <summary>
@@ -67,27 +68,48 @@ struct SR_API Image
     /// <param name="p1">The second triangle coordinate.</param>
     /// <param name="p2">The third triangle coordinate.</param>
     /// <param name="color">The triangle color.</param>
-    void triangle( const glm::vec2& p0, const glm::vec2& p1, const glm::vec2& p2, const Color& color ) noexcept;
-    
+    /// <param name="blendMode">The blend mode to apply.</param>
+    void drawTriangle( const glm::vec2& p0, const glm::vec2& p1, const glm::vec2& p2, const Color& color, const BlendMode& blendMode = {} ) noexcept;
+
+    /// <summary>
+    /// Draw an axis-aligned bounding box to the image.
+    /// </summary>
+    /// <param name="aabb">The AABB to draw.</param>
+    /// <param name="color">The color of the AABB.</param>
+    /// <param name="blendMode">The blend mode to use.</param>
+    void drawAABB( const Math::AABB& aabb, const Color& color, const BlendMode& blendMode = {} ) noexcept;
+
+    /// <summary>
+    /// Draw a rectangle to the image.
+    /// </summary>
+    /// <param name="rect">The rectangle to draw.</param>
+    /// <param name="color">The color of the rectangle.</param>
+    /// <param name="blendMode">The blend mode to use.</param>
+    /// <returns></returns>
+    void drawRect( const Math::RectI& rect, const Color& color, const BlendMode blendMode = {} ) noexcept;
+
     /// <summary>
     /// Draw a sprite on the screen using the given transform.
     /// </summary>
     /// <param name="sprite">The sprite to draw.</param>
     /// <param name="transform">The transform to apply to the sprite.</param>
-    void sprite( const Sprite& sprite, const Math::Transform2D& transform ) noexcept;
+    void drawSprite( const Sprite& sprite, const Math::Transform2D& transform ) noexcept;
 
     /// <summary>
     /// Plot a single pixel to the image. Out-of-bounds coordinates are discarded.
     /// </summary>
     /// <param name="x">The x-coordinate to plot.</param>
     /// <param name="y">The y-coordinate to plot.</param>
-    /// <param name="color">The color of the pixel to plot.</param>
-    void plot( uint32_t x, uint32_t y, const Color& color ) noexcept
+    /// <param name="src">The source color of the pixel to plot.</param>
+    /// <param name="blendMode">The blend mode to apply.</param>
+    void plot( uint32_t x, uint32_t y, const Color& src, const BlendMode& blendMode = {} ) noexcept
     {
         if ( x >= m_width || y >= m_height )
             return;
 
-        m_data[static_cast<uint64_t>( y ) * m_width + x] = color;
+        const size_t i   = static_cast<size_t>( y ) * m_width + x;
+        const Color  dst = m_data[i];
+        m_data[i]        = blendMode.Blend( src, dst );
     }
 
     /// <summary>
@@ -119,7 +141,7 @@ struct SR_API Image
     /// <returns>The color of the texel at the given UV texture coordinates.</returns>
     const Color& sample( float u, float v, AddressMode addressMode = AddressMode::Wrap ) const noexcept
     {
-        return sample( static_cast<int>( u * static_cast<float>(m_width) ), static_cast<int>( v * static_cast<float>(m_height) ), addressMode );
+        return sample( static_cast<int>( u * static_cast<float>( m_width ) ), static_cast<int>( v * static_cast<float>( m_height ) ), addressMode );
     }
 
     /// <summary>
@@ -170,8 +192,8 @@ struct SR_API Image
     }
 
 private:
-    uint32_t                 m_width  = 0u;
-    uint32_t                 m_height = 0u;
+    uint32_t m_width  = 0u;
+    uint32_t m_height = 0u;
     // Axis-aligned bounding box used for screen clipping.
     Math::AABB               m_AABB;
     std::unique_ptr<Color[]> m_data;
