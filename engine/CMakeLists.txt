@@ -11,6 +11,7 @@ set( INC_FILES
     inc/KeyCodes.hpp
     inc/Sprite.hpp
     inc/stb_image.h
+	inc/stb_truetype.h
     inc/Timer.hpp
     inc/Vertex.hpp
     inc/Window.hpp
@@ -21,6 +22,7 @@ set( SRC_FILES
     src/Color.cpp
     src/Image.cpp
     src/stb_image.cpp
+	src/stb_truetype.cpp
     src/Timer.cpp
     src/Window.cpp
 )
