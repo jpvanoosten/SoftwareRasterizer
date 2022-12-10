@@ -117,6 +117,16 @@ namespace Math
         }
 
         /// <summary>
+        /// Check to see if another AABB intersects with this one.
+        /// </summary>
+        /// <param name="aabb">The other AABB to check for intersection.</param>
+        /// <returns>`true` if the AABBs intersect, `false` otherwise.</returns>
+        bool intersect(const AABB& aabb) noexcept
+        {
+            return all( lessThanEqual( min, aabb.max ) ) && all( greaterThanEqual( max, aabb.min ) );
+        }
+
+        /// <summary>
         /// Check to see if this is a valid AABB.
         /// The min point of a valid AABB is less than the max point.
         /// </summary>

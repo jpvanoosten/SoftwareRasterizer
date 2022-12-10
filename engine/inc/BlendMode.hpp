@@ -5,6 +5,7 @@
 
 namespace sr
 {
+
 /// <summary>
 /// The BlendOperation defines how the final output pixel will be determined.
 /// The Source (s) value is the pixel that is generated from the pixel shader.

@@ -39,6 +39,8 @@ int main( int argc, char* argv[] )
 
         // Draw a red triangle in the middle of the screen.
         image.drawTriangle( { WINDOW_WIDTH * 0.5f, WINDOW_HEIGHT * 0.25 }, { WINDOW_WIDTH * 0.25f, WINDOW_HEIGHT * 0.75f }, { WINDOW_WIDTH * 0.75f, WINDOW_HEIGHT * 0.75f }, Color::Red );
+        // Draw a blue outline for the triangle.
+        image.drawTriangle( { WINDOW_WIDTH * 0.5f, WINDOW_HEIGHT * 0.25 }, { WINDOW_WIDTH * 0.25f, WINDOW_HEIGHT * 0.75f }, { WINDOW_WIDTH * 0.75f, WINDOW_HEIGHT * 0.75f }, Color::Blue, {}, FillMode::WireFrame );
         
         window.present( image );
 

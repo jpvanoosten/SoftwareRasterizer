@@ -3,6 +3,8 @@
 #include "BlendMode.hpp"
 #include "Color.hpp"
 #include "Config.hpp"
+#include "Enums.hpp"
+#include "aligned_unique_ptr.hpp"
 
 #include <Math/AABB.hpp>
 #include <Math/Transform2D.hpp>
@@ -16,16 +18,6 @@
 namespace sr
 {
 class Sprite;
-
-/// <summary>
-/// Address modes used for texture sampling.
-/// </summary>
-enum class AddressMode
-{
-    Wrap,    ///< Tile the texture.
-    Mirror,  ///< Flip the texture coordinates at integer boundaries.
-    Clamp,   ///< Clamp texture coordinates in the range 0..1.
-};
 
 struct SR_API Image
 {
@@ -49,16 +41,39 @@ struct SR_API Image
     /// <param name="color">The color to clear the screen to.</param>
     void clear( const Color& color ) noexcept;
 
+    /// <summary>
+    /// Draw a line on the image.
+    /// </summary>
+    /// <param name="x0">The x-coordinate of the start point of the line.</param>
+    /// <param name="y0">The y-coordinate of the start point of the line.</param>
+    /// <param name="x1">The x-coordinate of the end point of the line.</param>
+    /// <param name="y1">The y-coordinate of the end point of the line.</param>
+    /// <param name="color">The color of the line.</param>
+    /// <param name="blendMode">The blend mode to use.</param>
     void drawLine( int x0, int y0, int x1, int y1, const Color& color, const BlendMode& blendMode = {} ) noexcept;
 
+    /// <summary>
+    /// Draw a line on the image.
+    /// </summary>
+    /// <param name="p0">The start point.</param>
+    /// <param name="p1">The end point.</param>
+    /// <param name="color">The color of the line.</param>
+    /// <param name="blendMode">The blend mode to use.</param>
     void drawLine( const glm::ivec2& p0, const glm::ivec2& p1, const Color& color, const BlendMode& blendMode = {} ) noexcept
     {
         drawLine( p0.x, p0.y, p1.x, p1.y, color, blendMode );
     }
 
+    /// <summary>
+    /// Draw a line on the image.
+    /// </summary>
+    /// <param name="p0">The start point.</param>
+    /// <param name="p1">The end point.</param>
+    /// <param name="color">The color of the line.</param>
+    /// <param name="blendMode">The blend mode to use.</param>
     void drawLine( const glm::vec2& p0, const glm::vec2& p1, const Color& color, const BlendMode& blendMode ) noexcept
     {
-        drawLine( static_cast<int>( p0.x ), static_cast<int>( p0.y ), static_cast<int>( p1.x ), static_cast<int>( p0.y ), color, blendMode );
+        drawLine( static_cast<int>( p0.x ), static_cast<int>( p0.y ), static_cast<int>( p1.x ), static_cast<int>( p1.y ), color, blendMode );
     }
 
     /// <summary>
@@ -69,7 +84,8 @@ struct SR_API Image
     /// <param name="p2">The third triangle coordinate.</param>
     /// <param name="color">The triangle color.</param>
     /// <param name="blendMode">The blend mode to apply.</param>
-    void drawTriangle( const glm::vec2& p0, const glm::vec2& p1, const glm::vec2& p2, const Color& color, const BlendMode& blendMode = {} ) noexcept;
+    /// <param name="fillMode">The fill mode to use when rendering.</param>
+    void drawTriangle( const glm::vec2& p0, const glm::vec2& p1, const glm::vec2& p2, const Color& color, const BlendMode& blendMode = {}, FillMode fillMode = FillMode::Solid ) noexcept;
 
     /// <summary>
     /// Draw an axis-aligned bounding box to the image.
@@ -77,7 +93,8 @@ struct SR_API Image
     /// <param name="aabb">The AABB to draw.</param>
     /// <param name="color">The color of the AABB.</param>
     /// <param name="blendMode">The blend mode to use.</param>
-    void drawAABB( const Math::AABB& aabb, const Color& color, const BlendMode& blendMode = {} ) noexcept;
+    /// <param name="fillMode">The fill mode to use to draw the AABB.</param>
+    void drawAABB( Math::AABB aabb, const Color& color, const BlendMode& blendMode = {}, FillMode fillMode = FillMode::Solid ) noexcept;
 
     /// <summary>
     /// Draw a rectangle to the image.
@@ -85,8 +102,9 @@ struct SR_API Image
     /// <param name="rect">The rectangle to draw.</param>
     /// <param name="color">The color of the rectangle.</param>
     /// <param name="blendMode">The blend mode to use.</param>
+    /// <param name="fillMode">The fill mode to use to draw the rectangle.</param>
     /// <returns></returns>
-    void drawRect( const Math::RectI& rect, const Color& color, const BlendMode blendMode = {} ) noexcept;
+    void drawRect( const Math::RectI& rect, const Color& color, const BlendMode& blendMode = {}, FillMode fillMode = FillMode::Solid ) noexcept;
 
     /// <summary>
     /// Draw a sprite on the screen using the given transform.
@@ -195,7 +213,7 @@ private:
     uint32_t m_width  = 0u;
     uint32_t m_height = 0u;
     // Axis-aligned bounding box used for screen clipping.
-    Math::AABB               m_AABB;
-    std::unique_ptr<Color[]> m_data;
+    Math::AABB                  m_AABB;
+    aligned_unique_ptr<Color[]> m_data;
 };
 }  // namespace sr

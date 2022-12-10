@@ -105,7 +105,8 @@ void Image::resize( uint32_t width, uint32_t height )
           { m_width - 1, m_height - 1, 0 }
     };
 
-    m_data = std::make_unique<Color[]>( static_cast<uint64_t>( width ) * height );
+    // Align color buffer to 64-byte boundary for better cache alignment on 64-bit architectures.
+    m_data = make_aligned_unique<Color[], 64>( static_cast<uint64_t>(width) * height );
 }
 
 void Image::clear( const Color& color ) noexcept
@@ -150,33 +151,77 @@ void Image::drawLine( int x0, int y0, int x1, int y1, const Color& color, const 
     }
 }
 
-void Image::drawTriangle( const glm::vec2& p0, const glm::vec2& p1, const glm::vec2& p2, const Color& color, const BlendMode& blendMode ) noexcept
+void Image::drawTriangle( const glm::vec2& p0, const glm::vec2& p1, const glm::vec2& p2, const Color& color, const BlendMode& blendMode, FillMode fillMode ) noexcept
 {
     // Create an AABB for the triangle.
     AABB aabb = AABB::fromTriangle( { p0, 0 }, { p1, 0 }, { p2, 0 } );
-    // Clamp the triangle AABB to the screen bounds.
-    aabb.clamp( m_AABB );
+
+    // Check if the triangle is on screen.
+    if ( !aabb.intersect( m_AABB ) )
+        return;
+
+    switch ( fillMode )
+    {
+    case FillMode::WireFrame:
+    {
+        drawLine( p0, p1, color, blendMode );
+        drawLine( p1, p2, color, blendMode );
+        drawLine( p2, p0, color, blendMode );
+    }
+    break;
+    case FillMode::Solid:
+    {
+        // Clamp the triangle AABB to the screen bounds.
+        aabb.clamp( m_AABB );
 
 #pragma omp parallel for firstprivate( aabb )
-    for ( int y = static_cast<int>( aabb.min.y ); y <= static_cast<int>( aabb.max.y ); ++y )
-    {
-        for ( int x = static_cast<int>( aabb.min.x ); x <= static_cast<int>( aabb.max.x ); ++x )
+        for ( int y = static_cast<int>( aabb.min.y ); y <= static_cast<int>( aabb.max.y ); ++y )
         {
-            if ( pointInsideTriangle( { x, y }, p0, p1, p2 ) )
-                plot( static_cast<uint32_t>( x ), static_cast<uint32_t>( y ), color, blendMode );
+            for ( int x = static_cast<int>( aabb.min.x ); x <= static_cast<int>( aabb.max.x ); ++x )
+            {
+                if ( pointInsideTriangle( { x, y }, p0, p1, p2 ) )
+                    plot( static_cast<uint32_t>( x ), static_cast<uint32_t>( y ), color, blendMode );
+            }
         }
+    }
+    break;
     }
 }
 
-void Image::drawAABB( const Math::AABB& aabb, const Color& color, const BlendMode& blendMode ) noexcept
+void Image::drawAABB( AABB aabb, const Color& color, const BlendMode& blendMode, FillMode fillMode ) noexcept
 {
-    #pragma omp parallel for
-    for ( int y = static_cast<int>( aabb.min.y ); y <= static_cast<int>( aabb.max.y ); ++y )
+    if ( !m_AABB.intersect( aabb ) )
+        return;
+
+    switch ( fillMode )
     {
-        for ( int x = static_cast<int>( aabb.min.x ); x <= static_cast<int>( aabb.max.x ); ++x )
+    case FillMode::WireFrame:
+    {
+        const glm::ivec2 min     = aabb.min;
+        const glm::ivec2 max     = aabb.max;
+        const glm::ivec2 verts[] = { { min.x, min.y }, { max.x, min.y }, { max.x, max.y }, { min.x, max.y } };
+
+        for ( int i = 0; i < 3; ++i )
         {
-            plot( static_cast<uint32_t>( x ), static_cast<uint32_t>( y ), color, blendMode );
+            drawLine( verts[i], verts[( i + 1 ) % 4], color, blendMode );
         }
+    }
+    break;
+    case FillMode::Solid:
+    {
+        // Clamp to screen bounds.
+        aabb.clamp( m_AABB );
+
+#pragma omp parallel for firstprivate( aabb )
+        for ( int y = static_cast<int>( aabb.min.y ); y <= static_cast<int>( aabb.max.y ); ++y )
+        {
+            for ( int x = static_cast<int>( aabb.min.x ); x <= static_cast<int>( aabb.max.x ); ++x )
+            {
+                plot( static_cast<uint32_t>( x ), static_cast<uint32_t>( y ), color, blendMode );
+            }
+        }
+    }
+    break;
     }
 }
 
@@ -213,6 +258,11 @@ void Image::drawSprite( const Sprite& sprite, const Math::Transform2D& transform
         { verts[2].position, 0.0f },
         { verts[3].position, 0.0f }
     };
+
+    // Check if the AABB of the sprite is on screen.
+    if ( !aabb.intersect( m_AABB ) )
+        return;
+
     // Clamp to the size of the screen.
     aabb.clamp( m_AABB );
 

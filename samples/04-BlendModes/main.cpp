@@ -56,9 +56,11 @@ int main( int argc, char* argv[] )
         image.drawSprite( sprite, transform );
 
         // Draw a semi-transparent yellow AABB.
-        Color      color = Color::Yellow.withAlpha( ( static_cast<float>( std::sin( timer.totalSeconds() ) + 1.0f ) / 2.0f ) );
+        float      alpha = ( static_cast<float>( std::sin( timer.totalSeconds() ) + 1.0f ) / 2.0f );
         const AABB aabb { { WINDOW_WIDTH * 0.25f, WINDOW_HEIGHT * 0.25f, 0.0f }, { WINDOW_WIDTH * 0.75f, WINDOW_HEIGHT * 0.75f, 0.0f } };
-        image.drawAABB( aabb, color, BlendMode::AlphaBlend );
+        image.drawAABB( aabb, Color::Yellow.withAlpha( alpha ), BlendMode::AlphaBlend );
+        // Draw an outline.
+        image.drawAABB( aabb, Color::Blue.withAlpha( alpha ), BlendMode::AlphaBlend, FillMode::WireFrame );
 
         window.present( image );
 
