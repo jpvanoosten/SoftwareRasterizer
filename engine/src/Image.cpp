@@ -9,6 +9,7 @@
 
 #include <algorithm>
 #include <omp.h>
+#include <optional>
 
 using namespace sr;
 using namespace Math;
@@ -106,16 +107,60 @@ void Image::resize( uint32_t width, uint32_t height )
     };
 
     // Align color buffer to 64-byte boundary for better cache alignment on 64-bit architectures.
-    m_data = make_aligned_unique<Color[], 64>( static_cast<uint64_t>(width) * height );
+    m_data = make_aligned_unique<Color[], 64>( static_cast<uint64_t>( width ) * height );
 }
 
 void Image::clear( const Color& color ) noexcept
 {
-    Color* p = m_data.get();
+    Color* p = data();
 
 #pragma omp parallel for
     for ( int i = 0; i < static_cast<int>( m_width * m_height ); ++i )
         p[i] = color;
+}
+
+void Image::copy( const Image& srcImage, std::optional<Math::RectI> srcRect, std::optional<Math::RectI> dstRect, const BlendMode& blendMode )
+{
+    AABB srcAABB = AABB::fromRect( srcRect ? *srcRect : srcImage.getRect() );
+    AABB dstAABB = AABB::fromRect( dstRect ? *dstRect : getRect() );
+
+    // If the source AABB doesn't intersect with the source image bounds...
+    if ( !srcImage.m_AABB.intersect( srcAABB ) )
+        return;
+
+    srcAABB.clamp( srcImage.m_AABB );
+
+    const int sW = static_cast<int>( srcAABB.width() );
+    const int sH = static_cast<int>( srcAABB.height() );
+
+    // If the destination AABB doesn't intersect with this image bounds...
+    if ( !m_AABB.intersect( dstAABB ) )
+        return;
+
+    dstAABB.clamp( m_AABB );
+
+    const int dW = static_cast<int>( dstAABB.width() );
+    const int dH = static_cast<int>( dstAABB.height() );
+    const int dA = dW * dH;
+
+    const Color* src = srcImage.data();
+    Color*       dst = data();
+
+#pragma omp parallel for firstprivate( srcAABB, dstAABB, sW, sH, dW, dH )
+    for ( int i = 0; i < dA; ++i )
+    {
+        const int x  = i % dW;
+        const int y  = i / dW;
+        const int dx = x + static_cast<int>( dstAABB.min.x );
+        const int dy = y + static_cast<int>( dstAABB.min.y );
+        const int sx = ( x * sW / dW ) + static_cast<int>( srcAABB.min.x );
+        const int sy = ( y * sH / dH ) + static_cast<int>( srcAABB.min.y );
+
+        const Color sC = src[sy * srcImage.getWidth() + sx];
+        const Color dC = dst[dy * m_width + dx];
+
+        dst[dy * m_width + dx] = blendMode.Blend( sC, dC );
+    }
 }
 
 void Image::drawLine( int x0, int y0, int x1, int y1, const Color& color, const BlendMode& blendMode ) noexcept
@@ -157,7 +202,7 @@ void Image::drawTriangle( const glm::vec2& p0, const glm::vec2& p1, const glm::v
     AABB aabb = AABB::fromTriangle( { p0, 0 }, { p1, 0 }, { p2, 0 } );
 
     // Check if the triangle is on screen.
-    if ( !aabb.intersect( m_AABB ) )
+    if ( !m_AABB.intersect( aabb ) )
         return;
 
     switch ( fillMode )
@@ -174,14 +219,17 @@ void Image::drawTriangle( const glm::vec2& p0, const glm::vec2& p1, const glm::v
         // Clamp the triangle AABB to the screen bounds.
         aabb.clamp( m_AABB );
 
-#pragma omp parallel for firstprivate( aabb )
-        for ( int y = static_cast<int>( aabb.min.y ); y <= static_cast<int>( aabb.max.y ); ++y )
+        const int width  = static_cast<int>( aabb.width() );
+        const int height = static_cast<int>( aabb.height() );
+        const int area   = width * height;
+
+#pragma omp parallel for firstprivate( aabb, width, height, area )
+        for ( int i = 0; i < area; ++i )
         {
-            for ( int x = static_cast<int>( aabb.min.x ); x <= static_cast<int>( aabb.max.x ); ++x )
-            {
-                if ( pointInsideTriangle( { x, y }, p0, p1, p2 ) )
-                    plot( static_cast<uint32_t>( x ), static_cast<uint32_t>( y ), color, blendMode );
-            }
+            const int x = ( i % width ) + static_cast<int>( aabb.min.x );
+            const int y = ( i / width ) + static_cast<int>( aabb.min.y );
+            if ( pointInsideTriangle( { x, y }, p0, p1, p2 ) )
+                plot( x, y, color, blendMode );
         }
     }
     break;
@@ -212,13 +260,16 @@ void Image::drawAABB( AABB aabb, const Color& color, const BlendMode& blendMode,
         // Clamp to screen bounds.
         aabb.clamp( m_AABB );
 
-#pragma omp parallel for firstprivate( aabb )
-        for ( int y = static_cast<int>( aabb.min.y ); y <= static_cast<int>( aabb.max.y ); ++y )
+        const int width  = static_cast<int>( aabb.width() );
+        const int height = static_cast<int>( aabb.height() );
+        const int area   = width * height;
+
+#pragma omp parallel for firstprivate( aabb, width, height, area )
+        for ( int i = 0; i < area; ++i )
         {
-            for ( int x = static_cast<int>( aabb.min.x ); x <= static_cast<int>( aabb.max.x ); ++x )
-            {
-                plot( static_cast<uint32_t>( x ), static_cast<uint32_t>( y ), color, blendMode );
-            }
+            const int x = ( i % width ) + static_cast<int>( aabb.min.x );
+            const int y = ( i / width ) + static_cast<int>( aabb.min.y );
+            plot( x, y, color, blendMode );
         }
     }
     break;
@@ -260,7 +311,7 @@ void Image::drawSprite( const Sprite& sprite, const Math::Transform2D& transform
     };
 
     // Check if the AABB of the sprite is on screen.
-    if ( !aabb.intersect( m_AABB ) )
+    if ( !m_AABB.intersect( aabb ) )
         return;
 
     // Clamp to the size of the screen.

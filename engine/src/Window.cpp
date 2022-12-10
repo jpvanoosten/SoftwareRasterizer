@@ -41,6 +41,21 @@ void Window::destroy()
     pImpl.reset();
 }
 
+int Window::getWidth() const noexcept
+{
+    return pImpl->getWidth();
+}
+
+int Window::getHeight() const noexcept
+{
+    return pImpl->getHeight();
+}
+
+glm::ivec2 Window::getSize() const noexcept
+{
+    return pImpl->getSize();
+}
+
 Window::operator bool() const
 {
     return pImpl != nullptr;

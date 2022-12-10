@@ -42,6 +42,16 @@ struct SR_API Image
     void clear( const Color& color ) noexcept;
 
     /// <summary>
+    /// Copy a region of the source image to a region of this image.
+    /// If the source and destination regions are different, the image will be scaled.
+    /// </summary>
+    /// <param name="srcImage">The source image to copy.</param>
+    /// <param name="srcRect">(optional) The region to copy from.</param>
+    /// <param name="dstRect">(optional) The destination region to copy to.</param>
+    /// <param name="blendMode">(optional) The blend mode to use for the copy.</param>
+    void copy( const Image& srcImage, std::optional<Math::RectI> srcRect = {}, std::optional<Math::RectI> dstRect = {}, const BlendMode& blendMode = {} );
+
+    /// <summary>
     /// Draw a line on the image.
     /// </summary>
     /// <param name="x0">The x-coordinate of the start point of the line.</param>
@@ -197,6 +207,15 @@ struct SR_API Image
     uint32_t getHeight() const noexcept
     {
         return m_height;
+    }
+
+    /// <summary>
+    /// Get a rectangle that covers the entire image.
+    /// </summary>
+    /// <returns></returns>
+    Math::RectI getRect() const noexcept
+    {
+        return { 0, 0, static_cast<int>( m_width ), static_cast<int>( m_height ) };
     }
 
     Color* data() noexcept

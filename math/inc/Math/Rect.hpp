@@ -17,6 +17,18 @@ struct Rect
     , height { height }
     {}
 
+    auto operator<=>( const Rect& ) const = default;
+
+    T right() const noexcept
+    {
+        return left + width;
+    }
+
+    T bottom() const noexcept
+    {
+        return top + height;
+    }
+
     glm::vec<2, T> topLeft() const noexcept
     {
         return { left, top };
@@ -24,17 +36,17 @@ struct Rect
 
     glm::vec<2, T> topRight() const noexcept
     {
-        return { left + width, top };
+        return { right(), top };
     }
 
     glm::vec<2, T> bottomLeft() const noexcept
     {
-        return { left, top + height };
+        return { left, bottom() };
     }
 
     glm::vec<2, T> bottomRight() const noexcept
     {
-        return { left + width, top + height };
+        return { right(), bottom() };
     }
 
     /// <summary>

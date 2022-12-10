@@ -4,6 +4,8 @@
 #include "Events.hpp"
 #include "Image.hpp"
 
+#include <glm/vec2.hpp>
+
 #include <memory>
 #include <string>
 
@@ -34,6 +36,12 @@ namespace sr
         void show();
         void present(const Image& image);
         void destroy();
+
+        int getWidth() const noexcept;
+
+        int getHeight() const noexcept;
+
+        glm::ivec2 getSize() const noexcept;
 
         /// <summary>
         /// Check to see if the window is valid.

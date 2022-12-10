@@ -215,6 +215,30 @@ bool WindowWin32::popEvent( Event& event )
     return true;
 }
 
+int WindowWin32::getWidth() const noexcept
+{
+    RECT rect;
+    ::GetClientRect( m_hWnd, &rect );
+
+    return rect.right - rect.left;
+}
+
+int WindowWin32::getHeight() const noexcept
+{
+    RECT rect;
+    ::GetClientRect( m_hWnd, &rect );
+
+    return rect.bottom - rect.top;
+}
+
+glm::ivec2 WindowWin32::getSize() const noexcept
+{
+    RECT rect;
+    ::GetClientRect( m_hWnd, &rect );
+
+    return { rect.right - rect.left, rect.bottom - rect.top };
+}
+
 void WindowWin32::processEvents()
 {
     MSG msg;

@@ -66,6 +66,51 @@ namespace Math
         }
 
         /// <summary>
+        /// Get the width (along the x-axis) of the AABB.
+        /// </summary>
+        /// <returns>The width of the AABB.</returns>
+        float width() const noexcept
+        {
+            return max.x - min.x;
+        }
+
+        /// <summary>
+        /// Get the height (along the y-axis) of the AABB.
+        /// </summary>
+        /// <returns>The height of the AABB.</returns>
+        float height() const noexcept
+        {
+            return max.y - min.y;
+        }
+
+        /// <summary>
+        /// Get the depth (along the z-axis) of the AABB.
+        /// </summary>
+        /// <returns></returns>
+        float depth() const noexcept
+        {
+            return max.z - min.z;
+        }
+
+        /// <summary>
+        /// Compute the 2D area of the AABB (width x height).
+        /// </summary>
+        /// <returns>The 2D area of the AABB.</returns>
+        float area() const noexcept
+        {
+            return width() * height();
+        }
+
+        /// <summary>
+        /// Compute the 3D volume of the AABB.
+        /// </summary>
+        /// <returns>The 2D volume of the </returns>
+        float volume() const noexcept
+        {
+            return width() * height() * depth();
+        }
+
+        /// <summary>
         /// Compute the size of the AABB.
         /// </summary>
         /// <returns>Returns the vector from the min to the max point.</returns>
@@ -121,7 +166,7 @@ namespace Math
         /// </summary>
         /// <param name="aabb">The other AABB to check for intersection.</param>
         /// <returns>`true` if the AABBs intersect, `false` otherwise.</returns>
-        bool intersect(const AABB& aabb) noexcept
+        bool intersect(const AABB& aabb) const noexcept
         {
             return all( lessThanEqual( min, aabb.max ) ) && all( greaterThanEqual( max, aabb.min ) );
         }

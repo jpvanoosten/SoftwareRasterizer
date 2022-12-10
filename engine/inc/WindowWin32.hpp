@@ -8,41 +8,47 @@
 #define NOMINMAX
 #include <Windows.h>
 
-#include <string>
 #include <queue>
+#include <string>
 
 // Forward declaration of Windows callback function.
-LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+LRESULT CALLBACK WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam );
 
 namespace sr
 {
-    class SR_API WindowWin32 : public WindowImpl
-    {
-    public:
-        WindowWin32(std::wstring_view title, int width, int height);
-        ~WindowWin32();
+class SR_API WindowWin32 : public WindowImpl
+{
+public:
+    WindowWin32( std::wstring_view title, int width, int height );
+    ~WindowWin32();
 
-        void show() override;
-        void present(const Image& image) override;
+    void show() override;
+    void present( const Image& image ) override;
 
-        bool popEvent(Event& event) override;
+    bool popEvent( Event& event ) override;
 
-    protected:
-        void init();
+    int getWidth() const noexcept override;
 
-        void processEvents();
-        void pushEvent(const Event& e);
+    int getHeight() const noexcept override;
 
-        void onClose();
-        void onKeyPressed(KeyEventArgs& e);
-        void onKeyReleased(KeyEventArgs& e);
-        void onResize(ResizeEventArgs& e);
-        void onEndResize();
+    glm::ivec2 getSize() const noexcept override;
 
-    private:
-        friend LRESULT CALLBACK ::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+protected:
+    void init();
 
-        HWND m_hWnd;
-        std::queue<Event> m_eventQueue;
-    };
-}
+    void processEvents();
+    void pushEvent( const Event& e );
+
+    void onClose();
+    void onKeyPressed( KeyEventArgs& e );
+    void onKeyReleased( KeyEventArgs& e );
+    void onResize( ResizeEventArgs& e );
+    void onEndResize();
+
+private:
+    friend LRESULT CALLBACK ::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam );
+
+    HWND              m_hWnd;
+    std::queue<Event> m_eventQueue;
+};
+}  // namespace sr

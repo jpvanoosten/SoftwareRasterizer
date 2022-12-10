@@ -48,6 +48,11 @@ public:
         return { rect.width, rect.height };
     }
 
+    const Math::RectI& getRect() const noexcept
+    {
+        return rect;
+    }
+
     const Image* getImage() const noexcept
     {
         return image;
