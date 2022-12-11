@@ -1,3 +1,5 @@
+#include "Font.hpp"
+
 #include <Image.hpp>
 #include <Sprite.hpp>
 #include <Timer.hpp>
@@ -46,6 +48,7 @@ int main( int argc, char* argv[] )
     Timer    timer;
     double   totalTime  = 0.0;
     uint64_t frameCount = 0ull;
+    std::string fps        = "FPS: 0";
 
     while ( window )
     {
@@ -61,6 +64,8 @@ int main( int argc, char* argv[] )
         image.drawAABB( aabb, Color::Yellow.withAlpha( alpha ), BlendMode::AlphaBlend );
         // Draw an outline.
         image.drawAABB( aabb, Color::Blue.withAlpha( alpha ), BlendMode::AlphaBlend, FillMode::WireFrame );
+
+        image.drawText( Font::Default, 10, 10, fps, Color::White );
 
         window.present( image );
 
@@ -89,7 +94,9 @@ int main( int argc, char* argv[] )
         totalTime += timer.elapsedSeconds();
         if ( totalTime > 1.0 )
         {
-            std::cout << std::format( "FPS: {:.3f}\n", frameCount / totalTime );
+            fps = std::format( "FPS: {:.3f}", static_cast<double>(frameCount) / totalTime );
+
+            std::cout << fps << std::endl;
 
             frameCount = 0;
             totalTime  = 0.0;

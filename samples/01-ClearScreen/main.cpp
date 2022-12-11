@@ -1,3 +1,5 @@
+#include "Font.hpp"
+
 #include <Image.hpp>
 #include <Timer.hpp>
 #include <Window.hpp>
@@ -17,13 +19,17 @@ int main( int argc, char* argv[] )
 
     window.show();
 
-    Timer    timer;
-    double   totalTime  = 0.0;
-    uint64_t frameCount = 0ull;
+    Timer       timer;
+    double      totalTime  = 0.0;
+    uint64_t    frameCount = 0ull;
+    std::string fps        = "FPS: 0";
 
     while ( window )
     {
         image.clear( Color::Black );
+
+        image.drawText( Font::Default, 10, 10, fps, Color::White );
+
         window.present( image );
 
         Event e;
@@ -56,7 +62,9 @@ int main( int argc, char* argv[] )
         totalTime += timer.elapsedSeconds();
         if ( totalTime > 1.0 )
         {
-            std::cout << std::format( "FPS: {:.3f}\n", frameCount / totalTime );
+            fps = std::format( "FPS: {:.3f}", static_cast<double>( frameCount ) / totalTime );
+
+            std::cout << fps << std::endl;
 
             frameCount = 0;
             totalTime  = 0.0;

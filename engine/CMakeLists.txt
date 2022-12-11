@@ -7,9 +7,11 @@ set( INC_FILES
     inc/Color.hpp
     inc/Enums.hpp
     inc/Events.hpp
+    inc/Font.hpp
     inc/Image.hpp
     inc/KeyCodes.hpp
     inc/Sprite.hpp
+    inc/stb_easy_font.h
     inc/stb_image.h
 	inc/stb_truetype.h
     inc/Timer.hpp
@@ -20,6 +22,7 @@ set( INC_FILES
 set( SRC_FILES
     src/BlendMode.cpp
     src/Color.cpp
+    src/Font.cpp
     src/Image.cpp
     src/stb_image.cpp
 	src/stb_truetype.cpp

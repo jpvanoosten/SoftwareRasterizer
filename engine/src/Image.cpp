@@ -1,5 +1,5 @@
 #include "Image.hpp"
-
+#include "Font.hpp"
 #include "Sprite.hpp"
 #include "Vertex.hpp"
 #include "stb_image.h"
@@ -214,19 +214,13 @@ void Image::copy( const Image& srcImage, int x, int y )
     const Color*   src      = srcImage.data();
     Color*         dst      = data();
 
-    #pragma parallel for firstprivate(w, h, sX, dX )
+#pragma parallel for firstprivate( w, h, sX, dX )
     for ( int i = 0; i < h; ++i )
-        memcpy_s( dst + (i + dY) * m_width + dX, w * sizeof( Color ), src + (i + sY) * srcWidth + sX, w * sizeof( Color ) );
+        memcpy_s( dst + ( i + dY ) * m_width + dX, w * sizeof( Color ), src + ( i + sY ) * srcWidth + sX, w * sizeof( Color ) );
 }
 
 void Image::drawLine( int x0, int y0, int x1, int y1, const Color& color, const BlendMode& blendMode ) noexcept
 {
-    // Clamp the lines to the image bounds.
-    x0 = std::clamp( x0, 0, static_cast<int>( m_width ) );
-    y0 = std::clamp( y0, 0, static_cast<int>( m_height ) );
-    x1 = std::clamp( x1, 0, static_cast<int>( m_width ) );
-    y1 = std::clamp( y1, 0, static_cast<int>( m_height ) );
-
     const int dx = std::abs( x1 - x0 );
     const int dy = -std::abs( y1 - y0 );
     const int sx = x0 < x1 ? 1 : -1;
@@ -292,6 +286,63 @@ void Image::drawTriangle( const glm::vec2& p0, const glm::vec2& p1, const glm::v
             const int y = ( i / width ) + static_cast<int>( aabb.min.y );
             if ( pointInsideTriangle( { x, y }, p0, p1, p2 ) )
                 plot( x, y, color, blendMode );
+        }
+    }
+    break;
+    }
+}
+
+void Image::drawQuad( const glm::vec2& p0, const glm::vec2& p1, const glm::vec2& p2, const glm::vec2& p3, const Color& color, const BlendMode& blendMode, FillMode fillMode ) noexcept
+{
+    AABB aabb = AABB::fromQuad( { p0, 0 }, { p1, 0 }, { p2, 0 }, { p3, 0 } );
+
+    // Check if the triangle is on screen.
+    if ( !m_AABB.intersect( aabb ) )
+        return;
+
+    switch ( fillMode )
+    {
+    case FillMode::WireFrame:
+    {
+        drawLine( p0, p1, color, blendMode );
+        drawLine( p1, p2, color, blendMode );
+        drawLine( p2, p3, color, blendMode );
+        drawLine( p3, p0, color, blendMode );
+    }
+    break;
+    case FillMode::Solid:
+    {
+        glm::vec2 verts[] = {
+            p0, p1, p2, p3
+        };
+
+        // Index buffer for the two triangles of the quad.
+        const uint32_t indicies[] = {
+            0, 1, 3,
+            1, 2, 3
+        };
+
+        // Clamp to the size of the screen.
+        aabb.clamp( m_AABB );
+        
+#pragma omp parallel for schedule( dynamic ) firstprivate( aabb, indicies, verts )
+        for ( int y = static_cast<int>( aabb.min.y ); y <= static_cast<int>( aabb.max.y ); ++y )
+        {
+            for ( int x = static_cast<int>( aabb.min.x ); x <= static_cast<int>( aabb.max.x ); ++x )
+            {
+                for ( uint32_t i = 0; i < std::size( indicies ); i += 3 )
+                {
+                    const uint32_t i0 = indicies[i + 0];
+                    const uint32_t i1 = indicies[i + 1];
+                    const uint32_t i2 = indicies[i + 2];
+
+                    glm::vec3 bc = barycentric( verts[i0], verts[i1], verts[i2], { x, y } );
+                    if ( barycentricInside( bc ) )
+                    {
+                        plot( static_cast<uint32_t>( x ), static_cast<uint32_t>( y ), color, blendMode );
+                    }
+                }
+            }
         }
     }
     break;
@@ -409,6 +460,11 @@ void Image::drawSprite( const Sprite& sprite, const Math::Transform2D& transform
             }
         }
     }
+}
+
+void Image::drawText( const Font& font, int x, int y, std::string_view text, const Color& color ) noexcept
+{
+    font.drawText( *this, text, x, y, color );
 }
 
 const Color& Image::sample( int u, int v, AddressMode addressMode ) const noexcept

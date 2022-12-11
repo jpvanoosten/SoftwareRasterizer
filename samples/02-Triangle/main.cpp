@@ -1,3 +1,4 @@
+#include <Font.hpp>
 #include <Image.hpp>
 #include <Timer.hpp>
 #include <Window.hpp>
@@ -25,23 +26,28 @@ int main( int argc, char* argv[] )
     const int WINDOW_HEIGHT = 600;
 
     Window window { L"02 - Triangle", WINDOW_WIDTH, WINDOW_HEIGHT };
-    Image image { WINDOW_WIDTH, WINDOW_HEIGHT };
+    Image  image { WINDOW_WIDTH, WINDOW_HEIGHT };
 
     window.show();
 
-    Timer    timer;
-    double   totalTime  = 0.0;
-    uint64_t frameCount = 0ull;
+    Timer       timer;
+    double      totalTime  = 0.0;
+    uint64_t    frameCount = 0ull;
+    std::string fps        = "FPS: 0";
 
     while ( window )
     {
         image.clear( Color::Black );
 
+        float dx = std::sinf( timer.totalSeconds() * 0.5 ) * static_cast<float>( WINDOW_WIDTH / 2 );
+
         // Draw a red triangle in the middle of the screen.
-        image.drawTriangle( { WINDOW_WIDTH * 0.5f, WINDOW_HEIGHT * 0.25 }, { WINDOW_WIDTH * 0.25f, WINDOW_HEIGHT * 0.75f }, { WINDOW_WIDTH * 0.75f, WINDOW_HEIGHT * 0.75f }, Color::Red );
+        image.drawTriangle( { WINDOW_WIDTH * 0.5f + dx, WINDOW_HEIGHT * 0.25 }, { WINDOW_WIDTH * 0.25f + dx, WINDOW_HEIGHT * 0.75f }, { WINDOW_WIDTH * 0.75f + dx, WINDOW_HEIGHT * 0.75f }, Color::Red );
         // Draw a blue outline for the triangle.
-        image.drawTriangle( { WINDOW_WIDTH * 0.5f, WINDOW_HEIGHT * 0.25 }, { WINDOW_WIDTH * 0.25f, WINDOW_HEIGHT * 0.75f }, { WINDOW_WIDTH * 0.75f, WINDOW_HEIGHT * 0.75f }, Color::Blue, {}, FillMode::WireFrame );
-        
+        image.drawTriangle( { WINDOW_WIDTH * 0.5f + dx, WINDOW_HEIGHT * 0.25 }, { WINDOW_WIDTH * 0.25f + dx, WINDOW_HEIGHT * 0.75f }, { WINDOW_WIDTH * 0.75f + dx, WINDOW_HEIGHT * 0.75f }, Color::Blue, {}, FillMode::WireFrame );
+
+        image.drawText( Font::Default, 10, 10, fps, Color::White );
+
         window.present( image );
 
         Event e;
@@ -69,7 +75,9 @@ int main( int argc, char* argv[] )
         totalTime += timer.elapsedSeconds();
         if ( totalTime > 1.0 )
         {
-            std::cout << std::format( "FPS: {:.3f}\n", frameCount / totalTime );
+            fps = std::format( "FPS: {:.3f}", static_cast<double>( frameCount ) / totalTime );
+
+            std::cout << fps << std::endl;
 
             frameCount = 0;
             totalTime  = 0.0;

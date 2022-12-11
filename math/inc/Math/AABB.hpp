@@ -230,6 +230,11 @@ struct AABB
         return { a, b, c };
     }
 
+    static AABB fromQuad( const glm::vec3& a, const glm::vec3& b, const glm::vec3& c, const glm::vec3& d )
+    {
+        return { a, b, c, d };
+    }
+
     /// <summary>
     /// Construct an AABB from a rectangle.
     /// </summary>

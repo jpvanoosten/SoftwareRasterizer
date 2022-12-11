@@ -18,6 +18,7 @@
 namespace sr
 {
 class Sprite;
+class Font;
 
 struct SR_API Image
 {
@@ -108,6 +109,18 @@ struct SR_API Image
     void drawTriangle( const glm::vec2& p0, const glm::vec2& p1, const glm::vec2& p2, const Color& color, const BlendMode& blendMode = {}, FillMode fillMode = FillMode::Solid ) noexcept;
 
     /// <summary>
+    /// Draw a 2D quad on the screen.
+    /// </summary>
+    /// <param name="p0">The first quad point.</param>
+    /// <param name="p1">The second quad point.</param>
+    /// <param name="p2">The third quad point.</param>
+    /// <param name="p3">The fourth quad point.</param>
+    /// <param name="color">The color of the quad.</param>
+    /// <param name="blendMode">The blending mode to apply when rendering.</param>
+    /// <param name="fillMode">The fill mode to use.</param>
+    void drawQuad( const glm::vec2& p0, const glm::vec2& p1, const glm::vec2& p2, const glm::vec2& p3, const Color& color, const BlendMode& blendMode = {}, FillMode fillMode = FillMode::Solid ) noexcept;
+
+    /// <summary>
     /// Draw an axis-aligned bounding box to the image.
     /// </summary>
     /// <param name="aabb">The AABB to draw.</param>
@@ -132,6 +145,16 @@ struct SR_API Image
     /// <param name="sprite">The sprite to draw.</param>
     /// <param name="transform">The transform to apply to the sprite.</param>
     void drawSprite( const Sprite& sprite, const Math::Transform2D& transform ) noexcept;
+
+    /// <summary>
+    /// Draw text to the image.
+    /// </summary>
+    /// <param name="font">The font to use for font.</param>
+    /// <param name="x">The x-coordinate of the top-left corner of the text.</param>
+    /// <param name="y">The y-coordinate of the top-left corner fo the text.</param>
+    /// <param name="text">The text to print to the screen.</param>
+    /// <param name="color">The color of the text to draw on the screen.</param>
+    void drawText( const Font& font, int x, int y, std::string_view text, const Color& color ) noexcept;
 
     /// <summary>
     /// Plot a single pixel to the image. Out-of-bounds coordinates are discarded.
