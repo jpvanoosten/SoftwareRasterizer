@@ -121,38 +121,58 @@ void Image::clear( const Color& color ) noexcept
 
 void Image::copy( const Image& srcImage, std::optional<Math::RectI> srcRect, std::optional<Math::RectI> dstRect, const BlendMode& blendMode )
 {
+    // If the source rectangle is not provided, use the entire source image.
     AABB srcAABB = AABB::fromRect( srcRect ? *srcRect : srcImage.getRect() );
-    AABB dstAABB = AABB::fromRect( dstRect ? *dstRect : getRect() );
+    // If the destination rect is not provided, use the entire source image.
+    // I assume that the "expected behaviour" of this method to copy the source image to the
+    // destination image (without scaling) even if that results in clipping of the source image.
+    AABB dstAABB = AABB::fromRect( dstRect ? *dstRect : srcImage.getRect() );
 
-    // If the source AABB doesn't intersect with the source image bounds...
+    // If the source AABB doesn't intersect with the source image bounds.
+    // In other words, the source image rectangle doesn't cover any part of the source image.
     if ( !srcImage.m_AABB.intersect( srcAABB ) )
         return;
 
+    // Clamp the source AABB to the AABB of the source image (to prevent sampling outside of the source image bounds).
     srcAABB.clamp( srcImage.m_AABB );
 
+    // Source width
     const int sW = static_cast<int>( srcAABB.width() );
+    // Source height
     const int sH = static_cast<int>( srcAABB.height() );
 
     // If the destination AABB doesn't intersect with this image bounds...
+    // In other words, the destination bounds is completely offscreen.
     if ( !m_AABB.intersect( dstAABB ) )
         return;
 
-    dstAABB.clamp( m_AABB );
-
+    // Destination width
     const int dW = static_cast<int>( dstAABB.width() );
+    // Destination height
     const int dH = static_cast<int>( dstAABB.height() );
-    const int dA = dW * dH;
 
+    // Clamp the dstAABB to the bounds of this image (to prevent writing outside of this image's bounds).
+    AABB dstImage = dstAABB.clamped( m_AABB );
+
+    // Clamped image width.
+    const int iW = static_cast<int>( dstImage.width() );
+    // Clamped image height.
+    const int iH = static_cast<int>( dstImage.height() );
+    // Clamped image area
+    const int iA = iW * iH;
+
+    // Pointer to source image data.
     const Color* src = srcImage.data();
-    Color*       dst = data();
+    // Pointer to destination image data.
+    Color* dst = data();
 
-#pragma omp parallel for firstprivate( srcAABB, dstAABB, sW, sH, dW, dH )
-    for ( int i = 0; i < dA; ++i )
+#pragma omp parallel for firstprivate( srcAABB, dstAABB, dstImage, sW, sH, dW, dH, iW, iH )
+    for ( int i = 0; i < iA; ++i )
     {
-        const int x  = i % dW;
-        const int y  = i / dW;
-        const int dx = x + static_cast<int>( dstAABB.min.x );
-        const int dy = y + static_cast<int>( dstAABB.min.y );
+        const int x  = i % iW;
+        const int y  = i / iW;
+        const int dx = x + static_cast<int>( dstImage.min.x );
+        const int dy = y + static_cast<int>( dstImage.min.y );
         const int sx = ( x * sW / dW ) + static_cast<int>( srcAABB.min.x );
         const int sy = ( y * sH / dH ) + static_cast<int>( srcAABB.min.y );
 
@@ -165,6 +185,12 @@ void Image::copy( const Image& srcImage, std::optional<Math::RectI> srcRect, std
 
 void Image::drawLine( int x0, int y0, int x1, int y1, const Color& color, const BlendMode& blendMode ) noexcept
 {
+    // Clamp the lines to the image bounds.
+    x0 = std::clamp( x0, 0, static_cast<int>( m_width ) );
+    y0 = std::clamp( y0, 0, static_cast<int>( m_height ) );
+    x1 = std::clamp( x1, 0, static_cast<int>( m_width ) );
+    y1 = std::clamp( y1, 0, static_cast<int>( m_height ) );
+
     const int dx = std::abs( x1 - x0 );
     const int dy = -std::abs( y1 - y0 );
     const int sx = x0 < x1 ? 1 : -1;

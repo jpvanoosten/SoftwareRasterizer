@@ -45,21 +45,31 @@ int main( int argc, char* argv[] )
         image.clear( Color::Black );
 
         // Center the image on screen and maintain the aspect ratio.
+        float aspectRatio = static_cast<float>( monaLisa.getWidth() ) / static_cast<float>( monaLisa.getHeight() );
         float scaleRatio;
+        int   width;
+        int   height;
         if (image.getWidth() > image.getHeight())
         {
+            // Width is greater than the height. Scale by the height.
             scaleRatio = static_cast<float>( image.getHeight() ) / static_cast<float>( monaLisa.getHeight() );
+            height = monaLisa.getHeight() * scaleRatio;
+            width = height * aspectRatio;
         }
         else
         {
+            // Height is greater than the width. Scale by the width.
             scaleRatio = static_cast<float>( image.getWidth() ) / static_cast<float>( monaLisa.getWidth() );
+            width      = monaLisa.getWidth() * scaleRatio;
+            height     = width / aspectRatio;
         }
 
-        RectI dstRect = { 0, 0, static_cast<int>( monaLisa.getWidth() * scaleRatio ), static_cast<int>( monaLisa.getHeight() * scaleRatio ) };
-        dstRect.left  = ( static_cast<int>( image.getWidth() ) - dstRect.width ) / 2;
-        dstRect.top   = ( static_cast<int>( image.getHeight() ) - dstRect.height ) / 2;
+        RectI dstRect = { 0, 0, width, height };
+        dstRect.left  = ( static_cast<int>( image.getWidth() ) - width ) / 2;
+        dstRect.top   = ( static_cast<int>( image.getHeight() ) - height ) / 2;
 
         image.copy( monaLisa, {}, dstRect );
+        //image.copy( monaLisa ); // TODO: Fix. This should not scale.
         window.present( image );
 
         Event e;
