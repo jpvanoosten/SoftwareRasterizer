@@ -67,11 +67,10 @@ int main( int argc, char* argv[] )
 
         RectI dstRect = { 0, 0, width, height };
         // Center on screen.
-        dstRect.left  = ( static_cast<int>( image.getWidth() ) - width ) / 2;
-        dstRect.top   = ( static_cast<int>( image.getHeight() ) - height ) / 2;
+        dstRect.left = ( static_cast<int>( image.getWidth() ) - width ) / 2;
+        dstRect.top  = ( static_cast<int>( image.getHeight() ) - height ) / 2;
 
         image.copy( monaLisa, {}, dstRect );
-
         window.present( image );
 
         Event e;

@@ -183,6 +183,42 @@ void Image::copy( const Image& srcImage, std::optional<Math::RectI> srcRect, std
     }
 }
 
+void Image::copy( const Image& srcImage, int x, int y )
+{
+    // Source image coords.
+    int sX = x < 0 ? -x : 0;
+    int sY = y < 0 ? -y : 0;
+    int sW = static_cast<int>( srcImage.getWidth() ) - sX;
+    int sH = static_cast<int>( srcImage.getHeight() ) - sY;
+
+    // Check if source image is offscreen.
+    if ( sW <= 0 || sH <= 0 )
+        return;
+
+    // Destination coords.
+    int dX = x < 0 ? 0 : x;
+    int dY = y < 0 ? 0 : y;
+    int dW = static_cast<int>( m_width ) - dX;
+    int dH = static_cast<int>( m_height ) - dY;
+
+    // Check if the destination range is offscreen.
+    if ( dW <= 0 || dH <= 0 )
+        return;
+
+    // The destination copy region is the minimum of the source
+    // and destination dimensions.
+    int w = std::min( sW, dW );
+    int h = std::min( sH, dH );
+
+    const uint32_t srcWidth = srcImage.getWidth();
+    const Color*   src      = srcImage.data();
+    Color*         dst      = data();
+
+    #pragma parallel for firstprivate(w, h, sX, dX )
+    for ( int i = 0; i < h; ++i )
+        memcpy_s( dst + (i + dY) * m_width + dX, w * sizeof( Color ), src + (i + sY) * srcWidth + sX, w * sizeof( Color ) );
+}
+
 void Image::drawLine( int x0, int y0, int x1, int y1, const Color& color, const BlendMode& blendMode ) noexcept
 {
     // Clamp the lines to the image bounds.

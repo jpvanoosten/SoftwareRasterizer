@@ -52,6 +52,16 @@ struct SR_API Image
     void copy( const Image& srcImage, std::optional<Math::RectI> srcRect = {}, std::optional<Math::RectI> dstRect = {}, const BlendMode& blendMode = {} );
 
     /// <summary>
+    /// This is a simple 1:1 pixel copy to from the source image to the destination image.
+    /// If you don't need to scale, translate, or rotate the source image, this method
+    /// will be faster than using a sprite.
+    /// </summary>
+    /// <param name="srcImage">The source image to copy to this one.</param>
+    /// <param name="x">The x-coordinate of the top-left corner of the destination image.</param>
+    /// <param name="y">The y-coordinate of the top-left corner of the destination image.</param>
+    void copy( const Image& srcImage, int x, int y );
+
+    /// <summary>
     /// Draw a line on the image.
     /// </summary>
     /// <param name="x0">The x-coordinate of the start point of the line.</param>
