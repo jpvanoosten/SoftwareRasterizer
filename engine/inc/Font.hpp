@@ -1,9 +1,10 @@
 #pragma once
 
+#include "Color.hpp"
 #include "Config.hpp"
-#include "Vertex.hpp"
 
 #include <glm/vec2.hpp>
+#include <stb_truetype.h>
 
 #include <filesystem>
 
@@ -25,8 +26,10 @@ public:
     /// Load a font from a font file.
     /// </summary>
     /// <param name="fontFile">The TrueType font to load.</param>
-    /// <param name="size">The size of the font (in pixels) to generate.</param>
-    Font( const std::filesystem::path& fontFile, float size = 12.0f);
+    /// <param name="size">(optional) The size of the font (in pixels) to generate.</param>
+    /// <param name="firstChar">(optional) The first character in the font texture.</param>
+    /// <param name="numChars">(optional) The number of characters in the font texture.</param>
+    Font( const std::filesystem::path& fontFile, float size = 12.0f, uint32_t firstChar = 32u, uint32_t numChars = 96u);
 
     /// <summary>
     /// Get the size of the area needed to render the given text using this font.
@@ -46,12 +49,17 @@ public:
     static const Font Default;
 
 private:
-    // The font size.
-    float size;
-
     friend class Image;
 
     void drawText( Image& image, std::string_view text, int x, int y, const Color& color ) const;
 
+    // The font size.
+    float size;
+    uint32_t firstChar = 0;
+    uint32_t numChars = 0;
+
+    std::unique_ptr<Image>             fontImage;
+    std::unique_ptr<stbtt_bakedchar[]> bakedChar;
+    std::vector<unsigned char>         fontData;
 };
-}
+}  // namespace sr

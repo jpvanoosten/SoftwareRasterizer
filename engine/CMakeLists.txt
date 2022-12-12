@@ -7,6 +7,7 @@ set( INC_FILES
     inc/Color.hpp
     inc/Enums.hpp
     inc/Events.hpp
+    inc/File.hpp
     inc/Font.hpp
     inc/Image.hpp
     inc/KeyCodes.hpp

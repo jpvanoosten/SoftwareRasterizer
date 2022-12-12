@@ -60,7 +60,7 @@ Image::Image( const Image& copy )
 Image::Image( Image&& move ) noexcept
 : m_width { move.m_width }
 , m_height { move.m_height }
-, m_AABB { { 0, 0, 0 }, { m_width - 1, m_height - 1, 0 } }
+, m_AABB { { 0, 0, 0 }, { m_width, m_height, 0 } }
 , m_data { std::move( move.m_data ) }
 {
     move.m_width  = 0u;
@@ -84,7 +84,7 @@ Image& Image::operator=( Image&& image ) noexcept
 {
     m_width  = image.m_width;
     m_height = image.m_height;
-    m_AABB   = AABB { { 0, 0, 0 }, { m_width - 1, m_height - 1, 0 } };
+    m_AABB   = AABB { { 0, 0, 0 }, { m_width, m_height, 0 } };
 
     m_data = std::move( image.m_data );
 
@@ -103,7 +103,7 @@ void Image::resize( uint32_t width, uint32_t height )
     m_height = height;
     m_AABB   = {
           { 0, 0, 0 },
-          { m_width - 1, m_height - 1, 0 }
+          { m_width, m_height, 0 }
     };
 
     // Align color buffer to 64-byte boundary for better cache alignment on 64-bit architectures.
@@ -186,20 +186,20 @@ void Image::copy( const Image& srcImage, std::optional<Math::RectI> srcRect, std
 void Image::copy( const Image& srcImage, int x, int y )
 {
     // Source image coords.
-    int sX = x < 0 ? -x : 0;
-    int sY = y < 0 ? -y : 0;
-    int sW = static_cast<int>( srcImage.getWidth() ) - sX;
-    int sH = static_cast<int>( srcImage.getHeight() ) - sY;
+    const int sX = x < 0 ? -x : 0;
+    const int sY = y < 0 ? -y : 0;
+    const int sW = static_cast<int>( srcImage.getWidth() ) - sX;
+    const int sH = static_cast<int>( srcImage.getHeight() ) - sY;
 
     // Check if source image is offscreen.
     if ( sW <= 0 || sH <= 0 )
         return;
 
     // Destination coords.
-    int dX = x < 0 ? 0 : x;
-    int dY = y < 0 ? 0 : y;
-    int dW = static_cast<int>( m_width ) - dX;
-    int dH = static_cast<int>( m_height ) - dY;
+    const int dX = x < 0 ? 0 : x;
+    const int dY = y < 0 ? 0 : y;
+    const int dW = static_cast<int>( m_width ) - dX;
+    const int dH = static_cast<int>( m_height ) - dY;
 
     // Check if the destination range is offscreen.
     if ( dW <= 0 || dH <= 0 )
@@ -207,14 +207,14 @@ void Image::copy( const Image& srcImage, int x, int y )
 
     // The destination copy region is the minimum of the source
     // and destination dimensions.
-    int w = std::min( sW, dW );
-    int h = std::min( sH, dH );
+    const int w = std::min( sW, dW );
+    const int h = std::min( sH, dH );
 
     const uint32_t srcWidth = srcImage.getWidth();
     const Color*   src      = srcImage.data();
     Color*         dst      = data();
 
-#pragma parallel for firstprivate( w, h, sX, dX )
+#pragma omp parallel for firstprivate( w, h, sX, sY, dX, dY )
     for ( int i = 0; i < h; ++i )
         memcpy_s( dst + ( i + dY ) * m_width + dX, w * sizeof( Color ), src + ( i + sY ) * srcWidth + sX, w * sizeof( Color ) );
 }
@@ -279,11 +279,14 @@ void Image::drawTriangle( const glm::vec2& p0, const glm::vec2& p1, const glm::v
         const int height = static_cast<int>( aabb.height() );
         const int area   = width * height;
 
+        drawAABB( aabb, Color::Red, {}, FillMode::WireFrame );
+
 #pragma omp parallel for firstprivate( aabb, width, height, area )
         for ( int i = 0; i < area; ++i )
         {
             const int x = ( i % width ) + static_cast<int>( aabb.min.x );
             const int y = ( i / width ) + static_cast<int>( aabb.min.y );
+
             if ( pointInsideTriangle( { x, y }, p0, p1, p2 ) )
                 plot( x, y, color, blendMode );
         }
@@ -362,7 +365,7 @@ void Image::drawAABB( AABB aabb, const Color& color, const BlendMode& blendMode,
         const glm::ivec2 max     = aabb.max;
         const glm::ivec2 verts[] = { { min.x, min.y }, { max.x, min.y }, { max.x, max.y }, { min.x, max.y } };
 
-        for ( int i = 0; i < 3; ++i )
+        for ( int i = 0; i < 4; ++i )
         {
             drawLine( verts[i], verts[( i + 1 ) % 4], color, blendMode );
         }
@@ -377,7 +380,7 @@ void Image::drawAABB( AABB aabb, const Color& color, const BlendMode& blendMode,
         const int height = static_cast<int>( aabb.height() );
         const int area   = width * height;
 
-#pragma omp parallel for firstprivate( aabb, width, height, area )
+#pragma omp parallel for firstprivate( aabb, width, area )
         for ( int i = 0; i < area; ++i )
         {
             const int x = ( i % width ) + static_cast<int>( aabb.min.x );
