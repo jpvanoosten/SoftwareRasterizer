@@ -279,8 +279,6 @@ void Image::drawTriangle( const glm::vec2& p0, const glm::vec2& p1, const glm::v
         const int height = static_cast<int>( aabb.height() );
         const int area   = width * height;
 
-        drawAABB( aabb, Color::Red, {}, FillMode::WireFrame );
-
 #pragma omp parallel for firstprivate( aabb, width, height, area )
         for ( int i = 0; i < area; ++i )
         {
@@ -327,7 +325,7 @@ void Image::drawQuad( const glm::vec2& p0, const glm::vec2& p1, const glm::vec2&
 
         // Clamp to the size of the screen.
         aabb.clamp( m_AABB );
-        
+
 #pragma omp parallel for schedule( dynamic ) firstprivate( aabb, indicies, verts )
         for ( int y = static_cast<int>( aabb.min.y ); y <= static_cast<int>( aabb.max.y ); ++y )
         {
