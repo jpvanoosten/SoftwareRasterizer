@@ -131,8 +131,10 @@ void Image::save( const std::filesystem::path& file ) const
     {
         stbi_write_jpg( file.string().c_str(), static_cast<int>( m_width ), static_cast<int>( m_height ), 4, m_data.get(), 10 );
     }
-
-    std::cerr << "Invalid file extension: " << extension.string() << std::endl;
+    else
+    {
+        std::cerr << "Invalid file type: " << file << std::endl;
+    }
 }
 
 void Image::clear( const Color& color ) noexcept

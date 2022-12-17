@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Config.hpp"
 #include "Color.hpp"
+#include "Config.hpp"
 
 namespace sr
 {
@@ -227,12 +227,12 @@ constexpr Color BlendMode::Blend( const Color& srcColor, const Color& dstColor )
     if ( !blendEnable )
         return srcColor;
 
-    const Color   sRGB = ComputeBlendFactor( srcColor, dstColor, srcFactor ) * srcColor;
-    const Color   dRGB = ComputeBlendFactor( srcColor, dstColor, dstFactor ) * dstColor;
-    const uint8_t sA   = ComputeBlendFactor( srcColor.a, dstColor.a, srcAlphaFactor ) * srcColor.a;
-    const uint8_t dA   = ComputeBlendFactor( srcColor.a, dstColor.a, dstAlphaFactor ) * dstColor.a;
+    const Color sRGB = ComputeBlendFactor( srcColor, dstColor, srcFactor ) * srcColor;
+    const Color dRGB = ComputeBlendFactor( srcColor, dstColor, dstFactor ) * dstColor;
+    const auto  sA   = static_cast<uint8_t>( ComputeBlendFactor( srcColor.a, dstColor.a, srcAlphaFactor ) * srcColor.a / 255 );
+    const auto  dA   = static_cast<uint8_t>( ComputeBlendFactor( srcColor.a, dstColor.a, dstAlphaFactor ) * dstColor.a / 255 );
 
-    const Color RGB = ComputeBlendOp( sRGB, dRGB, blendOp );
+    const Color   RGB = ComputeBlendOp( sRGB, dRGB, blendOp );
     const uint8_t A   = ComputeBlendOp( sA, dA, alphaOp );
 
     return { RGB.r, RGB.g, RGB.b, A };

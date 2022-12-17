@@ -12,7 +12,10 @@ namespace Math
 /// </summary>
 struct AABB
 {
-    AABB() = default;
+    AABB()
+    : min { std::numeric_limits<float>::max() }
+    , max { std::numeric_limits<float>::lowest() }
+    {}
 
     AABB( const AABB& copy )
     : min { copy.min }

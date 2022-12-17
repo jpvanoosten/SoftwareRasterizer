@@ -32,8 +32,14 @@ Font::Font( const std::filesystem::path& fontFile, float size, uint32_t firstCha
         bakedChar = std::make_unique<stbtt_bakedchar[]>( numChars );
         fontData  = File::readFile<unsigned char>( fontFile, std::ios::binary );
 
-        // Calculate the size of the pixel buffer for the font.
-        const int pw         = static_cast<int>( std::ceil( size ) ) * static_cast<int>( numChars );
+        stbtt_InitFont( &fontInfo, fontData.data(), 0 );
+        //int x0, y0, x1, y1;
+        //stbtt_GetFontBoundingBox( &fontInfo, &x0, &y0, &x1, &y1 );
+        //float scale = stbtt_ScaleForPixelHeight( &fontInfo, size );
+
+        // I'm not sure how to calculate the exact size of the pixel buffer needed for the font.
+        // This pixel width is very liberal, but better safe than sorry.
+        const int pw         = static_cast<int>( std::ceil( static_cast<float>( numChars ) * size ) );
         const int ph         = static_cast<int>( std::ceil( size ) );
         auto      fontBitmap = std::make_unique<unsigned char[]>( static_cast<size_t>( pw ) * ph );
 
@@ -43,11 +49,14 @@ Font::Font( const std::filesystem::path& fontFile, float size, uint32_t firstCha
         // Copy the alpha values of the font bitmap to the font image.
         fontImage = std::make_unique<Image>( pw, ph );
         Color* c  = fontImage->data();
-        for (int y = 0; y < ph; ++y)
+        for ( int y = 0; y < ph; ++y )
         {
-            for (int x = 0; x < pw; ++x)
+            for ( int x = 0; x < pw; ++x )
             {
-                c[y * pw + x] = Color( 255, 255, 255, fontBitmap[y * pw + x] );
+                size_t        i = static_cast<size_t>( y ) * pw + x;
+                unsigned char a = fontBitmap[i];
+
+                c[i] = Color { 255, 255, 255, a };
             }
         }
 
@@ -63,9 +72,41 @@ Font::Font( const std::filesystem::path& fontFile, float size, uint32_t firstCha
 
 glm::ivec2 Font::getSize( std::string_view text ) const noexcept
 {
-    // TODO: Compute text dimensions for TrueType fonts.
-    int width  = stb_easy_font_width( text.data() ) * size;
-    int height = stb_easy_font_height( text.data() ) * size;
+    float width  = 0.0f;
+    float height = 0.0f;
+
+    if ( fontImage && bakedChar )
+    {
+        // TODO: There must be a better way of computing the size of the text using font metrics.
+        // But using GetBakedQuad seems like the most obvious (but not optimal) approach.
+        Math::AABB        aabb;
+        const char* t    = text.data();
+        float       xPos = 0.0f;
+        float       yPos = 0.0f;
+        while ( *t )
+        {
+            if ( *t >= firstChar && *t < ( firstChar + numChars ) )
+            {
+                stbtt_aligned_quad q;
+                stbtt_GetBakedQuad( bakedChar.get(), static_cast<int>( fontImage->getWidth() ), static_cast<int>( fontImage->getHeight() ), *t - firstChar, &xPos, &yPos, &q, 1 );
+                aabb.expand( Math::AABB::fromMinMax( { q.x0, q.y0, 0 }, { q.x1, q.y1, 0 } ) );
+            }
+            else if ( *t == '\n' )
+            {
+                xPos = 0.0f;
+                yPos += size;
+            }
+
+            ++t;
+        }
+        width = aabb.width();
+        height = aabb.height();
+    }
+    else
+    {
+        width  = static_cast<float>( stb_easy_font_width( text.data() ) ) * size;
+        height = static_cast<float>( stb_easy_font_height( text.data() ) ) * size;
+    }
 
     return { width, height };
 }
@@ -74,15 +115,6 @@ void Font::drawText( Image& image, std::string_view text, int x, int y, const Co
 {
     if ( fontImage && bakedChar )
     {
-        //Vertex v0 { { x, y }, { 0, 0 }, color };
-        //Vertex v1 { { x + fontImage->getWidth(), y }, { 1, 0 }, color };
-        //Vertex v2 { { x + fontImage->getWidth(), y + fontImage->getHeight() }, { 1, 1 }, color };
-        //Vertex v3 { { x, y + fontImage->getHeight() }, { 0, 1 }, color };
-
-        //image.drawQuad( v0, v1, v2, v3, *fontImage, BlendMode::AlphaBlend );
-        //image.drawQuad( { x, y }, { x + fontImage->getWidth(), y }, { x + fontImage->getWidth(), y + fontImage->getHeight() }, { x, y + fontImage->getHeight() }, Color::Red, {}, FillMode::WireFrame );
-        //return;
-
         const char* t    = text.data();
         auto        xPos = static_cast<float>( x );
         auto        yPos = static_cast<float>( y );
@@ -99,8 +131,14 @@ void Font::drawText( Image& image, std::string_view text, int x, int y, const Co
                 Vertex v3 { { q.x0, q.y1 }, { q.s0, q.t1 }, color };
 
                 image.drawQuad( v0, v1, v2, v3, *fontImage, BlendMode::AlphaBlend );
-                //image.drawQuad( { q.x0, q.y0 }, { q.x1, q.y0 }, { q.x1, q.y1 }, { q.x0, q.y1 }, Color::Red, {}, FillMode::WireFrame );
+                // image.drawQuad( { q.x0, q.y0 }, { q.x1, q.y0 }, { q.x1, q.y1 }, { q.x0, q.y1 }, Color::Red, {}, FillMode::WireFrame );
             }
+            else if ( *t == '\n' )
+            {
+                xPos = static_cast<float>( x );
+                yPos += size;
+            }
+
             ++t;
         }
     }

@@ -34,8 +34,8 @@ int main( int argc, char* argv[] )
     Image image { static_cast<uint32_t>( window.getWidth() ), static_cast<uint32_t>( window.getHeight() ) };
 
     // Load a font.
-    Font font24 { "assets/fonts/gbb__.ttf", 24 };
-    Font font56 { "assets/fonts/gbb__.ttf", 56 };
+    Font font24 { "assets/fonts/arial.ttf", 24 };
+    Font font56 { "assets/fonts/arial.ttf", 56 };
 
     window.show();
 
@@ -51,8 +51,14 @@ int main( int argc, char* argv[] )
 
         image.drawText( font24, 10, 24, fps, Color::White );
 
-        image.drawText( font56, 50, 90, "The quick brown fox jumps", Color::White );
-        image.drawText( font56, 50, 146, "over the lazy dog.", Color::White );
+        // Draw some text centered on the screen.
+        {
+            const std::string text = "The quick brown fox jumps\nover the lazy dog.";
+            const auto        size = font56.getSize( text );
+            int               x    = ( static_cast<int>( image.getWidth() ) - size.x ) / 2;
+            int               y    = ( static_cast<int>( image.getHeight() ) - size.y ) / 2;
+            image.drawText( font56, x, y, text, Color::White );
+        }
 
         window.present( image );
 
@@ -88,5 +94,7 @@ int main( int argc, char* argv[] )
             frameCount = 0;
             totalTime  = 0.0;
         }
+
+        timer.limitFPS( 60 );
     }
 }

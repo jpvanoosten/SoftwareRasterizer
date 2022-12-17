@@ -58,6 +58,7 @@ private:
     uint32_t firstChar = 0;
     uint32_t numChars = 0;
 
+    stbtt_fontinfo                     fontInfo;
     std::unique_ptr<Image>             fontImage;
     std::unique_ptr<stbtt_bakedchar[]> bakedChar;
     std::vector<unsigned char>         fontData;

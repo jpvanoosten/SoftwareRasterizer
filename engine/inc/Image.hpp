@@ -225,7 +225,7 @@ struct SR_API Image
     /// <returns>The color of the texel at the given UV texture coordinates.</returns>
     const Color& sample( float u, float v, AddressMode addressMode = AddressMode::Wrap ) const noexcept
     {
-        return sample( static_cast<int>( u * static_cast<float>( m_width ) ), static_cast<int>( v * static_cast<float>( m_height ) ), addressMode );
+        return sample( static_cast<int>( std::round( u * static_cast<float>( m_width ) ) ), static_cast<int>( std::round( v * static_cast<float>( m_height ) ) ), addressMode );
     }
 
     /// <summary>
