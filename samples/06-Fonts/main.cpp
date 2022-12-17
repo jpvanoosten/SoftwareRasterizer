@@ -1,11 +1,14 @@
-#include <Font.hpp>
+#include "Font.hpp"
+
 #include <Image.hpp>
+#include <Sprite.hpp>
 #include <Timer.hpp>
 #include <Window.hpp>
 
 #include <iostream>
 
 using namespace sr;
+using namespace Math;
 
 int main( int argc, char* argv[] )
 {
@@ -25,8 +28,14 @@ int main( int argc, char* argv[] )
     const int WINDOW_WIDTH  = 800;
     const int WINDOW_HEIGHT = 600;
 
-    Window window { L"02 - Triangle", WINDOW_WIDTH, WINDOW_HEIGHT };
-    Image  image { WINDOW_WIDTH, WINDOW_HEIGHT };
+    Window window { L"06 - Fonts", WINDOW_WIDTH, WINDOW_HEIGHT };
+
+    // Image to render to.
+    Image image { static_cast<uint32_t>( window.getWidth() ), static_cast<uint32_t>( window.getHeight() ) };
+
+    // Load a font.
+    Font font24 { "assets/fonts/gbb__.ttf", 24 };
+    Font font56 { "assets/fonts/gbb__.ttf", 56 };
 
     window.show();
 
@@ -37,16 +46,13 @@ int main( int argc, char* argv[] )
 
     while ( window )
     {
-        image.clear( Color::White );
+        image.resize( window.getWidth(), window.getHeight() );
+        image.clear( Color::Black );
 
-        float dx = std::sinf( timer.totalSeconds() * 0.5 ) * static_cast<float>( WINDOW_WIDTH / 2 );
+        image.drawText( font24, 10, 24, fps, Color::White );
 
-        // Draw a red triangle in the middle of the screen.
-        image.drawTriangle( { WINDOW_WIDTH * 0.5f + dx, WINDOW_HEIGHT * 0.25 }, { WINDOW_WIDTH * 0.25f + dx, WINDOW_HEIGHT * 0.75f }, { WINDOW_WIDTH * 0.75f + dx, WINDOW_HEIGHT * 0.75f }, Color::Red );
-        // Draw a blue outline for the triangle.
-        image.drawTriangle( { WINDOW_WIDTH * 0.5f + dx, WINDOW_HEIGHT * 0.25 }, { WINDOW_WIDTH * 0.25f + dx, WINDOW_HEIGHT * 0.75f }, { WINDOW_WIDTH * 0.75f + dx, WINDOW_HEIGHT * 0.75f }, Color::Blue, {}, FillMode::WireFrame );
-
-        image.drawText( Font::Default, 10, 10, fps, Color::Black );
+        image.drawText( font56, 50, 90, "The quick brown fox jumps", Color::White );
+        image.drawText( font56, 50, 146, "over the lazy dog.", Color::White );
 
         window.present( image );
 

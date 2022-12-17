@@ -350,6 +350,62 @@ void Image::drawQuad( const glm::vec2& p0, const glm::vec2& p1, const glm::vec2&
     }
 }
 
+void Image::drawQuad( const Vertex& v0, const Vertex& v1, const Vertex& v2, const Vertex& v3, const Image& image, const BlendMode& _blendMode ) noexcept
+{
+    // Compute an AABB over the sprite quad.
+    AABB aabb {
+        { v0.position, 0.0f },
+        { v1.position, 0.0f },
+        { v2.position, 0.0f },
+        { v3.position, 0.0f }
+    };
+
+    // Check if the AABB of the sprite is on screen.
+    if ( !m_AABB.intersect( aabb ) )
+        return;
+
+    // Clamp to the size of the screen.
+    aabb.clamp( m_AABB );
+
+    Vertex verts[] = {
+        v0, v1, v2, v3
+    };
+
+    // Index buffer for the two triangles of the quad.
+    const uint32_t indicies[] = {
+        0, 1, 3,
+        1, 2, 3
+    };
+
+    const BlendMode blendMode = _blendMode;
+
+#pragma omp parallel for schedule( dynamic ) firstprivate( aabb, indicies, verts, blendMode )
+    for ( int y = static_cast<int>( aabb.min.y ); y <= static_cast<int>( aabb.max.y ); ++y )
+    {
+        for ( int x = static_cast<int>( aabb.min.x ); x <= static_cast<int>( aabb.max.x ); ++x )
+        {
+            for ( uint32_t i = 0; i < std::size( indicies ); i += 3 )
+            {
+                const uint32_t i0 = indicies[i + 0];
+                const uint32_t i1 = indicies[i + 1];
+                const uint32_t i2 = indicies[i + 2];
+
+                glm::vec3 bc = barycentric( verts[i0].position, verts[i1].position, verts[i2].position, { x, y } );
+                if ( barycentricInside( bc ) )
+                {
+                    // Compute interpolated UV
+                    const glm::vec2 texCoord = verts[i0].texCoord * bc.x + verts[i1].texCoord * bc.y + verts[i2].texCoord * bc.z;
+                    const Color     color    = verts[i0].color * bc.x + verts[i1].color * bc.y + verts[i2].color * bc.z;
+                    // Sample the texture.
+                    const Color c = image.sample( texCoord.x, texCoord.y ) * color;
+                    // Plot.
+                    plot( static_cast<uint32_t>( x ), static_cast<uint32_t>( y ), c, blendMode );
+                }
+            }
+        }
+    }
+}
+
 void Image::drawAABB( AABB aabb, const Color& color, const BlendMode& blendMode, FillMode fillMode ) noexcept
 {
     if ( !m_AABB.intersect( aabb ) )
@@ -404,10 +460,10 @@ void Image::drawSprite( const Sprite& sprite, const Math::Transform2D& transform
     const glm::mat3& matrix = transform.getTransform();
 
     Vertex verts[] = {
-        Vertex { { 0, 0 }, { uv.x, uv.y }, color },                             // Top-left
-        Vertex { { size.x, 0 }, { uv.x + size.x, 0 }, color },                  // Top-right
-        Vertex { { 0, size.y }, { 0, uv.y + size.y }, color },                  // Bottom-left
-        Vertex { { size.x, size.y }, { uv.x + size.x, uv.y + size.y }, color }  // Bottom-right
+        Vertex { { 0, 0 }, { uv.x, uv.y }, color },                              // Top-left
+        Vertex { { size.x, 0 }, { uv.x + size.x, 0 }, color },                   // Top-right
+        Vertex { { size.x, size.y }, { uv.x + size.x, uv.y + size.y }, color },  // Bottom-right
+        Vertex { { 0, size.y }, { 0, uv.y + size.y }, color }                    // Bottom-left
     };
 
     // Transform verts.
@@ -433,8 +489,8 @@ void Image::drawSprite( const Sprite& sprite, const Math::Transform2D& transform
 
     // Index buffer for the two triangles of the quad.
     const uint32_t indicies[] = {
-        0, 1, 2,
-        1, 3, 2
+        0, 1, 3,
+        1, 2, 3
     };
 
 #pragma omp parallel for schedule( dynamic ) firstprivate( aabb, indicies, verts, color, blendMode )
