@@ -38,6 +38,17 @@ struct SR_API Image
     void resize( uint32_t width, uint32_t height );
 
     /// <summary>
+    /// Save the image to disk.
+    /// Supported file formats are:
+    ///   * PNG
+    ///   * BMP
+    ///   * TGA
+    ///   * JPEG
+    /// </summary>
+    /// <param name="file"></param>
+    void save( const std::filesystem::path& file ) const;
+
+    /// <summary>
     /// Clear the image to a single color.
     /// </summary>
     /// <param name="color">The color to clear the screen to.</param>

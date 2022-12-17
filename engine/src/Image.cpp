@@ -3,12 +3,13 @@
 #include "Sprite.hpp"
 #include "Vertex.hpp"
 #include "stb_image.h"
+#include "stb_image_write.h"
 
 #include <Math/AABB.hpp>
 #include <Math/Math.hpp>
 
 #include <algorithm>
-#include <omp.h>
+#include <iostream>
 #include <optional>
 
 using namespace sr;
@@ -108,6 +109,30 @@ void Image::resize( uint32_t width, uint32_t height )
 
     // Align color buffer to 64-byte boundary for better cache alignment on 64-bit architectures.
     m_data = make_aligned_unique<Color[], 64>( static_cast<uint64_t>( width ) * height );
+}
+
+void Image::save( const std::filesystem::path& file ) const
+{
+    const auto extension = file.extension();
+
+    if ( extension == ".png" )
+    {
+        stbi_write_png( file.string().c_str(), static_cast<int>( m_width ), static_cast<int>( m_height ), 4, m_data.get(), static_cast<int>( m_width * sizeof( Color ) ) );
+    }
+    else if ( extension == ".bmp" )
+    {
+        stbi_write_bmp( file.string().c_str(), static_cast<int>( m_width ), static_cast<int>( m_height ), 4, m_data.get() );
+    }
+    else if ( extension == ".tga" )
+    {
+        stbi_write_tga( file.string().c_str(), static_cast<int>( m_width ), static_cast<int>( m_height ), 4, m_data.get() );
+    }
+    else if ( extension == ".jpg" )
+    {
+        stbi_write_jpg( file.string().c_str(), static_cast<int>( m_width ), static_cast<int>( m_height ), 4, m_data.get(), 10 );
+    }
+
+    std::cerr << "Invalid file extension: " << extension.string() << std::endl;
 }
 
 void Image::clear( const Color& color ) noexcept

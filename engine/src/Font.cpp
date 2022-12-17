@@ -51,6 +51,9 @@ Font::Font( const std::filesystem::path& fontFile, float size, uint32_t firstCha
             }
         }
 
+        //auto fontTga = fontFile;
+        //fontTga.replace_extension( "tga" );
+        //fontImage->save( fontTga );
     }
     else
     {
@@ -60,6 +63,7 @@ Font::Font( const std::filesystem::path& fontFile, float size, uint32_t firstCha
 
 glm::ivec2 Font::getSize( std::string_view text ) const noexcept
 {
+    // TODO: Compute text dimensions for TrueType fonts.
     int width  = stb_easy_font_width( text.data() ) * size;
     int height = stb_easy_font_height( text.data() ) * size;
 

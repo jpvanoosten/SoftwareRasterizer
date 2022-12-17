@@ -14,6 +14,7 @@ set( INC_FILES
     inc/Sprite.hpp
     inc/stb_easy_font.h
     inc/stb_image.h
+    inc/stb_image_write.h
 	inc/stb_truetype.h
     inc/Timer.hpp
     inc/Vertex.hpp
@@ -26,6 +27,7 @@ set( SRC_FILES
     src/Font.cpp
     src/Image.cpp
     src/stb_image.cpp
+    src/stb_image_write.cpp
 	src/stb_truetype.cpp
     src/Timer.cpp
     src/Window.cpp
