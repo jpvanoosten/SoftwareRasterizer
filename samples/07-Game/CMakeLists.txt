@@ -2,12 +2,13 @@ cmake_minimum_required( VERSION 3.23.0 )
 
 set( TARGET_NAME 07-Game )
 
-set( SRC_FILES
-    main.cpp
+set( INC_FILES
+    inc/Game.hpp
 )
 
-set( INC_FILES
-
+set( SRC_FILES
+    main.cpp
+    src/Game.cpp
 )
 
 set( ALL_FILES ${SRC_FILES} ${INC_FILES} )
@@ -21,6 +22,10 @@ set_target_properties( ${TARGET_NAME}
 
 target_link_libraries( ${TARGET_NAME} 
     PUBLIC SoftwareRasterizer
+)
+
+target_include_directories( ${TARGET_NAME}
+    PUBLIC inc
 )
 
 # Set Local Debugger Settings (Command Arguments and Environment Variables)

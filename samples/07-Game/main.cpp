@@ -1,14 +1,46 @@
-#include "Font.hpp"
-
 #include <Image.hpp>
 #include <Sprite.hpp>
 #include <Timer.hpp>
 #include <Window.hpp>
+#include <Game.hpp>
 
 #include <iostream>
 
 using namespace sr;
 using namespace Math;
+
+// Copy a source image to the destination image while maintaining the aspect ratio
+// of the source image.
+void CopyImage( Image& dst, const Image& src )
+{
+    // Center the image on screen and maintain the aspect ratio of the original image.
+    const float aspectRatio = static_cast<float>( src.getWidth() ) / static_cast<float>( src.getHeight() );
+    const float scaleWidth  = static_cast<float>( dst.getWidth() ) / static_cast<float>( src.getWidth() );
+    const float scaleHeight = static_cast<float>( dst.getHeight() ) / static_cast<float>( src.getHeight() );
+
+    int width;
+    int height;
+
+    if ( scaleWidth < scaleHeight )
+    {
+        // Size according to the width.
+        width  = static_cast<int>( dst.getWidth() );
+        height = static_cast<int>( static_cast<float>( width ) / aspectRatio );
+    }
+    else
+    {
+        // Size according to the height.
+        height = static_cast<int>( dst.getHeight() );
+        width  = static_cast<int>( static_cast<float>( height ) * aspectRatio );
+    }
+
+    RectI dstRect = { 0, 0, width, height };
+    // Center on screen.
+    dstRect.left = ( static_cast<int>( dst.getWidth() ) - width ) / 2;
+    dstRect.top  = ( static_cast<int>( dst.getHeight() ) - height ) / 2;
+
+    dst.copy( src, {}, dstRect );
+}
 
 int main( int argc, char* argv[] )
 {
@@ -25,41 +57,29 @@ int main( int argc, char* argv[] )
         }
     }
 
-    const int WINDOW_WIDTH  = 800;
-    const int WINDOW_HEIGHT = 600;
+    constexpr int SCREEN_WIDTH  = 800;
+    constexpr int SCREEN_HEIGHT = 600;
 
-    Window window { L"07 - Game", WINDOW_WIDTH, WINDOW_HEIGHT };
+    Window window { L"07 - Game", SCREEN_WIDTH, SCREEN_HEIGHT };
 
-    // Image to render to.
+    // Image to render the final image to.
     Image image { static_cast<uint32_t>( window.getWidth() ), static_cast<uint32_t>( window.getHeight() ) };
+    image.clear( Color::Black );
 
-    // Load a font.
-    Font font24 { "assets/fonts/arial.ttf", 24 };
-    Font font56 { "assets/fonts/arial.ttf", 56 };
+    // The game class.
+    Game game { SCREEN_WIDTH, SCREEN_HEIGHT };
 
     window.show();
 
-    Timer       timer;
-    double      totalTime  = 0.0;
-    uint64_t    frameCount = 0ull;
-    std::string fps        = "FPS: 0";
-
     while ( window )
     {
-        image.resize( window.getWidth(), window.getHeight() );
-        image.clear( Color::Black );
+        // Update the game.
+        game.Update();
 
-        image.drawText( font24, 10, 24, fps, Color::White );
+        // Copy the game screen to the window's image.
+        CopyImage( image, game.getImage() );
 
-        // Draw some text centered on the screen.
-        {
-            const std::string text = "The quick brown fox jumps\nover the lazy dog.";
-            const auto        size = font56.getSize( text );
-            int               x    = ( static_cast<int>( image.getWidth() ) - size.x ) / 2;
-            int               y    = ( static_cast<int>( image.getHeight() ) - size.y ) / 2;
-            image.drawText( font56, x, y, text, Color::White );
-        }
-
+        // Present.
         window.present( image );
 
         Event e;
@@ -78,21 +98,11 @@ int main( int argc, char* argv[] )
                     break;
                 }
                 break;
+            case Event::Resize:
+                image.resize( window.getWidth(), window.getHeight() );
+                image.clear( Color::Black );
+                break;
             }
-        }
-
-        timer.tick();
-        ++frameCount;
-
-        totalTime += timer.elapsedSeconds();
-        if ( totalTime > 1.0 )
-        {
-            fps = std::format( "FPS: {:.3f}", static_cast<double>( frameCount ) / totalTime );
-
-            std::cout << fps << std::endl;
-
-            frameCount = 0;
-            totalTime  = 0.0;
         }
     }
 }
