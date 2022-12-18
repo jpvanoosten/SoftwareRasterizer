@@ -12,6 +12,7 @@ set( INC_FILES
     inc/Image.hpp
     inc/KeyCodes.hpp
     inc/Sprite.hpp
+    inc/SpriteSheet.hpp
     inc/stb_easy_font.h
     inc/stb_image.h
     inc/stb_image_write.h
@@ -26,6 +27,7 @@ set( SRC_FILES
     src/Color.cpp
     src/Font.cpp
     src/Image.cpp
+    src/SpriteSheet.cpp
     src/stb_image.cpp
     src/stb_image_write.cpp
 	src/stb_truetype.cpp

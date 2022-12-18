@@ -28,18 +28,14 @@ int main( int argc, char* argv[] )
     const int WINDOW_WIDTH  = 800;
     const int WINDOW_HEIGHT = 600;
 
-    Window window { L"03 - Sprites", WINDOW_WIDTH, WINDOW_HEIGHT };
+    Window window { L"07 - Game", WINDOW_WIDTH, WINDOW_HEIGHT };
 
-    Image       monaLisa = Image::fromFile( "assets/textures/Mona_Lisa.jpg" );
-    Sprite      sprite { monaLisa };
-    Transform2D transform;
-    // Rotate around the center of the screen.
-    transform.setAnchor( { monaLisa.getWidth() / 2.0f, monaLisa.getHeight() / 2.0f } );
-    transform.setPosition( { WINDOW_WIDTH / 2.0f, WINDOW_HEIGHT / 2.0f } );
+    // Image to render to.
+    Image image { static_cast<uint32_t>( window.getWidth() ), static_cast<uint32_t>( window.getHeight() ) };
 
-    transform.scale( { 0.1f, 0.1f } );
-
-    Image image { WINDOW_WIDTH, WINDOW_HEIGHT };
+    // Load a font.
+    Font font24 { "assets/fonts/arial.ttf", 24 };
+    Font font56 { "assets/fonts/arial.ttf", 56 };
 
     window.show();
 
@@ -53,13 +49,16 @@ int main( int argc, char* argv[] )
         image.resize( window.getWidth(), window.getHeight() );
         image.clear( Color::Black );
 
-        transform.rotate( timer.elapsedSeconds() );
-        //image.drawSprite( sprite, transform );
-        int x = ( window.getWidth() - sprite.getSize().x ) / 2;
-        int y = ( window.getHeight() - sprite.getSize().y ) / 2;
-        image.drawSprite( sprite, x, y );
+        image.drawText( font24, 10, 24, fps, Color::White );
 
-        image.drawText( Font::Default, 10, 10, fps, Color::White );
+        // Draw some text centered on the screen.
+        {
+            const std::string text = "The quick brown fox jumps\nover the lazy dog.";
+            const auto        size = font56.getSize( text );
+            int               x    = ( static_cast<int>( image.getWidth() ) - size.x ) / 2;
+            int               y    = ( static_cast<int>( image.getHeight() ) - size.y ) / 2;
+            image.drawText( font56, x, y, text, Color::White );
+        }
 
         window.present( image );
 
