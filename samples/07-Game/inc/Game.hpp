@@ -8,6 +8,8 @@
 #include <Events.hpp>
 #include <Math/Rect.hpp>
 
+#include <LDtkLoader/Project.hpp>
+
 #include <cstdint>
 
 class Game
@@ -35,6 +37,9 @@ public:
     void onResized( const sr::ResizeEventArgs& args );
 
 protected:
+
+    ldtk::Project ldtkProject;
+
     sr::Image image;
     sr::Timer timer;
     // The game rectangle in the Window's coordinate frame.

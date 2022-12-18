@@ -10,6 +10,8 @@ Game::Game( uint32_t screenWidth, uint32_t screenHeight )
 , arial20 { "assets/fonts/arial.ttf", 20 }
 , arial24 { "assets/fonts/arial.ttf", 24 }
 {
+    ldtkProject.loadFromFile( "assets/Pixel Adventure/Pixel Adventure.ldtk" );
+
     background = Background { "assets/Pixel Adventure/Background/Blue.png", 1.0f, { 0.0f, 1.0f }, 0.3f };
 }
 
