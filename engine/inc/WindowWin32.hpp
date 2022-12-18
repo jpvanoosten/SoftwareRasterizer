@@ -7,6 +7,7 @@
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 #include <Windows.h>
+#include <windowsx.h>
 
 #include <queue>
 #include <string>
@@ -20,7 +21,7 @@ class SR_API WindowWin32 : public WindowImpl
 {
 public:
     WindowWin32( std::wstring_view title, int width, int height );
-    ~WindowWin32();
+    ~WindowWin32() override;
 
     void show() override;
     void present( const Image& image ) override;
@@ -40,13 +41,26 @@ protected:
     void pushEvent( const Event& e );
 
     void onClose();
-    void onKeyPressed( KeyEventArgs& e );
-    void onKeyReleased( KeyEventArgs& e );
-    void onResize( ResizeEventArgs& e );
+    void onKeyPressed( KeyEventArgs& args );
+    void onKeyReleased( KeyEventArgs& args );
+    void onResize( ResizeEventArgs& args );
     void onEndResize();
+    void onMouseEnter( MouseMovedEventArgs& args );
+    void onMouseMoved( MouseMovedEventArgs& args );
+    void onMouseButtonPressed( MouseButtonEventArgs& args );
+    void onMouseButtonReleased( MouseButtonEventArgs& args );
+    void onMouseWheel( MouseWheelEventArgs& args );
+    void onMouseHWheel( MouseWheelEventArgs& args );
+    void onMouseLeave();
 
 private:
-    friend LRESULT CALLBACK ::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam );
+    friend LRESULT CALLBACK::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam );
+
+    void trackMouseEvents() const;
+
+    int  previousMouseX = 0;
+    int  previousMouseY = 0;
+    bool inClientRect   = false;
 
     HWND              m_hWnd;
     std::queue<Event> m_eventQueue;

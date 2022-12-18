@@ -154,34 +154,31 @@ void WindowWin32::onClose()
     pushEvent( e );
 }
 
-void WindowWin32::onKeyPressed( KeyEventArgs& e )
+void WindowWin32::onKeyPressed( KeyEventArgs& args )
 {
-    const Event event {
+    const Event e {
         .type = Event::KeyPressed,
-        .key  = e,
+        .key  = args,
     };
-
-    pushEvent( event );
+    pushEvent( e );
 }
 
-void WindowWin32::onKeyReleased( KeyEventArgs& e )
+void WindowWin32::onKeyReleased( KeyEventArgs& args )
 {
-    const Event event {
+    const Event e {
         .type = Event::KeyReleased,
-        .key  = e,
+        .key  = args,
     };
-
-    pushEvent( event );
+    pushEvent( e );
 }
 
-void WindowWin32::onResize( ResizeEventArgs& e )
+void WindowWin32::onResize( ResizeEventArgs& args )
 {
-    const Event event {
+    const Event e {
         .type   = Event::Resize,
-        .resize = e
+        .resize = args
     };
-
-    pushEvent( event );
+    pushEvent( e );
 }
 
 void WindowWin32::onEndResize()
@@ -189,14 +186,105 @@ void WindowWin32::onEndResize()
     RECT clientRect;
     ::GetClientRect( m_hWnd, &clientRect );
 
-    const Event event {
+    const Event e {
         .type = Event::EndResize,
         .resize {
             .width  = clientRect.right - clientRect.left,
             .height = clientRect.bottom - clientRect.top }
     };
 
-    pushEvent( event );
+    pushEvent( e );
+}
+
+void WindowWin32::onMouseEnter( MouseMovedEventArgs& args )
+{
+    const Event e {
+        .type      = Event::MouseEnter,
+        .mouseMove = args
+    };
+    pushEvent( e );
+}
+
+void WindowWin32::onMouseButtonPressed( MouseButtonEventArgs& args )
+{
+    const Event e {
+        .type        = Event::MouseButtonPressed,
+        .mouseButton = args
+    };
+    pushEvent( e );
+}
+
+void WindowWin32::onMouseButtonReleased( MouseButtonEventArgs& args )
+{
+    const Event e {
+        .type        = Event::MouseButtonReleased,
+        .mouseButton = args
+    };
+    pushEvent( e );
+}
+
+void WindowWin32::onMouseWheel( MouseWheelEventArgs& args )
+{
+    const Event e {
+        .type       = Event::MouseWheel,
+        .mouseWheel = args
+    };
+    pushEvent( e );
+}
+
+void WindowWin32::onMouseHWheel( MouseWheelEventArgs& args )
+{
+    const Event e {
+        .type       = Event::MouseHWheel,
+        .mouseWheel = args
+    };
+    pushEvent( e );
+}
+
+void WindowWin32::onMouseLeave()
+{
+    const Event e {
+        .type = Event::MouseLeave
+    };
+    pushEvent( e );
+}
+
+void WindowWin32::trackMouseEvents() const
+{
+    // Track mouse leave events.
+    TRACKMOUSEEVENT trackMouseEvent {};
+    trackMouseEvent.cbSize    = sizeof( TRACKMOUSEEVENT );
+    trackMouseEvent.hwndTrack = m_hWnd;
+    trackMouseEvent.dwFlags   = TME_LEAVE;
+    TrackMouseEvent( &trackMouseEvent );
+}
+
+void WindowWin32::onMouseMoved( MouseMovedEventArgs& args )
+{
+    if ( !inClientRect )
+    {
+        previousMouseX = args.screenX;
+        previousMouseY = args.screenY;
+
+        inClientRect = true;
+
+        trackMouseEvents();
+
+        // Also invoke a mouse enter event.
+        onMouseEnter( args );
+    }
+
+    args.relX = args.screenX - previousMouseX;
+    args.relY = args.screenY - previousMouseY;
+
+    previousMouseX = args.screenX;
+    previousMouseY = args.screenY;
+
+    const Event e {
+        .type      = Event::MouseMoved,
+        .mouseMove = args
+    };
+    pushEvent( e );
 }
 
 bool WindowWin32::popEvent( Event& event )
@@ -247,6 +335,34 @@ void WindowWin32::processEvents()
         ::TranslateMessage( &msg );
         ::DispatchMessageW( &msg );
     }
+}
+
+static MouseButton DecodeMouseButton( UINT messageID )
+{
+    MouseButton mouseButton = MouseButton::None;
+
+    switch ( messageID )
+    {
+    case WM_LBUTTONDOWN:
+    case WM_LBUTTONUP:
+    case WM_LBUTTONDBLCLK:
+        mouseButton = MouseButton::Left;
+        break;
+    case WM_RBUTTONDOWN:
+    case WM_RBUTTONUP:
+    case WM_RBUTTONDBLCLK:
+        mouseButton = MouseButton::Right;
+        break;
+    case WM_MBUTTONDOWN:
+    case WM_MBUTTONUP:
+    case WM_MBUTTONDBLCLK:
+        mouseButton = MouseButton::Middle;
+        break;
+    default:
+        break;
+    }
+
+    return mouseButton;
 }
 
 // Convert wParam of the WM_SIZE events to a WindowState.
@@ -356,6 +472,135 @@ LRESULT CALLBACK WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
         // not handled.
         case WM_SYSCHAR:
             break;
+
+        case WM_MOUSEMOVE:
+        {
+            int x = GET_X_LPARAM( lParam );
+            int y = GET_Y_LPARAM( lParam );
+
+            POINT p { x, y };
+            ::ClientToScreen( hWnd, &p );
+
+            MouseMovedEventArgs e {
+                .leftButton   = ( wParam & MK_LBUTTON ) != 0,
+                .middleButton = ( wParam & MK_MBUTTON ) != 0,
+                .rightButton  = ( wParam & MK_RBUTTON ) != 0,
+                .ctrl         = ( wParam & MK_CONTROL ) != 0,
+                .shift        = ( wParam & MK_SHIFT ) != 0,
+                .alt          = ( GetAsyncKeyState( VK_MENU ) & 0x8000 ) != 0,
+                .super        = ( GetAsyncKeyState( VK_APPS ) & 0x8000 ) != 0,
+                .x            = x,
+                .y            = y,
+                .screenX      = p.x,
+                .screenY      = p.y
+            };
+            window->onMouseMoved( e );
+        }
+        break;
+        case WM_LBUTTONDOWN:
+        case WM_RBUTTONDOWN:
+        case WM_MBUTTONDOWN:
+        {
+            // Capture mouse movement until the button is released.
+            ::SetCapture( hWnd );
+
+            int x = GET_X_LPARAM( lParam );
+            int y = GET_Y_LPARAM( lParam );
+
+            POINT p { x, y };
+            ::ClientToScreen( hWnd, &p );
+
+            MouseButtonEventArgs e {
+                .button       = DecodeMouseButton( msg ),
+                .state        = ButtonState::Pressed,
+                .leftButton   = ( wParam & MK_LBUTTON ) != 0,
+                .middleButton = ( wParam & MK_MBUTTON ) != 0,
+                .rightButton  = ( wParam & MK_RBUTTON ) != 0,
+                .ctrl         = ( wParam & MK_CONTROL ) != 0,
+                .shift        = ( wParam & MK_SHIFT ) != 0,
+                .alt          = ( GetAsyncKeyState( VK_MENU ) & 0x8000 ) != 0,
+                .super        = ( GetAsyncKeyState( VK_APPS ) & 0x8000 ) != 0,
+                .x            = x,
+                .y            = y,
+                .screenX      = p.x,
+                .screenY      = p.y
+            };
+            window->onMouseButtonPressed( e );
+        }
+        break;
+        case WM_LBUTTONUP:
+        case WM_RBUTTONUP:
+        case WM_MBUTTONUP:
+        {
+            // Stop capturing the mouse.
+            ::ReleaseCapture();
+
+            int x = GET_X_LPARAM( lParam );
+            int y = GET_Y_LPARAM( lParam );
+
+            POINT p { x, y };
+            ::ClientToScreen( hWnd, &p );
+
+            MouseButtonEventArgs e {
+                .button       = DecodeMouseButton( msg ),
+                .state        = ButtonState::Released,
+                .leftButton   = ( wParam & MK_LBUTTON ) != 0,
+                .middleButton = ( wParam & MK_MBUTTON ) != 0,
+                .rightButton  = ( wParam & MK_RBUTTON ) != 0,
+                .ctrl         = ( wParam & MK_CONTROL ) != 0,
+                .shift        = ( wParam & MK_SHIFT ) != 0,
+                .alt          = ( GetAsyncKeyState( VK_MENU ) & 0x8000 ) != 0,
+                .super        = ( GetAsyncKeyState( VK_APPS ) & 0x8000 ) != 0,
+                .x            = x,
+                .y            = y,
+                .screenX      = p.x,
+                .screenY      = p.y
+            };
+            window->onMouseButtonReleased( e );
+        }
+        break;
+        case WM_MOUSEWHEEL:
+        case WM_MOUSEHWHEEL:
+        {
+            // The distance the mouse wheel is rotated.
+            // A positive value indicates the wheel was rotated forwards (away
+            // from the user). A negative value indicates the wheel was rotated
+            // backwards (toward the user).
+            float zDelta    = GET_WHEEL_DELTA_WPARAM( wParam ) / static_cast<float>( WHEEL_DELTA );
+            short keyStates = GET_KEYSTATE_WPARAM( wParam );
+
+            int x = GET_X_LPARAM( lParam );
+            int y = GET_Y_LPARAM( lParam );
+
+            // Convert the screen coordinates to client coordinates.
+            POINT p { x, y };
+            ::ScreenToClient( hWnd, &p );
+
+            MouseWheelEventArgs e {
+                .wheelDelta   = zDelta,
+                .leftButton   = ( keyStates & MK_LBUTTON ) != 0,
+                .middleButton = ( keyStates & MK_MBUTTON ) != 0,
+                .rightButton  = ( keyStates & MK_RBUTTON ) != 0,
+                .ctrl         = ( keyStates & MK_CONTROL ) != 0,
+                .shift        = ( keyStates & MK_SHIFT ) != 0,
+                .alt          = ( GetAsyncKeyState( VK_MENU ) & 0x8000 ) != 0,
+                .super        = ( GetAsyncKeyState( VK_APPS ) & 0x8000 ) != 0,
+                .x            = static_cast<int>( p.x ),
+                .y            = static_cast<int>( p.y ),
+                .screenX      = x,
+                .screenY      = y
+            };
+            if ( msg == WM_MOUSEWHEEL )
+                window->onMouseWheel( e );
+            else
+                window->onMouseHWheel( e );
+        }
+        break;
+        case WM_MOUSELEAVE:
+        {
+            window->onMouseLeave();
+        }
+        break;
         case WM_SIZE:
         {
             ResizeEventArgs e {

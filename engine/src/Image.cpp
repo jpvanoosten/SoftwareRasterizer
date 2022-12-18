@@ -378,7 +378,7 @@ void Image::drawQuad( const glm::vec2& p0, const glm::vec2& p1, const glm::vec2&
     }
 }
 
-void Image::drawQuad( const Vertex& v0, const Vertex& v1, const Vertex& v2, const Vertex& v3, const Image& image, const BlendMode& _blendMode ) noexcept
+void Image::drawQuad( const Vertex& v0, const Vertex& v1, const Vertex& v2, const Vertex& v3, const Image& image, AddressMode addressMode, const BlendMode& _blendMode ) noexcept
 {
     // Compute an AABB over the sprite quad.
     AABB aabb {
@@ -407,7 +407,7 @@ void Image::drawQuad( const Vertex& v0, const Vertex& v1, const Vertex& v2, cons
 
     const BlendMode blendMode = _blendMode;
 
-#pragma omp parallel for schedule( dynamic ) firstprivate( aabb, indicies, verts, blendMode )
+#pragma omp parallel for schedule( dynamic ) firstprivate( aabb, indicies, verts, addressMode, blendMode )
     for ( int y = static_cast<int>( aabb.min.y ); y <= static_cast<int>( aabb.max.y ); ++y )
     {
         for ( int x = static_cast<int>( aabb.min.x ); x <= static_cast<int>( aabb.max.x ); ++x )
@@ -425,7 +425,7 @@ void Image::drawQuad( const Vertex& v0, const Vertex& v1, const Vertex& v2, cons
                     const glm::vec2 texCoord = verts[i0].texCoord * bc.x + verts[i1].texCoord * bc.y + verts[i2].texCoord * bc.z;
                     const Color     color    = verts[i0].color * bc.x + verts[i1].color * bc.y + verts[i2].color * bc.z;
                     // Sample the texture.
-                    const Color c = image.sample( texCoord.x, texCoord.y ) * color;
+                    const Color c = image.sample( texCoord.x, texCoord.y, addressMode ) * color;
                     // Plot.
                     plot( static_cast<uint32_t>( x ), static_cast<uint32_t>( y ), c, blendMode );
                 }
@@ -621,8 +621,8 @@ const Color& Image::sample( int u, int v, AddressMode addressMode ) const noexce
     {
     case AddressMode::Wrap:
     {
-        u = u % w;
-        v = v % h;
+        u = u - w * static_cast<int>( std::floor( static_cast<float>( u ) / static_cast<float>( w ) ) );
+        v = v - h * static_cast<int>( std::floor( static_cast<float>( v ) / static_cast<float>( h ) ) );
     }
     break;
     case AddressMode::Mirror:

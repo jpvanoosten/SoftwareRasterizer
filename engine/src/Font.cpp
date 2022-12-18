@@ -40,7 +40,7 @@ Font::Font( const std::filesystem::path& fontFile, float size, uint32_t firstCha
         // I'm not sure how to calculate the exact size of the pixel buffer needed for the font.
         // This pixel width is very liberal, but better safe than sorry.
         const int pw         = static_cast<int>( std::ceil( static_cast<float>( numChars ) * size ) );
-        const int ph         = static_cast<int>( std::ceil( size ) );
+        const int ph         = static_cast<int>( std::ceil( 2.0f * size ) );
         auto      fontBitmap = std::make_unique<unsigned char[]>( static_cast<size_t>( pw ) * ph );
 
         int numRows = stbtt_BakeFontBitmap( fontData.data(), 0, size, fontBitmap.get(), pw, ph,
@@ -60,8 +60,9 @@ Font::Font( const std::filesystem::path& fontFile, float size, uint32_t firstCha
             }
         }
 
-        //auto fontTga = fontFile;
-        //fontTga.replace_extension( "tga" );
+        // Uncomment the next lines to save the font image to disk.
+        // This is mostly used for testing the font baking.
+        //auto fontTga = std::format( "{}/{}_{}.tga", fontFile.parent_path().string(), fontFile.stem().string(), size );
         //fontImage->save( fontTga );
     }
     else
@@ -130,7 +131,7 @@ void Font::drawText( Image& image, std::string_view text, int x, int y, const Co
                 Vertex v2 { { q.x1, q.y1 }, { q.s1, q.t1 }, color };
                 Vertex v3 { { q.x0, q.y1 }, { q.s0, q.t1 }, color };
 
-                image.drawQuad( v0, v1, v2, v3, *fontImage, BlendMode::AlphaBlend );
+                image.drawQuad( v0, v1, v2, v3, *fontImage, AddressMode::Clamp, BlendMode::AlphaBlend );
                 // image.drawQuad( { q.x0, q.y0 }, { q.x1, q.y0 }, { q.x1, q.y1 }, { q.x0, q.y1 }, Color::Red, {}, FillMode::WireFrame );
             }
             else if ( *t == '\n' )

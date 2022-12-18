@@ -1,10 +1,6 @@
 #include <Image.hpp>
-#include <Sprite.hpp>
-#include <Timer.hpp>
 #include <Window.hpp>
 #include <Game.hpp>
-
-#include <iostream>
 
 using namespace sr;
 using namespace Math;
@@ -34,10 +30,10 @@ void CopyImage( Image& dst, const Image& src )
         width  = static_cast<int>( static_cast<float>( height ) * aspectRatio );
     }
 
-    RectI dstRect = { 0, 0, width, height };
-    // Center on screen.
-    dstRect.left = ( static_cast<int>( dst.getWidth() ) - width ) / 2;
-    dstRect.top  = ( static_cast<int>( dst.getHeight() ) - height ) / 2;
+    RectI dstRect = {
+        ( static_cast<int>( dst.getWidth() ) - width ) / 2,
+        ( static_cast<int>( dst.getHeight() ) - height ) / 2,
+        width, height };
 
     dst.copy( src, {}, dstRect );
 }
@@ -57,14 +53,13 @@ int main( int argc, char* argv[] )
         }
     }
 
-    constexpr int SCREEN_WIDTH  = 800;
-    constexpr int SCREEN_HEIGHT = 600;
+    constexpr int SCREEN_WIDTH  = 496;
+    constexpr int SCREEN_HEIGHT = 256;
 
     Window window { L"07 - Game", SCREEN_WIDTH, SCREEN_HEIGHT };
 
     // Image to render the final image to.
     Image image { static_cast<uint32_t>( window.getWidth() ), static_cast<uint32_t>( window.getHeight() ) };
-    image.clear( Color::Black );
 
     // The game class.
     Game game { SCREEN_WIDTH, SCREEN_HEIGHT };
@@ -82,9 +77,13 @@ int main( int argc, char* argv[] )
         // Present.
         window.present( image );
 
+        // Handle events.
         Event e;
         while ( window.popEvent( e ) )
         {
+            // Let the game process it's events.
+            game.processEvent( e );
+
             switch ( e.type )
             {
             case Event::Close:

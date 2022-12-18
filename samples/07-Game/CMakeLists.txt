@@ -3,11 +3,13 @@ cmake_minimum_required( VERSION 3.23.0 )
 set( TARGET_NAME 07-Game )
 
 set( INC_FILES
+    inc/Background.hpp
     inc/Game.hpp
 )
 
 set( SRC_FILES
     main.cpp
+    src/Background.cpp
     src/Game.cpp
 )
 
@@ -21,7 +23,7 @@ set_target_properties( ${TARGET_NAME}
 )
 
 target_link_libraries( ${TARGET_NAME} 
-    PUBLIC SoftwareRasterizer
+    PUBLIC SoftwareRasterizer LDtkLoader
 )
 
 target_include_directories( ${TARGET_NAME}
