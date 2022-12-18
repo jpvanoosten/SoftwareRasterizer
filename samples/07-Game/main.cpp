@@ -53,7 +53,7 @@ int main( int argc, char* argv[] )
         }
     }
 
-    constexpr int SCREEN_WIDTH  = 496;
+    constexpr int SCREEN_WIDTH  = 480;
     constexpr int SCREEN_HEIGHT = 256;
 
     Window window { L"07 - Game", SCREEN_WIDTH, SCREEN_HEIGHT };
@@ -99,7 +99,7 @@ int main( int argc, char* argv[] )
                 break;
             case Event::Resize:
                 image.resize( window.getWidth(), window.getHeight() );
-                image.clear( Color::Black );
+                image.clear( Color{0x211f30} );
                 break;
             }
         }
