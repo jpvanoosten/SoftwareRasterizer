@@ -94,7 +94,5 @@ int main( int argc, char* argv[] )
             frameCount = 0;
             totalTime  = 0.0;
         }
-
-        timer.limitFPS( 60 );
     }
 }

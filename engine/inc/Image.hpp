@@ -21,20 +21,61 @@ namespace sr
 class Sprite;
 class Font;
 
-struct SR_API Image
+struct SR_API Image final
 {
     static Image fromFile( const std::filesystem::path& fileName );
     static Image fromMemory( const Color* data, uint32_t width, uint32_t height );
 
+    /// <summary>
+    /// Default construct an image.
+    /// The image is 0x0 with no buffer.
+    /// </summary>
     Image();
+
+    /// <summary>
+    /// Construct an image from an initial width and height.
+    /// </summary>
+    /// <param name="width">The image width (in pixels).</param>
+    /// <param name="height">The image height (in pixels).</param>
     Image( uint32_t width, uint32_t height );
+
+    /// <summary>
+    /// Copy constructor.
+    /// </summary>
+    /// <param name="copy">The image to copy to this one.</param>
     Image( const Image& copy );
+
+    /// <summary>
+    /// Move constructor.
+    /// </summary>
+    /// <param name="move">The image to move to this one.</param>
     Image( Image&& move ) noexcept;
+
+    /// <summary>
+    /// Destructor.
+    /// </summary>
     ~Image() = default;
 
+    /// <summary>
+    /// Copy assignment operator.
+    /// </summary>
+    /// <param name="image">The image to copy to this one.</param>
+    /// <returns>A reference to this image.</returns>
     Image& operator=( const Image& image );
+
+    /// <summary>
+    /// Move assignment operator.
+    /// </summary>
+    /// <param name="image">The image to move to this one.</param>
+    /// <returns>A reference to this image.</returns>
     Image& operator=( Image&& image ) noexcept;
 
+    /// <summary>
+    /// Resize this image.
+    /// Note: Does nothing if the image is already the requested size.
+    /// </summary>
+    /// <param name="width">The new image width (in pixels).</param>
+    /// <param name="height">The new image height (in pixels).</param>
     void resize( uint32_t width, uint32_t height );
 
     /// <summary>
@@ -45,7 +86,7 @@ struct SR_API Image
     ///   * TGA
     ///   * JPEG
     /// </summary>
-    /// <param name="file"></param>
+    /// <param name="file">The name of the file to save this image to.</param>
     void save( const std::filesystem::path& file ) const;
 
     /// <summary>
@@ -59,9 +100,9 @@ struct SR_API Image
     /// If the source and destination regions are different, the image will be scaled.
     /// </summary>
     /// <param name="srcImage">The source image to copy.</param>
-    /// <param name="srcRect">(optional) The region to copy from.</param>
-    /// <param name="dstRect">(optional) The destination region to copy to.</param>
-    /// <param name="blendMode">(optional) The blend mode to use for the copy.</param>
+    /// <param name="srcRect">(optional) The region to copy from. By default, this is the size of the source image.</param>
+    /// <param name="dstRect">(optional) The destination region to copy to. By default, this is the size of the source image.</param>
+    /// <param name="blendMode">(optional) The blend mode to use for the copy. By default, no blending is applied.</param>
     void copy( const Image& srcImage, std::optional<Math::RectI> srcRect = {}, std::optional<Math::RectI> dstRect = {}, const BlendMode& blendMode = {} );
 
     /// <summary>
@@ -104,7 +145,7 @@ struct SR_API Image
     /// <param name="p1">The end point.</param>
     /// <param name="color">The color of the line.</param>
     /// <param name="blendMode">The blend mode to use.</param>
-    void drawLine( const glm::vec2& p0, const glm::vec2& p1, const Color& color, const BlendMode& blendMode ) noexcept
+    void drawLine( const glm::vec2& p0, const glm::vec2& p1, const Color& color, const BlendMode& blendMode = {} ) noexcept
     {
         drawLine( static_cast<int>( p0.x ), static_cast<int>( p0.y ), static_cast<int>( p1.x ), static_cast<int>( p1.y ), color, blendMode );
     }
@@ -121,7 +162,7 @@ struct SR_API Image
     void drawTriangle( const glm::vec2& p0, const glm::vec2& p1, const glm::vec2& p2, const Color& color, const BlendMode& blendMode = {}, FillMode fillMode = FillMode::Solid ) noexcept;
 
     /// <summary>
-    /// Draw a 2D quad on the screen.
+    /// Draw a solid or wireframe 2D quad on the screen.
     /// </summary>
     /// <param name="p0">The first quad point.</param>
     /// <param name="p1">The second quad point.</param>
@@ -153,21 +194,19 @@ struct SR_API Image
     void drawAABB( Math::AABB aabb, const Color& color, const BlendMode& blendMode = {}, FillMode fillMode = FillMode::Solid ) noexcept;
 
     /// <summary>
-    /// Draw a rectangle to the image.
-    /// </summary>
-    /// <param name="rect">The rectangle to draw.</param>
-    /// <param name="color">The color of the rectangle.</param>
-    /// <param name="blendMode">The blend mode to use.</param>
-    /// <param name="fillMode">The fill mode to use to draw the rectangle.</param>
-    /// <returns></returns>
-    void drawRect( const Math::RectI& rect, const Color& color, const BlendMode& blendMode = {}, FillMode fillMode = FillMode::Solid ) noexcept;
-
-    /// <summary>
     /// Draw a sprite on the screen using the given transform.
     /// </summary>
     /// <param name="sprite">The sprite to draw.</param>
     /// <param name="transform">The transform to apply to the sprite.</param>
     void drawSprite( const Sprite& sprite, const Math::Transform2D& transform ) noexcept;
+
+    /// <summary>
+    /// Draw a sprite on the screen without any transformation applied to the sprite.
+    /// </summary>
+    /// <param name="sprite">The sprite to draw.</param>
+    /// <param name="x">The x-coordinate on the screen.</param>
+    /// <param name="y">The y-coordinate on the screen.</param>
+    void drawSprite( const Sprite& sprite, int x, int y ) noexcept;
 
     /// <summary>
     /// Draw text to the image.

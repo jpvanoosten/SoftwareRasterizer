@@ -103,8 +103,8 @@ void Image::resize( uint32_t width, uint32_t height )
     m_width  = width;
     m_height = height;
     m_AABB   = {
-          { 0, 0, 0 },
-          { m_width, m_height, 0 }
+        { 0, 0, 0 },
+        { m_width, m_height, 0 }
     };
 
     // Align color buffer to 64-byte boundary for better cache alignment on 64-bit architectures.
@@ -246,6 +246,7 @@ void Image::copy( const Image& srcImage, int x, int y )
         memcpy_s( dst + ( i + dY ) * m_width + dX, w * sizeof( Color ), src + ( i + sY ) * srcWidth + sX, w * sizeof( Color ) );
 }
 
+// Source: https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
 void Image::drawLine( int x0, int y0, int x1, int y1, const Color& color, const BlendMode& blendMode ) noexcept
 {
     const int dx = std::abs( x1 - x0 );
@@ -543,6 +544,66 @@ void Image::drawSprite( const Sprite& sprite, const Math::Transform2D& transform
                 }
             }
         }
+    }
+}
+
+void Image::drawSprite( const Sprite& sprite, int x, int y ) noexcept
+{
+    const Image* image = sprite.getImage();
+    if ( !image )
+        return;
+
+    const Color      color     = sprite.getColor();
+    const BlendMode  blendMode = sprite.getBlendMode();
+    const glm::ivec2 uv        = sprite.getUV();
+    const glm::ivec2 size      = sprite.getSize();
+
+    // Source sprite coords
+    const int sX = x < 0 ? -x : 0;
+    const int sY = y < 0 ? -y : 0;
+    const int sW = size.x - sX;
+    const int sH = size.y - sY;
+
+    // Check if the sprite is offscreen.
+    if ( sW <= 0 || sH <= 0 )
+        return;
+
+    // Destination coords.
+    const int dX = x < 0 ? 0 : x;
+    const int dY = y < 0 ? 0 : y;
+    const int dW = static_cast<int>( m_width ) - dX;
+    const int dH = static_cast<int>( m_height ) - dY;
+
+    // Check if the destination region is offscreen.
+    if ( dW <= 0 || dH <= 0 )
+        return;
+
+    // Source image width.
+    const int iW = static_cast<int>( image->getWidth() );
+
+    // The destination copy region is the minimum of the source
+    // and destination dimensions.
+    const int w = std::min( sW, dW );
+    const int h = std::min( sH, dH );
+    const int a = w * h;
+
+    const Color* src = image->data();
+    Color*       dst = data();
+
+#pragma omp parallel for firstprivate( w, h, a, iW, color, blendMode )
+    for ( int i = 0; i < a; ++i )
+    {
+        const int x  = i % w;
+        const int y  = i / w;
+        const int dx = dX + x;
+        const int dy = dY + y;
+        const int sx = ( sX + uv.x ) + x;
+        const int sy = ( sY + uv.y ) + y;
+
+        Color dC = dst[dy * m_width + dx];
+        Color sC = src[sy * iW + sx] * color;
+
+        dst[dy * m_width + dx] = blendMode.Blend( sC, dC );
     }
 }
 
