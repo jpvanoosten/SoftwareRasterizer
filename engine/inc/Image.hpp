@@ -71,6 +71,14 @@ struct SR_API Image final
     Image& operator=( Image&& image ) noexcept;
 
     /// <summary>
+    /// Check if this is a valid image.
+    /// </summary>
+    explicit operator bool() const noexcept
+    {
+        return m_data != nullptr;
+    }
+
+    /// <summary>
     /// Resize this image.
     /// Note: Does nothing if the image is already the requested size.
     /// </summary>

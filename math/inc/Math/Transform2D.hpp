@@ -1,5 +1,7 @@
 #pragma once
 
+#include "AABB.hpp"
+
 #include <glm/mat3x3.hpp>
 #include <glm/vec2.hpp>
 
@@ -107,4 +109,35 @@ private:
     mutable bool      m_TransformDirty = true;
 };
 
-}  // namespace sr
+/// <summary>
+/// Transform a 2D AABB by a Transform2D.
+/// </summary>
+/// <param name="aabb">The AABB to transform.</param>
+/// <param name="transform">The transformation to apply.</param>
+/// <returns>The transformed AABB.</returns>
+inline AABB operator*( const AABB& aabb, const Transform2D& transform )
+{
+    const auto mat = transform.getTransform();
+    const auto min = glm::vec3 { aabb.min.x, aabb.min.y, 1 };
+    const auto max = glm::vec3 { aabb.max.x, aabb.max.y, 1 };
+
+    return { min * mat, max * mat };
+}
+
+/// <summary>
+/// Transform a 2D AABB by a Transform2D.
+/// </summary>
+/// <param name="aabb">The AABB to transform.</param>
+/// <param name="transform">The transformation to apply.</param>
+/// <returns>The transformed AABB.</returns>
+inline AABB& operator*=( AABB& aabb, const Transform2D& transform )
+{
+    const auto mat = transform.getTransform();
+
+    aabb.min = mat * glm::vec3 { aabb.min.x, aabb.min.y, 1 };
+    aabb.max = mat * glm::vec3 { aabb.max.x, aabb.max.y, 1 };
+
+    return aabb;
+}
+
+}  // namespace Math

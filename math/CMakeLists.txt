@@ -20,6 +20,11 @@ set( ALL_FILES
 
 add_library( Math STATIC ${ALL_FILES} )
 
+set_target_properties( Math
+    PROPERTIES
+        CXX_STANDARD 20
+)
+
 target_include_directories( Math
     PUBLIC inc
 )

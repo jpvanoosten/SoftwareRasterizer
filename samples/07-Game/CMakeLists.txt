@@ -4,12 +4,14 @@ set( TARGET_NAME 07-Game )
 
 set( INC_FILES
     inc/Background.hpp
+    inc/Button.hpp
     inc/Game.hpp
 )
 
 set( SRC_FILES
     main.cpp
     src/Background.cpp
+    src/Button.cpp
     src/Game.cpp
 )
 
@@ -23,7 +25,7 @@ set_target_properties( ${TARGET_NAME}
 )
 
 target_link_libraries( ${TARGET_NAME} 
-    PUBLIC SoftwareRasterizer LDtkLoader
+    PUBLIC SoftwareRasterizer Math LDtkLoader
 )
 
 target_include_directories( ${TARGET_NAME}

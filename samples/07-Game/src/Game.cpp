@@ -4,6 +4,7 @@
 #include <string>
 
 using namespace sr;
+using namespace Math;
 
 Game::Game( uint32_t screenWidth, uint32_t screenHeight )
 : image { screenWidth, screenHeight }
@@ -12,7 +13,35 @@ Game::Game( uint32_t screenWidth, uint32_t screenHeight )
 {
     ldtkProject.loadFromFile( "assets/Pixel Adventure/Pixel Adventure.ldtk" );
 
-    background = Background { "assets/Pixel Adventure/Background/Blue.png", 1.0f, { 0.0f, 1.0f }, 0.3f };
+    backgrounds.emplace_back( Background { "assets/Pixel Adventure/Background/Blue.png", 1.0f, { 0.0f, 1.0f }, 0.3f } );
+    backgrounds.emplace_back( Background { "assets/Pixel Adventure/Background/Brown.png", 1.0f, { 0.0f, 1.0f }, 0.3f } );
+    backgrounds.emplace_back( Background { "assets/Pixel Adventure/Background/Gray.png", 1.0f, { 0.0f, 1.0f }, 0.3f } );
+    backgrounds.emplace_back( Background { "assets/Pixel Adventure/Background/Green.png", 1.0f, { 0.0f, 1.0f }, 0.3f } );
+    backgrounds.emplace_back( Background { "assets/Pixel Adventure/Background/Pink.png", 1.0f, { 0.0f, 1.0f }, 0.3f } );
+    backgrounds.emplace_back( Background { "assets/Pixel Adventure/Background/Purple.png", 1.0f, { 0.0f, 1.0f }, 0.3f } );
+    backgrounds.emplace_back( Background { "assets/Pixel Adventure/Background/Yellow.png", 1.0f, { 0.0f, 1.0f }, 0.3f } );
+
+    // Buttons
+    {
+        // Previous button.
+        SpriteSheet sheet { "assets/Pixel Adventure/Menu/Buttons/Previous.png" };
+        previousButton = Button { sheet };
+        previousButton.setCallback( std::bind( &Game::onPreviousClicked, this ) );
+        // Initially, we are on the first level, so hide the previous button.
+        previousButton.enable( false );
+    }
+    {
+        // Next button.
+        SpriteSheet sheet { "assets/Pixel Adventure/Menu/Buttons/Next.png" };
+        nextButton = Button { sheet };
+        nextButton.setCallback( std::bind( &Game::onNextClicked, this ) );
+    }
+    {
+        // Restart button.
+        SpriteSheet sheet { "assets/Pixel Adventure/Menu/Buttons/Restart.png" };
+        restartButton = Button { sheet };
+        restartButton.setCallback( std::bind( &Game::onRestartClicked, this ) );
+    }
 }
 
 void Game::Update()
@@ -31,19 +60,27 @@ void Game::Update()
         totalTime = 0.0;
     }
 
-    background.update( timer );
-
-    image.clear( Color::Black );
-
-    background.draw( image );
+    backgrounds[0].update( timer );
+    backgrounds[0].draw( image );
 
     // Draw an FPS counter in the corner of the screen.
     image.drawText( arial20, 6, 20, fps, Color::Black );
     image.drawText( arial20, 4, 18, fps, Color::White );
+
+    // Draw some text at the mouse position.
+    image.drawText( arial20, mousePos.x, mousePos.y, std::format( "({}, {})", mousePos.x, mousePos.y ), Color::White );
+
+    // Draw the buttons
+    restartButton.draw( image );
+    nextButton.draw( image );
+    previousButton.draw( image );
 }
 
-void Game::processEvent( const sr::Event& event )
+void Game::processEvent( const sr::Event& _event )
 {
+    // Copy the event so we can modify it.
+    Event event = _event;
+
     switch ( event.type )
     {
     case Event::None:
@@ -79,7 +116,7 @@ void Game::processEvent( const sr::Event& event )
     }
 }
 
-void Game::onKeyPressed( const sr::KeyEventArgs& args )
+void Game::onKeyPressed( sr::KeyEventArgs& args )
 {
     switch ( args.code )
     {
@@ -94,7 +131,7 @@ void Game::onKeyPressed( const sr::KeyEventArgs& args )
     }
 }
 
-void Game::onKeyReleased( const sr::KeyEventArgs& args )
+void Game::onKeyReleased( sr::KeyEventArgs& args )
 {
     switch ( args.code )
     {
@@ -109,19 +146,22 @@ void Game::onKeyReleased( const sr::KeyEventArgs& args )
     }
 }
 
-void Game::onMouseMoved( const sr::MouseMovedEventArgs& args )
+void Game::onMouseMoved( sr::MouseMovedEventArgs& args )
 {
     // Compute the mouse position relative to the game screen (which can be scaled if the window is resized).
     const glm::vec2 scale {
         static_cast<float>( image.getWidth() ) / static_cast<float>( gameRect.width ),
-        static_cast<float>( image.getHeight() ) / static_cast<float>(gameRect.height)
+        static_cast<float>( image.getHeight() ) / static_cast<float>( gameRect.height )
     };
     const glm::vec2 offset { gameRect.topLeft() };
-    
-    mousePos = ( glm::vec2 { args.x, args.y } - offset ) * scale;
+
+    args.x = std::lround( ( static_cast<float>( args.x ) - offset.x ) * scale.x );
+    args.y = std::lround( ( static_cast<float>( args.y ) - offset.y ) * scale.y );
+
+    mousePos = { args.x, args.y };
 }
 
-void Game::onResized( const sr::ResizeEventArgs& args )
+void Game::onResized( sr::ResizeEventArgs& args )
 {
     const float aspectRatio = static_cast<float>( image.getWidth() ) / static_cast<float>( image.getHeight() );
     const float scaleWidth  = static_cast<float>( args.width ) / static_cast<float>( image.getWidth() );
@@ -148,4 +188,33 @@ void Game::onResized( const sr::ResizeEventArgs& args )
         ( args.height - height ) / 2,
         width, height
     };
+
+    // Position the buttons in the top-right corner of the screen.
+    constexpr float spacing = 10.0f;
+    float y = spacing;
+    float x = static_cast<float>( width ) - spacing;
+
+    x -= restartButton.getWidth() + spacing;
+    restartButton.setTransform( Transform2D { { x, y } } );
+
+    x -= nextButton.getWidth() + spacing;
+    nextButton.setTransform( Transform2D { { x, y } } );
+
+    x -= previousButton.getWidth() + spacing;
+    previousButton.setTransform( Transform2D { { x, y } } );
+}
+
+void Game::onPreviousClicked()
+{
+    // TODO: Load the previous level.
+}
+
+void Game::onNextClicked()
+{
+    // TODO: Load the next level.
+}
+
+void Game::onRestartClicked()
+{
+    // TODO: Restart the current level.
 }

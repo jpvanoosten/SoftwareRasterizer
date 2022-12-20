@@ -63,6 +63,52 @@ struct AABB
     }
 
     /// <summary>
+    /// Translate this AABB.
+    /// </summary>
+    /// <param name="rhs">The amount to translate this AABB by.</param>
+    /// <returns>The translated AABB.</returns>
+    AABB operator+(const glm::vec3& rhs) const noexcept
+    {
+        return { min + rhs, max + rhs };
+    }
+
+    /// <summary>
+    /// Translate this AABB.
+    /// </summary>
+    /// <param name="rhs">The amount to translate this AABB by.</param>
+    /// <returns>A reference to this AABB after translation.</returns>
+    AABB& operator+=( const glm::vec3& rhs ) noexcept
+    {
+        min += rhs;
+        max += rhs;
+
+        return *this;
+    }
+
+    /// <summary>
+    /// Translate this AABB.
+    /// </summary>
+    /// <param name="rhs">The amount to translate this AABB by.</param>
+    /// <returns>The translated AABB.</returns>
+    AABB operator-( const glm::vec3& rhs ) const noexcept
+    {
+        return { min - rhs, max - rhs };
+    }
+
+    /// <summary>
+    /// Translate this AABB.
+    /// </summary>
+    /// <param name="rhs">The amount to translate this AABB by.</param>
+    /// <returns>A reference to this AABB after translation.</returns>
+    AABB& operator-=( const glm::vec3& rhs ) noexcept
+    {
+        min -= rhs;
+        max -= rhs;
+
+        return *this;
+    }
+
+    /// <summary>
     /// Compute the center point of the AABB.
     /// </summary>
     /// <returns>The center point of the AABB.</returns>

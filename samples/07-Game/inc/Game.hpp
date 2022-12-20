@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Background.hpp"
+#include "Button.hpp"
+
 
 #include <Image.hpp>
 #include <Timer.hpp>
@@ -31,10 +33,15 @@ public:
 
     void processEvent( const sr::Event& event );
 
-    void onKeyPressed( const sr::KeyEventArgs& args );
-    void onKeyReleased( const sr::KeyEventArgs& args );
-    void onMouseMoved( const sr::MouseMovedEventArgs& args );
-    void onResized( const sr::ResizeEventArgs& args );
+    void onKeyPressed( sr::KeyEventArgs& args );
+    void onKeyReleased(sr::KeyEventArgs& args );
+    void onMouseMoved( sr::MouseMovedEventArgs& args );
+    void onResized( sr::ResizeEventArgs& args );
+
+    // Button handlers.
+    void onPreviousClicked();
+    void onNextClicked();
+    void onRestartClicked();
 
 protected:
 
@@ -52,6 +59,15 @@ protected:
     sr::Font arial20;
     sr::Font arial24;
 
-    Background background;
+    // Backgrounds
+    std::vector<Background> backgrounds;
+
+    // Buttons
+    Button previousButton;
+    Button nextButton;
+    Button restartButton;
+
+    
+
 };
 
