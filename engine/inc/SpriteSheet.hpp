@@ -13,7 +13,7 @@
 
 namespace sr
 {
-class SR_API SpriteSheet
+class SR_API SpriteSheet final
 {
 public:
     /// <summary>
@@ -21,6 +21,8 @@ public:
     /// A default sprite sheet contains no sprites.
     /// </summary>
     SpriteSheet() = default;
+
+    ~SpriteSheet() = default;
 
     /// <summary>
     /// Create a sprite sheet based on the size of each sprite in the sprite sheet.
@@ -43,7 +45,7 @@ public:
     /// Copy constructor.
     /// </summary>
     /// <param name="copy">The sprite sheet to copy.</param>
-    SpriteSheet( const SpriteSheet& copy ) = default;
+    SpriteSheet( const SpriteSheet& copy );
 
     /// <summary>
     /// Move constructor.
@@ -56,7 +58,7 @@ public:
     /// </summary>
     /// <param name="copy">The sprite sheet to copy.</param>
     /// <returns></returns>
-    SpriteSheet& operator=( const SpriteSheet& copy ) = default;
+    SpriteSheet& operator=( const SpriteSheet& copy );
 
     /// <summary>
     /// Move assignment operator.
@@ -141,6 +143,9 @@ private:
 
     // The image that contains the sprites.
     Image image;
+
+    // The blend mode for the sprites.
+    BlendMode blendMode;
 
     // The sprites in the sprite sheet.
     std::vector<Sprite> sprites;

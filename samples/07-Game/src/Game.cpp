@@ -24,23 +24,29 @@ Game::Game( uint32_t screenWidth, uint32_t screenHeight )
     // Buttons
     {
         // Previous button.
-        SpriteSheet sheet { "assets/Pixel Adventure/Menu/Buttons/Previous.png" };
+        SpriteSheet sheet { "assets/Pixel Adventure/Menu/Buttons/Previous.png", {}, {}, BlendMode::AlphaBlend };
         previousButton = Button { sheet };
-        previousButton.setCallback( std::bind( &Game::onPreviousClicked, this ) );
+        previousButton.setCallback( [this] {
+            onPreviousClicked();
+        } );
         // Initially, we are on the first level, so hide the previous button.
         previousButton.enable( false );
     }
     {
         // Next button.
-        SpriteSheet sheet { "assets/Pixel Adventure/Menu/Buttons/Next.png" };
+        SpriteSheet sheet { "assets/Pixel Adventure/Menu/Buttons/Next.png", {}, {}, BlendMode::AlphaBlend };
         nextButton = Button { sheet };
-        nextButton.setCallback( std::bind( &Game::onNextClicked, this ) );
+        nextButton.setCallback( [this] {
+            onNextClicked();
+        } );
     }
     {
         // Restart button.
-        SpriteSheet sheet { "assets/Pixel Adventure/Menu/Buttons/Restart.png" };
+        SpriteSheet sheet { "assets/Pixel Adventure/Menu/Buttons/Restart.png", {}, {}, BlendMode::AlphaBlend };
         restartButton = Button { sheet };
-        restartButton.setCallback( std::bind( &Game::onRestartClicked, this ) );
+        restartButton.setCallback( [this] {
+            onRestartClicked();
+        } );
     }
 }
 
@@ -114,6 +120,10 @@ void Game::processEvent( const sr::Event& _event )
     case Event::EndResize:
         break;
     }
+
+    previousButton.processEvents( event );
+    nextButton.processEvents( event );
+    restartButton.processEvents( event );
 }
 
 void Game::onKeyPressed( sr::KeyEventArgs& args )
@@ -189,10 +199,10 @@ void Game::onResized( sr::ResizeEventArgs& args )
         width, height
     };
 
-    // Position the buttons in the top-right corner of the screen.
-    constexpr float spacing = 10.0f;
-    float y = spacing;
-    float x = static_cast<float>( width ) - spacing;
+    // Position the buttons in the top-right corner of the game screen.
+    constexpr float spacing = 3.0f;
+    float           y       = spacing;
+    float           x       = static_cast<float>( image.getWidth() ) - spacing;
 
     x -= restartButton.getWidth() + spacing;
     restartButton.setTransform( Transform2D { { x, y } } );
@@ -206,15 +216,15 @@ void Game::onResized( sr::ResizeEventArgs& args )
 
 void Game::onPreviousClicked()
 {
-    // TODO: Load the previous level.
+    std::cout << "Previous Clicked!" << std::endl;
 }
 
 void Game::onNextClicked()
 {
-    // TODO: Load the next level.
+    std::cout << "Next Clicked!" << std::endl;
 }
 
 void Game::onRestartClicked()
 {
-    // TODO: Restart the current level.
+    std::cout << "Restart Clicked!" << std::endl;
 }

@@ -5,10 +5,10 @@
 using namespace sr;
 using namespace Math;
 
-Button::Button( sr::SpriteSheet sheet, const Math::Transform2D& transform, std::function<void()> onClick )
-: spriteSheet { std::move( sheet ) }
+Button::Button( const sr::SpriteSheet& sheet, const Math::Transform2D& transform, const std::function<void()>& onClick )
+: spriteSheet { sheet }
 , transform { transform }
-, onClick { std::move( onClick ) }
+, onClick { onClick }
 {
     aabb = AABB::fromRect( spriteSheet[0].getRect() );
     aabb *= transform;
@@ -22,12 +22,20 @@ void Button::processEvents( const sr::Event& event )
     switch ( event.type )
     {
     case Event::MouseMoved:
+        if ( aabb.contains( { event.mouseMove.x, event.mouseMove.y, 0 } ) )
+            state = State::Hover;
+        else
+            state = State::Default;
         break;
 
     case Event::MouseButtonPressed:
+        if ( state == State::Hover )
+            state = State::Pressed;
         break;
 
     case Event::MouseButtonReleased:
+        if ( state == State::Pressed )
+            onClick();
         break;
     }
 }
@@ -53,6 +61,4 @@ void Button::draw( sr::Image& image )
 
     if ( spriteToDraw )
         image.drawSprite( *spriteToDraw, transform );
-
-    image.drawAABB( aabb, Color::Red, {}, FillMode::WireFrame );
 }

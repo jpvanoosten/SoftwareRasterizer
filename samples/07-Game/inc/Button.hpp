@@ -30,7 +30,7 @@ public:
     /// <param name="sheet">A sprite sheet that contains the sprites for the button states.</param>
     /// <param name="transform">The transform to place the button on the screen.</param>
     /// <param name="onClick">The callback function to invoke when the button is clicked.</param>
-    Button( sr::SpriteSheet sheet, const Math::Transform2D& transform = Math::Transform2D {}, std::function<void()> onClick = {} );
+    Button( const sr::SpriteSheet& sheet, const Math::Transform2D& transform = Math::Transform2D {}, const std::function<void()>& onClick = {} );
 
     void setTransform( const Math::Transform2D& transform ) noexcept
     {

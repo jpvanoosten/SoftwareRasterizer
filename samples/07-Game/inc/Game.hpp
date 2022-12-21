@@ -66,8 +66,5 @@ protected:
     Button previousButton;
     Button nextButton;
     Button restartButton;
-
-    
-
 };
 
