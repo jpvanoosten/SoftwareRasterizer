@@ -103,8 +103,8 @@ void Image::resize( uint32_t width, uint32_t height )
     m_width  = width;
     m_height = height;
     m_AABB   = {
-        { 0, 0, 0 },
-        { m_width, m_height, 0 }
+          { 0, 0, 0 },
+          { m_width, m_height, 0 }
     };
 
     // Align color buffer to 64-byte boundary for better cache alignment on 64-bit architectures.
@@ -536,7 +536,7 @@ void Image::drawSprite( const Sprite& sprite, const Math::Transform2D& transform
                 if ( barycentricInside( bc ) )
                 {
                     // Compute interpolated UV
-                    const glm::ivec2 texCoord = verts[i0].texCoord * bc.x + verts[i1].texCoord * bc.y + verts[i2].texCoord * bc.z;
+                    const glm::ivec2 texCoord = round( verts[i0].texCoord * bc.x + verts[i1].texCoord * bc.y + verts[i2].texCoord * bc.z );
                     // Sample the sprite's texture.
                     const Color c = image->sample( texCoord.x, texCoord.y ) * color;
                     // Plot.

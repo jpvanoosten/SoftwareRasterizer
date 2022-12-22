@@ -1,7 +1,5 @@
 #include "Button.hpp"
 
-#include <utility>
-
 using namespace sr;
 using namespace Math;
 
@@ -61,4 +59,6 @@ void Button::draw( sr::Image& image )
 
     if ( spriteToDraw )
         image.drawSprite( *spriteToDraw, transform );
+
+    //image.drawAABB( aabb, Color::Red, {}, FillMode::WireFrame );
 }
