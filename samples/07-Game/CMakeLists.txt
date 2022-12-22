@@ -5,6 +5,7 @@ set( TARGET_NAME 07-Game )
 set( INC_FILES
     inc/Background.hpp
     inc/Button.hpp
+    inc/Curve.hpp
     inc/Game.hpp
 )
 

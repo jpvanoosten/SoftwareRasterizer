@@ -1,8 +1,11 @@
 #pragma once
 
+#include "Curve.hpp"
+
 #include <Events.hpp>
 #include <Image.hpp>
 #include <SpriteSheet.hpp>
+#include <Timer.hpp>
 
 #include <Math/AABB.hpp>
 #include <Math/Transform2D.hpp>
@@ -95,9 +98,15 @@ public:
     void draw( sr::Image& image );
 
 private:
+    void setState( State newState );
+    void endState( State oldState );
+    void startState( State newState );
+
     sr::SpriteSheet       spriteSheet;
     Math::Transform2D     transform;
     Math::AABB            aabb;
+    sr::Timer             animTimer;
+    Curve<float>          animCurve;
     std::function<void()> onClick;
     State                 state   = State::Default;
     bool                  enabled = true;
