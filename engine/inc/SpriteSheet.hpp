@@ -1,9 +1,9 @@
 #pragma once
 
+#include "BlendMode.hpp"
 #include "Config.hpp"
 #include "Image.hpp"
 #include "Sprite.hpp"
-#include "BlendMode.hpp"
 
 #include <Math/Rect.hpp>
 
@@ -20,8 +20,7 @@ public:
     /// Default constructor for a sprite sheet.
     /// A default sprite sheet contains no sprites.
     /// </summary>
-    SpriteSheet() = default;
-
+    SpriteSheet()  = default;
     ~SpriteSheet() = default;
 
     /// <summary>
@@ -139,7 +138,7 @@ public:
 
 private:
     // Create a sprite sheet from a pre-loaded sprite image.
-    void init( Image image, uint32_t spriteWidth, uint32_t spriteHeight, const BlendMode& blendMode );
+    void init();
 
     // The image that contains the sprites.
     Image image;
@@ -147,13 +146,16 @@ private:
     // The blend mode for the sprites.
     BlendMode blendMode;
 
-    // The sprites in the sprite sheet.
-    std::vector<Sprite> sprites;
+    // Sprite rectangles in the image.
+    std::vector<Math::RectI> spriteRects;
 
     // The number of sprites in the X-axis of the image.
     uint32_t columns = 0u;
     // The number of sprites in the Y-axis of the image.
-    uint32_t rows    = 0u;
+    uint32_t rows = 0u;
+
+    // The sprites in the sprite sheet.
+    std::vector<Sprite> sprites;
 };
 
 }  // namespace sr

@@ -3,9 +3,9 @@
 using namespace sr;
 
 SpriteSheet::SpriteSheet( const std::filesystem::path& fileName, std::optional<uint32_t> spriteWidth, std::optional<uint32_t> spriteHeight, const BlendMode& blendMode )
+: image { Image::fromFile( fileName ) }
+, blendMode { blendMode }
 {
-    Image image = Image::fromFile( fileName );
-
     if ( !image )
         return;
 
@@ -15,39 +15,57 @@ SpriteSheet::SpriteSheet( const std::filesystem::path& fileName, std::optional<u
     if ( !spriteHeight )
         spriteHeight = image.getHeight();
 
-    init( std::move( image ), *spriteWidth, *spriteHeight, blendMode );
+    // Make sure the sprite width/height are evenly divisible by the image width/height.
+    assert( image.getWidth() % *spriteWidth == 0 );
+    assert( image.getHeight() % *spriteHeight == 0 );
+
+    columns = image.getWidth() / *spriteWidth;
+    rows    = image.getHeight() / *spriteHeight;
+
+    spriteRects.reserve( static_cast<size_t>( columns ) * rows );
+
+    const uint32_t w = image.getWidth() / columns;
+    const uint32_t h = image.getHeight() / rows;
+
+    for ( uint32_t i = 0; i < rows; ++i )
+    {
+        for ( uint32_t j = 0; j < columns; ++j )
+        {
+            spriteRects.emplace_back( j * w, i * h, w, h );
+        }
+    }
+
+    init();
 }
 
 SpriteSheet::SpriteSheet( const std::filesystem::path& fileName, std::span<const Math::RectI> rects, const BlendMode& blendMode )
 : image { Image::fromFile( fileName ) }
+, blendMode { blendMode }
+, spriteRects { rects.begin(), rects.end() }
 , columns { static_cast<uint32_t>( rects.size() ) }
 , rows { 1u }
 {
-    sprites.reserve( rects.size() );
-
-    for ( auto& rect: rects )
-    {
-        sprites.emplace_back( image, rect, blendMode );
-    }
+    init();
 }
 
 SpriteSheet::SpriteSheet( const SpriteSheet& copy )
+: image { copy.image }
+, blendMode { copy.blendMode }
+, spriteRects { copy.spriteRects }
+, columns { copy.columns }
+, rows { copy.rows }
 {
-    if ( &copy == this || !copy.image )
-        return;
-
-    init( copy.image, copy.image.getWidth() / copy.columns, copy.image.getHeight() / copy.rows, copy.blendMode );
+    init();
 }
 
 SpriteSheet::SpriteSheet( SpriteSheet&& other ) noexcept
+: image { std::move( other.image ) }
+, blendMode { other.blendMode }
+, spriteRects { std::move( other.spriteRects ) }
+, columns { other.columns }
+, rows { other.rows }
 {
-    if ( &other == this || !other.image )
-        return;
-
-    const auto spriteWidth  = other.image.getWidth() / other.columns;
-    const auto spriteHeight = other.image.getHeight() / other.rows;
-
-    init( std::move( other.image ), spriteWidth, spriteHeight, other.blendMode );
+    init();
 
     other.rows    = 0u;
     other.columns = 0u;
@@ -59,20 +77,29 @@ SpriteSheet& SpriteSheet::operator=( const SpriteSheet& copy )
     if ( &copy == this )
         return *this;
 
-    init( copy.image, copy.image.getWidth() / copy.columns, copy.image.getHeight() / copy.rows, copy.blendMode );
+    image       = copy.image;
+    blendMode   = copy.blendMode;
+    spriteRects = copy.spriteRects;
+    columns     = copy.columns;
+    rows        = copy.rows;
+
+    init();
 
     return *this;
 }
 
 SpriteSheet& SpriteSheet::operator=( SpriteSheet&& other ) noexcept
 {
-    if ( &other == this || !other.image )
+    if ( &other == this )
         return *this;
 
-    const auto spriteWidth  = other.image.getWidth() / other.columns;
-    const auto spriteHeight = other.image.getHeight() / other.rows;
+    image       = std::move( other.image );
+    blendMode   = other.blendMode;
+    spriteRects = std::move( other.spriteRects );
+    columns     = other.columns;
+    rows        = other.rows;
 
-    init( std::move( other.image ), spriteWidth, spriteHeight, other.blendMode );
+    init();
 
     other.columns = 0u;
     other.rows    = 0u;
@@ -103,38 +130,38 @@ SpriteSheet SpriteSheet::fromGrid( const std::filesystem::path& fileName, uint32
     assert( image.getWidth() % columns == 0 );
     assert( image.getHeight() % rows == 0 );
 
-    const uint32_t spriteWidth  = image.getWidth() / columns;
-    const uint32_t spriteHeight = image.getHeight() / rows;
+    std::vector<Math::RectI> spriteRects;
+    spriteRects.reserve( static_cast<size_t>( columns ) * rows );
+
+    const uint32_t w = image.getWidth() / columns;
+    const uint32_t h = image.getHeight() / rows;
+
+    for ( uint32_t i = 0; i < rows; ++i )
+    {
+        for ( uint32_t j = 0; j < columns; ++j )
+        {
+            spriteRects.emplace_back( j * w, i * h, w, h );
+        }
+    }
 
     SpriteSheet sheet;
-    sheet.init( std::move( image ), spriteWidth, spriteHeight, blendMode );
+    sheet.image       = std::move( image );
+    sheet.blendMode   = blendMode;
+    sheet.spriteRects = std::move( spriteRects );
+    sheet.columns     = columns;
+    sheet.rows        = rows;
+
+    sheet.init();
 
     return sheet;
 }
 
-void SpriteSheet::init( Image _image, uint32_t spriteWidth, uint32_t spriteHeight, const BlendMode& _blendMode )
+void SpriteSheet::init()
 {
-    image = std::move( _image );
+    sprites.reserve( spriteRects.size() );
 
-    blendMode = _blendMode;
-
-    // Make sure the image can be split up evenly by the size of the sprites.
-    assert( image.getWidth() % spriteWidth == 0 );
-    assert( image.getHeight() % spriteHeight == 0 );
-
-    columns = image.getWidth() / spriteWidth;
-    rows    = image.getHeight() / spriteHeight;
-
-    sprites.reserve( static_cast<size_t>( columns ) * rows );
-
-    const int w = static_cast<int>( image.getWidth() ) / columns;
-    const int h = static_cast<int>( image.getHeight() ) / rows;
-
-    for ( int i = 0; i < rows; ++i )
+    for ( const auto& rect: spriteRects )
     {
-        for ( int j = 0; j < columns; ++j )
-        {
-            sprites.emplace_back( image, Math::RectI { j * w, i * h, w, h }, blendMode );
-        }
+        sprites.emplace_back( image, rect, blendMode );
     }
 }
