@@ -28,7 +28,7 @@ const char* g_VertexShader = {
 };
 
 const char* g_FragmentShader = {
-    #include <FragmentShader.glsl>
+#include <FragmentShader.glsl>
 };
 
 void ReportError()
@@ -91,11 +91,15 @@ WindowWin32::WindowWin32( std::wstring_view title, int width, int height )
     glGetIntegerv( GL_MINOR_VERSION, &minorVersion );
 
     const int attribs[] = {
-        WGL_CONTEXT_MAJOR_VERSION_ARB, majorVersion,
-        WGL_CONTEXT_MINOR_VERSION_ARB, minorVersion,
-        WGL_CONTEXT_PROFILE_MASK_ARB, 1,
+        WGL_CONTEXT_MAJOR_VERSION_ARB,
+        majorVersion,
+        WGL_CONTEXT_MINOR_VERSION_ARB,
+        minorVersion,
+        WGL_CONTEXT_PROFILE_MASK_ARB,
+        1,
 #if _DEBUG
-        WGL_CONTEXT_FLAGS_ARB, 1,
+        WGL_CONTEXT_FLAGS_ARB,
+        1,
 #endif
         0
     };
@@ -119,8 +123,8 @@ WindowWin32::WindowWin32( std::wstring_view title, int width, int height )
     const Vertex verts[] = {
         { { -1, 1 }, { 0, 0 } },  // Top-left.
         { { 1, 1 }, { 1, 0 } },   // Top-right.
-        { { 1, -1 }, { 1, 1 } },    // Bottom-right.
-        { { -1, -1 }, { 0, 1 } }    // Bottom-left.
+        { { 1, -1 }, { 1, 1 } },  // Bottom-right.
+        { { -1, -1 }, { 0, 1 } }  // Bottom-left.
     };
     const uint8_t indices[] = {
         0, 1, 2,  // First triangle.
@@ -143,7 +147,7 @@ WindowWin32::WindowWin32( std::wstring_view title, int width, int height )
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, m_IndexBuffer );
     glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( indices ), indices, GL_STATIC_DRAW );
 
-    glBindVertexArray(0);
+    glBindVertexArray( 0 );
 
     // Load shaders.
     GLuint vertexShader = glCreateShader( GL_VERTEX_SHADER );
@@ -163,7 +167,7 @@ WindowWin32::WindowWin32( std::wstring_view title, int width, int height )
     {
         GLint success;
         glGetProgramiv( m_ShaderProgram, GL_LINK_STATUS, &success );
-        if (!success)
+        if ( !success )
         {
             GLchar infoLog[512];
             glGetProgramInfoLog( m_ShaderProgram, 512, nullptr, infoLog );
@@ -171,7 +175,7 @@ WindowWin32::WindowWin32( std::wstring_view title, int width, int height )
         }
     }
 
-    glDeleteShader(vertexShader);
+    glDeleteShader( vertexShader );
     glDeleteShader( fragmentShader );
 }
 
@@ -298,9 +302,30 @@ void WindowWin32::present( const Image& image )
     glTextureParameteri( m_Texture, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
     glTextureParameteri( m_Texture, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
 
-    glViewport( 0, 0, getWidth(), getHeight() ); // TODO: Compute the size of the viewport for image scaling.
+    // Center the image on screen and maintain the aspect ratio.
+    const float aspectRatio = static_cast<float>( image.getWidth() ) / static_cast<float>( image.getHeight() );
+    const float scaleWidth  = static_cast<float>( getWidth() ) / static_cast<float>( image.getWidth() );
+    const float scaleHeight = static_cast<float>( getHeight() ) / static_cast<float>( image.getHeight() );
+
+    int width, height;
+
+    if ( scaleWidth < scaleHeight )
+    {
+        width  = getWidth();
+        height = static_cast<int>( static_cast<float>( width ) / aspectRatio );
+    }
+    else
+    {
+        height = getHeight();
+        width  = static_cast<int>( static_cast<float>( height ) * aspectRatio );
+    }
+    const int x = ( getWidth() - width ) / 2;
+    const int y = ( getHeight() - height ) / 2;
+
+    glViewport( x, y, width, height );
+
     glUseProgram( m_ShaderProgram );
-    glBindVertexArray(m_VAO);
+    glBindVertexArray( m_VAO );
     glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, nullptr );
 
     ::SwapBuffers( m_hDC );
