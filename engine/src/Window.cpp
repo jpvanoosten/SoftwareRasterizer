@@ -31,6 +31,21 @@ void Window::show()
     pImpl->show();
 }
 
+void Window::setVSync( bool enabled )
+{
+    pImpl->setVSync( enabled );
+}
+
+bool Window::isVSync() const noexcept
+{
+    return pImpl->isVSync();
+}
+
+void Window::clear( const Color& color )
+{
+    pImpl->clear( color );
+}
+
 void Window::present(const Image& image)
 {
     pImpl->present(image);

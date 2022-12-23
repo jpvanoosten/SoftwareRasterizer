@@ -5,11 +5,31 @@
 
 #include <iostream>
 
-#pragma comment(lib, "OpenGL32.lib" )
+#pragma comment( lib, "OpenGL32.lib" )
+
+extern "C"
+{
+    /// <summary>
+    /// Make sure OpenGL always uses the dedicated GPU when creating an OpenGL context.
+    /// </summary>
+    _declspec( dllexport ) DWORD NvOptimusEnablement = 0x00000001;
+}
 
 using namespace sr;
 
 constexpr const wchar_t* WINDOW_CLASS_NAME = L"RasterizerWindow";
+HGLRC                    g_hTempContext;
+
+// Keep track of the currently active context on the current thread.
+thread_local HGLRC currentContext = nullptr;
+
+const char* g_VertexShader = {
+#include <VertexShader.glsl>
+};
+
+const char* g_FragmentShader = {
+    #include <FragmentShader.glsl>
+};
 
 void ReportError()
 {
@@ -50,12 +70,117 @@ WindowWin32::WindowWin32( std::wstring_view title, int width, int height )
     height = windowRect.bottom - windowRect.top;
 
     m_hWnd = ::CreateWindowExW( 0, WINDOW_CLASS_NAME, title.data(), WS_OVERLAPPEDWINDOW, 0, 0, width, height, NULL, NULL, ::GetModuleHandleW( nullptr ), this );
+    m_hDC  = ::GetDC( m_hWnd );
 
-    HDC hDC = ::GetDC( m_hWnd );
+    PIXELFORMATDESCRIPTOR pfd { sizeof( PIXELFORMATDESCRIPTOR ) };
+    pfd.nVersion   = 1;
+    pfd.dwFlags    = PFD_DOUBLEBUFFER | PFD_SUPPORT_OPENGL | PFD_DRAW_TO_WINDOW;
+    pfd.iPixelType = PFD_TYPE_RGBA;
+    pfd.cColorBits = 24;
+    pfd.cAlphaBits = 8;
+    pfd.iLayerType = PFD_MAIN_PLANE;
+
+    const auto pixelFormat = ::ChoosePixelFormat( m_hDC, &pfd );
+    assert( pixelFormat != 0 );
+    auto result = ::SetPixelFormat( m_hDC, pixelFormat, &pfd );
+
+    // Create an OpenGL context for our window.
+    int majorVersion;
+    int minorVersion;
+    glGetIntegerv( GL_MAJOR_VERSION, &majorVersion );
+    glGetIntegerv( GL_MINOR_VERSION, &minorVersion );
+
+    const int attribs[] = {
+        WGL_CONTEXT_MAJOR_VERSION_ARB, majorVersion,
+        WGL_CONTEXT_MINOR_VERSION_ARB, minorVersion,
+        WGL_CONTEXT_PROFILE_MASK_ARB, 1,
+#if _DEBUG
+        WGL_CONTEXT_FLAGS_ARB, 1,
+#endif
+        0
+    };
+
+    m_hGLRC = wglCreateContextAttribsARB( m_hDC, nullptr, attribs );
+    makeCurrent();
+
+    // Create an OpenGL texture for pixel operations.
+    glGenTextures( 1, &m_Texture );
+    glTextureParameteri( m_Texture, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+    glTextureParameteri( m_Texture, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+    glTextureParameteri( m_Texture, GL_TEXTURE_MAX_LEVEL, 0 );
+
+    // Create a full-screen quad.
+    struct Vertex
+    {
+        glm::vec2 pos;
+        glm::vec2 uv;
+    };
+
+    const Vertex verts[] = {
+        { { -1, 1 }, { 0, 0 } },  // Top-left.
+        { { 1, 1 }, { 1, 0 } },   // Top-right.
+        { { 1, -1 }, { 1, 1 } },    // Bottom-right.
+        { { -1, -1 }, { 0, 1 } }    // Bottom-left.
+    };
+    const uint8_t indices[] = {
+        0, 1, 2,  // First triangle.
+        2, 3, 0   // Second triangle.
+    };
+
+    glGenVertexArrays( 1, &m_VAO );
+    glBindVertexArray( m_VAO );
+
+    glGenBuffers( 1, &m_VBO );
+    glBindBuffer( GL_ARRAY_BUFFER, m_VBO );
+    glBufferData( GL_ARRAY_BUFFER, sizeof( verts ), verts, GL_STATIC_DRAW );
+
+    glVertexAttribPointer( 0, 2, GL_FLOAT, GL_FALSE, sizeof( Vertex ), (void*)offsetof( Vertex, pos ) );
+    glEnableVertexAttribArray( 0 );
+    glVertexAttribPointer( 1, 2, GL_FLOAT, GL_FALSE, sizeof( Vertex ), (void*)offsetof( Vertex, uv ) );
+    glEnableVertexAttribArray( 1 );
+
+    glGenBuffers( 1, &m_IndexBuffer );
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, m_IndexBuffer );
+    glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( indices ), indices, GL_STATIC_DRAW );
+
+    glBindVertexArray(0);
+
+    // Load shaders.
+    GLuint vertexShader = glCreateShader( GL_VERTEX_SHADER );
+    glShaderSource( vertexShader, 1, &g_VertexShader, nullptr );
+    glCompileShader( vertexShader );
+
+    GLuint fragmentShader = glCreateShader( GL_FRAGMENT_SHADER );
+    glShaderSource( fragmentShader, 1, &g_FragmentShader, nullptr );
+    glCompileShader( fragmentShader );
+
+    m_ShaderProgram = glCreateProgram();
+    glAttachShader( m_ShaderProgram, vertexShader );
+    glAttachShader( m_ShaderProgram, fragmentShader );
+    glLinkProgram( m_ShaderProgram );
+
+    // Check for success.
+    {
+        GLint success;
+        glGetProgramiv( m_ShaderProgram, GL_LINK_STATUS, &success );
+        if (!success)
+        {
+            GLchar infoLog[512];
+            glGetProgramInfoLog( m_ShaderProgram, 512, nullptr, infoLog );
+            std::cerr << "Failed to link program: " << infoLog << std::endl;
+        }
+    }
+
+    glDeleteShader(vertexShader);
+    glDeleteShader( fragmentShader );
 }
 
 WindowWin32::~WindowWin32()
 {
+    glDeleteTextures( 1, &m_Texture );
+    wglMakeCurrent( m_hDC, nullptr );
+    wglDeleteContext( m_hGLRC );
+    ::ReleaseDC( m_hWnd, m_hDC );
     ::DestroyWindow( m_hWnd );
 }
 
@@ -101,8 +226,8 @@ void WindowWin32::init()
     }
 
     // Use a dummy window to create an initial OpenGL context to init GLEW.
-    const auto hModule = GetModuleHandle( nullptr );
-    const auto hWnd    = CreateWindow( "STATIC", "", WS_POPUP | WS_DISABLED, 0, 0, 0, 0, nullptr, nullptr, hModule, nullptr );
+    const auto hModule = ::GetModuleHandle( nullptr );
+    const auto hWnd    = ::CreateWindow( "STATIC", "", WS_POPUP | WS_DISABLED, 0, 0, 0, 0, nullptr, nullptr, hModule, nullptr );
     ::ShowWindow( hWnd, SW_HIDE );
     const auto hDC = GetDC( hWnd );
 
@@ -117,8 +242,8 @@ void WindowWin32::init()
     assert( pixelFormat != 0 );
     auto result = ::SetPixelFormat( hDC, pixelFormat, &pfd );
 
-    HGLRC context = wglCreateContext( hDC );
-    wglMakeCurrent( hDC, context );
+    g_hTempContext = wglCreateContext( hDC );
+    wglMakeCurrent( hDC, g_hTempContext );
 
     GLenum err = glewInit();
     if ( err != GLEW_OK )
@@ -136,45 +261,49 @@ void WindowWin32::show()
     ::ShowWindow( m_hWnd, SW_SHOW );
 }
 
+void WindowWin32::setVSync( bool enabled )
+{
+    makeCurrent();
+
+    if ( WGLEW_EXT_swap_control )
+    {
+        wglSwapIntervalEXT( enabled ? 1 : 0 );
+        vSync = enabled;
+    }
+}
+
+bool WindowWin32::isVSync() const noexcept
+{
+    return vSync;
+}
+
+void WindowWin32::clear( const Color& color )
+{
+    makeCurrent();
+
+    // Bind the default framebuffer.
+    glBindFramebuffer( GL_FRONT_AND_BACK, 0 );
+    glClearColor( color.r / 255.0f, color.g / 255.0f, color.b / 255.0f, color.a / 255.0f );
+    glClear( GL_COLOR_BUFFER_BIT );
+}
+
 void WindowWin32::present( const Image& image )
 {
-    // Invalidate the window's client rectangle so it gets repainted.
-    RECT clientRect;
-    ::GetClientRect( m_hWnd, &clientRect );
-    ::InvalidateRect( m_hWnd, &clientRect, FALSE );
+    makeCurrent();
 
-    PAINTSTRUCT ps;
-    HDC         hdc = ::BeginPaint( m_hWnd, &ps );
-    if ( hdc == nullptr )
-        return;
+    // Copy the image data to the texture
+    // glInvalidateTexImage( m_Texture, 0 );
+    glBindTexture( GL_TEXTURE_2D, m_Texture );
+    glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, static_cast<GLsizei>( image.getWidth() ), static_cast<GLsizei>( image.getHeight() ), 0, GL_RGBA, GL_UNSIGNED_BYTE, image.data() );
+    glTextureParameteri( m_Texture, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+    glTextureParameteri( m_Texture, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
 
-    int srcWidth  = static_cast<int>( image.getWidth() );
-    int srcHeight = static_cast<int>( image.getHeight() );
-    int dstWidth  = clientRect.right - clientRect.left;
-    int dstHeight = clientRect.bottom - clientRect.top;
+    glViewport( 0, 0, getWidth(), getHeight() ); // TODO: Compute the size of the viewport for image scaling.
+    glUseProgram( m_ShaderProgram );
+    glBindVertexArray(m_VAO);
+    glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, nullptr );
 
-    BITMAPINFO bmi {
-        .bmiHeader {
-            .biSize        = sizeof( BITMAPINFOHEADER ),
-            .biWidth       = srcWidth,
-            .biHeight      = -srcHeight,  // If biHeight is negative, the bitmap is a top-down DIB and its origin is the upper-left corner.
-            .biPlanes      = 1,
-            .biBitCount    = 32,
-            .biCompression = BI_RGB,
-        }
-    };
-
-    if ( srcWidth == dstWidth && srcHeight == dstHeight )
-    {
-        ::SetDIBitsToDevice( hdc, 0, 0, srcWidth, srcHeight, 0, 0, 0, srcHeight, image.data(), &bmi, DIB_RGB_COLORS );
-    }
-    else
-    {
-        ::SetStretchBltMode( hdc, HALFTONE );
-        ::StretchDIBits( hdc, 0, 0, dstWidth, dstHeight, 0, 0, srcWidth, srcHeight, image.data(), &bmi, DIB_RGB_COLORS, SRCCOPY );
-    }
-
-    ::EndPaint( m_hWnd, &ps );
+    ::SwapBuffers( m_hDC );
 }
 
 void WindowWin32::pushEvent( const Event& e )
@@ -281,6 +410,22 @@ void WindowWin32::onMouseLeave()
         .type = Event::MouseLeave
     };
     pushEvent( e );
+}
+
+void WindowWin32::makeCurrent()
+{
+    if ( !m_hDC || !m_hGLRC )
+        return;
+
+    if ( currentContext == m_hGLRC )
+        return;
+
+    if ( wglMakeCurrent( m_hDC, m_hGLRC ) == FALSE )
+    {
+        std::cerr << "Failed to activate the OpenGL context" << std::endl;
+    }
+
+    currentContext = m_hGLRC;
 }
 
 void WindowWin32::trackMouseEvents() const

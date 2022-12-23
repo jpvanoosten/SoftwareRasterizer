@@ -13,6 +13,9 @@ class SR_API WindowImpl
 {
 public:
     virtual void       show()                        = 0;
+    virtual void       setVSync( bool enabled )      = 0;
+    virtual bool       isVSync() const noexcept      = 0;
+    virtual void       clear( const Color& color )   = 0;
     virtual void       present( const Image& image ) = 0;
     virtual bool       popEvent( Event& event )      = 0;
     virtual int        getWidth() const noexcept     = 0;

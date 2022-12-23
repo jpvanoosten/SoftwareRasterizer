@@ -9,6 +9,7 @@ set( INC_FILES
     inc/Events.hpp
     inc/File.hpp
     inc/Font.hpp
+    inc/FragmentShader.glsl
     inc/Image.hpp
     inc/KeyCodes.hpp
     inc/Sprite.hpp
@@ -19,7 +20,9 @@ set( INC_FILES
 	inc/stb_truetype.h
     inc/Timer.hpp
     inc/Vertex.hpp
+    inc/VertexShader.glsl
     inc/Window.hpp
+
 )
 
 set( SRC_FILES

@@ -34,7 +34,23 @@ namespace sr
         bool popEvent(Event& event);
 
         void show();
+
+        void setVSync( bool enabled );
+
+        bool isVSync() const noexcept;
+
+        /// <summary>
+        /// Clear the window contents.
+        /// </summary>
+        /// <param name="color">The color to clear the window to.</param>
+        void clear( const Color& color );
+
+        /// <summary>
+        /// Present the image to the screen.
+        /// </summary>
+        /// <param name="image">The image to present.</param>
         void present(const Image& image);
+
         void destroy();
 
         int getWidth() const noexcept;

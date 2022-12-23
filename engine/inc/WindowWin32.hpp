@@ -26,6 +26,13 @@ public:
     ~WindowWin32() override;
 
     void show() override;
+
+    void setVSync( bool enabled ) override;
+
+    bool isVSync() const noexcept override;
+
+    void clear( const Color& color ) override;
+
     void present( const Image& image ) override;
 
     bool popEvent( Event& event ) override;
@@ -58,14 +65,24 @@ protected:
 private:
     friend LRESULT CALLBACK::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam );
 
+    // Make sure this is the current context on the current thread.
+    void makeCurrent();
+
     void trackMouseEvents() const;
 
     int  previousMouseX = 0;
     int  previousMouseY = 0;
     bool inClientRect   = false;
+    bool vSync          = true;
 
-    HWND              m_hWnd;   ///< Window handle.
-    HGLRC             m_hGLRC;  ///< OpenGL render context.
+    HWND              m_hWnd;           ///< Window handle.
+    HDC               m_hDC;            ///< Window draw context.
+    HGLRC             m_hGLRC;          ///< OpenGL render context.
+    GLuint            m_Texture;        ///< OpenGL texture for pixel transfers.
+    GLuint            m_VBO;            ///< Vertex buffer object for the vertices of the quad.
+    GLuint            m_IndexBuffer;    ///< Index buffer for draw a quad.
+    GLuint            m_VAO;            ///< Vertex Array Object for drawing a fullscreen quad.
+    GLuint            m_ShaderProgram;  ///< Shader program.
     std::queue<Event> m_eventQueue;
 };
 }  // namespace sr
