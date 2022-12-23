@@ -5,6 +5,8 @@
 
 #include <iostream>
 
+#pragma comment(lib, "OpenGL32.lib" )
+
 using namespace sr;
 
 constexpr const wchar_t* WINDOW_CLASS_NAME = L"RasterizerWindow";
@@ -48,6 +50,8 @@ WindowWin32::WindowWin32( std::wstring_view title, int width, int height )
     height = windowRect.bottom - windowRect.top;
 
     m_hWnd = ::CreateWindowExW( 0, WINDOW_CLASS_NAME, title.data(), WS_OVERLAPPEDWINDOW, 0, 0, width, height, NULL, NULL, ::GetModuleHandleW( nullptr ), this );
+
+    HDC hDC = ::GetDC( m_hWnd );
 }
 
 WindowWin32::~WindowWin32()
@@ -94,6 +98,36 @@ void WindowWin32::init()
     if ( !RegisterClassExW( &wndClass ) )
     {
         ::MessageBoxA( nullptr, "Unable to register the window class.", "Error", MB_OK | MB_ICONERROR );
+    }
+
+    // Use a dummy window to create an initial OpenGL context to init GLEW.
+    const auto hModule = GetModuleHandle( nullptr );
+    const auto hWnd    = CreateWindow( "STATIC", "", WS_POPUP | WS_DISABLED, 0, 0, 0, 0, nullptr, nullptr, hModule, nullptr );
+    ::ShowWindow( hWnd, SW_HIDE );
+    const auto hDC = GetDC( hWnd );
+
+    PIXELFORMATDESCRIPTOR pfd { sizeof( PIXELFORMATDESCRIPTOR ) };
+    pfd.nVersion   = 1;
+    pfd.dwFlags    = PFD_DOUBLEBUFFER | PFD_SUPPORT_OPENGL | PFD_DRAW_TO_WINDOW;
+    pfd.iPixelType = PFD_TYPE_RGBA;
+    pfd.cColorBits = 24;
+    pfd.iLayerType = PFD_MAIN_PLANE;
+
+    const auto pixelFormat = ::ChoosePixelFormat( hDC, &pfd );
+    assert( pixelFormat != 0 );
+    auto result = ::SetPixelFormat( hDC, pixelFormat, &pfd );
+
+    HGLRC context = wglCreateContext( hDC );
+    wglMakeCurrent( hDC, context );
+
+    GLenum err = glewInit();
+    if ( err != GLEW_OK )
+    {
+        ::MessageBoxA( nullptr, "Failed to initialize GLEW.", "Error", MB_OK | MB_ICONERROR );
+    }
+    else
+    {
+        std::cout << std::format( "Using GLEW: {}\n", reinterpret_cast<const char*>( glewGetString( GLEW_VERSION ) ) );
     }
 }
 

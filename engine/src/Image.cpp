@@ -103,8 +103,8 @@ void Image::resize( uint32_t width, uint32_t height )
     m_width  = width;
     m_height = height;
     m_AABB   = {
-          { 0, 0, 0 },
-          { m_width, m_height, 0 }
+        { 0, 0, 0 },
+        { m_width, m_height, 0 }
     };
 
     // Align color buffer to 64-byte boundary for better cache alignment on 64-bit architectures.
@@ -612,6 +612,11 @@ void Image::drawText( const Font& font, int x, int y, std::string_view text, con
     font.drawText( *this, text, x, y, color );
 }
 
+constexpr int fast_floor( float x )
+{
+    return static_cast<int>( x + 32768.0f ) - 32768;
+}
+
 const Color& Image::sample( int u, int v, AddressMode addressMode ) const noexcept
 {
     const int w = static_cast<int>( m_width );
@@ -621,8 +626,8 @@ const Color& Image::sample( int u, int v, AddressMode addressMode ) const noexce
     {
     case AddressMode::Wrap:
     {
-        u = u - w * static_cast<int>( std::floor( static_cast<float>( u ) / static_cast<float>( w ) ) );
-        v = v - h * static_cast<int>( std::floor( static_cast<float>( v ) / static_cast<float>( h ) ) );
+        u = u - w * fast_floor( static_cast<float>( u ) / static_cast<float>( w ) );
+        v = v - h * fast_floor( static_cast<float>( v ) / static_cast<float>( h ) );
     }
     break;
     case AddressMode::Mirror:

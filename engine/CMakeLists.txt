@@ -71,7 +71,8 @@ target_include_directories( SoftwareRasterizer
 )
 
 target_link_libraries( SoftwareRasterizer
-    PUBLIC Math
+    PUBLIC Math 
+    PRIVATE glew
 )
 
 find_package(OpenMP)

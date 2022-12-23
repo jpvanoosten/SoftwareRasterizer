@@ -12,6 +12,10 @@ FetchContent_Declare(
 	GIT_REPOSITORY https://github.com/Madour/LDtkLoader.git
 	GIT_TAG		   1.1
 )
+FetchContent_Declare(
+	glew
+	GIT_REPOSITORY https://github.com/jpvanoosten/glew.git
+)
 
 message( STATUS "Fetching glm..." )
 FetchContent_MakeAvailable(glm)
@@ -19,9 +23,12 @@ FetchContent_MakeAvailable(glm)
 message( STATUS "Fetching LDtkLoader..." )
 FetchContent_MakeAvailable(LDtkLoader)
 
+message( STATUS "Fetching glew..." )
+FetchContent_MakeAvailable( glew )
+
 if(BUILD_SHARED_LIBS)
 set_target_properties(
-	glm_shared LDtkLoader
+	glm_shared LDtkLoader glew
     PROPERTIES FOLDER externals
 )
 endif(BUILD_SHARED_LIBS)

@@ -4,13 +4,15 @@
 #include "Events.hpp"
 #include "WindowImpl.hpp"
 
+#include <GL/glew.h>
+#include <GL/wglew.h>
+
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 #include <Windows.h>
 #include <windowsx.h>
 
 #include <queue>
-#include <string>
 
 // Forward declaration of Windows callback function.
 LRESULT CALLBACK WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam );
@@ -62,7 +64,8 @@ private:
     int  previousMouseY = 0;
     bool inClientRect   = false;
 
-    HWND              m_hWnd;
+    HWND              m_hWnd;   ///< Window handle.
+    HGLRC             m_hGLRC;  ///< OpenGL render context.
     std::queue<Event> m_eventQueue;
 };
 }  // namespace sr
