@@ -14,7 +14,13 @@ set( INC_FILES
     inc/GamePadState.hpp
     inc/GamePadStateTracker.hpp
     inc/Image.hpp
+    inc/Keyboard.hpp
+    inc/KeyboardState.hpp
+    inc/KeyboardStateTracker.hpp
     inc/KeyCodes.hpp
+    inc/Mouse.hpp
+    inc/MouseState.hpp
+    inc/MouseStateTracker.hpp
     inc/Sprite.hpp
     inc/SpriteSheet.hpp
     inc/stb_easy_font.h
@@ -25,6 +31,8 @@ set( INC_FILES
     inc/Vertex.hpp
     inc/VertexShader.glsl
     inc/Window.hpp
+    inc/WindowHandle.hpp
+    inc/WindowImpl.hpp
 )
 
 set( SRC_FILES
@@ -34,6 +42,10 @@ set( SRC_FILES
     src/GamePad.cpp
     src/GamePadStateTracker.cpp
     src/Image.cpp
+    src/Keyboard.cpp
+    src/KeyboardState.cpp
+    src/KeyboardStateTracker.cpp
+    src/Mouse.cpp
     src/SpriteSheet.cpp
     src/stb_image.cpp
     src/stb_image_write.cpp
@@ -44,8 +56,10 @@ set( SRC_FILES
 
 if(WIN32)
     list( APPEND SRC_FILES
-        src/GamePadXInput.cpp
+        src/Win32/GamePadXInput.cpp
         src/Win32/IncludeWin32.hpp
+        src/Win32/KeyboardWin32.cpp
+        src/Win32/MouseWin32.cpp
         src/Win32/WindowWin32.hpp
         src/Win32/WindowWin32.cpp
     )

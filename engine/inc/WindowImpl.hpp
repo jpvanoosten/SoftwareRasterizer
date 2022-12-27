@@ -2,6 +2,7 @@
 
 #include "Config.hpp"
 #include "Image.hpp"
+#include "WindowHandle.hpp"
 
 #include <glm/vec2.hpp>
 
@@ -12,15 +13,16 @@ namespace sr
 class SR_API WindowImpl
 {
 public:
-    virtual void       show()                        = 0;
-    virtual void       setVSync( bool enabled )      = 0;
-    virtual bool       isVSync() const noexcept      = 0;
-    virtual void       clear( const Color& color )   = 0;
-    virtual void       present( const Image& image ) = 0;
-    virtual bool       popEvent( Event& event )      = 0;
-    virtual int        getWidth() const noexcept     = 0;
-    virtual int        getHeight() const noexcept    = 0;
-    virtual glm::ivec2 getSize() const noexcept      = 0;
+    virtual void         show()                           = 0;
+    virtual WindowHandle getWindowHandle() const noexcept = 0;
+    virtual void         setVSync( bool enabled )         = 0;
+    virtual bool         isVSync() const noexcept         = 0;
+    virtual void         clear( const Color& color )      = 0;
+    virtual void         present( const Image& image )    = 0;
+    virtual bool         popEvent( Event& event )         = 0;
+    virtual int          getWidth() const noexcept        = 0;
+    virtual int          getHeight() const noexcept       = 0;
+    virtual glm::ivec2   getSize() const noexcept         = 0;
 
 protected:
     friend struct std::default_delete<WindowImpl>;  // Allow default delete access to the protected destructor.

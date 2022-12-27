@@ -3,7 +3,7 @@
 /// See: https://github.com/microsoft/DirectXTK12
 /// </summary>
 
-#include "Win32/IncludeWin32.hpp"
+#include "IncludeWin32.hpp"
 
 #include <GamePad.hpp>
 #include <Timer.hpp>

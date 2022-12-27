@@ -1,9 +1,10 @@
 #pragma once
 
+#include "IncludeWin32.hpp"
+
 #include <Config.hpp>
 #include <Events.hpp>
 #include <WindowImpl.hpp>
-#include "IncludeWin32.hpp"
 
 #include <GL/glew.h>
 
@@ -21,6 +22,8 @@ public:
     ~WindowWin32() override;
 
     void show() override;
+
+    WindowHandle getWindowHandle() const noexcept override;
 
     void setVSync( bool enabled ) override;
 

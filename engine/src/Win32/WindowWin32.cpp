@@ -267,6 +267,11 @@ void WindowWin32::show()
     ::ShowWindow( m_hWnd, SW_SHOW );
 }
 
+WindowHandle WindowWin32::getWindowHandle() const noexcept
+{
+    return m_hWnd;
+}
+
 void WindowWin32::setVSync( bool enabled )
 {
     makeCurrent();

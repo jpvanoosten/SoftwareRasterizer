@@ -21,6 +21,11 @@ void Window::create(std::wstring_view title, int width, int height)
     pImpl = std::make_unique<WindowType>(title, width, height);
 }
 
+WindowHandle Window::getWindowHandle() const noexcept
+{
+    return pImpl->getWindowHandle();
+}
+
 bool Window::popEvent(Event& event)
 {
     return pImpl && pImpl->popEvent(event);
