@@ -5,6 +5,8 @@
 
 #include <iostream>
 
+#include <GL/wglew.h>
+
 #pragma comment( lib, "OpenGL32.lib" )
 
 extern "C"

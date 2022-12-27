@@ -3,7 +3,7 @@
 using namespace sr;
 
 #if defined(_WIN32)
-#include "WindowWin32.hpp"
+#include "Win32/WindowWin32.hpp"
 using WindowType = WindowWin32;
 #endif
 

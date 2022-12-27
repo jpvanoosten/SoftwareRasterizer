@@ -3,12 +3,12 @@
 #include "Background.hpp"
 #include "Button.hpp"
 
-
-#include <Image.hpp>
-#include <Timer.hpp>
-#include <Font.hpp>
 #include <Events.hpp>
+#include <Font.hpp>
+#include <GamePadStateTracker.hpp>
+#include <Image.hpp>
 #include <Math/Rect.hpp>
+#include <Timer.hpp>
 
 #include <LDtkLoader/Project.hpp>
 
@@ -19,8 +19,8 @@ class Game
 public:
     Game( uint32_t screenWidth, uint32_t screenHeight );
 
-    Game( const Game& ) = delete;
-    Game( Game&& )      = delete;
+    Game( const Game& )            = delete;
+    Game( Game&& )                 = delete;
     Game& operator=( const Game& ) = delete;
     Game& operator=( Game&& )      = delete;
 
@@ -34,7 +34,7 @@ public:
     void processEvent( const sr::Event& event );
 
     void onKeyPressed( sr::KeyEventArgs& args );
-    void onKeyReleased(sr::KeyEventArgs& args );
+    void onKeyReleased( sr::KeyEventArgs& args );
     void onMouseMoved( sr::MouseMovedEventArgs& args );
     void onResized( sr::ResizeEventArgs& args );
 
@@ -44,7 +44,6 @@ public:
     void onRestartClicked();
 
 protected:
-
     ldtk::Project ldtkProject;
 
     sr::Image image;
@@ -54,6 +53,7 @@ protected:
     Math::RectI gameRect;
 
     glm::ivec2 mousePos;
+    sr::GamePadStateTracker gamePadStateTracker;
 
     // Fonts.
     sr::Font arial20;
@@ -67,4 +67,3 @@ protected:
     Button nextButton;
     Button restartButton;
 };
-

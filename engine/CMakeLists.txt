@@ -10,6 +10,9 @@ set( INC_FILES
     inc/File.hpp
     inc/Font.hpp
     inc/FragmentShader.glsl
+    inc/GamePad.hpp
+    inc/GamePadState.hpp
+    inc/GamePadStateTracker.hpp
     inc/Image.hpp
     inc/KeyCodes.hpp
     inc/Sprite.hpp
@@ -22,13 +25,14 @@ set( INC_FILES
     inc/Vertex.hpp
     inc/VertexShader.glsl
     inc/Window.hpp
-
 )
 
 set( SRC_FILES
     src/BlendMode.cpp
     src/Color.cpp
     src/Font.cpp
+    src/GamePad.cpp
+    src/GamePadStateTracker.cpp
     src/Image.cpp
     src/SpriteSheet.cpp
     src/stb_image.cpp
@@ -39,12 +43,11 @@ set( SRC_FILES
 )
 
 if(WIN32)
-    list(APPEND INC_FILES
-        inc/WindowWin32.hpp
-    )
-
     list( APPEND SRC_FILES
-        src/WindowWin32.cpp
+        src/GamePadXInput.cpp
+        src/Win32/IncludeWin32.hpp
+        src/Win32/WindowWin32.hpp
+        src/Win32/WindowWin32.cpp
     )
 
 endif(WIN32)

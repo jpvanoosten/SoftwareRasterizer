@@ -1,16 +1,11 @@
 #pragma once
 
-#include "Config.hpp"
-#include "Events.hpp"
-#include "WindowImpl.hpp"
+#include <Config.hpp>
+#include <Events.hpp>
+#include <WindowImpl.hpp>
+#include "IncludeWin32.hpp"
 
 #include <GL/glew.h>
-#include <GL/wglew.h>
-
-#define WIN32_LEAN_AND_MEAN
-#define NOMINMAX
-#include <Windows.h>
-#include <windowsx.h>
 
 #include <queue>
 

@@ -1,5 +1,6 @@
 #include <Color.hpp>
 #include <Game.hpp>
+#include <GamePad.hpp>
 
 #include <string>
 
@@ -65,6 +66,7 @@ void Game::Update()
         frames    = 0;
         totalTime = 0.0;
     }
+
 
     backgrounds[0].update( timer );
     backgrounds[0].draw( image );
