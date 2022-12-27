@@ -50,6 +50,16 @@ struct SR_API MouseStateTracker
     /// <see cref="ButtonState" />
     ButtonState xButton2;
 
+    /// <summary>
+    /// The change in the X position of the mouse.
+    /// </summary>
+    int x = 0;
+
+    /// <summary>
+    /// The change in Y position of the mouse.
+    /// </summary>
+    int y = 0;
+
     MouseStateTracker() noexcept;
 
     /// <summary>
@@ -72,7 +82,7 @@ struct SR_API MouseStateTracker
     /// </summary>
     /// <returns>The last state that was passed to
     /// `MouseStateTracker::update()`.</returns>
-    MouseState getLastState() const noexcept;
+    [[nodiscard]] MouseState getLastState() const noexcept;
 
 private:
     MouseState lastState;

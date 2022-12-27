@@ -117,7 +117,7 @@ private:
 /// <returns>The transformed AABB.</returns>
 inline AABB operator*( const AABB& aabb, const Transform2D& transform )
 {
-    const auto mat = transform.getTransform();
+    auto& mat = transform.getTransform();
     const auto min = mat * glm::vec3 { aabb.min.x, aabb.min.y, 1 };
     const auto max = mat * glm::vec3 { aabb.max.x, aabb.max.y, 1 };
 
@@ -132,8 +132,7 @@ inline AABB operator*( const AABB& aabb, const Transform2D& transform )
 /// <returns>The transformed AABB.</returns>
 inline AABB& operator*=( AABB& aabb, const Transform2D& transform )
 {
-    const auto mat = transform.getTransform();
-
+    auto& mat = transform.getTransform();
     const auto min = mat * glm::vec3 { aabb.min.x, aabb.min.y, 1 };
     const auto max = mat * glm::vec3 { aabb.max.x, aabb.max.y, 1 };
 

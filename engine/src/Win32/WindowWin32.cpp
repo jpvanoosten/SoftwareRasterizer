@@ -33,6 +33,10 @@ const char* g_FragmentShader = {
 #include <FragmentShader.glsl>
 };
 
+extern void Keyboard_ProcessMessage( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam );
+extern void Mouse_ProcessMessage( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam );
+
+
 void ReportError()
 {
     // Retrieve the system error message for the last-error code
@@ -601,6 +605,9 @@ static WindowState DecodeWindowState( WPARAM wParam )
 
 LRESULT CALLBACK WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 {
+    Keyboard_ProcessMessage( hWnd, msg, wParam, lParam );
+    Mouse_ProcessMessage( hWnd, msg, wParam, lParam );
+
     if ( msg == WM_CREATE )
     {
         // Associate the Window pointer with the user data of when Win32 window.

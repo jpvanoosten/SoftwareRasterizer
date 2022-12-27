@@ -4,6 +4,9 @@
 
 namespace sr
 {
+    /// <summary>
+    /// An enumeration for all of the virtual key codes on the keyboard.
+    /// </summary>
     enum class KeyCode : uint8_t
     {
         None = 0x00,  // No key was pressed

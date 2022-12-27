@@ -1,6 +1,7 @@
-#include <Color.hpp>
 #include <Game.hpp>
-#include <GamePad.hpp>
+
+#include <Color.hpp>
+#include <Input.hpp>
 
 #include <string>
 
@@ -65,6 +66,15 @@ void Game::Update()
         fps       = std::format( "FPS: {:.3f}", static_cast<double>( frames ) / totalTime );
         frames    = 0;
         totalTime = 0.0;
+    }
+
+    if ( Input::getAxis( "Horizontal" ) != 0.0f )
+    {
+        std::cout << "Horizontal: " << Input::getAxis( "Horizontal" ) << std::endl;
+    }
+    if ( Input::getAxis( "Vertical" ) != 0.0f )
+    {
+        std::cout << "Vertical: " << Input::getAxis( "Vertical" ) << std::endl;
     }
     
     backgrounds[0].update( timer );

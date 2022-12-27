@@ -14,6 +14,7 @@ set( INC_FILES
     inc/GamePadState.hpp
     inc/GamePadStateTracker.hpp
     inc/Image.hpp
+    inc/Input.hpp
     inc/Keyboard.hpp
     inc/KeyboardState.hpp
     inc/KeyboardStateTracker.hpp
@@ -42,6 +43,7 @@ set( SRC_FILES
     src/GamePad.cpp
     src/GamePadStateTracker.cpp
     src/Image.cpp
+    src/Input.cpp
     src/Keyboard.cpp
     src/KeyboardState.cpp
     src/KeyboardStateTracker.cpp

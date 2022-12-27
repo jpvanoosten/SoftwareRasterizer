@@ -24,7 +24,7 @@ void  ApplyStickDeadZone( float x, float y, DeadZone deadZoneMode, float maxValu
 
 using namespace sr;
 
-constexpr int GamePad::MAX_PLAYERS = XUSER_MAX_COUNT;
+//const int GamePad::MAX_PLAYERS = XUSER_MAX_COUNT;
 
 // Don't poll disconnected joysticks for N seconds.
 static constexpr double POLLING_TIMEOUT = 5.0;

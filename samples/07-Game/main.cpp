@@ -1,3 +1,5 @@
+#include "Input.hpp"
+
 #include <Game.hpp>
 #include <Image.hpp>
 #include <Window.hpp>
@@ -32,6 +34,9 @@ int main( int argc, char* argv[] )
 
     while ( window )
     {
+        // Update the state of the input.
+        Input::update();
+
         // Update the game.
         game.Update();
 

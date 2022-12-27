@@ -18,7 +18,7 @@ enum class DeadZone
 class SR_API GamePad
 {
 public:
-    static const int MAX_PLAYERS;
+    static constexpr int MAX_PLAYERS = 4;
 
     static GamePadState getState( int      player,
                                   DeadZone deadZoneMode = DeadZone::IndependentAxis );

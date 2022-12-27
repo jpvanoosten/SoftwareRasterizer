@@ -21,7 +21,7 @@ public:
 
     bool isKeyReleased( KeyCode key ) const noexcept;
 
-    KeyboardState getLastState() const noexcept;
+    [[nodiscard]] KeyboardState getLastState() const noexcept;
 
 private:
     KeyboardState lastState;

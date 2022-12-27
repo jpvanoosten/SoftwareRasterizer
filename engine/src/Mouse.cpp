@@ -16,6 +16,9 @@ bool MouseStateTracker::update( const MouseState& state ) noexcept
     UPDATE_BUTTON_STATE( xButton1 );
     UPDATE_BUTTON_STATE( xButton2 );
 
+    x = state.x - lastState.x;
+    y = state.y - lastState.y;
+
     if (lastState != state) {
         lastState = state;
         return true;
