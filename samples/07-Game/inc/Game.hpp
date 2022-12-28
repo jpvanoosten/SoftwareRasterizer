@@ -33,8 +33,6 @@ public:
 
     void processEvent( const sr::Event& event );
 
-    void onKeyPressed( sr::KeyEventArgs& args );
-    void onKeyReleased( sr::KeyEventArgs& args );
     void onMouseMoved( sr::MouseMovedEventArgs& args );
     void onResized( sr::ResizeEventArgs& args );
 

@@ -13,6 +13,45 @@ Game::Game( uint32_t screenWidth, uint32_t screenHeight )
 , arial20 { "assets/fonts/arial.ttf", 20 }
 , arial24 { "assets/fonts/arial.ttf", 24 }
 {
+    // Input actions map
+    Input::mapAxis( "Horizontal", []( std::span<const GamePadStateTracker> gamePadStates, const KeyboardStateTracker& keyboardState, const MouseStateTracker& mouseState ) {
+        float leftX = 0.0f;
+
+        for ( auto& gamePadState: gamePadStates )
+        {
+            const auto state = gamePadState.getLastState();
+
+            leftX += state.thumbSticks.leftX;
+        }
+
+        const auto keyState = keyboardState.getLastState();
+
+        const float a     = keyState.A ? 1.0f : 0.0f;
+        const float d     = keyState.D ? 1.0f : 0.0f;
+        const float left  = keyState.Left ? 1.0f : 0.0f;
+        const float right = keyState.Right ? 1.0f : 0.0f;
+
+        const float x = static_cast<float>( mouseState.x );
+
+        return std::clamp( leftX - a + d - left + right + x, -1.0f, 1.0f );
+    } );
+    Input::mapAxis( "Jump", []( std::span<const GamePadStateTracker> gamePadStates, const KeyboardStateTracker& keyboardState, const MouseStateTracker& mouseState ) {
+        float a = 0.0f;
+
+        for ( auto& gamePadState: gamePadStates )
+        {
+            const auto state = gamePadState.getLastState();
+            a += state.buttons.a ? 1.0f : 0.0f;
+        }
+
+        const auto keyState = keyboardState.getLastState();
+
+        const float space = keyState.Space ? 1.0f : 0.0f;
+        const float up    = keyState.Up ? 1.0f : 0.0f;
+
+        return std::clamp( a + space + up, 0.0f, 1.0f );
+    } );
+
     ldtkProject.loadFromFile( "assets/Pixel Adventure/Pixel Adventure.ldtk" );
 
     backgrounds.emplace_back( Background { "assets/Pixel Adventure/Background/Blue.png", 1.0f, { 0.0f, 1.0f }, 0.3f } );
@@ -68,27 +107,6 @@ void Game::Update()
         totalTime = 0.0;
     }
 
-    if ( Input::getAxis( "Horizontal" ) != 0.0f )
-    {
-        std::cout << "Horizontal: " << Input::getAxis( "Horizontal" ) << std::endl;
-    }
-    if ( Input::getAxis( "Vertical" ) != 0.0f )
-    {
-        std::cout << "Vertical: " << Input::getAxis( "Vertical" ) << std::endl;
-    }
-    if ( Input::getAxis( "Fire1" ) != 0.0f )
-    {
-        std::cout << "Fire1: " << Input::getAxis( "Fire1" ) << std::endl;
-    }
-    if ( Input::getAxis( "Fire2" ) != 0.0f )
-    {
-        std::cout << "Fire2: " << Input::getAxis( "Fire2" ) << std::endl;
-    }
-    if ( Input::getAxis( "Fire3" ) != 0.0f )
-    {
-        std::cout << "Fire3: " << Input::getAxis( "Fire3" ) << std::endl;
-    }
-    
     backgrounds[0].update( timer );
     backgrounds[0].draw( image );
 
@@ -117,10 +135,8 @@ void Game::processEvent( const sr::Event& _event )
     case Event::Close:
         break;
     case Event::KeyPressed:
-        onKeyPressed( event.key );
         break;
     case Event::KeyReleased:
-        onKeyReleased( event.key );
         break;
     case Event::MouseMoved:
         onMouseMoved( event.mouseMove );
@@ -147,36 +163,6 @@ void Game::processEvent( const sr::Event& _event )
     previousButton.processEvents( event );
     nextButton.processEvents( event );
     restartButton.processEvents( event );
-}
-
-void Game::onKeyPressed( sr::KeyEventArgs& args )
-{
-    switch ( args.code )
-    {
-    case KeyCode::Up:
-        break;
-    case KeyCode::Down:
-        break;
-    case KeyCode::Left:
-        break;
-    case KeyCode::Right:
-        break;
-    }
-}
-
-void Game::onKeyReleased( sr::KeyEventArgs& args )
-{
-    switch ( args.code )
-    {
-    case KeyCode::Up:
-        break;
-    case KeyCode::Down:
-        break;
-    case KeyCode::Left:
-        break;
-    case KeyCode::Right:
-        break;
-    }
 }
 
 void Game::onMouseMoved( sr::MouseMovedEventArgs& args )

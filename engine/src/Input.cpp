@@ -1246,18 +1246,6 @@ static std::map<std::string, ButtonCallback> g_ButtonUpMap = {
      } },
 };
 
-static std::map<KeyCode, KeyCallback> g_KeyCallback;
-
-static std::map<KeyCode, KeyCallback> g_KeyDownCallback;
-
-static std::map<KeyCode, KeyCallback> g_KeyUpCallback;
-
-static std::map<MouseButton, MouseButtonCallback> g_MouseButtonCallback;
-
-static std::map<MouseButton, MouseButtonCallback> g_MouseButtonDownCallback;
-
-static std::map<MouseButton, MouseButtonCallback> g_MouseButtonUpCallback;
-
 void Input::update()
 {
     for ( int i = 0; i < GamePad::MAX_PLAYERS; ++i )
@@ -1363,42 +1351,21 @@ bool Input::getKeyUp( std::string_view keyName )
 
 bool Input::getKey( KeyCode key )
 {
-    // First check if there is a matching callback in the key callback map
-    if ( const auto& iter = g_KeyCallback.find(key); iter != g_KeyCallback.end() )
-    {
-        return iter->second( g_KeyboardStateTracker );
-    }
-
     return g_KeyboardStateTracker.getLastState().isKeyDown( key );
 }
 
 bool Input::getKeyDown( KeyCode key )
 {
-    if ( const auto& iter = g_KeyDownCallback.find( key ); iter != g_KeyDownCallback.end() )
-    {
-        return iter->second( g_KeyboardStateTracker );
-    }
-
     return g_KeyboardStateTracker.isKeyPressed( key );
 }
 
 bool Input::getKeyUp( KeyCode key )
 {
-    if ( const auto& iter = g_KeyUpCallback.find( key ); iter != g_KeyUpCallback.end() )
-    {
-        return iter->second( g_KeyboardStateTracker );
-    }
-
     return g_KeyboardStateTracker.isKeyReleased( key );
 }
 
 bool Input::getMouseButton( MouseButton button )
 {
-    if ( const auto& iter = g_MouseButtonCallback.find( button ); iter != g_MouseButtonCallback.end() )
-    {
-        return iter->second( g_MouseStateTracker );
-    }
-
     switch ( button )
     {
     case MouseButton::Left:
@@ -1418,11 +1385,6 @@ bool Input::getMouseButton( MouseButton button )
 
 bool Input::getMouseButtonDown( MouseButton button )
 {
-    if ( const auto& iter = g_MouseButtonDownCallback.find( button ); iter != g_MouseButtonDownCallback.end() )
-    {
-        return iter->second( g_MouseStateTracker );
-    }
-
     switch ( button )
     {
     case MouseButton::Left:
@@ -1441,11 +1403,6 @@ bool Input::getMouseButtonDown( MouseButton button )
 
 bool Input::getMouseButtonUp( MouseButton button )
 {
-    if ( const auto& iter = g_MouseButtonUpCallback.find( button ); iter != g_MouseButtonUpCallback.end() )
-    {
-        return iter->second( g_MouseStateTracker );
-    }
-
     switch ( button )
     {
     case MouseButton::Left:
@@ -1480,34 +1437,4 @@ void Input::mapButtonDown( std::string_view buttonName, ButtonCallback callback 
 void Input::mapButtonUp( std::string_view buttonName, ButtonCallback callback )
 {
     g_ButtonUpMap[std::string( buttonName )] = std::move( callback );
-}
-
-void Input::mapKey( KeyCode key, KeyCallback callback )
-{
-    g_KeyCallback[key] = std::move( callback );
-}
-
-void Input::mapKeyDown( KeyCode key, KeyCallback callback )
-{
-    g_KeyDownCallback[key] = std::move( callback );
-}
-
-void Input::mapKeyUp( KeyCode key, KeyCallback callback )
-{
-    g_KeyUpCallback[key] = std::move( callback );
-}
-
-void Input::mapMouseButton( MouseButton button, MouseButtonCallback callback )
-{
-    g_MouseButtonCallback[button] = std::move( callback );
-}
-
-void Input::mapMouseButtonDown( MouseButton button, MouseButtonCallback callback )
-{
-    g_MouseButtonDownCallback[button] = std::move( callback );
-}
-
-void Input::mapMouseButtonUp( MouseButton button, MouseButtonCallback callback )
-{
-    g_MouseButtonUpCallback[button] = std::move( callback );
 }
