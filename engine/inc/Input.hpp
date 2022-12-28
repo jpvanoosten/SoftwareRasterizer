@@ -14,7 +14,7 @@ namespace sr
 {
 /// <summary>
 /// An AxisCallback function takes a GamePadStateTracker (for each connected GamePad), KeyboardStateTracker, and a MouseStateTracker and returns
-/// the value of the axis being queried (in the range [-1...1].
+/// the value of the axis being queried (in the range [-1...1]).
 /// </summary>
 using AxisCallback = std::function<float(std::span<const GamePadStateTracker>, const KeyboardStateTracker&, const MouseStateTracker&)>;
 
@@ -161,16 +161,52 @@ public:
     /// <param name="callback">The callback function./param>
     static void mapButtonUp( std::string_view buttonName, ButtonCallback callback );
 
+    /// <summary>
+    /// Map a KeyCode to a key callback function.
+    /// Note: You should prefer mapAxis or mapButton instead.
+    /// </summary>
+    /// <param name="key">The key to map to the callback function.</param>
+    /// <param name="callback">The callback function.</param>
     static void mapKey( KeyCode key, KeyCallback callback );
 
+    /// <summary>
+    /// Map a KeyCode to a key down callback function.
+    /// Note: You should prefer mapAxis or mapButton instead.
+    /// </summary>
+    /// <param name="key">The key to map to the callback function.</param>
+    /// <param name="callback">The callback function.</param>
     static void mapKeyDown( KeyCode key, KeyCallback callback );
 
+    /// <summary>
+    /// Map a KeyCode to a key up callback function.
+    /// Note: You should prefer mapAxis or mapButton instead.
+    /// </summary>
+    /// <param name="key">The key to map.</param>
+    /// <param name="callback">The callback function.</param>
     static void mapKeyUp( KeyCode key, KeyCallback callback );
 
+    /// <summary>
+    /// Map a MouseButton to a mouse button callback function.
+    /// Note: You should prefer mapAxis or mapButton instead.
+    /// </summary>
+    /// <param name="button">The mouse button to map.</param>
+    /// <param name="callback">The callback function.</param>
     static void mapMouseButton( MouseButton button, MouseButtonCallback callback );
 
+    /// <summary>
+    /// Map a MouseButton to a mouse button down callback function.
+    /// Note: You should prefer mapAxis or mapButton instead.
+    /// </summary>
+    /// <param name="button">The mouse button to map.</param>
+    /// <param name="callback">The callback function.</param>
     static void mapMouseButtonDown( MouseButton button, MouseButtonCallback callback );
 
+    /// <summary>
+    /// Map a MouseButton to a mouse button up callback function.
+    /// Note: You should prefer mapAxis or mapButton instead.
+    /// </summary>
+    /// <param name="button">The mouse button to map.</param>
+    /// <param name="callback">The callback function.</param>
     static void mapMouseButtonUp( MouseButton button, MouseButtonCallback callback );
 
     // Static class, delete constructors and assignment operators.

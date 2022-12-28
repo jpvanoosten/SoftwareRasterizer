@@ -76,6 +76,18 @@ void Game::Update()
     {
         std::cout << "Vertical: " << Input::getAxis( "Vertical" ) << std::endl;
     }
+    if ( Input::getAxis( "Fire1" ) != 0.0f )
+    {
+        std::cout << "Fire1: " << Input::getAxis( "Fire1" ) << std::endl;
+    }
+    if ( Input::getAxis( "Fire2" ) != 0.0f )
+    {
+        std::cout << "Fire2: " << Input::getAxis( "Fire2" ) << std::endl;
+    }
+    if ( Input::getAxis( "Fire3" ) != 0.0f )
+    {
+        std::cout << "Fire3: " << Input::getAxis( "Fire3" ) << std::endl;
+    }
     
     backgrounds[0].update( timer );
     backgrounds[0].draw( image );

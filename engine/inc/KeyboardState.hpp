@@ -5,6 +5,9 @@
 
 namespace sr
 {
+/// <summary>
+/// A class that represents the current state of the keyboard.
+/// </summary>
 struct SR_API KeyboardState
 {
     // clang-format off
@@ -236,8 +239,18 @@ struct SR_API KeyboardState
     // ============ ( 32 bytes ) ===========================
     // clang-format on
 
+    /// <summary>
+    /// Check if a key is being pressed on the keyboard.
+    /// </summary>
+    /// <param name="key">The key to query.</param>
+    /// <returns>`true` if the key is pressed on the keyboard, `false` otherwise.</returns>
     bool isKeyDown( KeyCode key ) const noexcept;
 
+    /// <summary>
+    /// Check if a key is not being pressed on the keyboard.
+    /// </summary>
+    /// <param name="key">The key to query.</param>
+    /// <returns>`true` if the key is not pressed, `false` otherwise.</returns>
     bool isKeyUp( KeyCode key ) const noexcept;
 
     bool operator==( const KeyboardState& ) const = default;

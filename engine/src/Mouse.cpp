@@ -19,6 +19,9 @@ bool MouseStateTracker::update( const MouseState& state ) noexcept
     x = state.x - lastState.x;
     y = state.y - lastState.y;
 
+    hScrollWheel = state.hScrollWheel - lastState.hScrollWheel;
+    vScrollWheel = state.vScrollWheel - lastState.vScrollWheel;
+
     if (lastState != state) {
         lastState = state;
         return true;

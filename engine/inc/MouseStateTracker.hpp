@@ -60,6 +60,16 @@ struct SR_API MouseStateTracker
     /// </summary>
     int y = 0;
 
+    /// <summary>
+    /// The change in the horizontal scroll wheel of the mouse.
+    /// </summary>
+    float hScrollWheel = 0.0f;
+
+    /// <summary>
+    /// The change in the vertical scroll wheel of the mouse.
+    /// </summary>
+    float vScrollWheel = 0.0f;
+
     MouseStateTracker() noexcept;
 
     /// <summary>
