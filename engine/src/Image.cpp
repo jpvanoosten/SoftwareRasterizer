@@ -491,7 +491,7 @@ void Image::drawSprite( const Sprite& sprite, const Math::Transform2D& transform
         Vertex { { 0, 0 }, { uv.x, uv.y }, color },                              // Top-left
         Vertex { { size.x, 0 }, { uv.x + size.x, 0 }, color },                   // Top-right
         Vertex { { size.x, size.y }, { uv.x + size.x, uv.y + size.y }, color },  // Bottom-right
-        Vertex { { 0, size.y }, { 0, uv.y + size.y }, color }                    // Bottom-left
+        Vertex { { 0, size.y }, { uv.x, uv.y + size.y }, color }                 // Bottom-left
     };
 
     // Transform verts.

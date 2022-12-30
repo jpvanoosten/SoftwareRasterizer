@@ -23,6 +23,7 @@ set( INC_FILES
     inc/MouseState.hpp
     inc/MouseStateTracker.hpp
     inc/Sprite.hpp
+    inc/SpriteAnim.hpp
     inc/SpriteSheet.hpp
     inc/stb_easy_font.h
     inc/stb_image.h
@@ -48,6 +49,7 @@ set( SRC_FILES
     src/KeyboardState.cpp
     src/KeyboardStateTracker.cpp
     src/Mouse.cpp
+    src/SpriteAnim.cpp
     src/SpriteSheet.cpp
     src/stb_image.cpp
     src/stb_image_write.cpp

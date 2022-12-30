@@ -16,7 +16,7 @@ public:
     /// Set the transform position.
     /// </summary>
     /// <param name="pos">The new position.</param>
-    void setPosition( const glm::vec2& pos )
+    void setPosition( const glm::vec2& pos ) noexcept
     {
         m_Position       = pos;
         m_TransformDirty = true;
@@ -26,7 +26,7 @@ public:
     /// Get the current position of the transform.
     /// </summary>
     /// <returns>The current position of the transform.</returns>
-    const glm::vec2& getPosition() const
+    const glm::vec2& getPosition() const noexcept
     {
         return m_Position;
     }
@@ -35,7 +35,7 @@ public:
     /// Set the anchor position for the transforms.
     /// </summary>
     /// <param name="anchor">The new anchor point.</param>
-    void setAnchor( const glm::vec2& anchor )
+    void setAnchor( const glm::vec2& anchor ) noexcept
     {
         m_Anchor         = anchor;
         m_TransformDirty = true;
@@ -45,27 +45,38 @@ public:
     /// Get the anchor position of the transform.
     /// </summary>
     /// <returns>The anchor position of the transform.</returns>
-    const glm::vec2& getAnchor() const
+    const glm::vec2& getAnchor() const noexcept
     {
         return m_Anchor;
     }
 
-    void setRotation( float rot )
+    void setRotation( float rot ) noexcept
     {
         m_Rotation       = rot;
         m_TransformDirty = true;
     }
 
-    float getRotation() const
+    float getRotation() const noexcept
     {
         return m_Rotation;
+    }
+
+    void setScale( const glm::vec2& scale ) noexcept
+    {
+        m_Scale = scale;
+        m_TransformDirty = true;
+    }
+
+    const glm::vec2& getScale() const noexcept
+    {
+        return m_Scale;
     }
 
     /// <summary>
     /// Add to the current translation of the transform.
     /// </summary>
     /// <param name="translation">The translation to apply to the position of the object.</param>
-    void translate( const glm::vec2& translation )
+    void translate( const glm::vec2& translation ) noexcept
     {
         m_Position += translation;
         m_TransformDirty = true;
@@ -76,13 +87,13 @@ public:
     /// The current scale of the object is multiplied by this scale factor.
     /// </summary>
     /// <param name="factor">The scale factor to apply to the current scale of the object.</param>
-    void scale( const glm::vec2& factor )
+    void scale( const glm::vec2& factor ) noexcept
     {
         m_Scale *= factor;
         m_TransformDirty = true;
     }
 
-    void rotate( float rotation )
+    void rotate( float rotation ) noexcept
     {
         m_Rotation += rotation;
         m_TransformDirty = true;
@@ -92,7 +103,7 @@ public:
     /// Get the 3x3 transform matrix.
     /// </summary>
     /// <returns></returns>
-    const glm::mat3& getTransform() const;
+    const glm::mat3& getTransform() const noexcept;
 
 private:
     // The anchor point determines the origin of the applied transformations.

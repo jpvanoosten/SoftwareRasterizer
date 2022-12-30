@@ -9,6 +9,7 @@
 
 #include <cstdint>
 #include <filesystem>
+#include <optional>
 #include <span>
 
 namespace sr

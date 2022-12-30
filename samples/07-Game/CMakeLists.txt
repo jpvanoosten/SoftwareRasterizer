@@ -5,15 +5,19 @@ set( TARGET_NAME 07-Game )
 set( INC_FILES
     inc/Background.hpp
     inc/Button.hpp
+    inc/Character.hpp
     inc/Curve.hpp
     inc/Game.hpp
+    inc/Player.hpp
 )
 
 set( SRC_FILES
     main.cpp
     src/Background.cpp
     src/Button.cpp
+    src/Character.cpp
     src/Game.cpp
+    src/Player.cpp
 )
 
 set( ALL_FILES ${SRC_FILES} ${INC_FILES} )

@@ -2,6 +2,7 @@
 
 #include "Background.hpp"
 #include "Button.hpp"
+#include "Player.hpp"
 
 #include <Events.hpp>
 #include <Font.hpp>
@@ -64,4 +65,7 @@ protected:
     Button previousButton;
     Button nextButton;
     Button restartButton;
+
+    // Player
+    Player player;
 };

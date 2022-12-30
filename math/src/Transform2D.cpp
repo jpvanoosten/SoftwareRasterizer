@@ -10,7 +10,7 @@ Transform2D::Transform2D( const glm::vec2& position, const glm::vec2& scale, flo
 , m_Rotation { rotation }
 {}
 
-const glm::mat3& Transform2D::getTransform() const
+const glm::mat3& Transform2D::getTransform() const noexcept
 {
     if ( m_TransformDirty )
     {

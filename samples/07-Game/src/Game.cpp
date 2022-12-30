@@ -31,9 +31,7 @@ Game::Game( uint32_t screenWidth, uint32_t screenHeight )
         const float left  = keyState.Left ? 1.0f : 0.0f;
         const float right = keyState.Right ? 1.0f : 0.0f;
 
-        const float x = static_cast<float>( mouseState.x );
-
-        return std::clamp( leftX - a + d - left + right + x, -1.0f, 1.0f );
+        return std::clamp( leftX - a + d - left + right, -1.0f, 1.0f );
     } );
     Input::mapAxis( "Jump", []( std::span<const GamePadStateTracker> gamePadStates, const KeyboardStateTracker& keyboardState, const MouseStateTracker& mouseState ) {
         float a = 0.0f;
@@ -89,6 +87,14 @@ Game::Game( uint32_t screenWidth, uint32_t screenHeight )
             onRestartClicked();
         } );
     }
+
+    // Player
+    Transform2D playerTransform { { screenWidth / 2, screenHeight } };
+    // Player sprite is 32x32 pixels.
+    // Place the anchor point in the bottom center of the sprite.
+    playerTransform.setAnchor( { 16, 32 } );
+
+    player.setTransform( playerTransform );
 }
 
 void Game::Update()
@@ -121,6 +127,10 @@ void Game::Update()
     restartButton.draw( image );
     nextButton.draw( image );
     previousButton.draw( image );
+
+    // Player.
+    player.update( static_cast<float>( timer.elapsedSeconds() ) );
+    player.draw( image );
 }
 
 void Game::processEvent( const sr::Event& _event )
@@ -236,4 +246,5 @@ void Game::onNextClicked()
 void Game::onRestartClicked()
 {
     std::cout << "Restart Clicked!" << std::endl;
+    player.reset();
 }
