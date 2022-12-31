@@ -75,6 +75,8 @@ Game::Game( uint32_t screenWidth, uint32_t screenHeight )
     backgrounds.emplace_back( Background { "assets/Pixel Adventure/Background/Purple.png", 1.0f, { 0.0f, 1.0f }, 0.3f } );
     backgrounds.emplace_back( Background { "assets/Pixel Adventure/Background/Yellow.png", 1.0f, { 0.0f, 1.0f }, 0.3f } );
 
+    currentBackground = backgrounds.begin();
+
     // Buttons
     {
         // Previous button.
@@ -128,8 +130,8 @@ void Game::Update()
         totalTime = 0.0;
     }
 
-    backgrounds[0].update( timer );
-    backgrounds[0].draw( image );
+    currentBackground->update( timer );
+    currentBackground->draw( image );
 
     // Draw an FPS counter in the corner of the screen.
     image.drawText( arial20, 6, 20, fps, Color::Black );
@@ -261,5 +263,10 @@ void Game::onNextClicked()
 void Game::onRestartClicked()
 {
     std::cout << "Restart Clicked!" << std::endl;
+    if (++currentBackground == backgrounds.end())
+    {
+        currentBackground = backgrounds.begin();
+    }
+
     player.reset();
 }

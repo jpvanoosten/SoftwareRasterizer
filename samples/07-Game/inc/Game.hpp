@@ -59,7 +59,10 @@ protected:
     sr::Font arial24;
 
     // Backgrounds
-    std::vector<Background> backgrounds;
+    using BackgroundList = std::vector<Background>;
+    BackgroundList backgrounds;
+    BackgroundList::iterator currentBackground;
+
 
     // Buttons
     Button previousButton;
