@@ -8,9 +8,14 @@ class Curve
 public:
     Curve() = default;
 
-    explicit Curve( std::function<T( T )> func )
-    : func { std::move( func ) }
+    explicit Curve( std::function<T( T )> _func )
+    : func { std::move( _func ) }
     {}
+
+    void setFunc( std::function<T(T)> _func )
+    {
+        func = std::move( _func );
+    }
 
     T operator()( const T& x ) const
     {
@@ -39,6 +44,13 @@ public:
     Curve& operator+=( const T& x )
     {
         currentValue += x;
+
+        return *this;
+    }
+
+    Curve& operator-=(const T& x)
+    {
+        currentValue -= x;
 
         return *this;
     }

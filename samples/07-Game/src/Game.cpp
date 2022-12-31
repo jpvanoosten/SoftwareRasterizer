@@ -33,22 +33,37 @@ Game::Game( uint32_t screenWidth, uint32_t screenHeight )
 
         return std::clamp( leftX - a + d - left + right, -1.0f, 1.0f );
     } );
-    Input::mapAxis( "Jump", []( std::span<const GamePadStateTracker> gamePadStates, const KeyboardStateTracker& keyboardState, const MouseStateTracker& mouseState ) {
-        float a = 0.0f;
+
+    Input::mapButtonDown( "Jump", []( std::span<const GamePadStateTracker> gamePadStates, const KeyboardStateTracker& keyboardState, const MouseStateTracker& mouseState ) {
+        bool a = false;
 
         for ( auto& gamePadState: gamePadStates )
         {
-            const auto state = gamePadState.getLastState();
-            a += state.buttons.a ? 1.0f : 0.0f;
+            a = a || gamePadState.a == ButtonState::Pressed;
         }
 
-        const auto keyState = keyboardState.getLastState();
+        const bool space = keyboardState.isKeyPressed( KeyCode::Space );
+        const bool up    = keyboardState.isKeyPressed( KeyCode::Up );
 
-        const float space = keyState.Space ? 1.0f : 0.0f;
-        const float up    = keyState.Up ? 1.0f : 0.0f;
-
-        return std::clamp( a + space + up, 0.0f, 1.0f );
+        return a || space || up;
     } );
+
+    //Input::mapAxis( "Jump", []( std::span<const GamePadStateTracker> gamePadStates, const KeyboardStateTracker& keyboardState, const MouseStateTracker& mouseState ) {
+    //    float a = 0.0f;
+
+    //    for ( auto& gamePadState: gamePadStates )
+    //    {
+    //        const auto state = gamePadState.getLastState();
+    //        a += state.buttons.a ? 1.0f : 0.0f;
+    //    }
+
+    //    const auto keyState = keyboardState.getLastState();
+
+    //    const float space = keyState.Space ? 1.0f : 0.0f;
+    //    const float up    = keyState.Up ? 1.0f : 0.0f;
+
+    //    return std::clamp( a + space + up, 0.0f, 1.0f );
+    //} );
 
     ldtkProject.loadFromFile( "assets/Pixel Adventure/Pixel Adventure.ldtk" );
 

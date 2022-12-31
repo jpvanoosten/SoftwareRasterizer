@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Character.hpp"
+#include "Curve.hpp"
 
 #include <Image.hpp>
 #include <Math/Transform2D.hpp>
@@ -10,7 +11,19 @@
 class Player
 {
 public:
-    explicit Player( const Math::Transform2D& transform = Math::Transform2D{} );
+    enum class State
+    {
+        Idle,
+        Run,
+        Jump,
+        Hit,
+        DoubleJump,
+        Falling,
+        WallJump,
+        Dead,
+    };
+
+    explicit Player( const Math::Transform2D& transform = Math::Transform2D {} );
 
     /// <summary>
     /// Reset the character (and choose a different character).
@@ -23,6 +36,15 @@ public:
     /// <param name="deltaTime">The elapsed time (in seconds).</param>
     void update( float deltaTime ) noexcept;
 
+    /// <summary>
+    /// Get the current player's state.
+    /// </summary>
+    /// <returns></returns>
+    State getState() const noexcept
+    {
+        return state;
+    }
+
     void                     setTransform( const Math::Transform2D& transform );
     const Math::Transform2D& getTransform() const noexcept;
 
@@ -33,19 +55,43 @@ public:
     void draw( sr::Image& image ) noexcept;
 
 private:
+
     using CharacterList = std::vector<Character>;
 
-    /// <summary>
-    /// A list of possible character models.
-    /// </summary>
+    void setState( State newState );
+    void startState( State newState );
+    void endState( State oldState );
+
+    float doHorizontalMovement( float deltaTime );
+    void doIdle( float deltaTime );
+    void doRun( float deltaTime );
+    void doJump( float deltaTime );
+    void doHit( float deltaTime );
+    void doDoubleJump(float deltaTime );
+    void doFalling( float deltaTime );
+    void doWallJump( float deltaTime );
+
+    // A list of possible character models.
     CharacterList           characters;
     CharacterList::iterator currentCharacter = characters.end();
 
     // The player's transform.
     Math::Transform2D transform;
 
-    /// <summary>
-    /// The maximum speed of the player.
-    /// </summary>
-    float playerSpeed = 150.0f;
+    // Player's current state.
+    State state = State::Idle;
+
+    // Player acceleration curve.
+    Curve<float> accelCurve;
+
+    // The maximum speed of the player.
+    const float playerSpeed = 150.0f;
+    const float jumpVelocity = 500.0f;
+    const float gravity      = 2000.0f;
+
+    // True if the player can double jump.
+    bool canDoubleJump = true;
+
+    // Player's current velocity.
+    glm::vec2 velocity { 0 };
 };
