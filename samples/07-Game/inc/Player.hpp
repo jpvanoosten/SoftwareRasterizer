@@ -86,8 +86,14 @@ private:
 
     // The maximum speed of the player.
     const float playerSpeed = 150.0f;
-    const float jumpVelocity = 500.0f;
-    const float gravity      = 2000.0f;
+    // Maximum jump height in pixels.
+    const float jumpHeight   = 60.0f;
+    // Jump time is the time (in seconds) to the apex of the jump.
+    const float jumpTime     = 0.25f;
+    // Gravity is computed to achieve the desired jump parabola.
+    const float gravity  = 2.0f * jumpHeight / ( jumpTime * jumpTime );
+    // Jump speed required to achieve the desired jump parabola.
+    const float jumpSpeed = std::sqrt(2.0f * jumpHeight * gravity);
 
     // True if the player can double jump.
     bool canDoubleJump = true;

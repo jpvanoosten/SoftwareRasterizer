@@ -538,7 +538,7 @@ void Image::drawSprite( const Sprite& sprite, const Math::Transform2D& transform
                     // Compute interpolated UV
                     const glm::ivec2 texCoord = round( verts[i0].texCoord * bc.x + verts[i1].texCoord * bc.y + verts[i2].texCoord * bc.z );
                     // Sample the sprite's texture.
-                    const Color c = image->sample( texCoord.x, texCoord.y ) * color;
+                    const Color c = image->sample( texCoord.x, texCoord.y, AddressMode::Clamp ) * color;
                     // Plot.
                     plot( static_cast<uint32_t>( x ), static_cast<uint32_t>( y ), c, blendMode );
                 }
@@ -641,8 +641,8 @@ const Color& Image::sample( int u, int v, AddressMode addressMode ) const noexce
     break;
     case AddressMode::Clamp:
     {
-        u = std::clamp( u, 0, w );
-        v = std::clamp( v, 0, h );
+        u = std::clamp( u, 0, w - 1 );
+        v = std::clamp( v, 0, h - 1 );
     }
     break;
     }

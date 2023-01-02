@@ -162,16 +162,16 @@ void Player::startState( State newState )
         break;
     case State::Jump:
         currentCharacter->setAnimation( "Jump" );
-        velocity.y    = jumpVelocity;
+        velocity.y    = jumpSpeed;
         canDoubleJump = true;
         break;
     case State::Hit:
         currentCharacter->setAnimation( "Hit" );
-        velocity.y = jumpVelocity / 2.0f;
+        velocity.y = jumpSpeed / 2.0f;
         break;
     case State::DoubleJump:
         currentCharacter->setAnimation( "Double Jump" );
-        velocity.y    = jumpVelocity;
+        velocity.y    = jumpSpeed;
         canDoubleJump = false;
         break;
     case State::Falling:
@@ -215,7 +215,7 @@ void Player::doIdle( float deltaTime )
         setState( State::Run );
     }
 
-    if ( Input::getButton( "Jump" ) )
+    if ( Input::getButtonDown( "Jump" ) )
     {
         setState( State::Jump );
     }
