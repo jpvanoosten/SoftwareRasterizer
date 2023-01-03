@@ -126,15 +126,18 @@ const Math::Transform2D& Player::getTransform() const noexcept
     return transform;
 }
 
-void Player::draw( sr::Image& image ) noexcept
+void Player::draw( sr::Image& image ) const noexcept
 {
     if ( currentCharacter != characters.end() )
     {
         currentCharacter->draw( image, transform );
     }
 
+#if _DEBUG
+    // Draw the current state of the player.
     auto pos = transform.getPosition() - glm::vec2 { 12, 50 };
     image.drawText( Font::Default, static_cast<int>( pos.x ), static_cast<int>( pos.y ), stateToString[state], Color::White );
+#endif
 }
 
 void Player::setState( State newState )

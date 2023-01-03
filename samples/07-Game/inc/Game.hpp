@@ -2,7 +2,7 @@
 
 #include "Background.hpp"
 #include "Button.hpp"
-#include "Player.hpp"
+#include "Level.hpp"
 
 #include <Events.hpp>
 #include <Font.hpp>
@@ -69,6 +69,9 @@ protected:
     Button nextButton;
     Button restartButton;
 
-    // Player
-    Player player;
+    // Levels
+    using LevelList = std::vector<Level>;
+    LevelList levels;
+    LevelList::iterator currentLevel;
+
 };

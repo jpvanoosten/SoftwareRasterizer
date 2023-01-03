@@ -66,6 +66,13 @@ Game::Game( uint32_t screenWidth, uint32_t screenHeight )
     //} );
 
     ldtkProject.loadFromFile( "assets/Pixel Adventure/Pixel Adventure.ldtk" );
+    auto& world = ldtkProject.getWorld();
+
+    for ( auto& ldtkLevels = world.allLevels(); auto& ldtkLevel: ldtkLevels )
+    {
+        levels.emplace_back( world, ldtkLevel );
+    }
+    currentLevel = levels.begin();
 
     backgrounds.emplace_back( Background { "assets/Pixel Adventure/Background/Blue.png", 1.0f, { 0.0f, 1.0f }, 0.3f } );
     backgrounds.emplace_back( Background { "assets/Pixel Adventure/Background/Brown.png", 1.0f, { 0.0f, 1.0f }, 0.3f } );
@@ -104,14 +111,6 @@ Game::Game( uint32_t screenWidth, uint32_t screenHeight )
             onRestartClicked();
         } );
     }
-
-    // Player
-    Transform2D playerTransform { { screenWidth / 2, screenHeight } };
-    // Player sprite is 32x32 pixels.
-    // Place the anchor point in the bottom center of the sprite.
-    playerTransform.setAnchor( { 16, 32 } );
-
-    player.setTransform( playerTransform );
 }
 
 void Game::Update()
@@ -130,8 +129,13 @@ void Game::Update()
         totalTime = 0.0;
     }
 
+    // Update and draw the background.
     currentBackground->update( timer );
     currentBackground->draw( image );
+
+    // Update and draw the level.
+    currentLevel->update( static_cast<float>( timer.elapsedSeconds() ) );
+    currentLevel->draw( image );
 
     // Draw an FPS counter in the corner of the screen.
     image.drawText( arial20, 6, 20, fps, Color::Black );
@@ -144,10 +148,6 @@ void Game::Update()
     restartButton.draw( image );
     nextButton.draw( image );
     previousButton.draw( image );
-
-    // Player.
-    player.update( static_cast<float>( timer.elapsedSeconds() ) );
-    player.draw( image );
 }
 
 void Game::processEvent( const sr::Event& _event )
@@ -258,6 +258,10 @@ void Game::onPreviousClicked()
 void Game::onNextClicked()
 {
     std::cout << "Next Clicked!" << std::endl;
+    if (++currentLevel == levels.end())
+    {
+        currentLevel = levels.begin();
+    }
 }
 
 void Game::onRestartClicked()
@@ -268,5 +272,5 @@ void Game::onRestartClicked()
         currentBackground = backgrounds.begin();
     }
 
-    player.reset();
+    currentLevel->reset();
 }

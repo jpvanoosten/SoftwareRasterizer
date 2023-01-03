@@ -8,6 +8,7 @@ set( INC_FILES
     inc/Character.hpp
     inc/Curve.hpp
     inc/Game.hpp
+    inc/Level.hpp
     inc/Player.hpp
 )
 
@@ -17,6 +18,7 @@ set( SRC_FILES
     src/Button.cpp
     src/Character.cpp
     src/Game.cpp
+    src/Level.cpp
     src/Player.cpp
 )
 
