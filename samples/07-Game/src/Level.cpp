@@ -33,8 +33,41 @@ Level::Level( const ldtk::World& world, const ldtk::Level& level )
 
 void Level::update( float deltaTime )
 {
-    // Player.
+    AABB previousAABB = player.getAABB();
+
+    // Update Player.
     player.update( deltaTime );
+
+    // Check player collision
+    AABB      currentAABB = player.getAABB();
+    glm::vec2 p0 { currentAABB.min.x, currentAABB.max.y };
+    glm::vec2 p1 { currentAABB.max.x, currentAABB.max.y };
+
+    // Check if the bottom of the player's AABB is intersecting with any of the level AABB's
+    bool isColliding = false;
+    for ( auto& collider: colliders )
+    {
+        if ( collider.intersect( { p0, 0 }, { p1, 0 } ) )
+        {
+            // Set the player's position to the top of the AABB.
+            auto& pos = player.getPosition();
+            player.setPosition( { pos.x, collider.min.y } );
+
+            // And 0 the Y velocity.
+            auto& vel = player.getVelocity();
+            player.setVelocity( { vel.x, 0 } );
+
+            if ( player.getState() == Player::State::Falling )
+                player.setState( Player::State::Run );
+
+            isColliding = true;
+            break;
+        }
+    }
+
+    // If the player was moving but is no longer colliding, then start falling.
+    if ( player.getState() == Player::State::Run && !isColliding )
+        player.setState( Player::State::Falling );
 }
 
 void Level::reset()

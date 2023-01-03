@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Line.hpp"
+#include "OutCodes.hpp"
 #include "Rect.hpp"
 
 #include <glm/common.hpp>
@@ -7,6 +9,7 @@
 
 namespace Math
 {
+
 /// <summary>
 /// Axis-aligned bounding box.
 /// </summary>
@@ -67,7 +70,7 @@ struct AABB
     /// </summary>
     /// <param name="rhs">The amount to translate this AABB by.</param>
     /// <returns>The translated AABB.</returns>
-    AABB operator+(const glm::vec3& rhs) const noexcept
+    AABB operator+( const glm::vec3& rhs ) const noexcept
     {
         return { min + rhs, max + rhs };
     }
@@ -185,20 +188,24 @@ struct AABB
     /// Expand the AABB to include a given point.
     /// </summary>
     /// <param name="p"></param>
-    void expand( const glm::vec3& p ) noexcept
+    AABB& expand( const glm::vec3& p ) noexcept
     {
         min = glm::min( min, p );
         max = glm::max( max, p );
+
+        return *this;
     }
 
     /// <summary>
     /// Expand this AABB by another AABB.
     /// </summary>
     /// <param name="aabb">The other ABB to expand this one.</param>
-    void expand( const AABB& aabb ) noexcept
+    AABB& expand( const AABB& aabb ) noexcept
     {
         min = glm::min( min, aabb.min );
         max = glm::max( max, aabb.max );
+
+        return *this;
     }
 
     /// <summary>
@@ -207,10 +214,12 @@ struct AABB
     /// Use the <see cref="AABB::isValid"/> method to test if the AABB is still valid after clamping.
     /// </summary>
     /// <param name="aabb">The AABB to clamp this one to.</param>
-    void clamp( const AABB& aabb ) noexcept
+    AABB& clamp( const AABB& aabb ) noexcept
     {
         min = glm::max( min, aabb.min );
         max = glm::min( max, aabb.max );
+
+        return *this;
     }
 
     /// <summary>
@@ -249,6 +258,87 @@ struct AABB
     bool contains( const glm::vec3& p ) const noexcept
     {
         return all( greaterThanEqual( p, min ) ) && all( lessThanEqual( p, max ) );
+    }
+
+    /// <summary>
+    /// Compute the outcode of a point.
+    /// Source: https://en.wikipedia.org/wiki/Cohen%E2%80%93Sutherland_algorithm
+    /// </summary>
+    /// <param name="p">The point to test.</param>
+    /// <returns>The OutCode of the point relative to this AABB.</returns>
+    OutCode computeOutCode( const glm::vec3& p ) const noexcept
+    {
+        OutCode code = OutCode::Inside;
+
+        if ( p.x < min.x )
+            code |= OutCode::Left;
+        else if ( p.x > max.x )
+            code |= OutCode::Right;
+
+        if ( p.y < min.y )
+            code |= OutCode::Bottom;
+        else if ( p.y > max.y )
+            code |= OutCode::Top;
+
+        if ( p.z < min.z )
+            code |= OutCode::Near;
+        else if ( p.z > max.z )
+            code |= OutCode::Far;
+
+        return code;
+    }
+
+    [[nodiscard]] bool intersect( const glm::vec3& p0, const glm::vec3& p1 ) const noexcept
+    {
+        const glm::vec3 c = center();            // AABB center point.
+        const glm::vec3 e = max - c;             // AABB extents.
+        glm::vec3       m = ( p0 + p1 ) * 0.5f;  // Line half-point.
+        const glm::vec3 d = p1 - m;              // Line direction.
+
+        // Translate to origin.
+        m = m - c;
+
+        float adx = std::abs( d.x );
+        if ( std::abs( m.x ) > e.x + adx )
+            return false;
+
+        float ady = std::abs( d.y );
+        if ( std::abs( m.y ) > e.y + ady )
+            return false;
+
+        float adz = std::abs( d.z );
+        if ( std::abs( m.z ) > e.z + adz )
+            return false;
+
+        // Add some small epsilon to counteract arithmetic errors when
+        // the line is (near) parallel to one of the coordinate axis.
+        //constexpr float epsilon = std::numeric_limits<float>::epsilon();
+        //adx += epsilon;
+        //ady += epsilon;
+        //adz += epsilon;
+
+        if ( std::abs( m.y * d.z - m.z * d.y ) > e.y * adz + e.z * ady )
+            return false;
+
+        if ( std::abs( m.z * d.x - m.x * d.z ) > e.x * adz + e.z * adx )
+            return false;
+
+        if ( std::abs( m.x * d.y - m.y * d.x ) > e.x * ady + e.y * adx )
+            return false;
+
+        // No separating axis found, line must be overlapping AABB.
+        return true;
+    }
+
+    /// <summary>
+    /// Test if a line intersects this AABB.
+    /// Source: Real-time Collision Detection, Christer Ericson (2005)
+    /// </summary>
+    /// <param name="line">The line to test for intersection.</param>
+    /// <returns>`true` if the line intersects this AABB.</returns>
+    [[nodiscard]] bool intersect( const Line& line ) const noexcept
+    {
+        return intersect( line.p0, line.p1 );
     }
 
     /// <summary>

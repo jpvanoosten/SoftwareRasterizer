@@ -48,6 +48,7 @@ Character createCharacter( const std::filesystem::path& basePath )
 
 Player::Player( const Math::Transform2D& transform )
 : transform { transform }
+, aabb { { 7, 0, 0 }, { 25, 32, 0 } } // Player is 32x32 pixels, but the AABB should be slightly smaller.
 {
     characters.emplace_back( createCharacter( "assets/Pixel Adventure/Main Characters/Mask Dude" ) );
     characters.emplace_back( createCharacter( "assets/Pixel Adventure/Main Characters/Ninja Frog" ) );
@@ -116,16 +117,6 @@ void Player::update( float deltaTime ) noexcept
     }
 }
 
-void Player::setTransform( const Math::Transform2D& _transform )
-{
-    transform = _transform;
-}
-
-const Math::Transform2D& Player::getTransform() const noexcept
-{
-    return transform;
-}
-
 void Player::draw( sr::Image& image ) const noexcept
 {
     if ( currentCharacter != characters.end() )
@@ -137,6 +128,9 @@ void Player::draw( sr::Image& image ) const noexcept
     // Draw the current state of the player.
     auto pos = transform.getPosition() - glm::vec2 { 12, 50 };
     image.drawText( Font::Default, static_cast<int>( pos.x ), static_cast<int>( pos.y ), stateToString[state], Color::White );
+
+    // Draw the AABB of the player
+    image.drawAABB( getAABB(), Color::Blue, BlendMode::Disable, FillMode::WireFrame );
 #endif
 }
 
@@ -298,15 +292,6 @@ void Player::doFalling( float deltaTime )
     if ( canDoubleJump && Input::getButtonDown( "Jump" ) )
     {
         setState( State::DoubleJump );
-    }
-
-    auto pos = transform.getPosition();
-    if ( pos.y > 256 )
-    {
-        pos.y      = 256;
-        velocity.y = 0.0f;
-        transform.setPosition( pos );
-        setState( velocity.x == 0.0 ? State::Idle : State::Run );
     }
 }
 
