@@ -48,8 +48,8 @@ Game::Game( uint32_t screenWidth, uint32_t screenHeight )
         return a || space || up;
     } );
 
-    //Input::mapAxis( "Jump", []( std::span<const GamePadStateTracker> gamePadStates, const KeyboardStateTracker& keyboardState, const MouseStateTracker& mouseState ) {
-    //    float a = 0.0f;
+    // Input::mapAxis( "Jump", []( std::span<const GamePadStateTracker> gamePadStates, const KeyboardStateTracker& keyboardState, const MouseStateTracker& mouseState ) {
+    //     float a = 0.0f;
 
     //    for ( auto& gamePadState: gamePadStates )
     //    {
@@ -115,9 +115,9 @@ Game::Game( uint32_t screenWidth, uint32_t screenHeight )
 
 void Game::Update()
 {
-    static double      totalTime = 0.0;
-    static uint64_t    frames    = 0;
-    static std::string fps       = "FPS: 0";
+    static double      totalTime   = 0.0;
+    static uint64_t    frames      = 0;
+    static std::string fps         = "FPS: 0";
 
     timer.tick();
     ++frames;
@@ -133,8 +133,16 @@ void Game::Update()
     currentBackground->update( timer );
     currentBackground->draw( image );
 
-    // Update and draw the level.
-    currentLevel->update( static_cast<float>( timer.elapsedSeconds() ) );
+    auto elapsedTime = static_cast<float>( timer.elapsedSeconds() );
+    do
+    {
+        // Update the input state.
+        Input::update();
+
+        currentLevel->update( std::min( elapsedTime, physicsTick ) );
+        elapsedTime -= physicsTick;
+    } while ( elapsedTime > 0.0f );
+
     currentLevel->draw( image );
 
     // Draw an FPS counter in the corner of the screen.
@@ -148,6 +156,9 @@ void Game::Update()
     restartButton.draw( image );
     nextButton.draw( image );
     previousButton.draw( image );
+
+    // Simulate low frame rates.
+    //timer.limitFPS( 25 );
 }
 
 void Game::processEvent( const sr::Event& _event )
@@ -258,7 +269,7 @@ void Game::onPreviousClicked()
 void Game::onNextClicked()
 {
     std::cout << "Next Clicked!" << std::endl;
-    if (++currentLevel == levels.end())
+    if ( ++currentLevel == levels.end() )
     {
         currentLevel = levels.begin();
     }
@@ -267,7 +278,7 @@ void Game::onNextClicked()
 void Game::onRestartClicked()
 {
     std::cout << "Restart Clicked!" << std::endl;
-    if (++currentBackground == backgrounds.end())
+    if ( ++currentBackground == backgrounds.end() )
     {
         currentBackground = backgrounds.begin();
     }

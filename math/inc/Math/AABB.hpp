@@ -21,8 +21,8 @@ struct AABB
     {}
 
     AABB( const AABB& copy )
-    : min { copy.min }
-    , max { copy.max }
+    : min { glm::min(copy.min, copy.max) }
+    , max { glm::max(copy.min, copy.max) }
     {}
 
     /// <summary>

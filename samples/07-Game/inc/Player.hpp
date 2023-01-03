@@ -92,6 +92,26 @@ public:
         return aabb * transform;
     }
 
+    Math::AABB getTopAABB() const noexcept
+    {
+        return topAABB * transform;
+    }
+
+    Math::AABB getBottomAABB() const noexcept
+    {
+        return bottomAABB * transform;
+    }
+
+    Math::AABB getLeftAABB() const noexcept
+    {
+        return leftAABB * transform;
+    }
+
+    Math::AABB getRightAABB() const noexcept
+    {
+        return rightAABB * transform;
+    }
+
 private:
     using CharacterList = std::vector<Character>;
 
@@ -116,6 +136,10 @@ private:
 
     // The player's AABB.
     Math::AABB aabb;
+    Math::AABB topAABB;
+    Math::AABB bottomAABB;
+    Math::AABB leftAABB;
+    Math::AABB rightAABB;
 
     // Player's current state.
     State state = State::Idle;

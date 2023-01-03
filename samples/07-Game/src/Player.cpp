@@ -1,9 +1,6 @@
-#include "Player.hpp"
-
-#include "Font.hpp"
-
 #include <Player.hpp>
 
+#include <Font.hpp>
 #include <Input.hpp>
 #include <SpriteAnim.hpp>
 #include <iostream>
@@ -48,7 +45,11 @@ Character createCharacter( const std::filesystem::path& basePath )
 
 Player::Player( const Math::Transform2D& transform )
 : transform { transform }
-, aabb { { 7, 0, 0 }, { 25, 32, 0 } } // Player is 32x32 pixels, but the AABB should be slightly smaller.
+, aabb { { 7, 5, 0 }, { 25, 32, 0 } }  // Player is 32x32 pixels, but the AABB should be slightly smaller.
+, topAABB { { 7, 3, 0 }, { 25, 5, 0 } }
+, bottomAABB { { 7, 30, 0 }, { 25, 32, 0 } }
+, leftAABB { { 5, 5, 0 }, { 7, 29, 0 } }
+, rightAABB { { 25, 5, 0 }, { 27, 29, 0 } }
 {
     characters.emplace_back( createCharacter( "assets/Pixel Adventure/Main Characters/Mask Dude" ) );
     characters.emplace_back( createCharacter( "assets/Pixel Adventure/Main Characters/Ninja Frog" ) );
@@ -79,6 +80,7 @@ void Player::reset()
     }
 
     currentCharacter->setAnimation( "Idle" );
+    setVelocity( glm::vec2 { 0 } );
     setState( State::Idle );
 }
 
@@ -130,7 +132,11 @@ void Player::draw( sr::Image& image ) const noexcept
     image.drawText( Font::Default, static_cast<int>( pos.x ), static_cast<int>( pos.y ), stateToString[state], Color::White );
 
     // Draw the AABB of the player
-    image.drawAABB( getAABB(), Color::Blue, BlendMode::Disable, FillMode::WireFrame );
+    image.drawAABB( getTopAABB(), Color::Green, BlendMode::Disable, FillMode::WireFrame );
+    image.drawAABB( getBottomAABB(), Color::Blue, BlendMode::Disable, FillMode::WireFrame );
+    image.drawAABB( getLeftAABB(), Color::Yellow, BlendMode::Disable, FillMode::WireFrame );
+    image.drawAABB( getRightAABB(), Color::Magenta, BlendMode::Disable, FillMode::WireFrame );
+    image.drawAABB( getAABB(), Color::Red, BlendMode::Disable, FillMode::WireFrame );
 #endif
 }
 
@@ -286,7 +292,6 @@ void Player::doFalling( float deltaTime )
     const float horizontal = doHorizontalMovement( deltaTime );
     velocity.x             = horizontal;
 
-    // Apply gravity
     velocity.y -= gravity * deltaTime;
 
     if ( canDoubleJump && Input::getButtonDown( "Jump" ) )
@@ -297,5 +302,17 @@ void Player::doFalling( float deltaTime )
 
 void Player::doWallJump( float deltaTime )
 {
-    // TODO:
+    const float horizontal = doHorizontalMovement( deltaTime );
+    velocity.x             = horizontal;
+
+    // Apply gravity
+    velocity.y -= gravity * deltaTime;
+
+    // Clamp gravity.
+    velocity.y = std::max( velocity.y, -gravity * deltaTime * 3.0f );
+
+    if ( Input::getButtonDown( "Jump" ) )
+    {
+        setState( State::Jump );
+    }
 }

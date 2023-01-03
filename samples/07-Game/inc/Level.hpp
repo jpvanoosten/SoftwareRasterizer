@@ -30,4 +30,5 @@ private:
     std::vector<Math::AABB> colliders;
 
     Player player;
+    glm::vec2 playerStart;
 };

@@ -159,6 +159,17 @@ struct SR_API Image final
     }
 
     /// <summary>
+    /// Draw a line on the image.
+    /// </summary>
+    /// <param name="line">The line to draw.</param>
+    /// <param name="color">The color of the line.</param>
+    /// <param name="blendMode">The blend mode to use.</param>
+    void drawLine( const Math::Line& line, const Color& color, const BlendMode& blendMode = {} ) noexcept
+    {
+        drawLine( glm::vec2 { line.p0 }, glm::vec2 { line.p1 }, color, blendMode );
+    }
+
+    /// <summary>
     /// Plot a 2D triangle.
     /// </summary>
     /// <param name="p0">The first triangle coordinate.</param>

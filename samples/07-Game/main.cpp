@@ -34,9 +34,6 @@ int main( int argc, char* argv[] )
 
     while ( window )
     {
-        // Update the state of the input.
-        Input::update();
-
         // Update the game.
         game.Update();
 

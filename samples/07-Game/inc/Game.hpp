@@ -47,12 +47,16 @@ protected:
 
     sr::Image image;
     sr::Timer timer;
+
+    // Maximum tick time for physics.
+    const float physicsTick = 1.0f / 60.0f;
+
     // The game rectangle in the Window's coordinate frame.
     // Used for translating mouse coordinates.
     Math::RectI gameRect;
 
+    // Translated mouse position.
     glm::ivec2 mousePos;
-    sr::GamePadStateTracker gamePadStateTracker;
 
     // Fonts.
     sr::Font arial20;
