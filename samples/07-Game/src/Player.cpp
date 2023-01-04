@@ -60,17 +60,6 @@ Player::Player( const Math::Transform2D& transform )
     currentCharacter = characters.begin();
 
     currentCharacter->setAnimation( "Idle" );
-
-    // Setup an acceleration curve for running.
-    accelCurve.setFunc( []( float x ) {
-        if ( x > 0.0f && x < 0.25f )
-            return x * 4;
-
-        if ( x <= 0.0f )
-            return 0.0f;
-
-        return 1.0f;
-    } );
 }
 
 void Player::reset()
@@ -113,6 +102,9 @@ void Player::update( float deltaTime ) noexcept
         break;
     }
 
+    // Clamp velocity.
+    velocity.x = std::clamp( velocity.x, -playerMaxSpeed, playerMaxSpeed );
+
     transform.translate( glm::vec2 { velocity.x, -velocity.y } * deltaTime );
 
     if ( currentCharacter != characters.end() )
@@ -134,10 +126,6 @@ void Player::draw( sr::Image& image ) const noexcept
     image.drawText( Font::Default, static_cast<int>( pos.x ), static_cast<int>( pos.y ), stateToString[state], Color::White );
 
     // Draw the AABB of the player
-    image.drawAABB( getTopAABB(), Color::Green, BlendMode::Disable, FillMode::WireFrame );
-    image.drawAABB( getBottomAABB(), Color::Blue, BlendMode::Disable, FillMode::WireFrame );
-    image.drawAABB( getLeftAABB(), Color::Yellow, BlendMode::Disable, FillMode::WireFrame );
-    image.drawAABB( getRightAABB(), Color::Magenta, BlendMode::Disable, FillMode::WireFrame );
     image.drawAABB( getAABB(), Color::Red, BlendMode::Disable, FillMode::WireFrame );
 #endif
 }
@@ -158,8 +146,8 @@ void Player::startState( State newState )
     {
     case State::Idle:
         currentCharacter->setAnimation( "Idle" );
-        accelCurve    = 0.0f;
         canDoubleJump = true;
+        velocity.x    = 0.0f;
         break;
     case State::Run:
         currentCharacter->setAnimation( "Run" );
@@ -202,9 +190,7 @@ void Player::endState( State oldState )
 
 float Player::doHorizontalMovement( float deltaTime )
 {
-    accelCurve += deltaTime;
-
-    const float horizontal = Input::getAxis( "Horizontal" ) * accelCurve() * playerSpeed;
+    const float horizontal = Input::getAxis( "Horizontal" ) * playerAccel * deltaTime;
 
     if ( horizontal < 0.0f )
     {
@@ -234,7 +220,7 @@ void Player::doIdle( float deltaTime )
 void Player::doRun( float deltaTime )
 {
     const float horizontal = doHorizontalMovement( deltaTime );
-    velocity.x             = horizontal;
+    velocity.x             += horizontal;
 
     if ( Input::getButtonDown( "Jump" ) )
     {
@@ -249,7 +235,7 @@ void Player::doRun( float deltaTime )
 void Player::doJump( float deltaTime )
 {
     const float horizontal = doHorizontalMovement( deltaTime );
-    velocity.x             = horizontal;
+    velocity.x             += horizontal;
 
     // Apply gravity
     velocity.y -= gravity * deltaTime;
@@ -283,7 +269,7 @@ void Player::doHit( float deltaTime )
 void Player::doDoubleJump( float deltaTime )
 {
     const float horizontal = doHorizontalMovement( deltaTime );
-    velocity.x             = horizontal;
+    velocity.x             += horizontal;
 
     // Apply gravity
     velocity.y -= gravity * deltaTime;
@@ -297,7 +283,7 @@ void Player::doDoubleJump( float deltaTime )
 void Player::doFalling( float deltaTime )
 {
     const float horizontal = doHorizontalMovement( deltaTime );
-    velocity.x             = horizontal;
+    velocity.x             += horizontal;
 
     velocity.y -= gravity * deltaTime;
 
@@ -310,7 +296,7 @@ void Player::doFalling( float deltaTime )
 void Player::doWallJump( float deltaTime )
 {
     const float horizontal = doHorizontalMovement( deltaTime );
-    velocity.x             = horizontal;
+    velocity.x             += horizontal;
 
     // Apply gravity
     velocity.y -= gravity * deltaTime;
@@ -320,7 +306,7 @@ void Player::doWallJump( float deltaTime )
 
     if ( Input::getButtonDown( "Jump" ) )
     {
-        velocity.x = state == State::LeftWallJump ? jumpSpeed : -jumpSpeed;
+        velocity.x = state == State::LeftWallJump ? wallJumpSpeed : -wallJumpSpeed;
         setState( State::Jump );
     }
 }

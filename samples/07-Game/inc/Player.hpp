@@ -145,11 +145,10 @@ private:
     // Player's current state.
     State state = State::Idle;
 
-    // Player acceleration curve (for running).
-    Curve<float> accelCurve;
-
+    // How fast the player accelerates.
+    const float playerAccel = 1000.0f;
     // The maximum speed of the player.
-    const float playerSpeed = 150.0f;
+    const float playerMaxSpeed = 150.0f;
     // Maximum jump height in pixels.
     const float jumpHeight = 60.0f;
     // Jump time is the time (in seconds) to the apex of the jump.
@@ -159,6 +158,7 @@ private:
     // Source: https://jobtalle.com/2d_platformer_physics.html
     const float gravity   = 2.0f * jumpHeight / ( jumpTime * jumpTime );
     const float jumpSpeed = std::sqrt( 2.0f * jumpHeight * gravity );
+    const float wallJumpSpeed = 50.0f;
 
     // True if the player can double jump.
     bool canDoubleJump = true;

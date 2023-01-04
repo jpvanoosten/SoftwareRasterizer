@@ -158,7 +158,7 @@ void Game::Update()
     previousButton.draw( image );
 
     // Simulate low frame rates.
-    //timer.limitFPS( 25 );
+    // timer.limitFPS( 25 );
 }
 
 void Game::processEvent( const sr::Event& _event )
