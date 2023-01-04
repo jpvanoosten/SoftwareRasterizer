@@ -19,7 +19,8 @@ public:
         Hit,
         DoubleJump,
         Falling,
-        WallJump,
+        LeftWallJump,
+        RightWallJump,
         Dead,
     };
 

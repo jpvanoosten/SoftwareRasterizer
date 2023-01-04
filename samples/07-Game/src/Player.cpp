@@ -15,7 +15,8 @@ std::map<Player::State, std::string> stateToString = {
     { Player::State::Hit, "Hit" },
     { Player::State::DoubleJump, "Double Jump" },
     { Player::State::Falling, "Falling" },
-    { Player::State::WallJump, "Wall Jump" }
+    { Player::State::LeftWallJump, "Left Wall Jump" },
+    { Player::State::RightWallJump, "Right Wall Jump" }
 };
 
 using namespace sr;
@@ -106,7 +107,8 @@ void Player::update( float deltaTime ) noexcept
     case State::Falling:
         doFalling( deltaTime );
         break;
-    case State::WallJump:
+    case State::LeftWallJump:
+    case State::RightWallJump:
         doWallJump( deltaTime );
         break;
     }
@@ -180,7 +182,12 @@ void Player::startState( State newState )
     case State::Falling:
         currentCharacter->setAnimation( "Fall" );
         break;
-    case State::WallJump:
+    case State::LeftWallJump:
+        transform.setScale( { -1, 1 } );
+        currentCharacter->setAnimation( "Wall Jump" );
+        break;
+    case State::RightWallJump:
+        transform.setScale( { 1, 1 } );
         currentCharacter->setAnimation( "Wall Jump" );
         break;
     case State::Dead:
@@ -313,6 +320,7 @@ void Player::doWallJump( float deltaTime )
 
     if ( Input::getButtonDown( "Jump" ) )
     {
+        velocity.x = state == State::LeftWallJump ? jumpSpeed : -jumpSpeed;
         setState( State::Jump );
     }
 }

@@ -58,8 +58,9 @@ void Level::update( float deltaTime )
     // Number of pixels padding to account for collisions.
     const float padding = 3.0f;
 
-    bool onGround = false;
-    bool onWall   = false;
+    bool onGround    = false;
+    bool onLeftWall  = false;
+    bool onRightWall = false;
     for ( auto& collider: colliders )
     {
         AABB colliderAABB = collider.aabb;
@@ -76,7 +77,8 @@ void Level::update( float deltaTime )
                 // And 0 the X velocity.
                 vel.x = 0.0f;
 
-                onWall = true;
+                // On a wall that is right of the player.
+                onRightWall = true;
             }
         }
         // Player is moving left.
@@ -91,18 +93,23 @@ void Level::update( float deltaTime )
                 // And 0 the X velocity.
                 vel.x = 0.0f;
 
-                onWall = true;
+                // Player is on a wall that is to the left of the player.
+                onLeftWall = true;
             }
         }
         else
         {
             // Check to see if the player is still colliding with the left or right edge of the collider.
             Line leftEdge { { colliderAABB.min.x, colliderAABB.min.y + padding, 0 }, { colliderAABB.min.x, colliderAABB.max.y - padding, 0 } };
-            Line rightEdge { { colliderAABB.max.x, colliderAABB.min.y + padding, 0 }, { colliderAABB.max.x, colliderAABB.max.y - padding, 0 } };
-
-            if ( !collider.isOneWay && ( playerAABB.intersect( leftEdge ) || playerAABB.intersect( rightEdge ) ) )
+            if ( !collider.isOneWay && playerAABB.intersect( leftEdge ) )
             {
-                onWall = true;
+                onRightWall = true;
+            }
+
+            Line rightEdge { { colliderAABB.max.x, colliderAABB.min.y + padding, 0 }, { colliderAABB.max.x, colliderAABB.max.y - padding, 0 } };
+            if ( !collider.isOneWay && playerAABB.intersect( rightEdge ) )
+            {
+                onLeftWall = true;
             }
         }
 
@@ -156,16 +163,26 @@ void Level::update( float deltaTime )
         }
     }
 
+    Player::State playerState = player.getState();
+
     // If the player was falling and is touching a wall, then start wall jump
-    if ( player.getState() == Player::State::Falling && onWall )
-        player.setState( Player::State::WallJump );
+    if ( playerState == Player::State::Falling )
+    {
+        if ( onLeftWall )
+            player.setState( Player::State::LeftWallJump );
+        else if ( onRightWall )
+            player.setState( Player::State::RightWallJump );
+    }
 
     // If the player was wall jumping but is no longer touching a wall, then start falling.
-    if ( player.getState() == Player::State::WallJump && !onWall )
-        player.setState( Player::State::Falling );
+    if ( playerState == Player::State::LeftWallJump || playerState == Player::State::RightWallJump )
+    {
+        if ( !onLeftWall && !onRightWall )
+            player.setState( Player::State::Falling );
+    }
 
     // If the player was moving but is no longer colliding, then start falling.
-    if ( player.getState() == Player::State::Run && !onGround )
+    if ( playerState == Player::State::Run && !onGround )
         player.setState( Player::State::Falling );
 
     // Update player position and velocity.
