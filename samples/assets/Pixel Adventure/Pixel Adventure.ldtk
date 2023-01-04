@@ -11,7 +11,7 @@
 	"iid": "8522f0d0-7820-11ed-9e2d-dfff8a54490f",
 	"jsonVersion": "1.2.0",
 	"appBuildId": 464631,
-	"nextUid": 78,
+	"nextUid": 80,
 	"identifierStyle": "Capitalize",
 	"worldLayout": "Free",
 	"worldGridWidth": 256,
@@ -727,7 +727,40 @@
 			"limitBehavior": "MoveLastOne",
 			"pivotX": 0,
 			"pivotY": 0,
-			"fieldDefs": []
+			"fieldDefs": [
+				{
+					"identifier": "OneWay",
+					"doc": "True for one way collision surfaces.",
+					"__type": "Bool",
+					"uid": 78,
+					"type": "F_Bool",
+					"isArray": false,
+					"canBeNull": false,
+					"arrayMinLength": null,
+					"arrayMaxLength": null,
+					"editorDisplayMode": "NameAndValue",
+					"editorDisplayPos": "Above",
+					"editorLinkStyle": "StraightArrow",
+					"editorAlwaysShow": false,
+					"editorShowInWorld": true,
+					"editorCutLongValues": true,
+					"editorTextSuffix": null,
+					"editorTextPrefix": null,
+					"useForSmartColor": false,
+					"min": null,
+					"max": null,
+					"regex": null,
+					"acceptFileTypes": null,
+					"defaultOverride": null,
+					"textLanguageMode": null,
+					"symmetricalRef": false,
+					"autoChainRef": true,
+					"allowOutOfLevelRef": true,
+					"allowedRefs": "OnlySame",
+					"allowedRefTags": [],
+					"tilesetUid": null
+				}
+			]
 		}
 	], "tilesets": [
 		{
@@ -1642,7 +1675,7 @@
 							"height": 256,
 							"defUid": 77,
 							"px": [0,0],
-							"fieldInstances": []
+							"fieldInstances": [{ "__identifier": "OneWay", "__value": false, "__type": "Bool", "__tile": null, "defUid": 78, "realEditorValues": [] }]
 						},
 						{
 							"__identifier": "Collision",
@@ -1656,7 +1689,7 @@
 							"height": 16,
 							"defUid": 77,
 							"px": [16,0],
-							"fieldInstances": []
+							"fieldInstances": [{ "__identifier": "OneWay", "__value": false, "__type": "Bool", "__tile": null, "defUid": 78, "realEditorValues": [] }]
 						},
 						{
 							"__identifier": "Collision",
@@ -1670,7 +1703,7 @@
 							"height": 16,
 							"defUid": 77,
 							"px": [112,112],
-							"fieldInstances": []
+							"fieldInstances": [{ "__identifier": "OneWay", "__value": false, "__type": "Bool", "__tile": null, "defUid": 78, "realEditorValues": [] }]
 						},
 						{
 							"__identifier": "Collision",
@@ -1684,7 +1717,7 @@
 							"height": 16,
 							"defUid": 77,
 							"px": [256,80],
-							"fieldInstances": []
+							"fieldInstances": [{ "__identifier": "OneWay", "__value": false, "__type": "Bool", "__tile": null, "defUid": 78, "realEditorValues": [] }]
 						},
 						{
 							"__identifier": "Collision",
@@ -1698,7 +1731,7 @@
 							"height": 16,
 							"defUid": 77,
 							"px": [288,96],
-							"fieldInstances": []
+							"fieldInstances": [{ "__identifier": "OneWay", "__value": false, "__type": "Bool", "__tile": null, "defUid": 78, "realEditorValues": [] }]
 						},
 						{
 							"__identifier": "Collision",
@@ -1712,7 +1745,7 @@
 							"height": 16,
 							"defUid": 77,
 							"px": [16,240],
-							"fieldInstances": []
+							"fieldInstances": [{ "__identifier": "OneWay", "__value": false, "__type": "Bool", "__tile": null, "defUid": 78, "realEditorValues": [] }]
 						},
 						{
 							"__identifier": "Collision",
@@ -1726,7 +1759,7 @@
 							"height": 32,
 							"defUid": 77,
 							"px": [16,16],
-							"fieldInstances": []
+							"fieldInstances": [{ "__identifier": "OneWay", "__value": false, "__type": "Bool", "__tile": null, "defUid": 78, "realEditorValues": [] }]
 						},
 						{
 							"__identifier": "Collision",
@@ -1740,7 +1773,7 @@
 							"height": 16,
 							"defUid": 77,
 							"px": [48,16],
-							"fieldInstances": []
+							"fieldInstances": [{ "__identifier": "OneWay", "__value": false, "__type": "Bool", "__tile": null, "defUid": 78, "realEditorValues": [] }]
 						},
 						{
 							"__identifier": "Collision",
@@ -1754,7 +1787,7 @@
 							"height": 32,
 							"defUid": 77,
 							"px": [144,224],
-							"fieldInstances": []
+							"fieldInstances": [{ "__identifier": "OneWay", "__value": false, "__type": "Bool", "__tile": null, "defUid": 78, "realEditorValues": [] }]
 						},
 						{
 							"__identifier": "Collision",
@@ -1768,7 +1801,7 @@
 							"height": 208,
 							"defUid": 77,
 							"px": [448,16],
-							"fieldInstances": []
+							"fieldInstances": [{ "__identifier": "OneWay", "__value": false, "__type": "Bool", "__tile": null, "defUid": 78, "realEditorValues": [] }]
 						},
 						{
 							"__identifier": "Collision",
@@ -1782,7 +1815,7 @@
 							"height": 32,
 							"defUid": 77,
 							"px": [208,176],
-							"fieldInstances": []
+							"fieldInstances": [{ "__identifier": "OneWay", "__value": false, "__type": "Bool", "__tile": null, "defUid": 78, "realEditorValues": [] }]
 						},
 						{
 							"__identifier": "Collision",
@@ -1796,7 +1829,7 @@
 							"height": 16,
 							"defUid": 77,
 							"px": [192,208],
-							"fieldInstances": []
+							"fieldInstances": [{ "__identifier": "OneWay", "__value": false, "__type": "Bool", "__tile": null, "defUid": 78, "realEditorValues": [] }]
 						},
 						{
 							"__identifier": "Collision",
@@ -1810,7 +1843,41 @@
 							"height": 32,
 							"defUid": 77,
 							"px": [400,192],
-							"fieldInstances": []
+							"fieldInstances": [{ "__identifier": "OneWay", "__value": false, "__type": "Bool", "__tile": null, "defUid": 78, "realEditorValues": [] }]
+						},
+						{
+							"__identifier": "Collision",
+							"__grid": [1,11],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#D77643",
+							"iid": "ee9cd730-7820-11ed-8b59-ef3b86e1b0ff",
+							"width": 48,
+							"height": 16,
+							"defUid": 77,
+							"px": [16,176],
+							"fieldInstances": [{ "__identifier": "OneWay", "__value": true, "__type": "Bool", "__tile": null, "defUid": 78, "realEditorValues": [{
+								"id": "V_Bool",
+								"params": [ true ]
+							}] }]
+						},
+						{
+							"__identifier": "Collision",
+							"__grid": [25,9],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#D77643",
+							"iid": "f334d5e0-7820-11ed-8b59-01fdeff66724",
+							"width": 48,
+							"height": 16,
+							"defUid": 77,
+							"px": [400,144],
+							"fieldInstances": [{ "__identifier": "OneWay", "__value": true, "__type": "Bool", "__tile": null, "defUid": 78, "realEditorValues": [{
+								"id": "V_Bool",
+								"params": [ true ]
+							}] }]
 						}
 					]
 				}

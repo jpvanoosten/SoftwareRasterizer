@@ -408,9 +408,9 @@ void Image::drawQuad( const Vertex& v0, const Vertex& v1, const Vertex& v2, cons
     const BlendMode blendMode = _blendMode;
 
 #pragma omp parallel for schedule( dynamic ) firstprivate( aabb, indicies, verts, addressMode, blendMode )
-    for ( int y = static_cast<int>( aabb.min.y ); y <= static_cast<int>( aabb.max.y ); ++y )
+    for ( int y = static_cast<int>( aabb.min.y ); y < static_cast<int>( aabb.max.y ); ++y )
     {
-        for ( int x = static_cast<int>( aabb.min.x ); x <= static_cast<int>( aabb.max.x ); ++x )
+        for ( int x = static_cast<int>( aabb.min.x ); x < static_cast<int>( aabb.max.x ); ++x )
         {
             for ( uint32_t i = 0; i < std::size( indicies ); i += 3 )
             {
@@ -522,9 +522,9 @@ void Image::drawSprite( const Sprite& sprite, const Math::Transform2D& transform
     };
 
 #pragma omp parallel for schedule( dynamic ) firstprivate( aabb, indicies, verts, color, blendMode )
-    for ( int y = static_cast<int>( aabb.min.y ); y <= static_cast<int>( aabb.max.y ); ++y )
+    for ( int y = static_cast<int>( aabb.min.y ); y < static_cast<int>( aabb.max.y ); ++y )
     {
-        for ( int x = static_cast<int>( aabb.min.x ); x <= static_cast<int>( aabb.max.x ); ++x )
+        for ( int x = static_cast<int>( aabb.min.x ); x < static_cast<int>( aabb.max.x ); ++x )
         {
             for ( uint32_t i = 0; i < std::size( indicies ); i += 3 )
             {

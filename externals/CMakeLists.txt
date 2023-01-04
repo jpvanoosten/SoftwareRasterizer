@@ -10,7 +10,7 @@ FetchContent_Declare(
 FetchContent_Declare(
 	LDtkLoader
 	GIT_REPOSITORY https://github.com/jpvanoosten/LDtkLoader.git
-	GIT_TAG		   remove_autoTilesetDefUid
+	GIT_TAG		   master
 )
 FetchContent_Declare(
 	glew

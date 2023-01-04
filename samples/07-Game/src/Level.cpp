@@ -14,11 +14,18 @@ Level::Level( const ldtk::World& world, const ldtk::Level& level )
     const auto& collisions = entities.getEntitiesByName( "Collision" );
     for ( auto& collision: collisions )
     {
-        auto& e = collision.get();
-        auto& p = e.getPosition();
-        auto& s = e.getSize();
+        auto& e      = collision.get();
+        auto& p      = e.getPosition();
+        auto& s      = e.getSize();
+        auto& oneWay = e.getField<ldtk::FieldType::Bool>( "OneWay" );
 
-        colliders.emplace_back( glm::vec3 { p.x, p.y, 0.0f }, glm::vec3 { p.x + s.x, p.y + s.y, 0.0f } );
+        Collider collider {
+            .type     = ColliderType::Default,
+            .aabb     = AABB { { p.x, p.y, 0.0 }, { p.x + s.x, p.y + s.y, 0.0f } },
+            .isOneWay = oneWay ? *oneWay : false,
+        };
+
+        colliders.push_back( collider );
     }
 
     // Player start position
@@ -35,11 +42,15 @@ Level::Level( const ldtk::World& world, const ldtk::Level& level )
 
 void Level::update( float deltaTime )
 {
+    // Store the previous position so we know if the
+    // player moved through a 1-way collider.
+    glm::vec2 prevPos = player.getPosition();
+
     // Update Player.
     player.update( deltaTime );
 
     // Check player collision
-    AABB aabb = player.getAABB();
+    AABB playerAABB = player.getAABB();
 
     glm::vec2 vel = player.getVelocity();
     glm::vec2 pos = player.getPosition();
@@ -51,15 +62,17 @@ void Level::update( float deltaTime )
     bool onWall   = false;
     for ( auto& collider: colliders )
     {
+        AABB colliderAABB = collider.aabb;
+
         // Player is moving right.
         if ( vel.x > 0.0f )
         {
             // Check to see if the player is colliding with the left edge of the collider.
-            Line leftEdge { { collider.min.x, collider.min.y + padding, 0 }, { collider.min.x, collider.max.y - padding, 0 } };
-            if ( aabb.intersect( leftEdge ) )
+            Line leftEdge { { colliderAABB.min.x, colliderAABB.min.y + padding, 0 }, { colliderAABB.min.x, colliderAABB.max.y - padding, 0 } };
+            if ( !collider.isOneWay && playerAABB.intersect( leftEdge ) )
             {
                 // Set the player's position to the left edge of the collider.
-                pos.x = collider.min.x - aabb.width() * 0.5f;
+                pos.x = colliderAABB.min.x - playerAABB.width() * 0.5f;
                 // And 0 the X velocity.
                 vel.x = 0.0f;
 
@@ -70,11 +83,11 @@ void Level::update( float deltaTime )
         else if ( vel.x < 0.0f )
         {
             // Check to see if the player is colliding with the right edge of the collider.
-            Line rightEdge { { collider.max.x, collider.min.y + padding, 0 }, { collider.max.x, collider.max.y - padding, 0 } };
-            if ( aabb.intersect( rightEdge ) )
+            Line rightEdge { { colliderAABB.max.x, colliderAABB.min.y + padding, 0 }, { colliderAABB.max.x, colliderAABB.max.y - padding, 0 } };
+            if ( !collider.isOneWay && playerAABB.intersect( rightEdge ) )
             {
                 // Set the player's position to the right edge of the collider.
-                pos.x = collider.max.x + aabb.width() * 0.5f;
+                pos.x = colliderAABB.max.x + playerAABB.width() * 0.5f;
                 // And 0 the X velocity.
                 vel.x = 0.0f;
 
@@ -84,10 +97,10 @@ void Level::update( float deltaTime )
         else
         {
             // Check to see if the player is still colliding with the left or right edge of the collider.
-            Line leftEdge { { collider.min.x, collider.min.y + padding, 0 }, { collider.min.x, collider.max.y - padding, 0 } };
-            Line rightEdge { { collider.max.x, collider.min.y + padding, 0 }, { collider.max.x, collider.max.y - padding, 0 } };
+            Line leftEdge { { colliderAABB.min.x, colliderAABB.min.y + padding, 0 }, { colliderAABB.min.x, colliderAABB.max.y - padding, 0 } };
+            Line rightEdge { { colliderAABB.max.x, colliderAABB.min.y + padding, 0 }, { colliderAABB.max.x, colliderAABB.max.y - padding, 0 } };
 
-            if ( aabb.intersect( leftEdge ) || aabb.intersect( rightEdge ))
+            if ( !collider.isOneWay && ( playerAABB.intersect( leftEdge ) || playerAABB.intersect( rightEdge ) ) )
             {
                 onWall = true;
             }
@@ -97,29 +110,33 @@ void Level::update( float deltaTime )
         if ( vel.y < 0.0f )
         {
             // Check to see if the player is colliding with the top edge of the collider.
-            Line topEdge { { collider.min.x + padding, collider.min.y, 0 }, { collider.max.x - padding, collider.min.y, 0 } };
-            if ( aabb.intersect( topEdge ) )
+            Line topEdge { { colliderAABB.min.x + padding, colliderAABB.min.y, 0 }, { colliderAABB.max.x - padding, colliderAABB.min.y, 0 } };
+            if ( playerAABB.intersect( topEdge ) )
             {
-                // Set the player's position to the top of the AABB.
-                pos.y = collider.min.y;
-                // And 0 the Y velocity.
-                vel.y = 0.0f;
+                // We only collide with 1-way colliders if the player's previous position was above the collider.
+                if ( !collider.isOneWay || prevPos.y < colliderAABB.min.y )
+                {
+                    // Set the player's position to the top of the AABB.
+                    pos.y = colliderAABB.min.y;
+                    // And 0 the Y velocity.
+                    vel.y = 0.0f;
 
-                // And change state to running (to preserve momentum.)
-                player.setState( Player::State::Run );
+                    // And change state to running (to preserve momentum.)
+                    player.setState( Player::State::Run );
 
-                onGround = true;
+                    onGround = true;
+                }
             }
         }
         // Player is moving up (jumping)
         else if ( vel.y > 0.0f )
         {
             // Check to see if the player is colliding with the bottom edge of the collider.
-            Line bottomEdge { { collider.min.x + padding, collider.max.y, 0 }, { collider.max.x - padding, collider.max.y, 0 } };
-            if ( aabb.intersect( bottomEdge ) )
+            Line bottomEdge { { colliderAABB.min.x + padding, colliderAABB.max.y, 0 }, { colliderAABB.max.x - padding, colliderAABB.max.y, 0 } };
+            if ( !collider.isOneWay && playerAABB.intersect( bottomEdge ) )
             {
                 // Set the player's position to the bottom of the collider.
-                pos.y = collider.max.y + aabb.height();
+                pos.y = colliderAABB.max.y + playerAABB.height();
                 // And 0 the Y velocity.
                 vel.y = 0.0f;
 
@@ -131,8 +148,8 @@ void Level::update( float deltaTime )
         else
         {
             // Check to see if the player is colliding with the top edge of the collider.
-            Line topEdge { { collider.min.x + padding, collider.min.y, 0 }, { collider.max.x - padding, collider.min.y, 0 } };
-            if ( aabb.intersect( topEdge ) )
+            Line topEdge { { colliderAABB.min.x + padding, colliderAABB.min.y, 0 }, { colliderAABB.max.x - padding, colliderAABB.min.y, 0 } };
+            if ( playerAABB.intersect( topEdge ) )
             {
                 onGround = true;
             }
@@ -167,7 +184,7 @@ void Level::draw( sr::Image& image ) const
 {
     for ( const auto& collider: colliders )
     {
-        image.drawAABB( collider, Color::Red, BlendMode::Disable, FillMode::WireFrame );
+        image.drawAABB( collider.aabb, collider.isOneWay ? Color::Yellow : Color::Red, BlendMode::Disable, FillMode::WireFrame );
     }
 
     player.draw( image );
