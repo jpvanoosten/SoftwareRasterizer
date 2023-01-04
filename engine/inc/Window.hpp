@@ -55,6 +55,23 @@ public:
     void show();
 
     /// <summary>
+    /// Set the fullscreen state of the Window.
+    /// </summary>
+    /// <param name="fullscreen">`true` to set the window to fullscreen, `false` to restore to Windowed mode.</param>
+    void setFullscreen( bool fullscreen );
+
+    /// <summary>
+    /// Get the fullscreen state of the window.
+    /// </summary>
+    /// <returns>`true` if the window is in a fullscreen state, `false` otherwise.</returns>
+    bool isFullscreen() const noexcept;
+
+    /// <summary>
+    /// Toggle the fullscreen state.
+    /// </summary>
+    void toggleFullscreen();
+
+    /// <summary>
     /// Enable or disable v-sync.
     /// </summary>
     /// <param name="enabled">`true` to enable v-sync, or `false` to disable it.</param>

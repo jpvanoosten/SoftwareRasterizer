@@ -41,6 +41,12 @@ public:
 
     glm::ivec2 getSize() const noexcept override;
 
+    void setFullscreen( bool fullscreen ) override;
+
+    bool isFullscreen() const noexcept override;
+
+    void toggleFullscreen() override;
+
 protected:
     void init();
 
@@ -72,8 +78,10 @@ private:
     int  previousMouseY = 0;
     bool inClientRect   = false;
     bool vSync          = true;
+    bool fullscreen     = false;
 
     HWND              m_hWnd;           ///< Window handle.
+    RECT              windowRect;       ///< Window rectangle (for restoring from fullscreen state).
     HDC               m_hDC;            ///< Window draw context.
     HGLRC             m_hGLRC;          ///< OpenGL render context.
     GLuint            m_Texture;        ///< OpenGL texture for pixel transfers.

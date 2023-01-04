@@ -36,6 +36,21 @@ void Window::show()
     pImpl->show();
 }
 
+void Window::setFullscreen( bool fullscreen )
+{
+    pImpl->setFullscreen( fullscreen );
+}
+
+bool Window::isFullscreen() const noexcept
+{
+    return pImpl->isFullscreen();
+}
+
+void Window::toggleFullscreen()
+{
+    pImpl->toggleFullscreen();
+}
+
 void Window::setVSync( bool enabled )
 {
     pImpl->setVSync( enabled );

@@ -542,6 +542,60 @@ glm::ivec2 WindowWin32::getSize() const noexcept
     return { rect.right - rect.left, rect.bottom - rect.top };
 }
 
+void WindowWin32::setFullscreen( bool _fullscreen )
+{
+    if (m_hWnd && fullscreen != _fullscreen )
+    {
+        fullscreen = _fullscreen;
+
+        if ( fullscreen )
+        {
+            // Store the current window rectangle so it can be restored
+            // when switching back to windowed mode.
+            GetWindowRect( m_hWnd, &windowRect );
+
+            SetWindowLongW( m_hWnd, GWL_STYLE, 0 );
+
+            // Query the name of the nearest display device for the window.
+            // This is required to set the fullscreen dimensions of the window
+            // when using a multi-monitor setup.
+            const HMONITOR hMonitor    = ::MonitorFromWindow( m_hWnd, MONITOR_DEFAULTTONEAREST );
+            MONITORINFOEX  monitorInfo = {};
+            monitorInfo.cbSize         = sizeof( MONITORINFOEX );
+            GetMonitorInfo( hMonitor, &monitorInfo );
+
+            SetWindowPos( m_hWnd, HWND_TOP, monitorInfo.rcMonitor.left, monitorInfo.rcMonitor.top,
+                          monitorInfo.rcMonitor.right - monitorInfo.rcMonitor.left,
+                          monitorInfo.rcMonitor.bottom - monitorInfo.rcMonitor.top,
+                          SWP_FRAMECHANGED | SWP_NOACTIVATE );
+
+            ShowWindow( m_hWnd, SW_MAXIMIZE );
+        }
+        else
+        {
+            // Restore all the window decorators.
+            SetWindowLong( m_hWnd, GWL_STYLE, WS_OVERLAPPEDWINDOW );
+
+            SetWindowPos( m_hWnd, HWND_NOTOPMOST, windowRect.left, windowRect.top,
+                          windowRect.right - windowRect.left, windowRect.bottom - windowRect.top,
+                          SWP_FRAMECHANGED | SWP_NOACTIVATE );
+
+            ShowWindow( m_hWnd, SW_NORMAL );
+        }
+
+    }
+}
+
+bool WindowWin32::isFullscreen() const noexcept
+{
+    return fullscreen;
+}
+
+void WindowWin32::toggleFullscreen()
+{
+    setFullscreen( !fullscreen );
+}
+
 void WindowWin32::processEvents()
 {
     MSG msg;

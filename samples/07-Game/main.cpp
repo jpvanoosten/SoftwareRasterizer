@@ -31,6 +31,7 @@ int main( int argc, char* argv[] )
     Game game { SCREEN_WIDTH, SCREEN_HEIGHT };
 
     window.show();
+    window.setFullscreen( true );
 
     while ( window )
     {
@@ -60,6 +61,14 @@ int main( int argc, char* argv[] )
                 case KeyCode::V:
                     window.setVSync( !window.isVSync() );
                     std::cout << "Vsync: " << window.isVSync() << std::endl;
+                    break;
+                case KeyCode::Enter:
+                    if ( e.key.alt )
+                    {
+                        [[fallthrough]];
+                    case KeyCode::F11:
+                        window.toggleFullscreen();
+                    }
                     break;
                 case KeyCode::Escape:
                     window.destroy();
