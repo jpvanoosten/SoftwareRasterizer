@@ -11,7 +11,7 @@
 	"iid": "8522f0d0-7820-11ed-9e2d-dfff8a54490f",
 	"jsonVersion": "1.2.1",
 	"appBuildId": 464653,
-	"nextUid": 80,
+	"nextUid": 89,
 	"identifierStyle": "Capitalize",
 	"worldLayout": "Free",
 	"worldGridWidth": 256,
@@ -592,7 +592,7 @@
 			"identifier": "Entities",
 			"type": "Entities",
 			"uid": 55,
-			"gridSize": 16,
+			"gridSize": 8,
 			"guideGridWid": 0,
 			"guideGridHei": 0,
 			"displayOpacity": 1,
@@ -666,10 +666,10 @@
 			"limitScope": "PerLevel",
 			"limitBehavior": "MoveLastOne",
 			"pivotX": 0.5,
-			"pivotY": 1,
+			"pivotY": 0.5,
 			"fieldDefs": [
 				{
-					"identifier": "Pickups",
+					"identifier": "PickupType",
 					"doc": null,
 					"__type": "LocalEnum.Pickups",
 					"uid": 73,
@@ -1005,6 +1005,182 @@
 			"customData": [],
 			"savedSelections": [],
 			"cachedPixelData": { "opaqueTiles": "00000000", "averageColors": "2a442ba6284428853a782b962a632a54" }
+		},
+		{
+			"__cWid": 17,
+			"__cHei": 1,
+			"identifier": "Apple",
+			"uid": 80,
+			"relPath": "Items/Fruits/Apple.png",
+			"embedAtlas": null,
+			"pxWid": 544,
+			"pxHei": 32,
+			"tileGridSize": 32,
+			"spacing": 0,
+			"padding": 0,
+			"tags": ["Fruit"],
+			"tagsSourceEnumUid": null,
+			"enumTags": [],
+			"customData": [],
+			"savedSelections": [],
+			"cachedPixelData": {
+				"opaqueTiles": "00000000000000000",
+				"averageColors": "2a442a442a442a442a442a442a442a442a442a442a442a442a442a442a442a442a44"
+			}
+		},
+		{
+			"__cWid": 17,
+			"__cHei": 1,
+			"identifier": "Banana",
+			"uid": 81,
+			"relPath": "Items/Fruits/Bananas.png",
+			"embedAtlas": null,
+			"pxWid": 544,
+			"pxHei": 32,
+			"tileGridSize": 32,
+			"spacing": 0,
+			"padding": 0,
+			"tags": ["Fruit"],
+			"tagsSourceEnumUid": null,
+			"enumTags": [],
+			"customData": [],
+			"savedSelections": [],
+			"cachedPixelData": {
+				"opaqueTiles": "00000000000000000",
+				"averageColors": "2ba62ba62ba62ba62ba62ba62ba72ba72ba72ba62ba62ba62ba62ba62ba62ba62ba6"
+			}
+		},
+		{
+			"__cWid": 17,
+			"__cHei": 1,
+			"identifier": "Cherry",
+			"uid": 82,
+			"relPath": "Items/Fruits/Cherries.png",
+			"embedAtlas": null,
+			"pxWid": 544,
+			"pxHei": 32,
+			"tileGridSize": 32,
+			"spacing": 0,
+			"padding": 0,
+			"tags": ["Fruit"],
+			"tagsSourceEnumUid": null,
+			"enumTags": [],
+			"customData": [],
+			"savedSelections": [],
+			"cachedPixelData": {
+				"opaqueTiles": "00000000000000000",
+				"averageColors": "28442844284428442844294429442944294429442944294429442944294429442944"
+			}
+		},
+		{
+			"__cWid": 17,
+			"__cHei": 1,
+			"identifier": "Kiwi",
+			"uid": 83,
+			"relPath": "Items/Fruits/Kiwi.png",
+			"embedAtlas": null,
+			"pxWid": 544,
+			"pxHei": 32,
+			"tileGridSize": 32,
+			"spacing": 0,
+			"padding": 0,
+			"tags": ["Fruit"],
+			"tagsSourceEnumUid": null,
+			"enumTags": [],
+			"customData": [],
+			"savedSelections": [],
+			"cachedPixelData": {
+				"opaqueTiles": "00000000000000000",
+				"averageColors": "28852885288528852885288527852785278528852885288527752775277528852885"
+			}
+		},
+		{
+			"__cWid": 17,
+			"__cHei": 1,
+			"identifier": "Melon",
+			"uid": 84,
+			"relPath": "Items/Fruits/Melon.png",
+			"embedAtlas": null,
+			"pxWid": 544,
+			"pxHei": 32,
+			"tileGridSize": 32,
+			"spacing": 0,
+			"padding": 0,
+			"tags": ["Fruit"],
+			"tagsSourceEnumUid": null,
+			"enumTags": [],
+			"customData": [],
+			"savedSelections": [],
+			"cachedPixelData": {
+				"opaqueTiles": "00000000000000000",
+				"averageColors": "3a783a783a783a783a783a783a783a783a783a783a783a783a783a783a783a783a78"
+			}
+		},
+		{
+			"__cWid": 17,
+			"__cHei": 1,
+			"identifier": "Orange",
+			"uid": 85,
+			"relPath": "Items/Fruits/Orange.png",
+			"embedAtlas": null,
+			"pxWid": 544,
+			"pxHei": 32,
+			"tileGridSize": 32,
+			"spacing": 0,
+			"padding": 0,
+			"tags": ["Fruit"],
+			"tagsSourceEnumUid": null,
+			"enumTags": [],
+			"customData": [],
+			"savedSelections": [],
+			"cachedPixelData": {
+				"opaqueTiles": "00000000000000000",
+				"averageColors": "2b962b962b962b962b962b962b962b962b962b962b962b962b962b962b962b962b96"
+			}
+		},
+		{
+			"__cWid": 17,
+			"__cHei": 1,
+			"identifier": "Pineapple",
+			"uid": 86,
+			"relPath": "Items/Fruits/Pineapple.png",
+			"embedAtlas": null,
+			"pxWid": 544,
+			"pxHei": 32,
+			"tileGridSize": 32,
+			"spacing": 0,
+			"padding": 0,
+			"tags": ["Fruit"],
+			"tagsSourceEnumUid": null,
+			"enumTags": [],
+			"customData": [],
+			"savedSelections": [],
+			"cachedPixelData": {
+				"opaqueTiles": "00000000000000000",
+				"averageColors": "2a632a632a632a632a633a732a732a732a733b733b732a732a632a632a632a732a73"
+			}
+		},
+		{
+			"__cWid": 17,
+			"__cHei": 1,
+			"identifier": "Strawberry",
+			"uid": 87,
+			"relPath": "Items/Fruits/Strawberry.png",
+			"embedAtlas": null,
+			"pxWid": 544,
+			"pxHei": 32,
+			"tileGridSize": 32,
+			"spacing": 0,
+			"padding": 0,
+			"tags": ["Fruit"],
+			"tagsSourceEnumUid": null,
+			"enumTags": [],
+			"customData": [],
+			"savedSelections": [],
+			"cachedPixelData": {
+				"opaqueTiles": "00000000000000000",
+				"averageColors": "2a542a542a542a542a541a542a542a542a541a541a541a642a642a642a641a641a64"
+			}
 		}
 	], "enums": [{ "identifier": "Pickups", "uid": 70, "values": [
 		{ "id": "Apple", "tileId": 0, "color": 11094337, "__tileSrcRect": [0,0,32,32] },
@@ -1373,9 +1549,9 @@
 				{
 					"__identifier": "Entities",
 					"__type": "Entities",
-					"__cWid": 30,
-					"__cHei": 16,
-					"__gridSize": 16,
+					"__cWid": 60,
+					"__cHei": 32,
+					"__gridSize": 8,
 					"__opacity": 1,
 					"__pxTotalOffsetX": 0,
 					"__pxTotalOffsetY": 0,
@@ -1396,7 +1572,7 @@
 					"entityInstances": [
 						{
 							"__identifier": "Player_Start",
-							"__grid": [15,10],
+							"__grid": [31,21],
 							"__pivot": [0.5,1],
 							"__tags": [],
 							"__tile": null,
@@ -1410,8 +1586,8 @@
 						},
 						{
 							"__identifier": "Pickup",
-							"__grid": [7,6],
-							"__pivot": [0.5,1],
+							"__grid": [15,12],
+							"__pivot": [0.5,0.5],
 							"__tags": [],
 							"__tile": { "tilesetUid": 71, "x": 0, "y": 0, "w": 32, "h": 32 },
 							"__smartColor": "#94D9B3",
@@ -1419,16 +1595,16 @@
 							"width": 32,
 							"height": 32,
 							"defUid": 72,
-							"px": [120,112],
-							"fieldInstances": [{ "__identifier": "Pickups", "__value": "Apple", "__type": "LocalEnum.Pickups", "__tile": { "tilesetUid": 71, "x": 0, "y": 0, "w": 32, "h": 32 }, "defUid": 73, "realEditorValues": [{
+							"px": [120,96],
+							"fieldInstances": [{ "__identifier": "PickupType", "__value": "Apple", "__type": "LocalEnum.Pickups", "__tile": { "tilesetUid": 71, "x": 0, "y": 0, "w": 32, "h": 32 }, "defUid": 73, "realEditorValues": [{
 								"id": "V_String",
 								"params": ["Apple"]
 							}] }]
 						},
 						{
 							"__identifier": "Pickup",
-							"__grid": [9,6],
-							"__pivot": [0.5,1],
+							"__grid": [19,12],
+							"__pivot": [0.5,0.5],
 							"__tags": [],
 							"__tile": { "tilesetUid": 71, "x": 0, "y": 0, "w": 32, "h": 32 },
 							"__smartColor": "#94D9B3",
@@ -1436,16 +1612,16 @@
 							"width": 32,
 							"height": 32,
 							"defUid": 72,
-							"px": [152,112],
-							"fieldInstances": [{ "__identifier": "Pickups", "__value": "Apple", "__type": "LocalEnum.Pickups", "__tile": { "tilesetUid": 71, "x": 0, "y": 0, "w": 32, "h": 32 }, "defUid": 73, "realEditorValues": [{
+							"px": [152,96],
+							"fieldInstances": [{ "__identifier": "PickupType", "__value": "Apple", "__type": "LocalEnum.Pickups", "__tile": { "tilesetUid": 71, "x": 0, "y": 0, "w": 32, "h": 32 }, "defUid": 73, "realEditorValues": [{
 								"id": "V_String",
 								"params": ["Apple"]
 							}] }]
 						},
 						{
 							"__identifier": "Pickup",
-							"__grid": [11,6],
-							"__pivot": [0.5,1],
+							"__grid": [23,12],
+							"__pivot": [0.5,0.5],
 							"__tags": [],
 							"__tile": { "tilesetUid": 71, "x": 0, "y": 0, "w": 32, "h": 32 },
 							"__smartColor": "#94D9B3",
@@ -1453,16 +1629,16 @@
 							"width": 32,
 							"height": 32,
 							"defUid": 72,
-							"px": [184,112],
-							"fieldInstances": [{ "__identifier": "Pickups", "__value": "Apple", "__type": "LocalEnum.Pickups", "__tile": { "tilesetUid": 71, "x": 0, "y": 0, "w": 32, "h": 32 }, "defUid": 73, "realEditorValues": [{
+							"px": [184,96],
+							"fieldInstances": [{ "__identifier": "PickupType", "__value": "Apple", "__type": "LocalEnum.Pickups", "__tile": { "tilesetUid": 71, "x": 0, "y": 0, "w": 32, "h": 32 }, "defUid": 73, "realEditorValues": [{
 								"id": "V_String",
 								"params": ["Apple"]
 							}] }]
 						},
 						{
 							"__identifier": "Pickup",
-							"__grid": [10,4],
-							"__pivot": [0.5,1],
+							"__grid": [21,9],
+							"__pivot": [0.5,0.5],
 							"__tags": [],
 							"__tile": { "tilesetUid": 71, "x": 0, "y": 0, "w": 32, "h": 32 },
 							"__smartColor": "#94D9B3",
@@ -1470,16 +1646,16 @@
 							"width": 32,
 							"height": 32,
 							"defUid": 72,
-							"px": [168,80],
-							"fieldInstances": [{ "__identifier": "Pickups", "__value": "Apple", "__type": "LocalEnum.Pickups", "__tile": { "tilesetUid": 71, "x": 0, "y": 0, "w": 32, "h": 32 }, "defUid": 73, "realEditorValues": [{
+							"px": [168,72],
+							"fieldInstances": [{ "__identifier": "PickupType", "__value": "Apple", "__type": "LocalEnum.Pickups", "__tile": { "tilesetUid": 71, "x": 0, "y": 0, "w": 32, "h": 32 }, "defUid": 73, "realEditorValues": [{
 								"id": "V_String",
 								"params": ["Apple"]
 							}] }]
 						},
 						{
 							"__identifier": "Pickup",
-							"__grid": [8,4],
-							"__pivot": [0.5,1],
+							"__grid": [17,9],
+							"__pivot": [0.5,0.5],
 							"__tags": [],
 							"__tile": { "tilesetUid": 71, "x": 0, "y": 0, "w": 32, "h": 32 },
 							"__smartColor": "#94D9B3",
@@ -1487,16 +1663,16 @@
 							"width": 32,
 							"height": 32,
 							"defUid": 72,
-							"px": [136,80],
-							"fieldInstances": [{ "__identifier": "Pickups", "__value": "Apple", "__type": "LocalEnum.Pickups", "__tile": { "tilesetUid": 71, "x": 0, "y": 0, "w": 32, "h": 32 }, "defUid": 73, "realEditorValues": [{
+							"px": [136,72],
+							"fieldInstances": [{ "__identifier": "PickupType", "__value": "Apple", "__type": "LocalEnum.Pickups", "__tile": { "tilesetUid": 71, "x": 0, "y": 0, "w": 32, "h": 32 }, "defUid": 73, "realEditorValues": [{
 								"id": "V_String",
 								"params": ["Apple"]
 							}] }]
 						},
 						{
 							"__identifier": "Pickup",
-							"__grid": [9,2],
-							"__pivot": [0.5,1],
+							"__grid": [19,6],
+							"__pivot": [0.5,0.5],
 							"__tags": [],
 							"__tile": { "tilesetUid": 71, "x": 0, "y": 0, "w": 32, "h": 32 },
 							"__smartColor": "#94D9B3",
@@ -1505,15 +1681,15 @@
 							"height": 32,
 							"defUid": 72,
 							"px": [152,48],
-							"fieldInstances": [{ "__identifier": "Pickups", "__value": "Apple", "__type": "LocalEnum.Pickups", "__tile": { "tilesetUid": 71, "x": 0, "y": 0, "w": 32, "h": 32 }, "defUid": 73, "realEditorValues": [{
+							"fieldInstances": [{ "__identifier": "PickupType", "__value": "Apple", "__type": "LocalEnum.Pickups", "__tile": { "tilesetUid": 71, "x": 0, "y": 0, "w": 32, "h": 32 }, "defUid": 73, "realEditorValues": [{
 								"id": "V_String",
 								"params": ["Apple"]
 							}] }]
 						},
 						{
 							"__identifier": "Pickup",
-							"__grid": [26,8],
-							"__pivot": [0.5,1],
+							"__grid": [53,15],
+							"__pivot": [0.5,0.5],
 							"__tags": [],
 							"__tile": { "tilesetUid": 71, "x": 192, "y": 0, "w": 32, "h": 32 },
 							"__smartColor": "#94D9B3",
@@ -1521,16 +1697,16 @@
 							"width": 32,
 							"height": 32,
 							"defUid": 72,
-							"px": [424,144],
-							"fieldInstances": [{ "__identifier": "Pickups", "__value": "Pineapple", "__type": "LocalEnum.Pickups", "__tile": { "tilesetUid": 71, "x": 192, "y": 0, "w": 32, "h": 32 }, "defUid": 73, "realEditorValues": [{
+							"px": [424,120],
+							"fieldInstances": [{ "__identifier": "PickupType", "__value": "Pineapple", "__type": "LocalEnum.Pickups", "__tile": { "tilesetUid": 71, "x": 192, "y": 0, "w": 32, "h": 32 }, "defUid": 73, "realEditorValues": [{
 								"id": "V_String",
 								"params": ["Pineapple"]
 							}] }]
 						},
 						{
 							"__identifier": "Pickup",
-							"__grid": [26,6],
-							"__pivot": [0.5,1],
+							"__grid": [53,11],
+							"__pivot": [0.5,0.5],
 							"__tags": [],
 							"__tile": { "tilesetUid": 71, "x": 192, "y": 0, "w": 32, "h": 32 },
 							"__smartColor": "#94D9B3",
@@ -1538,16 +1714,16 @@
 							"width": 32,
 							"height": 32,
 							"defUid": 72,
-							"px": [424,112],
-							"fieldInstances": [{ "__identifier": "Pickups", "__value": "Pineapple", "__type": "LocalEnum.Pickups", "__tile": { "tilesetUid": 71, "x": 192, "y": 0, "w": 32, "h": 32 }, "defUid": 73, "realEditorValues": [{
+							"px": [424,88],
+							"fieldInstances": [{ "__identifier": "PickupType", "__value": "Pineapple", "__type": "LocalEnum.Pickups", "__tile": { "tilesetUid": 71, "x": 192, "y": 0, "w": 32, "h": 32 }, "defUid": 73, "realEditorValues": [{
 								"id": "V_String",
 								"params": ["Pineapple"]
 							}] }]
 						},
 						{
 							"__identifier": "Pickup",
-							"__grid": [26,4],
-							"__pivot": [0.5,1],
+							"__grid": [53,7],
+							"__pivot": [0.5,0.5],
 							"__tags": [],
 							"__tile": { "tilesetUid": 71, "x": 192, "y": 0, "w": 32, "h": 32 },
 							"__smartColor": "#94D9B3",
@@ -1555,16 +1731,16 @@
 							"width": 32,
 							"height": 32,
 							"defUid": 72,
-							"px": [424,80],
-							"fieldInstances": [{ "__identifier": "Pickups", "__value": "Pineapple", "__type": "LocalEnum.Pickups", "__tile": { "tilesetUid": 71, "x": 192, "y": 0, "w": 32, "h": 32 }, "defUid": 73, "realEditorValues": [{
+							"px": [424,56],
+							"fieldInstances": [{ "__identifier": "PickupType", "__value": "Pineapple", "__type": "LocalEnum.Pickups", "__tile": { "tilesetUid": 71, "x": 192, "y": 0, "w": 32, "h": 32 }, "defUid": 73, "realEditorValues": [{
 								"id": "V_String",
 								"params": ["Pineapple"]
 							}] }]
 						},
 						{
 							"__identifier": "Pickup",
-							"__grid": [16,4],
-							"__pivot": [0.5,1],
+							"__grid": [34,8],
+							"__pivot": [0.5,0.5],
 							"__tags": [],
 							"__tile": { "tilesetUid": 71, "x": 160, "y": 0, "w": 32, "h": 32 },
 							"__smartColor": "#94D9B3",
@@ -1572,16 +1748,16 @@
 							"width": 32,
 							"height": 32,
 							"defUid": 72,
-							"px": [264,80],
-							"fieldInstances": [{ "__identifier": "Pickups", "__value": "Orange", "__type": "LocalEnum.Pickups", "__tile": { "tilesetUid": 71, "x": 160, "y": 0, "w": 32, "h": 32 }, "defUid": 73, "realEditorValues": [{
+							"px": [272,64],
+							"fieldInstances": [{ "__identifier": "PickupType", "__value": "Orange", "__type": "LocalEnum.Pickups", "__tile": { "tilesetUid": 71, "x": 160, "y": 0, "w": 32, "h": 32 }, "defUid": 73, "realEditorValues": [{
 								"id": "V_String",
 								"params": ["Orange"]
 							}] }]
 						},
 						{
 							"__identifier": "Pickup",
-							"__grid": [18,4],
-							"__pivot": [0.5,1],
+							"__grid": [38,8],
+							"__pivot": [0.5,0.5],
 							"__tags": [],
 							"__tile": { "tilesetUid": 71, "x": 160, "y": 0, "w": 32, "h": 32 },
 							"__smartColor": "#94D9B3",
@@ -1589,16 +1765,16 @@
 							"width": 32,
 							"height": 32,
 							"defUid": 72,
-							"px": [296,80],
-							"fieldInstances": [{ "__identifier": "Pickups", "__value": "Orange", "__type": "LocalEnum.Pickups", "__tile": { "tilesetUid": 71, "x": 160, "y": 0, "w": 32, "h": 32 }, "defUid": 73, "realEditorValues": [{
+							"px": [304,64],
+							"fieldInstances": [{ "__identifier": "PickupType", "__value": "Orange", "__type": "LocalEnum.Pickups", "__tile": { "tilesetUid": 71, "x": 160, "y": 0, "w": 32, "h": 32 }, "defUid": 73, "realEditorValues": [{
 								"id": "V_String",
 								"params": ["Orange"]
 							}] }]
 						},
 						{
 							"__identifier": "Pickup",
-							"__grid": [17,2],
-							"__pivot": [0.5,1],
+							"__grid": [36,5],
+							"__pivot": [0.5,0.5],
 							"__tags": [],
 							"__tile": { "tilesetUid": 71, "x": 160, "y": 0, "w": 32, "h": 32 },
 							"__smartColor": "#94D9B3",
@@ -1606,16 +1782,16 @@
 							"width": 32,
 							"height": 32,
 							"defUid": 72,
-							"px": [280,48],
-							"fieldInstances": [{ "__identifier": "Pickups", "__value": "Orange", "__type": "LocalEnum.Pickups", "__tile": { "tilesetUid": 71, "x": 160, "y": 0, "w": 32, "h": 32 }, "defUid": 73, "realEditorValues": [{
+							"px": [288,40],
+							"fieldInstances": [{ "__identifier": "PickupType", "__value": "Orange", "__type": "LocalEnum.Pickups", "__tile": { "tilesetUid": 71, "x": 160, "y": 0, "w": 32, "h": 32 }, "defUid": 73, "realEditorValues": [{
 								"id": "V_String",
 								"params": ["Orange"]
 							}] }]
 						},
 						{
 							"__identifier": "Pickup",
-							"__grid": [7,13],
-							"__pivot": [0.5,1],
+							"__grid": [16,26],
+							"__pivot": [0.5,0.5],
 							"__tags": [],
 							"__tile": { "tilesetUid": 71, "x": 64, "y": 0, "w": 32, "h": 32 },
 							"__smartColor": "#94D9B3",
@@ -1623,16 +1799,16 @@
 							"width": 32,
 							"height": 32,
 							"defUid": 72,
-							"px": [120,224],
-							"fieldInstances": [{ "__identifier": "Pickups", "__value": "Cherry", "__type": "LocalEnum.Pickups", "__tile": { "tilesetUid": 71, "x": 64, "y": 0, "w": 32, "h": 32 }, "defUid": 73, "realEditorValues": [{
+							"px": [128,208],
+							"fieldInstances": [{ "__identifier": "PickupType", "__value": "Cherry", "__type": "LocalEnum.Pickups", "__tile": { "tilesetUid": 71, "x": 64, "y": 0, "w": 32, "h": 32 }, "defUid": 73, "realEditorValues": [{
 								"id": "V_String",
 								"params": ["Cherry"]
 							}] }]
 						},
 						{
 							"__identifier": "Pickup",
-							"__grid": [5,13],
-							"__pivot": [0.5,1],
+							"__grid": [12,26],
+							"__pivot": [0.5,0.5],
 							"__tags": [],
 							"__tile": { "tilesetUid": 71, "x": 64, "y": 0, "w": 32, "h": 32 },
 							"__smartColor": "#94D9B3",
@@ -1640,16 +1816,16 @@
 							"width": 32,
 							"height": 32,
 							"defUid": 72,
-							"px": [88,224],
-							"fieldInstances": [{ "__identifier": "Pickups", "__value": "Cherry", "__type": "LocalEnum.Pickups", "__tile": { "tilesetUid": 71, "x": 64, "y": 0, "w": 32, "h": 32 }, "defUid": 73, "realEditorValues": [{
+							"px": [96,208],
+							"fieldInstances": [{ "__identifier": "PickupType", "__value": "Cherry", "__type": "LocalEnum.Pickups", "__tile": { "tilesetUid": 71, "x": 64, "y": 0, "w": 32, "h": 32 }, "defUid": 73, "realEditorValues": [{
 								"id": "V_String",
 								"params": ["Cherry"]
 							}] }]
 						},
 						{
 							"__identifier": "Pickup",
-							"__grid": [3,13],
-							"__pivot": [0.5,1],
+							"__grid": [8,26],
+							"__pivot": [0.5,0.5],
 							"__tags": [],
 							"__tile": { "tilesetUid": 71, "x": 64, "y": 0, "w": 32, "h": 32 },
 							"__smartColor": "#94D9B3",
@@ -1657,8 +1833,8 @@
 							"width": 32,
 							"height": 32,
 							"defUid": 72,
-							"px": [56,224],
-							"fieldInstances": [{ "__identifier": "Pickups", "__value": "Cherry", "__type": "LocalEnum.Pickups", "__tile": { "tilesetUid": 71, "x": 64, "y": 0, "w": 32, "h": 32 }, "defUid": 73, "realEditorValues": [{
+							"px": [64,208],
+							"fieldInstances": [{ "__identifier": "PickupType", "__value": "Cherry", "__type": "LocalEnum.Pickups", "__tile": { "tilesetUid": 71, "x": 64, "y": 0, "w": 32, "h": 32 }, "defUid": 73, "realEditorValues": [{
 								"id": "V_String",
 								"params": ["Cherry"]
 							}] }]
@@ -1679,7 +1855,7 @@
 						},
 						{
 							"__identifier": "Collision",
-							"__grid": [1,0],
+							"__grid": [2,0],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": null,
@@ -1693,7 +1869,7 @@
 						},
 						{
 							"__identifier": "Collision",
-							"__grid": [7,7],
+							"__grid": [14,14],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": null,
@@ -1707,7 +1883,7 @@
 						},
 						{
 							"__identifier": "Collision",
-							"__grid": [16,5],
+							"__grid": [32,10],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": null,
@@ -1721,7 +1897,7 @@
 						},
 						{
 							"__identifier": "Collision",
-							"__grid": [18,6],
+							"__grid": [36,12],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": null,
@@ -1735,7 +1911,7 @@
 						},
 						{
 							"__identifier": "Collision",
-							"__grid": [1,15],
+							"__grid": [2,30],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": null,
@@ -1749,7 +1925,7 @@
 						},
 						{
 							"__identifier": "Collision",
-							"__grid": [1,1],
+							"__grid": [2,2],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": null,
@@ -1763,7 +1939,7 @@
 						},
 						{
 							"__identifier": "Collision",
-							"__grid": [3,1],
+							"__grid": [6,2],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": null,
@@ -1777,7 +1953,7 @@
 						},
 						{
 							"__identifier": "Collision",
-							"__grid": [9,14],
+							"__grid": [18,28],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": null,
@@ -1791,7 +1967,7 @@
 						},
 						{
 							"__identifier": "Collision",
-							"__grid": [28,1],
+							"__grid": [56,2],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": null,
@@ -1805,7 +1981,7 @@
 						},
 						{
 							"__identifier": "Collision",
-							"__grid": [13,11],
+							"__grid": [26,22],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": null,
@@ -1819,7 +1995,7 @@
 						},
 						{
 							"__identifier": "Collision",
-							"__grid": [12,13],
+							"__grid": [24,26],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": null,
@@ -1833,7 +2009,7 @@
 						},
 						{
 							"__identifier": "Collision",
-							"__grid": [25,12],
+							"__grid": [50,24],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": null,
@@ -1847,7 +2023,7 @@
 						},
 						{
 							"__identifier": "Collision",
-							"__grid": [1,11],
+							"__grid": [2,22],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": null,
@@ -1864,7 +2040,7 @@
 						},
 						{
 							"__identifier": "Collision",
-							"__grid": [25,9],
+							"__grid": [50,18],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": null,

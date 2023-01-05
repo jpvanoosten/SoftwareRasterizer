@@ -3,6 +3,7 @@
 #include "Line.hpp"
 #include "OutCodes.hpp"
 #include "Rect.hpp"
+#include "Sphere.hpp"
 
 #include <glm/common.hpp>
 #include <glm/vec3.hpp>
@@ -21,8 +22,8 @@ struct AABB
     {}
 
     AABB( const AABB& copy )
-    : min { glm::min(copy.min, copy.max) }
-    , max { glm::max(copy.min, copy.max) }
+    : min { glm::min( copy.min, copy.max ) }
+    , max { glm::max( copy.min, copy.max ) }
     {}
 
     /// <summary>
@@ -312,10 +313,10 @@ struct AABB
 
         // Add some small epsilon to counteract arithmetic errors when
         // the line is (near) parallel to one of the coordinate axis.
-        //constexpr float epsilon = std::numeric_limits<float>::epsilon();
-        //adx += epsilon;
-        //ady += epsilon;
-        //adz += epsilon;
+        // constexpr float epsilon = std::numeric_limits<float>::epsilon();
+        // adx += epsilon;
+        // ady += epsilon;
+        // adz += epsilon;
 
         if ( std::abs( m.y * d.z - m.z * d.y ) > e.y * adz + e.z * ady )
             return false;
@@ -339,6 +340,20 @@ struct AABB
     [[nodiscard]] bool intersect( const Line& line ) const noexcept
     {
         return intersect( line.p0, line.p1 );
+    }
+
+    /// <summary>
+    /// Test if a sphere is colliding with this AABB.
+    /// </summary>
+    /// <param name="sphere">The sphere to test.</param>
+    /// <returns>`true` if the sphere is colliding with this AABB, `false` otherwise.</returns>
+    bool intersect( const Sphere& sphere ) const noexcept
+    {
+        // Expand the AABB by the radius of the sphere.
+        const AABB e { min - glm::vec3 { sphere.radius }, max + glm::vec3 { sphere.radius } };
+
+        // Test if the center point of the sphere is in the expanded AABB.
+        return e.contains( sphere.center );
     }
 
     /// <summary>
@@ -384,6 +399,11 @@ struct AABB
     static AABB fromRect( const Rect<T>& rect )
     {
         return fromMinMax( { rect.topLeft(), 0.0f }, { rect.bottomRight(), 0.0f } );
+    }
+
+    static AABB fromSphere( const Sphere& sphere )
+    {
+        return fromMinMax( sphere.min(), sphere.max() );
     }
 
     /// <summary>

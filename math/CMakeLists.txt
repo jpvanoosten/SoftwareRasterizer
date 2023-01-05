@@ -7,6 +7,7 @@ set( INC_FILES
     inc/Math/Math.hpp
     inc/Math/OutCodes.hpp
     inc/Math/Rect.hpp
+    inc/Math/Sphere.hpp
     inc/Math/Transform2D.hpp
 )
 

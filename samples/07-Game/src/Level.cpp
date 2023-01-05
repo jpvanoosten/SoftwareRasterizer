@@ -12,6 +12,23 @@ Level::Level( const ldtk::Project& project, const ldtk::World& world, const ldtk
 : world { &world }
 , level { &level }
 {
+    const std::filesystem::path projectPath = project.getFilePath().directory();
+
+    // Load the fruit collected animation.
+    pickupCollected = SpriteAnim{ projectPath / "Items/Fruits/Collected.png", 20, 32 };
+
+    // Load the fruit sprites.
+    const auto& tilesets = project.allTilesets();
+    for ( auto& tileset: tilesets )
+    {
+        if ( tileset.hasTag( "Fruit" ) )
+        {
+            SpriteSheet sprites { projectPath / tileset.path, tileset.tile_size, tileset.tile_size, BlendMode::AlphaBlend };
+            fruitSprites[tileset.name] = std::move( sprites );
+        }
+    }
+
+    // Parse collisions.
     const auto& entities   = level.getLayer( "Entities" );
     const auto& collisions = entities.getEntitiesByName( "Collision" );
     for ( auto& collision: collisions )
@@ -30,12 +47,26 @@ Level::Level( const ldtk::Project& project, const ldtk::World& world, const ldtk
         colliders.push_back( collider );
     }
 
+    // Parse pickups
+    const auto& pickups = entities.getEntitiesByName( "Pickup" );
+    for ( auto& pickup: pickups )
+    {
+        auto& e    = pickup.get();
+        auto& p    = e.getPosition();
+        auto& type = e.getField<ldtk::FieldType::Enum>( "PickupType" );
+
+        auto&  fruitSprite = fruitSprites[type->name];
+        Sphere collider { { p.x, p.y, 0 }, 8.0f };
+
+        allPickups.emplace_back( fruitSprite, collider );
+    }
+
+    availablePickups = allPickups;
+
     const auto& tilesLayer = level.getLayer( "Tiles" );
     const auto& intGrid    = level.getLayer( "IntGrid" );  // TODO: Should probably rename this layer..
     const auto& gridSize   = tilesLayer.getGridSize();
     const auto& tileSet    = tilesLayer.getTileset();
-
-    const std::filesystem::path projectPath = project.getFilePath().directory();
 
     spriteSheet = SpriteSheet( projectPath / tileSet.path, tileSet.tile_size, tileSet.tile_size, BlendMode::AlphaBlend );
     tileMap     = TileMap( spriteSheet, gridSize.x, gridSize.y );
@@ -67,6 +98,8 @@ Level::Level( const ldtk::Project& project, const ldtk::World& world, const ldtk
 void Level::update( float deltaTime )
 {
     updateCollisions( deltaTime );
+    updatePickups( deltaTime );
+    updateEffects( deltaTime );
 }
 
 void Level::updateCollisions( float deltaTime )
@@ -196,16 +229,64 @@ void Level::updateCollisions( float deltaTime )
     player.setVelocity( vel );
 }
 
+void Level::updatePickups( float deltaTime )
+{
+    for ( auto iter = availablePickups.begin(); iter != availablePickups.end(); )
+    {
+        if ( iter->collides( player ) )
+        {
+            // Play the collected animation at the pickup location.
+            effects.emplace_back( pickupCollected, iter->getTransform() );
+            iter = availablePickups.erase( iter );
+        }
+        else
+            ++iter;
+    }
+
+    // update remaining pickups.
+    for ( auto& pickup: availablePickups )
+        pickup.update( deltaTime );
+}
+
+void Level::updateEffects( float deltaTime )
+{
+    for ( auto iter = effects.begin(); iter != effects.end(); )
+    {
+        iter->update( deltaTime );
+        if (iter->isDone())
+        {
+            iter = effects.erase( iter );
+        }
+        else
+        {
+            ++iter;
+        }
+    }
+}
+
 void Level::reset()
 {
     player.setPosition( playerStart );
     player.setVelocity( { 0, 0 } );
     player.reset();
+
+    availablePickups = allPickups;
 }
 
 void Level::draw( sr::Image& image ) const
 {
     tileMap.draw( image );
+
+    for ( auto& pickup: availablePickups )
+    {
+        pickup.draw( image );
+    }
+
+    for (auto& effect : effects)
+    {
+        effect.draw( image );
+    }
+
     player.draw( image );
 
 #if _DEBUG

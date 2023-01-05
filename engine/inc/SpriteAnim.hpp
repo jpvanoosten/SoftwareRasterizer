@@ -30,11 +30,27 @@ public:
     /// <summary>
     /// Allow conversion to sprite.
     /// </summary>
-    /// <returns>The Sprite frame to render for this Sprite animation.</returns>
+    /// <returns>The current Sprite frame to render for this Sprite animation.</returns>
     operator const Sprite&() const noexcept;
 
     SpriteAnim& operator=( const SpriteAnim& ) = default;
     SpriteAnim& operator=( SpriteAnim&& ) noexcept = default;
+
+    /// <summary>
+    /// Get a sprite from the sprite sheet.
+    /// </summary>
+    /// <param name="i">The index of the sprite in the sprite sheet.
+    /// The sprite returned is `i % numSprites`.
+    /// </param>
+    /// <returns>The sprite in the sprite sheet.</returns>
+    const Sprite& operator[]( size_t i ) const noexcept;
+
+    /// <summary>
+    /// Get the sprite at a specific moment in time.
+    /// </summary>
+    /// <param name="time">The animation time.</param>
+    /// <returns>A reference to the sprite at the given time.</returns>
+    const Sprite& at( float time ) const noexcept;
 
     /// <summary>
     /// Update the internal timer for the sprite animation.
@@ -47,6 +63,19 @@ public:
     /// Reset the internal frame timer.
     /// </summary>
     void reset() noexcept;
+
+    /// <summary>
+    /// Get the duration (in seconds) of the animation.
+    /// </summary>
+    /// <returns>The duration of the animation (in seconds).</returns>
+    float getDuration() const noexcept;
+
+    /// <summary>
+    /// For "one shot" sprite animations, the animation is done
+    /// when all the frames in the sprite animation have played.
+    /// </summary>
+    /// <returns>`true` if all of the frames of the animation have played at least once, `false` otherwise.</returns>
+    bool isDone() const noexcept;
 
 private:
     SpriteSheet spriteSheet;

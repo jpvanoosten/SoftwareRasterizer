@@ -95,21 +95,29 @@ public:
     }
 
     /// <summary>
-    /// Get the width (in pixels) of each sprite in the sprite sheet.
+    /// Get the width (in pixels) of a sprite in the sprite sheet.
     /// </summary>
+    /// <param name="spriteId">(optional): The ID of the sprite in the sprite sheet. Default: 0.</param>
     /// <returns>The width of the sprites in the sprite sheet.</returns>
-    uint32_t getSpriteWidth() const noexcept
+    uint32_t getSpriteWidth(uint32_t spriteId = 0u) const noexcept
     {
-        return image.getWidth() / columns;
+        if ( spriteId < spriteRects.size() )
+            return spriteRects[spriteId].width;
+
+        return 0u;
     }
 
     /// <summary>
-    /// Get the height (in pixels) of each sprite in the sprite sheet.
+    /// Get the height (in pixels) of a sprite in the sprite sheet.
     /// </summary>
+    /// <param name="spriteId">(optional) The ID of the sprite in the sprite sheet. Default: 0.</param>
     /// <returns>The height of the sprites in the sprite sheet.</returns>
-    uint32_t getSpriteHeight() const noexcept
+    uint32_t getSpriteHeight(uint32_t spriteId = 0u) const noexcept
     {
-        return image.getHeight() / rows;
+        if ( spriteId < spriteRects.size() )
+            return spriteRects[spriteId].height;
+
+        return 0u;
     }
 
     /// <summary>

@@ -17,7 +17,7 @@ public:
     /// Construct a tile map from a sprite sheet and a grid size.
     /// Note: All tiles are initialized to -1.
     /// </summary>
-    /// <param name="spriteSheet">The a pointer to the sprite sheet to use for drawing the tile map.
+    /// <param name="spriteSheet">The sprite sheet to use for drawing the tile map.
     /// The `TileMap` class does not take ownership of the `SpriteSheet`. You must make sure the `SpriteSheet` stays in scope
     /// as long as `TileMap` has a reference to it!</param>
     /// <param name="gridWidth">The number of tiles in the width of the tile map.</param>
