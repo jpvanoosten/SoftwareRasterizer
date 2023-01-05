@@ -65,12 +65,12 @@ Game::Game( uint32_t screenWidth, uint32_t screenHeight )
     //    return std::clamp( a + space + up, 0.0f, 1.0f );
     //} );
 
-    ldtkProject.loadFromFile( "assets/Pixel Adventure/Pixel Adventure.ldtk" );
-    auto& world = ldtkProject.getWorld();
+    project.loadFromFile( "assets/Pixel Adventure/Pixel Adventure.ldtk" );
+    auto& world = project.getWorld();
 
     for ( auto& ldtkLevels = world.allLevels(); auto& ldtkLevel: ldtkLevels )
     {
-        levels.emplace_back( world, ldtkLevel );
+        levels.emplace_back( project, world, ldtkLevel );
     }
     currentLevel = levels.begin();
 
@@ -115,9 +115,9 @@ Game::Game( uint32_t screenWidth, uint32_t screenHeight )
 
 void Game::Update()
 {
-    static double      totalTime   = 0.0;
-    static uint64_t    frames      = 0;
-    static std::string fps         = "FPS: 0";
+    static double      totalTime = 0.0;
+    static uint64_t    frames    = 0;
+    static std::string fps       = "FPS: 0";
 
     timer.tick();
     ++frames;
@@ -149,8 +149,10 @@ void Game::Update()
     image.drawText( arial20, 6, 20, fps, Color::Black );
     image.drawText( arial20, 4, 18, fps, Color::White );
 
+#if _DEBUG
     // Draw some text at the mouse position.
     image.drawText( arial20, mousePos.x, mousePos.y, std::format( "({}, {})", mousePos.x, mousePos.y ), Color::White );
+#endif
 
     // Draw the buttons
     restartButton.draw( image );

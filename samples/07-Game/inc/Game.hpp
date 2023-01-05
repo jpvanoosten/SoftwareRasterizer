@@ -43,7 +43,7 @@ public:
     void onRestartClicked();
 
 protected:
-    ldtk::Project ldtkProject;
+    ldtk::Project project;
 
     sr::Image image;
     sr::Timer timer;

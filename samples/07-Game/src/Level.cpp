@@ -1,3 +1,5 @@
+#include "LDtkLoader/Project.hpp"
+
 #include <Level.hpp>
 
 #include <BlendMode.hpp>
@@ -6,7 +8,7 @@
 using namespace Math;
 using namespace sr;
 
-Level::Level( const ldtk::World& world, const ldtk::Level& level )
+Level::Level( const ldtk::Project& project, const ldtk::World& world, const ldtk::Level& level )
 : world { &world }
 , level { &level }
 {
@@ -21,11 +23,33 @@ Level::Level( const ldtk::World& world, const ldtk::Level& level )
 
         Collider collider {
             .type     = ColliderType::Default,
-            .aabb     = AABB { { p.x, p.y, 0.0 }, { p.x + s.x, p.y + s.y, 0.0f } },
+            .aabb     = AABB { { p.x, p.y, 0.0 }, { p.x + s.x - 1, p.y + s.y - 1, 0.0f } },
             .isOneWay = oneWay ? *oneWay : false,
         };
 
         colliders.push_back( collider );
+    }
+
+    const auto& tilesLayer = level.getLayer( "Tiles" );
+    const auto& intGrid    = level.getLayer( "IntGrid" );  // TODO: Should probably rename this layer..
+    const auto& gridSize   = tilesLayer.getGridSize();
+    const auto& tileSet    = tilesLayer.getTileset();
+
+    const std::filesystem::path projectPath = project.getFilePath().directory();
+
+    spriteSheet = SpriteSheet( projectPath / tileSet.path, tileSet.tile_size, tileSet.tile_size, BlendMode::AlphaBlend );
+    tileMap     = TileMap( spriteSheet, gridSize.x, gridSize.y );
+
+    for ( auto& tile: intGrid.allTiles() )
+    {
+        const auto& gridPos             = tile.getGridPosition();
+        tileMap( gridPos.x, gridPos.y ) = tile.tileId;
+    }
+
+    for ( auto& tile: tilesLayer.allTiles() )
+    {
+        const auto& gridPos             = tile.getGridPosition();
+        tileMap( gridPos.x, gridPos.y ) = tile.tileId;
     }
 
     // Player start position
@@ -41,6 +65,11 @@ Level::Level( const ldtk::World& world, const ldtk::Level& level )
 }
 
 void Level::update( float deltaTime )
+{
+    updateCollisions( deltaTime );
+}
+
+void Level::updateCollisions( float deltaTime )
 {
     // Store the previous position so we know if the
     // player moved through a 1-way collider.
@@ -65,52 +94,29 @@ void Level::update( float deltaTime )
     {
         AABB colliderAABB = collider.aabb;
 
-        // Player is moving right.
-        if ( vel.x > 0.0f )
+        // Check to see if the player is colliding with the left edge of the collider.
+        Line leftEdge { { colliderAABB.min.x, colliderAABB.min.y + padding, 0 }, { colliderAABB.min.x, colliderAABB.max.y - padding, 0 } };
+        if ( !collider.isOneWay && playerAABB.intersect( leftEdge ) )
         {
-            // Check to see if the player is colliding with the left edge of the collider.
-            Line leftEdge { { colliderAABB.min.x, colliderAABB.min.y + padding, 0 }, { colliderAABB.min.x, colliderAABB.max.y - padding, 0 } };
-            if ( !collider.isOneWay && playerAABB.intersect( leftEdge ) )
-            {
-                // Set the player's position to the left edge of the collider.
-                pos.x = colliderAABB.min.x - playerAABB.width() * 0.5f;
-                // And 0 the X velocity.
-                vel.x = 0.0f;
+            // Set the player's position to the left edge of the collider.
+            pos.x = colliderAABB.min.x - playerAABB.width() * 0.5f;
+            // And 0 the X velocity.
+            vel.x = 0.0f;
 
-                // On a wall that is right of the player.
-                onRightWall = true;
-            }
+            // On a wall that is right of the player.
+            onRightWall = true;
         }
-        // Player is moving left.
-        else if ( vel.x < 0.0f )
+        // Check to see if the player is colliding with the right edge of the collider.
+        Line rightEdge { { colliderAABB.max.x, colliderAABB.min.y + padding, 0 }, { colliderAABB.max.x, colliderAABB.max.y - padding, 0 } };
+        if ( !collider.isOneWay && playerAABB.intersect( rightEdge ) )
         {
-            // Check to see if the player is colliding with the right edge of the collider.
-            Line rightEdge { { colliderAABB.max.x, colliderAABB.min.y + padding, 0 }, { colliderAABB.max.x, colliderAABB.max.y - padding, 0 } };
-            if ( !collider.isOneWay && playerAABB.intersect( rightEdge ) )
-            {
-                // Set the player's position to the right edge of the collider.
-                pos.x = colliderAABB.max.x + playerAABB.width() * 0.5f;
-                // And 0 the X velocity.
-                vel.x = 0.0f;
+            // Set the player's position to the right edge of the collider.
+            pos.x = colliderAABB.max.x + playerAABB.width() * 0.5f;
+            // And 0 the X velocity.
+            vel.x = 0.0f;
 
-                // Player is on a wall that is to the left of the player.
-                onLeftWall = true;
-            }
-        }
-        else
-        {
-            // Check to see if the player is still colliding with the left or right edge of the collider.
-            Line leftEdge { { colliderAABB.min.x, colliderAABB.min.y + padding, 0 }, { colliderAABB.min.x, colliderAABB.max.y - padding, 0 } };
-            if ( !collider.isOneWay && playerAABB.intersect( leftEdge ) )
-            {
-                onRightWall = true;
-            }
-
-            Line rightEdge { { colliderAABB.max.x, colliderAABB.min.y + padding, 0 }, { colliderAABB.max.x, colliderAABB.max.y - padding, 0 } };
-            if ( !collider.isOneWay && playerAABB.intersect( rightEdge ) )
-            {
-                onLeftWall = true;
-            }
+            // Player is on a wall that is to the left of the player.
+            onLeftWall = true;
         }
 
         // Player is moving down (falling).
@@ -199,10 +205,13 @@ void Level::reset()
 
 void Level::draw( sr::Image& image ) const
 {
+    tileMap.draw( image );
+    player.draw( image );
+
+#if _DEBUG
     for ( const auto& collider: colliders )
     {
         image.drawAABB( collider.aabb, collider.isOneWay ? Color::Yellow : Color::Red, BlendMode::Disable, FillMode::WireFrame );
     }
-
-    player.draw( image );
+#endif
 }

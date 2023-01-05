@@ -29,6 +29,7 @@ set( INC_FILES
     inc/stb_image.h
     inc/stb_image_write.h
 	inc/stb_truetype.h
+    inc/TileMap.hpp
     inc/Timer.hpp
     inc/Vertex.hpp
     inc/VertexShader.glsl
@@ -54,6 +55,7 @@ set( SRC_FILES
     src/stb_image.cpp
     src/stb_image_write.cpp
 	src/stb_truetype.cpp
+    src/TileMap.cpp
     src/Timer.cpp
     src/Window.cpp
 )

@@ -80,7 +80,7 @@ public:
     /// Get the number of rows in the sprite sheet.
     /// </summary>
     /// <returns>The number of rows in the sprite sheet.</returns>
-    size_t getNumRows() const noexcept
+    uint32_t getNumRows() const noexcept
     {
         return rows;
     }
@@ -89,7 +89,7 @@ public:
     /// Get the number of columns in the sprite sheet.
     /// </summary>
     /// <returns>The number of columns in the sprite sheet.</returns>
-    size_t getNumColumns() const noexcept
+    uint32_t getNumColumns() const noexcept
     {
         return columns;
     }
@@ -98,7 +98,7 @@ public:
     /// Get the width (in pixels) of each sprite in the sprite sheet.
     /// </summary>
     /// <returns>The width of the sprites in the sprite sheet.</returns>
-    size_t getSpriteWidth() const noexcept
+    uint32_t getSpriteWidth() const noexcept
     {
         return image.getWidth() / columns;
     }
@@ -107,7 +107,7 @@ public:
     /// Get the height (in pixels) of each sprite in the sprite sheet.
     /// </summary>
     /// <returns>The height of the sprites in the sprite sheet.</returns>
-    size_t getSpriteHeight() const noexcept
+    uint32_t getSpriteHeight() const noexcept
     {
         return image.getHeight() / rows;
     }

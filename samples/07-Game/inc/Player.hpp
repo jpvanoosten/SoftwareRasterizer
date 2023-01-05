@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Character.hpp"
-#include "Curve.hpp"
 
 #include <Image.hpp>
 #include <Math/Transform2D.hpp>
@@ -145,10 +144,13 @@ private:
     // Player's current state.
     State state = State::Idle;
 
+    // How much dampening to apply.
+    float xDampen = 50.0f;
+
     // How fast the player accelerates.
-    const float playerAccel = 1000.0f;
+    const float accel = 5e3f;
     // The maximum speed of the player.
-    const float playerMaxSpeed = 150.0f;
+    const float maxSpeed = 150.0f;
     // Maximum jump height in pixels.
     const float jumpHeight = 60.0f;
     // Jump time is the time (in seconds) to the apex of the jump.
@@ -158,7 +160,8 @@ private:
     // Source: https://jobtalle.com/2d_platformer_physics.html
     const float gravity   = 2.0f * jumpHeight / ( jumpTime * jumpTime );
     const float jumpSpeed = std::sqrt( 2.0f * jumpHeight * gravity );
-    const float wallJumpSpeed = 50.0f;
+    // How fast the player jumps off the wall.
+    const float wallJumpSpeed = 500.0f;
 
     // True if the player can double jump.
     bool canDoubleJump = true;

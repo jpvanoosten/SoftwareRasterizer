@@ -20,7 +20,10 @@ Image Image::fromFile( const std::filesystem::path& fileName )
     int            x, y, n;
     unsigned char* data = stbi_load( fileName.string().c_str(), &x, &y, &n, STBI_rgb_alpha );
     if ( !data )
+    {
+        std::cerr << "ERROR: Could not load: " << fileName.string() << std::endl;
         return {};
+    }
 
     // Convert ARGB
     unsigned char* p = data;

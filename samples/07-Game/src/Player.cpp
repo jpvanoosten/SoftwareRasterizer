@@ -103,9 +103,13 @@ void Player::update( float deltaTime ) noexcept
     }
 
     // Clamp velocity.
-    velocity.x = std::clamp( velocity.x, -playerMaxSpeed, playerMaxSpeed );
+//    velocity.x = std::clamp( velocity.x, -maxSpeed, maxSpeed );
 
+    // Update player position.
     transform.translate( glm::vec2 { velocity.x, -velocity.y } * deltaTime );
+
+    // Dampen x velocity
+    velocity.x = velocity.x / ( 1.0f + xDampen * deltaTime );
 
     if ( currentCharacter != characters.end() )
     {
@@ -147,7 +151,6 @@ void Player::startState( State newState )
     case State::Idle:
         currentCharacter->setAnimation( "Idle" );
         canDoubleJump = true;
-        velocity.x    = 0.0f;
         break;
     case State::Run:
         currentCharacter->setAnimation( "Run" );
@@ -190,7 +193,7 @@ void Player::endState( State oldState )
 
 float Player::doHorizontalMovement( float deltaTime )
 {
-    const float horizontal = Input::getAxis( "Horizontal" ) * playerAccel * deltaTime;
+    const float horizontal = Input::getAxis( "Horizontal" ) * accel * deltaTime;
 
     if ( horizontal < 0.0f )
     {
