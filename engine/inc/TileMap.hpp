@@ -17,12 +17,10 @@ public:
     /// Construct a tile map from a sprite sheet and a grid size.
     /// Note: All tiles are initialized to -1.
     /// </summary>
-    /// <param name="spriteSheet">The sprite sheet to use for drawing the tile map.
-    /// The `TileMap` class does not take ownership of the `SpriteSheet`. You must make sure the `SpriteSheet` stays in scope
-    /// as long as `TileMap` has a reference to it!</param>
+    /// <param name="spriteSheet">The sprite sheet to use for drawing the tile map.</param>
     /// <param name="gridWidth">The number of tiles in the width of the tile map.</param>
     /// <param name="gridHeight">The number of tiles in the height of the tile map.</param>
-    TileMap( const SpriteSheet& spriteSheet, uint32_t gridWidth, uint32_t gridHeight );
+    TileMap( SpriteSheet spriteSheet, uint32_t gridWidth, uint32_t gridHeight );
 
     /// <summary>
     /// Copy a tile map.
@@ -95,7 +93,7 @@ public:
     /// <returns>The width (in pixels) of a sprite in the sprite sheet.</returns>
     uint32_t getSpriteWidth() const noexcept
     {
-        return spriteSheet ? spriteSheet->getSpriteWidth() : 0u;
+        return spriteSheet.getSpriteWidth();
     }
 
     /// <summary>
@@ -104,14 +102,14 @@ public:
     /// <returns>The height (in pixels) of a sprite in the sprite sheet.</returns>
     uint32_t getSpriteHeight() const noexcept
     {
-        return spriteSheet ? spriteSheet->getSpriteHeight() : 0u;
+        return spriteSheet.getSpriteHeight();
     }
 
     /// <summary>
     /// Get the sprite sheet associated with this tile map.
     /// </summary>
     /// <returns>A reference to the sprite sheet.</returns>
-    const SpriteSheet* getSpriteSheet() const noexcept
+    const SpriteSheet& getSpriteSheet() const noexcept
     {
         return spriteSheet;
     }
@@ -121,7 +119,7 @@ public:
     /// </summary>
     /// <param name="spriteGrid">The IDs of the sprites in the tile map.
     /// Tiles that don't contain a sprite should be set to -1.</param>
-    void setSpriteGrid( std::span<int> spriteGrid );
+    void setSpriteGrid( std::span<const int> spriteGrid );
 
     /// <summary>
     /// Get the sprite IDs for the sprites in the tile map.
@@ -145,7 +143,7 @@ private:
     uint32_t gridHeight = 0u;
 
     // The sprite sheet to use for drawing the tilemap.
-    const SpriteSheet* spriteSheet = nullptr;
+    SpriteSheet spriteSheet;
     std::vector<int>   spriteGrid;
 };
 }  // namespace sr

@@ -31,6 +31,12 @@ public:
     Level() = default;
     Level( const ldtk::Project& project, const ldtk::World& world, const ldtk::Level& level );
 
+    Level( const Level& copy );
+    Level( Level&& other ) noexcept;
+
+    Level& operator=( const Level& copy );
+    Level& operator=( Level&& other ) noexcept;
+
     void update( float deltaTime );
 
     // Reset level.
@@ -45,6 +51,8 @@ private:
 
     const ldtk::World* world = nullptr;
     const ldtk::Level* level = nullptr;
+
+    std::string levelName;
 
     // Level colliders.
     std::vector<Collider> colliders;
@@ -61,10 +69,8 @@ private:
     // Currently playing effects.
     std::vector<Effect> effects;
 
-        // Tile map.
-        sr::TileMap tileMap;
-    // Sprite sheet for the tile map.
-    sr::SpriteSheet spriteSheet;
+    // Tile map.
+    sr::TileMap tileMap;
 
     Player    player;
     glm::vec2 playerStart { 0 };

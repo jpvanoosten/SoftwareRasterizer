@@ -62,6 +62,80 @@ Player::Player( const Math::Transform2D& transform )
     currentCharacter->setAnimation( "Idle" );
 }
 
+Player::Player( const Player& copy )
+: characters { copy.characters }
+, currentCharacter { characters.begin() }
+, transform { copy.transform }
+, aabb { copy.aabb }
+, topAABB { copy.topAABB }
+, bottomAABB { copy.bottomAABB }
+, leftAABB { copy.leftAABB }
+, rightAABB { copy.rightAABB }
+, state { copy.state }
+, xDampen { copy.xDampen }
+, canDoubleJump { copy.canDoubleJump }
+, velocity { copy.velocity }
+{
+    int i = 3;
+}
+
+Player::Player( Player&& other ) noexcept
+: characters { std::move( other.characters ) }
+, currentCharacter { characters.begin() }
+, transform { other.transform }
+, aabb { other.aabb }
+, topAABB { other.aabb }
+, bottomAABB { other.bottomAABB }
+, leftAABB { other.leftAABB }
+, rightAABB { other.rightAABB }
+, state { other.state }
+, xDampen { other.xDampen }
+, canDoubleJump { other.canDoubleJump }
+, velocity { other.velocity }
+{}
+
+Player& Player::operator=( const Player& copy )
+{
+    if ( this == &copy )
+        return *this;
+
+    characters       = copy.characters;
+    currentCharacter = characters.begin();
+    transform        = copy.transform;
+    aabb             = copy.aabb;
+    topAABB          = copy.topAABB;
+    bottomAABB       = copy.bottomAABB;
+    leftAABB         = copy.leftAABB;
+    rightAABB        = copy.rightAABB;
+    state            = copy.state;
+    xDampen          = copy.xDampen;
+    canDoubleJump    = copy.canDoubleJump;
+    velocity         = copy.velocity;
+
+    return *this;
+}
+
+Player& Player::operator=( Player&& other ) noexcept
+{
+    if ( this == &other )
+        return *this;
+
+    characters       = std::move( other.characters );
+    currentCharacter = characters.begin();
+    transform        = other.transform;
+    aabb             = other.aabb;
+    topAABB          = other.topAABB;
+    bottomAABB       = other.bottomAABB;
+    leftAABB         = other.leftAABB;
+    rightAABB        = other.rightAABB;
+    state            = other.state;
+    xDampen          = other.xDampen;
+    canDoubleJump    = other.canDoubleJump;
+    velocity         = other.velocity;
+
+    return *this;
+}
+
 void Player::reset()
 {
     if ( ++currentCharacter == characters.end() )
@@ -103,7 +177,7 @@ void Player::update( float deltaTime ) noexcept
     }
 
     // Clamp velocity.
-//    velocity.x = std::clamp( velocity.x, -maxSpeed, maxSpeed );
+    //    velocity.x = std::clamp( velocity.x, -maxSpeed, maxSpeed );
 
     // Update player position.
     transform.translate( glm::vec2 { velocity.x, -velocity.y } * deltaTime );
@@ -223,7 +297,7 @@ void Player::doIdle( float deltaTime )
 void Player::doRun( float deltaTime )
 {
     const float horizontal = doHorizontalMovement( deltaTime );
-    velocity.x             += horizontal;
+    velocity.x += horizontal;
 
     if ( Input::getButtonDown( "Jump" ) )
     {
@@ -238,7 +312,7 @@ void Player::doRun( float deltaTime )
 void Player::doJump( float deltaTime )
 {
     const float horizontal = doHorizontalMovement( deltaTime );
-    velocity.x             += horizontal;
+    velocity.x += horizontal;
 
     // Apply gravity
     velocity.y -= gravity * deltaTime;
@@ -272,7 +346,7 @@ void Player::doHit( float deltaTime )
 void Player::doDoubleJump( float deltaTime )
 {
     const float horizontal = doHorizontalMovement( deltaTime );
-    velocity.x             += horizontal;
+    velocity.x += horizontal;
 
     // Apply gravity
     velocity.y -= gravity * deltaTime;
@@ -286,7 +360,7 @@ void Player::doDoubleJump( float deltaTime )
 void Player::doFalling( float deltaTime )
 {
     const float horizontal = doHorizontalMovement( deltaTime );
-    velocity.x             += horizontal;
+    velocity.x += horizontal;
 
     velocity.y -= gravity * deltaTime;
 
@@ -299,7 +373,7 @@ void Player::doFalling( float deltaTime )
 void Player::doWallJump( float deltaTime )
 {
     const float horizontal = doHorizontalMovement( deltaTime );
-    velocity.x             += horizontal;
+    velocity.x += horizontal;
 
     // Apply gravity
     velocity.y -= gravity * deltaTime;

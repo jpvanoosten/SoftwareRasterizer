@@ -25,6 +25,12 @@ public:
 
     explicit Player( const Math::Transform2D& transform = Math::Transform2D {} );
 
+    Player( const Player& copy );
+    Player( Player&& other ) noexcept;
+
+    Player& operator=( const Player& copy );
+    Player& operator=( Player&& other ) noexcept;
+
     /// <summary>
     /// Reset the character (and choose a different character).
     /// </summary>

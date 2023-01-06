@@ -6,7 +6,6 @@
 
 #include <Events.hpp>
 #include <Font.hpp>
-#include <GamePadStateTracker.hpp>
 #include <Image.hpp>
 #include <Math/Rect.hpp>
 #include <Timer.hpp>
@@ -64,9 +63,8 @@ protected:
 
     // Backgrounds
     using BackgroundList = std::vector<Background>;
-    BackgroundList backgrounds;
+    BackgroundList           backgrounds;
     BackgroundList::iterator currentBackground;
-
 
     // Buttons
     Button previousButton;
@@ -74,8 +72,6 @@ protected:
     Button restartButton;
 
     // Levels
-    using LevelList = std::vector<Level>;
-    LevelList levels;
-    LevelList::iterator currentLevel;
-
+    Level     currentLevel;
+    size_t    currentLevelId = 0u;
 };

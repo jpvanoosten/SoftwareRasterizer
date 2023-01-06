@@ -12,6 +12,12 @@ namespace sr
 class SR_API SpriteAnim
 {
 public:
+    enum class PlayMode
+    {
+        Loop,   ///< Loop the animation.
+        Clamp,  ///< Clamp to the last frame of the animation.
+    };
+
     SpriteAnim() = default;
     ~SpriteAnim() = default;
     SpriteAnim( const SpriteAnim& ) = default;
