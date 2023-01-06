@@ -33,6 +33,12 @@ struct SR_API Image final
     Image();
 
     /// <summary>
+    /// Load an image from a file.
+    /// </summary>
+    /// <param name="fileName">The file to load.</param>
+    explicit Image( const std::filesystem::path& fileName );
+
+    /// <summary>
     /// Construct an image from an initial width and height.
     /// </summary>
     /// <param name="width">The image width (in pixels).</param>

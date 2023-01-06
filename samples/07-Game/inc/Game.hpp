@@ -3,6 +3,7 @@
 #include "Background.hpp"
 #include "Button.hpp"
 #include "Level.hpp"
+#include "Transition.hpp"
 
 #include <Events.hpp>
 #include <Font.hpp>
@@ -42,6 +43,13 @@ public:
     void onRestartClicked();
 
 protected:
+    enum class TransitionState
+    {
+        None,
+        In,
+        Out,
+    };
+
     ldtk::Project project;
 
     sr::Image image;
@@ -66,12 +74,21 @@ protected:
     BackgroundList           backgrounds;
     BackgroundList::iterator currentBackground;
 
+    // Level transition effect.
+    Transition  transition;
+    const float transitionDuration = 0.5f;
+    float       transitionTime     = transitionDuration;
+    // Start by playing the transition out.
+    TransitionState transitionState = TransitionState::Out;
+
     // Buttons
     Button previousButton;
     Button nextButton;
     Button restartButton;
 
     // Levels
-    Level     currentLevel;
-    size_t    currentLevelId = 0u;
+    Level  currentLevel;
+    size_t currentLevelId = 0u;
+    // Which level to play next.
+    size_t nextLevelId = 0u;
 };

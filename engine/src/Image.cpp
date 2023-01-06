@@ -17,29 +17,7 @@ using namespace Math;
 
 Image Image::fromFile( const std::filesystem::path& fileName )
 {
-    int            x, y, n;
-    unsigned char* data = stbi_load( fileName.string().c_str(), &x, &y, &n, STBI_rgb_alpha );
-    if ( !data )
-    {
-        std::cerr << "ERROR: Could not load: " << fileName.string() << std::endl;
-        return {};
-    }
-
-    // Convert ARGB
-    unsigned char* p = data;
-    for ( size_t i = 0; i < x * y; ++i )
-    {
-        unsigned char c = p[0];
-        p[0]            = p[2];
-        p[2]            = c;
-        p += 4;
-    }
-
-    Image image = fromMemory( reinterpret_cast<Color*>( data ), x, y );
-
-    stbi_image_free( data );
-
-    return image;
+    return Image { fileName };
 }
 
 Image Image::fromMemory( const Color* data, uint32_t width, uint32_t height )
@@ -54,6 +32,33 @@ Image Image::fromMemory( const Color* data, uint32_t width, uint32_t height )
 }
 
 Image::Image() = default;
+
+Image::Image( const std::filesystem::path& fileName )
+{
+    int            x, y, n;
+    unsigned char* data = stbi_load( fileName.string().c_str(), &x, &y, &n, STBI_rgb_alpha );
+    if ( !data )
+    {
+        std::cerr << "ERROR: Could not load: " << fileName.string() << std::endl;
+        return;
+    }
+
+    // Convert ARGB
+    unsigned char* p = data;
+    for ( size_t i = 0; i < x * y; ++i )
+    {
+        unsigned char c = p[0];
+        p[0]            = p[2];
+        p[2]            = c;
+        p += 4;
+    }
+
+    resize( static_cast<uint32_t>( x ), static_cast<uint32_t>( y ) );
+
+    memcpy_s( m_data.get(), static_cast<rsize_t>( m_width ) * m_height * sizeof( Color ), data, static_cast<rsize_t>( m_width ) * m_height * sizeof( Color ) );
+
+    stbi_image_free( data );
+}
 
 Image::Image( const Image& copy )
 {

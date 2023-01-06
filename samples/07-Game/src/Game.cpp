@@ -4,6 +4,7 @@
 #include <Input.hpp>
 
 #include <string>
+#include <numbers>
 
 using namespace sr;
 using namespace Math;
@@ -13,7 +14,7 @@ Game::Game( uint32_t screenWidth, uint32_t screenHeight )
 , arial20 { "assets/fonts/arial.ttf", 20 }
 , arial24 { "assets/fonts/arial.ttf", 24 }
 {
-    // Input actions map
+    // Input that controls the characters horizontal movement.
     Input::mapAxis( "Horizontal", []( std::span<const GamePadStateTracker> gamePadStates, const KeyboardStateTracker& keyboardState, const MouseStateTracker& mouseState ) {
         float leftX = 0.0f;
 
@@ -34,6 +35,7 @@ Game::Game( uint32_t screenWidth, uint32_t screenHeight )
         return std::clamp( leftX - a + d - left + right, -1.0f, 1.0f );
     } );
 
+    // Input that controls jumping.
     Input::mapButtonDown( "Jump", []( std::span<const GamePadStateTracker> gamePadStates, const KeyboardStateTracker& keyboardState, const MouseStateTracker& mouseState ) {
         bool a = false;
 
@@ -44,26 +46,34 @@ Game::Game( uint32_t screenWidth, uint32_t screenHeight )
 
         const bool space = keyboardState.isKeyPressed( KeyCode::Space );
         const bool up    = keyboardState.isKeyPressed( KeyCode::Up );
+        const bool w     = keyboardState.isKeyPressed( KeyCode::W );
 
-        return a || space || up;
+        return a || space || up || w;
     } );
 
-    // Input::mapAxis( "Jump", []( std::span<const GamePadStateTracker> gamePadStates, const KeyboardStateTracker& keyboardState, const MouseStateTracker& mouseState ) {
-    //     float a = 0.0f;
+    // Input to go to the next map.
+    Input::mapButtonDown( "Next", []( std::span<const GamePadStateTracker> gamePadStates, const KeyboardStateTracker& keyboardState, const MouseStateTracker& mouseState ) {
+        bool start = false;
 
-    //    for ( auto& gamePadState: gamePadStates )
-    //    {
-    //        const auto state = gamePadState.getLastState();
-    //        a += state.buttons.a ? 1.0f : 0.0f;
-    //    }
+        for ( auto& gamePadState: gamePadStates )
+        {
+            start = start || gamePadState.start == ButtonState::Pressed;
+        }
 
-    //    const auto keyState = keyboardState.getLastState();
+        return start;
+    } );
 
-    //    const float space = keyState.Space ? 1.0f : 0.0f;
-    //    const float up    = keyState.Up ? 1.0f : 0.0f;
+    // Input to go to the previous map.
+    Input::mapButtonDown( "Previous", []( std::span<const GamePadStateTracker> gamePadStates, const KeyboardStateTracker& keyboardState, const MouseStateTracker& mouseState ) {
+        bool back = false;
 
-    //    return std::clamp( a + space + up, 0.0f, 1.0f );
-    //} );
+        for ( auto& gamePadState: gamePadStates )
+        {
+            back = back || gamePadState.back == ButtonState::Pressed;
+        }
+
+        return back;
+    } );
 
     project.loadFromFile( "assets/Pixel Adventure/Pixel Adventure.ldtk" );
     auto& world = project.getWorld();
@@ -80,6 +90,8 @@ Game::Game( uint32_t screenWidth, uint32_t screenHeight )
     backgrounds.emplace_back( Background { "assets/Pixel Adventure/Background/Yellow.png", 1.0f, { 0.0f, 1.0f }, 0.3f } );
 
     currentBackground = backgrounds.begin();
+
+    transition = Transition( "assets/Pixel Adventure/Other/Transition.png" );
 
     // Buttons
     {
@@ -136,11 +148,50 @@ void Game::Update()
         // Update the input state.
         Input::update();
 
+        // Check if next/previous input buttons have been pressed.
+        if ( Input::getButtonDown( "Next" ) )
+        {
+            onNextClicked();
+        }
+        if ( Input::getButtonDown( "Previous" ) )
+        {
+            onPreviousClicked();
+        }
+
         currentLevel.update( std::min( elapsedTime, physicsTick ) );
         elapsedTime -= physicsTick;
     } while ( elapsedTime > 0.0f );
 
     currentLevel.draw( image );
+
+    // Draw the buttons
+    restartButton.draw( image );
+    nextButton.draw( image );
+    previousButton.draw( image );
+
+    // Update the transition effect.
+    switch ( transitionState )
+    {
+    case TransitionState::None:
+        transitionTime = 0.0f;
+        break;
+    case TransitionState::In:
+        transitionTime += static_cast<float>( timer.elapsedSeconds() );
+        if ( transitionTime > transitionDuration )
+            transitionState = TransitionState::None;
+        break;
+    case TransitionState::Out:
+        transitionTime -= static_cast<float>( timer.elapsedSeconds() );
+        if ( transitionTime < 0.0f )
+            transitionState = TransitionState::None;
+        break;
+    }
+
+    if ( transitionState != TransitionState::None )
+    {
+        transition.setRatio( transitionTime / transitionDuration );
+        transition.draw( image );
+    }
 
     // Draw an FPS counter in the corner of the screen.
     image.drawText( arial20, 6, 20, fps, Color::Black );
@@ -150,11 +201,6 @@ void Game::Update()
     // Draw some text at the mouse position.
     image.drawText( arial20, mousePos.x, mousePos.y, std::format( "({}, {})", mousePos.x, mousePos.y ), Color::White );
 #endif
-
-    // Draw the buttons
-    restartButton.draw( image );
-    nextButton.draw( image );
-    previousButton.draw( image );
 
     // Simulate low frame rates.
     // timer.limitFPS( 25 );
@@ -263,14 +309,15 @@ void Game::onResized( sr::ResizeEventArgs& args )
 void Game::onPreviousClicked()
 {
     std::cout << "Previous Clicked!" << std::endl;
-    assert( currentLevelId > 0 );
+    if ( currentLevelId > 0 )
+    {
+        --currentLevelId;
 
-    --currentLevelId;
+        auto& world  = project.getWorld();
+        auto& levels = world.allLevels();
 
-    auto& world  = project.getWorld();
-    auto& levels = world.allLevels();
-    
-    currentLevel = Level { project, world, levels[currentLevelId] };
+        currentLevel = Level { project, world, levels[currentLevelId] };
+    }
 
     previousButton.enable( currentLevelId != 0 );
 }
@@ -279,7 +326,7 @@ void Game::onNextClicked()
 {
     std::cout << "Next Clicked!" << std::endl;
 
-    auto& world = project.getWorld();
+    auto& world  = project.getWorld();
     auto& levels = world.allLevels();
 
     currentLevelId = ( currentLevelId + 1 ) % levels.size();

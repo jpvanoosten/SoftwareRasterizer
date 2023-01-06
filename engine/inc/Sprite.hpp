@@ -10,10 +10,12 @@
 
 namespace sr
 {
-class SR_API Sprite
+class SR_API Sprite final
 {
 public:
     Sprite() = default;
+
+    ~Sprite() = default;
 
     /// <summary>
     /// Construct a Sprite from an Image.
@@ -37,6 +39,14 @@ public:
     , rect{rect}
     , blendMode { blendMode }
     {}
+
+    Sprite( const Sprite& ) = default;
+
+    Sprite( Sprite&& other ) noexcept;
+
+    Sprite& operator=( const Sprite& ) = default;
+
+    Sprite& operator=( Sprite&& other ) noexcept;
 
     glm::ivec2 getUV() const noexcept
     {
@@ -91,5 +101,30 @@ private:
     // The blend mode to apply when rendering.
     BlendMode blendMode;
 };
+
+inline Sprite::Sprite( Sprite&& other ) noexcept
+: image{other.image}
+, rect{other.rect}
+, color{other.color}
+, blendMode{other.blendMode}
+{
+    other.image = nullptr;
+}
+
+inline Sprite& Sprite::operator=( Sprite&& other ) noexcept
+{
+    if ( this == &other )
+        return *this;
+
+    image = other.image;
+    rect  = other.rect;
+    color = other.color;
+    blendMode = other.blendMode;
+
+    other.image = nullptr;
+
+    return *this;
+}
+
 
 }  // namespace sr

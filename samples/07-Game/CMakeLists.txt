@@ -12,6 +12,7 @@ set( INC_FILES
     inc/Level.hpp
     inc/Pickup.hpp
     inc/Player.hpp
+    inc/Transition.hpp
 )
 
 set( SRC_FILES
@@ -24,6 +25,7 @@ set( SRC_FILES
     src/Level.cpp
     src/Pickup.cpp
     src/Player.cpp
+    src/Transition.cpp
 )
 
 set( ALL_FILES ${SRC_FILES} ${INC_FILES} )
