@@ -158,6 +158,7 @@ SpriteSheet SpriteSheet::fromGrid( const std::filesystem::path& fileName, uint32
 
 void SpriteSheet::init()
 {
+    sprites.clear();
     sprites.reserve( spriteRects.size() );
 
     for ( const auto& rect: spriteRects )
