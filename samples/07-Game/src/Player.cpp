@@ -58,7 +58,6 @@ Player::Player( const Math::Transform2D& transform )
     characters.emplace_back( createCharacter( "assets/Pixel Adventure/Main Characters/Virtual Guy" ) );
 
     currentCharacter = characters.begin();
-
     currentCharacter->setAnimation( "Idle" );
 }
 
@@ -216,6 +215,13 @@ void Player::setState( State newState )
         startState( newState );
         state = newState;
     }
+}
+
+void Player::setCharacter( size_t characterId )
+{
+    characterId = characterId % characters.size();
+    currentCharacter = characters.begin() + characterId;
+    currentCharacter->setAnimation( "Idle" );
 }
 
 void Player::startState( State newState )

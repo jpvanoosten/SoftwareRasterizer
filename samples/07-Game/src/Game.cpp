@@ -75,10 +75,6 @@ Game::Game( uint32_t screenWidth, uint32_t screenHeight )
         return back;
     } );
 
-    project.loadFromFile( "assets/Pixel Adventure/Pixel Adventure.ldtk" );
-
-    loadLevel( 0 );
-
     backgrounds.emplace_back( Background { "assets/Pixel Adventure/Background/Blue.png", 1.0f, { 0.0f, 1.0f }, 0.3f } );
     backgrounds.emplace_back( Background { "assets/Pixel Adventure/Background/Brown.png", 1.0f, { 0.0f, 1.0f }, 0.3f } );
     backgrounds.emplace_back( Background { "assets/Pixel Adventure/Background/Gray.png", 1.0f, { 0.0f, 1.0f }, 0.3f } );
@@ -86,8 +82,14 @@ Game::Game( uint32_t screenWidth, uint32_t screenHeight )
     backgrounds.emplace_back( Background { "assets/Pixel Adventure/Background/Pink.png", 1.0f, { 0.0f, 1.0f }, 0.3f } );
     backgrounds.emplace_back( Background { "assets/Pixel Adventure/Background/Purple.png", 1.0f, { 0.0f, 1.0f }, 0.3f } );
     backgrounds.emplace_back( Background { "assets/Pixel Adventure/Background/Yellow.png", 1.0f, { 0.0f, 1.0f }, 0.3f } );
+    // The loadLevel function will switch to the next level.
+    // Setting the current background to the last background ensures
+    // the first background is used when the first level is loaded.
+    currentBackground = backgrounds.end() - 1;
 
-    currentBackground = backgrounds.begin();
+    project.loadFromFile( "assets/Pixel Adventure/Pixel Adventure.ldtk" );
+
+    loadLevel( 0, 0 );
 
     transition = Transition( "assets/Pixel Adventure/Other/Transition.png" );
 
@@ -177,7 +179,7 @@ void Game::Update()
         transitionTime += static_cast<float>( timer.elapsedSeconds() );
         if ( transitionTime > transitionDuration )
         {
-            loadLevel( nextLevelId );
+            loadLevel( nextLevelId, ++currentCharacterId );
             transitionState = TransitionState::Out;
         }
         break;
@@ -348,7 +350,7 @@ void Game::onRestartClicked()
     transitionTime  = 0.0f;
 }
 
-void Game::loadLevel( size_t levelId )
+void Game::loadLevel( size_t levelId, size_t characterId )
 {
     auto& world  = project.getWorld();
     auto& levels = world.allLevels();
@@ -357,10 +359,12 @@ void Game::loadLevel( size_t levelId )
 
     currentLevel = Level { project, world, levels[currentLevelId] };
 
+    currentLevel.setCharacter( characterId );
+
     previousButton.enable( currentLevelId != 0 );
 
     // Also change the background
-    if (++currentBackground == backgrounds.end())
+    if ( ++currentBackground == backgrounds.end() )
     {
         currentBackground = backgrounds.begin();
     }

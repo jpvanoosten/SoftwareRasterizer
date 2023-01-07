@@ -42,6 +42,9 @@ public:
     // Reset level.
     void reset();
 
+    // Choose which character to use for this level.
+    void setCharacter( size_t characterId );
+
     void draw( sr::Image& image ) const;
 
 private:

@@ -118,6 +118,13 @@ public:
         return rightAABB * transform;
     }
 
+    void setCharacter( size_t characterId );
+
+    size_t getNumCharacters() const noexcept
+    {
+        return characters.size();
+    }
+
 private:
     using CharacterList = std::vector<Character>;
 

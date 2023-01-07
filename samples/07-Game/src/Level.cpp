@@ -355,6 +355,11 @@ void Level::reset()
     availablePickups = allPickups;
 }
 
+void Level::setCharacter( size_t characterId )
+{
+    player.setCharacter( characterId );
+}
+
 void Level::draw( sr::Image& image ) const
 {
     tileMap.draw( image );

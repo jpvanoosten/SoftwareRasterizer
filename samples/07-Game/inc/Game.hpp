@@ -42,7 +42,7 @@ public:
     void onNextClicked();
     void onRestartClicked();
 
-    void loadLevel( size_t levelId );
+    void loadLevel( size_t levelId, size_t characterId );
 
 protected:
     enum class TransitionState
@@ -92,4 +92,7 @@ protected:
     size_t currentLevelId = 0u;
     // Which level to play next.
     size_t nextLevelId = 0u;
+
+    // Player character.
+    size_t currentCharacterId = 0u;
 };
