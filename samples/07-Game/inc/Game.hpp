@@ -42,6 +42,8 @@ public:
     void onNextClicked();
     void onRestartClicked();
 
+    void loadLevel( size_t levelId );
+
 protected:
     enum class TransitionState
     {
@@ -76,10 +78,9 @@ protected:
 
     // Level transition effect.
     Transition  transition;
-    const float transitionDuration = 0.5f;
+    const float transitionDuration = 0.3f;
     float       transitionTime     = transitionDuration;
-    // Start by playing the transition out.
-    TransitionState transitionState = TransitionState::Out;
+    TransitionState transitionState = TransitionState::None;
 
     // Buttons
     Button previousButton;

@@ -70,6 +70,11 @@ public:
     int& operator()( size_t x, size_t y ) noexcept;
 
     /// <summary>
+    /// Clear the sprite grid (set all sprite values to -1).
+    /// </summary>
+    void clear();
+
+    /// <summary>
     /// Get the number of tiles in the width of the tile map.
     /// </summary>
     /// <returns>The number of tiles in the width of the tile map.</returns>
@@ -143,7 +148,7 @@ private:
     uint32_t gridHeight = 0u;
 
     // The sprite sheet to use for drawing the tilemap.
-    SpriteSheet spriteSheet;
-    std::vector<int>   spriteGrid;
+    SpriteSheet      spriteSheet;
+    std::vector<int> spriteGrid;
 };
 }  // namespace sr

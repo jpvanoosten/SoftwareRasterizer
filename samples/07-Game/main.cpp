@@ -35,10 +35,10 @@ int main( int argc, char* argv[] )
 
     while ( window )
     {
+        window.clear( Color { 0x211f30 } );
+
         // Update the game.
         game.Update();
-
-        window.clear( Color { 0x211f30 } );
 
         // Present.
         window.present( game.getImage() );

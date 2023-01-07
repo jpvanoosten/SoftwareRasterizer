@@ -51,9 +51,14 @@ int& TileMap::operator()( size_t x, size_t y ) noexcept
     return spriteGrid[y * gridWidth + x];
 }
 
+void TileMap::clear()
+{
+    std::ranges::fill( spriteGrid, -1 );
+}
+
 void TileMap::setSpriteGrid( std::span<const int> _spriteGrid )
 {
-    spriteGrid = std::vector<int>( _spriteGrid.begin(), _spriteGrid.end() );
+    spriteGrid = std::vector( _spriteGrid.begin(), _spriteGrid.end() );
 }
 
 void TileMap::draw( Image& image ) const

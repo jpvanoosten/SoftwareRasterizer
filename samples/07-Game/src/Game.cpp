@@ -3,8 +3,8 @@
 #include <Color.hpp>
 #include <Input.hpp>
 
-#include <string>
 #include <numbers>
+#include <string>
 
 using namespace sr;
 using namespace Math;
@@ -76,10 +76,8 @@ Game::Game( uint32_t screenWidth, uint32_t screenHeight )
     } );
 
     project.loadFromFile( "assets/Pixel Adventure/Pixel Adventure.ldtk" );
-    auto& world = project.getWorld();
 
-    currentLevelId = 0;
-    currentLevel   = Level( project, world, world.allLevels()[currentLevelId] );
+    loadLevel( 0 );
 
     backgrounds.emplace_back( Background { "assets/Pixel Adventure/Background/Blue.png", 1.0f, { 0.0f, 1.0f }, 0.3f } );
     backgrounds.emplace_back( Background { "assets/Pixel Adventure/Background/Brown.png", 1.0f, { 0.0f, 1.0f }, 0.3f } );
@@ -178,7 +176,10 @@ void Game::Update()
     case TransitionState::In:
         transitionTime += static_cast<float>( timer.elapsedSeconds() );
         if ( transitionTime > transitionDuration )
-            transitionState = TransitionState::None;
+        {
+            loadLevel( nextLevelId );
+            transitionState = TransitionState::Out;
+        }
         break;
     case TransitionState::Out:
         transitionTime -= static_cast<float>( timer.elapsedSeconds() );
@@ -309,40 +310,60 @@ void Game::onResized( sr::ResizeEventArgs& args )
 void Game::onPreviousClicked()
 {
     std::cout << "Previous Clicked!" << std::endl;
+
+    if ( transitionState != TransitionState::None )
+        return;
+
     if ( currentLevelId > 0 )
     {
-        --currentLevelId;
 
-        auto& world  = project.getWorld();
-        auto& levels = world.allLevels();
+        transitionState = TransitionState::In;
+        transitionTime  = 0.0f;
 
-        currentLevel = Level { project, world, levels[currentLevelId] };
+        nextLevelId = currentLevelId - 1;
     }
-
-    previousButton.enable( currentLevelId != 0 );
 }
 
 void Game::onNextClicked()
 {
     std::cout << "Next Clicked!" << std::endl;
 
-    auto& world  = project.getWorld();
-    auto& levels = world.allLevels();
+    if ( transitionState != TransitionState::None )
+        return;
 
-    currentLevelId = ( currentLevelId + 1 ) % levels.size();
+    transitionState = TransitionState::In;
+    transitionTime  = 0.0f;
 
-    currentLevel = Level { project, world, levels[currentLevelId] };
-
-    previousButton.enable( currentLevelId != 0 );
+    nextLevelId = currentLevelId + 1;
 }
 
 void Game::onRestartClicked()
 {
     std::cout << "Restart Clicked!" << std::endl;
-    if ( ++currentBackground == backgrounds.end() )
+
+    if ( transitionState != TransitionState::None )
+        return;
+
+    transitionState = TransitionState::In;
+    transitionTime  = 0.0f;
+}
+
+void Game::loadLevel( size_t levelId )
+{
+    auto& world  = project.getWorld();
+    auto& levels = world.allLevels();
+
+    currentLevelId = levelId % levels.size();
+
+    currentLevel = Level { project, world, levels[currentLevelId] };
+
+    previousButton.enable( currentLevelId != 0 );
+
+    // Also change the background
+    if (++currentBackground == backgrounds.end())
     {
         currentBackground = backgrounds.begin();
     }
 
-    currentLevel.reset();
+    transitionState = TransitionState::Out;
 }
