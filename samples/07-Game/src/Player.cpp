@@ -23,6 +23,10 @@ const float Player::gravity   = 2.0f * jumpHeight / ( jumpTime * jumpTime );
 const float Player::jumpSpeed = std::sqrt( 2.0f * jumpHeight * gravity );
 // How fast the player jumps off the wall.
 const float Player::wallJumpSpeed = 500.0f;
+// How long after falling can the player still jump?
+const float Player::coyoteTime = 0.1f;
+// How long before landing the user can trigger a jump.
+const float Player::jumpBuffer = 0.1f;
 
 // A map to convert the player state to a string (for debugging).
 std::map<Player::State, std::string> stateToString = {
@@ -122,14 +126,14 @@ void Player::update( float deltaTime ) noexcept
         break;
     }
 
-    // Clamp velocity.
-    //    velocity.x = std::clamp( velocity.x, -maxSpeed, maxSpeed );
-
     // Update player position.
     transform.translate( glm::vec2 { velocity.x, -velocity.y } * deltaTime );
 
     // Dampen x velocity
     velocity.x = velocity.x / ( 1.0f + xDampen * deltaTime );
+
+    // Update jump timer.
+    jumpTimer += deltaTime;
 
     if ( currentCharacter )
     {
@@ -208,6 +212,8 @@ void Player::startState( State oldState, State newState )
         case State::RightWallJump:
             fallTimer = 0.0f;
             break;
+        default:
+            fallTimer = coyoteTime;
         }
         break;
     case State::LeftWallJump:
@@ -262,7 +268,7 @@ void Player::doRun( float deltaTime )
     const float horizontal = doHorizontalMovement( deltaTime );
     velocity.x += horizontal;
 
-    if ( Input::getButtonDown( "Jump" ) )
+    if ( jumpTimer < jumpBuffer || Input::getButtonDown( "Jump" ) )
     {
         setState( State::Jump );
     }
@@ -280,9 +286,10 @@ void Player::doJump( float deltaTime )
     // Apply gravity
     velocity.y -= gravity * deltaTime;
 
-    if ( canDoubleJump && Input::getButtonDown( "Jump" ) )
+    if ( Input::getButtonDown( "Jump" ) )
     {
-        setState( State::DoubleJump );
+        if ( canDoubleJump )
+            setState( State::DoubleJump );
     }
     else if ( velocity.y < 0.0f )
     {
@@ -329,10 +336,12 @@ void Player::doFalling( float deltaTime )
 
     if ( Input::getButtonDown( "Jump" ) )
     {
-        if ( fallTimer < 0.1f )  // Allow jumping for a short time after starting to fall.
+        if ( fallTimer < coyoteTime )  // Allow jumping for a short time after starting to fall.
             setState( State::Jump );
         else if ( canDoubleJump )
             setState( State::DoubleJump );
+        else
+            jumpTimer = 0.0f;  // Allow the player to jump if landing after a short time.
     }
 
     fallTimer += deltaTime;

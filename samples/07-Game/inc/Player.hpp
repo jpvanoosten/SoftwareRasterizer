@@ -169,12 +169,17 @@ private:
     static const float jumpSpeed;
     // How fast the player jumps off the wall.
     static const float wallJumpSpeed;
+    // How long after falling can the player still jump?
+    static const float coyoteTime;
+    // How long before landing the user can trigger a jump.
+    static const float jumpBuffer;
 
     // True if the player can double jump.
     bool canDoubleJump = true;
 
     // Allow jumping when falling for a short time.
     float fallTimer = 0.0f;
+    float jumpTimer = 0.0f;
 
     // Player's current velocity.
     glm::vec2 velocity { 0 };
