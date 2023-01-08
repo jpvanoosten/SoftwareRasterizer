@@ -66,8 +66,6 @@ Level::Level( const ldtk::Project& project, const ldtk::World& world, const ldtk
         allPickups.emplace_back( fruitSprite, collider );
     }
 
-    availablePickups = allPickups;
-
     const auto& tilesLayer = level.getLayer( "Tiles" );
     const auto& intGrid    = level.getLayer( "IntGrid" );  // TODO: Should probably rename this layer..
     const auto& gridSize   = tilesLayer.getGridSize();
@@ -100,87 +98,6 @@ Level::Level( const ldtk::Project& project, const ldtk::World& world, const ldtk
     playerTransform.setAnchor( { 16, 32 } );
 
     player.setTransform( playerTransform );
-}
-
-Level::Level( const Level& copy )
-: world { copy.world }
-, level { copy.level }
-, levelName { copy.levelName }
-, colliders { copy.colliders }
-, fruitSprites { copy.fruitSprites }
-, allPickups { copy.allPickups }
-, pickupCollected { copy.pickupCollected }
-, effects { copy.effects }
-, tileMap { copy.tileMap }
-, player { copy.player }
-, playerStart { copy.playerStart }
-{
-    tileMap.setSpriteGrid( copy.tileMap.getSpriteGrid() );
-    availablePickups = allPickups;
-}
-
-Level::Level( Level&& other ) noexcept
-: world { other.world }
-, level { other.level }
-, levelName { std::move( other.levelName ) }
-, colliders { std::move( other.colliders ) }
-, fruitSprites { std::move( other.fruitSprites ) }
-, allPickups { std::move( other.allPickups ) }
-, pickupCollected { std::move( other.pickupCollected ) }
-, effects { std::move( other.effects ) }
-, tileMap { std::move( other.tileMap ) }
-, player { std::move( other.player ) }
-, playerStart { other.playerStart }
-{
-    availablePickups = allPickups;
-
-    other.world = nullptr;
-    other.level = nullptr;
-}
-
-Level& Level::operator=( const Level& copy )
-{
-    if ( this == &copy )
-        return *this;
-
-    world            = copy.world;
-    level            = copy.level;
-    levelName        = copy.levelName;
-    colliders        = copy.colliders;
-    fruitSprites     = copy.fruitSprites;
-    allPickups       = copy.allPickups;
-    availablePickups = allPickups;
-    pickupCollected  = copy.pickupCollected;
-    effects          = copy.effects;
-    tileMap          = copy.tileMap;
-    player           = copy.player;
-    playerStart      = copy.playerStart;
-
-    return *this;
-}
-
-Level& Level::operator=( Level&& other ) noexcept
-{
-    if ( this == &other )
-        return *this;
-
-    world            = other.world;
-    level            = other.level;
-    levelName        = std::move( other.levelName );
-    colliders        = std::move( other.colliders );
-    fruitSprites     = std::move( other.fruitSprites );
-    allPickups       = std::move( other.allPickups );
-    availablePickups = allPickups;
-    pickupCollected  = std::move( other.pickupCollected );
-    effects          = std::move( other.effects );
-    tileMap          = std::move( other.tileMap );
-    player           = std::move( other.player );
-    playerStart      = other.playerStart;
-
-    other.world = nullptr;
-    other.level = nullptr;
-
-    return *this;
 }
 
 void Level::update( float deltaTime )
@@ -319,20 +236,20 @@ void Level::updateCollisions( float deltaTime )
 
 void Level::updatePickups( float deltaTime )
 {
-    for ( auto iter = availablePickups.begin(); iter != availablePickups.end(); )
+    for ( auto iter = allPickups.begin(); iter != allPickups.end(); )
     {
         if ( iter->collides( player ) )
         {
             // Play the collected animation at the pickup location.
             effects.emplace_back( pickupCollected, iter->getTransform() );
-            iter = availablePickups.erase( iter );
+            iter = allPickups.erase( iter );
         }
         else
             ++iter;
     }
 
     // update remaining pickups.
-    for ( auto& pickup: availablePickups )
+    for ( auto& pickup: allPickups )
         pickup.update( deltaTime );
 }
 
@@ -357,8 +274,6 @@ void Level::reset()
     player.setPosition( playerStart );
     player.setVelocity( { 0, 0 } );
     player.reset();
-
-    availablePickups = allPickups;
 }
 
 void Level::setCharacter( size_t characterId )
@@ -370,7 +285,7 @@ void Level::draw( sr::Image& image ) const
 {
     tileMap.draw( image );
 
-    for ( auto& pickup: availablePickups )
+    for ( auto& pickup: allPickups )
     {
         pickup.draw( image );
     }

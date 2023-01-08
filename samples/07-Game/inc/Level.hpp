@@ -30,13 +30,6 @@ class Level final
 public:
     Level() = default;
     Level( const ldtk::Project& project, const ldtk::World& world, const ldtk::Level& level );
-    ~Level() = default;
-
-    Level( const Level& copy );
-    Level( Level&& other ) noexcept;
-
-    Level& operator=( const Level& copy );
-    Level& operator=( Level&& other ) noexcept;
 
     void update( float deltaTime );
 
@@ -66,8 +59,6 @@ private:
 
     // All pickups
     std::vector<Pickup> allPickups;
-    // Remaining pickups.
-    std::vector<Pickup> availablePickups;
     // Sprite animation to play when a pickup is collected.
     sr::SpriteAnim pickupCollected;
     // Currently playing effects.
