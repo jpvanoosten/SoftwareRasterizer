@@ -10,7 +10,7 @@
 /// <summary>
 ///  This class is used to draw a background sprite on the screen.
 /// </summary>
-class Background
+class Background final
 {
 public:
     Background() = default;
@@ -37,7 +37,7 @@ public:
     void draw( sr::Image& dst ) const;
 
 private:
-    sr::Image backgroundImage;
+    std::shared_ptr<sr::Image> backgroundImage;
 
     glm::vec2 scrollDirection { 0.0f };
     float     scrollSpeed { 0.0f };

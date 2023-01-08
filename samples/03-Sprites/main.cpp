@@ -1,6 +1,7 @@
 #include "Font.hpp"
 
 #include <Image.hpp>
+#include <ResourceManager.hpp>
 #include <Sprite.hpp>
 #include <Timer.hpp>
 #include <Window.hpp>
@@ -30,11 +31,12 @@ int main( int argc, char* argv[] )
 
     Window window { L"03 - Sprites", WINDOW_WIDTH, WINDOW_HEIGHT };
 
-    Image       monaLisa = Image::fromFile( "assets/textures/Mona_Lisa.jpg" );
+    auto monaLisa = ResourceManager::loadImage( "assets/textures/Mona_Lisa.jpg" );
     Sprite      sprite { monaLisa };
     Transform2D transform;
+
     // Rotate around the center of the screen.
-    transform.setAnchor( { monaLisa.getWidth() / 2.0f, monaLisa.getHeight() / 2.0f } );
+    transform.setAnchor( { monaLisa->getWidth() / 2.0f, monaLisa->getHeight() / 2.0f } );
     transform.setPosition( { WINDOW_WIDTH / 2.0f, WINDOW_HEIGHT / 2.0f } );
 
     transform.scale( { 0.1f, 0.1f } );

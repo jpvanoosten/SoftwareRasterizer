@@ -2,9 +2,10 @@
 
 #include <Font.hpp>
 #include <Input.hpp>
+#include <ResourceManager.hpp>
 #include <SpriteAnim.hpp>
-#include <iostream>
 
+#include <iostream>
 #include <numbers>
 
 // A map to convert the player state to a string (for debugging).
@@ -23,23 +24,25 @@ using namespace sr;
 
 Character createCharacter( const std::filesystem::path& basePath )
 {
-    SpriteAnim doubleJump { basePath / "Double Jump (32x32).png", 20, 32, 32 };
-    SpriteAnim fall { basePath / "Fall (32x32).png", 20, 32, 32 };
-    SpriteAnim hit { basePath / "Hit (32x32).png", 20, 32, 32 };
-    SpriteAnim idle { basePath / "Idle (32x32).png", 20, 32, 32 };
-    SpriteAnim jump { basePath / "Jump (32x32).png", 20, 32, 32 };
-    SpriteAnim run { basePath / "Run (32x32).png", 20, 32, 32 };
-    SpriteAnim wallJump { basePath / "Wall Jump (32x32).png", 20, 32, 32 };
-
     Character character;
 
-    character.addAnimation( "Double Jump", std::move( doubleJump ) );
-    character.addAnimation( "Fall", std::move( fall ) );
-    character.addAnimation( "Hit", std::move( hit ) );
-    character.addAnimation( "Idle", std::move( idle ) );
-    character.addAnimation( "Jump", std::move( jump ) );
-    character.addAnimation( "Run", std::move( run ) );
-    character.addAnimation( "Wall Jump", std::move( wallJump ) );
+    // Load the sprite sheets for the character.
+    const auto doubleJump = ResourceManager::loadSpriteSheet( basePath / "Double Jump (32x32).png", 32, 32, BlendMode::AlphaBlend );
+    const auto fall       = ResourceManager::loadSpriteSheet( basePath / "Fall (32x32).png", 32, 32, BlendMode::AlphaBlend );
+    const auto hit        = ResourceManager::loadSpriteSheet( basePath / "Hit (32x32).png", 32, 32, BlendMode::AlphaBlend );
+    const auto idle       = ResourceManager::loadSpriteSheet( basePath / "Idle (32x32).png", 32, 32, BlendMode::AlphaBlend );
+    const auto jump       = ResourceManager::loadSpriteSheet( basePath / "Jump (32x32).png", 32, 32, BlendMode::AlphaBlend );
+    const auto run        = ResourceManager::loadSpriteSheet( basePath / "Run (32x32).png", 32, 32, BlendMode::AlphaBlend );
+    const auto wallJump   = ResourceManager::loadSpriteSheet( basePath / "Wall Jump (32x32).png", 32, 32, BlendMode::AlphaBlend );
+
+    // Add the sprite animations for the character.
+    character.addAnimation( "Double Jump", SpriteAnim { doubleJump, 20 } );
+    character.addAnimation( "Fall", SpriteAnim { fall, 20 } );
+    character.addAnimation( "Hit", SpriteAnim { hit, 20 } );
+    character.addAnimation( "Idle", SpriteAnim { idle, 20 } );
+    character.addAnimation( "Jump", SpriteAnim { jump, 20 } );
+    character.addAnimation( "Run", SpriteAnim { run, 20 } );
+    character.addAnimation( "Wall Jump", SpriteAnim { wallJump, 20 } );
 
     return character;
 }
@@ -58,12 +61,13 @@ Player::Player( const Math::Transform2D& transform )
     characters.emplace_back( createCharacter( "assets/Pixel Adventure/Main Characters/Virtual Guy" ) );
 
     currentCharacter = characters.begin();
+
     currentCharacter->setAnimation( "Idle" );
 }
 
 Player::Player( const Player& copy )
 : characters { copy.characters }
-, currentCharacter { characters.begin() }
+, currentCharacter { characters.end() }
 , transform { copy.transform }
 , aabb { copy.aabb }
 , topAABB { copy.topAABB }
@@ -74,13 +78,11 @@ Player::Player( const Player& copy )
 , xDampen { copy.xDampen }
 , canDoubleJump { copy.canDoubleJump }
 , velocity { copy.velocity }
-{
-    int i = 3;
-}
+{}
 
 Player::Player( Player&& other ) noexcept
 : characters { std::move( other.characters ) }
-, currentCharacter { characters.begin() }
+, currentCharacter { characters.end() }
 , transform { other.transform }
 , aabb { other.aabb }
 , topAABB { other.aabb }
@@ -99,7 +101,7 @@ Player& Player::operator=( const Player& copy )
         return *this;
 
     characters       = copy.characters;
-    currentCharacter = characters.begin();
+    currentCharacter = characters.end();
     transform        = copy.transform;
     aabb             = copy.aabb;
     topAABB          = copy.topAABB;
@@ -120,7 +122,7 @@ Player& Player::operator=( Player&& other ) noexcept
         return *this;
 
     characters       = std::move( other.characters );
-    currentCharacter = characters.begin();
+    currentCharacter = characters.end();
     transform        = other.transform;
     aabb             = other.aabb;
     topAABB          = other.topAABB;
@@ -219,7 +221,7 @@ void Player::setState( State newState )
 
 void Player::setCharacter( size_t characterId )
 {
-    characterId = characterId % characters.size();
+    characterId      = characterId % characters.size();
     currentCharacter = characters.begin() + characterId;
     currentCharacter->setAnimation( "Idle" );
 }

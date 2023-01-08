@@ -5,16 +5,16 @@
 
 #include <filesystem>
 
-class Transition
+class Transition final
 {
 public:
-    Transition() = default;
+    Transition()  = default;
     ~Transition() = default;
 
     Transition( const std::filesystem::path& fileName );
 
-    Transition( const Transition& )                = default;
-    Transition( Transition&& )                     = default;
+    Transition( const Transition& ) = default;
+    Transition( Transition&& )      = default;
 
     Transition& operator=( const Transition& copy );
     Transition& operator=( Transition&& other ) noexcept;
@@ -33,8 +33,8 @@ public:
     void draw( sr::Image& image ) const;
 
 private:
-    sr::Image  transition;
-    sr::Sprite sprite;
+    std::shared_ptr<sr::Image> transition;
+    sr::Sprite                 sprite;
 
     float                          time     = 0.0f;
     const float                    maxScale = 3.2f;

@@ -2,9 +2,10 @@
 
 using namespace sr;
 
-SpriteAnim::SpriteAnim( const std::filesystem::path& fileName, uint32_t fps, std::optional<uint32_t> spriteWidth, std::optional<uint32_t> spriteHeight, const BlendMode& blendMode )
-: spriteSheet( fileName, spriteWidth, spriteHeight, blendMode )
+SpriteAnim::SpriteAnim( std::shared_ptr<SpriteSheet> spriteSheet, uint32_t fps )
+: spriteSheet { std::move( spriteSheet ) }
 , frameRate { fps }
+, time { 0.0f }
 {}
 
 SpriteAnim::operator const Sprite&() const noexcept
@@ -12,16 +13,27 @@ SpriteAnim::operator const Sprite&() const noexcept
     return at( time );
 }
 
-const Sprite& SpriteAnim::operator[]( size_t i ) const noexcept {
-    const size_t frame = i % spriteSheet.getNumSprites();
-    return spriteSheet[frame];
+const Sprite& SpriteAnim::operator[]( size_t i ) const noexcept
+{
+    if ( spriteSheet )
+    {
+        const size_t frame = i % spriteSheet->getNumSprites();
+        return ( *spriteSheet )[frame];
+    }
+
+    static const Sprite emptySprite;
+    return emptySprite;
 }
 
 const Sprite& SpriteAnim::at( float _time ) const noexcept
 {
-    // Compute the current animation frame based on the animation time and the frame rate.
-    const uint32_t frame = static_cast<uint32_t>( _time * static_cast<float>( frameRate ) ) % spriteSheet.getNumSprites();
-    return spriteSheet[frame];
+    uint32_t frame = 0;
+
+    if ( spriteSheet && spriteSheet->getNumSprites() > 0 )
+        frame = static_cast<uint32_t>( _time * static_cast<float>( frameRate ) ) % spriteSheet->getNumSprites();
+
+    // Will return an empty sprite if spriteSheet is null.
+    return operator[]( frame );
 }
 
 void SpriteAnim::update( float deltaTime ) noexcept
@@ -36,8 +48,8 @@ void SpriteAnim::reset() noexcept
 
 float SpriteAnim::getDuration() const noexcept
 {
-    if (spriteSheet.getNumSprites() > 0)
-        return static_cast<float>( spriteSheet.getNumSprites() ) / static_cast<float>( frameRate );
+    if ( spriteSheet && spriteSheet->getNumSprites() > 0 )
+        return static_cast<float>( spriteSheet->getNumSprites() ) / static_cast<float>( frameRate );
 
     return 0.0f;
 }

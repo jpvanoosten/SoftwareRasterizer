@@ -25,11 +25,12 @@ struct Collider
     bool         isOneWay = false;
 };
 
-class Level
+class Level final
 {
 public:
     Level() = default;
     Level( const ldtk::Project& project, const ldtk::World& world, const ldtk::Level& level );
+    ~Level() = default;
 
     Level( const Level& copy );
     Level( Level&& other ) noexcept;

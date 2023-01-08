@@ -15,38 +15,28 @@ class SR_API Sprite final
 public:
     Sprite() = default;
 
-    ~Sprite() = default;
-
     /// <summary>
     /// Construct a Sprite from an Image.
     /// </summary>
-    /// <param name="image">The image to create the sprite from.</param>
+    /// <param name="_image">The image to create the sprite from.</param>
     /// <param name="blendMode">The blend mode to apply when rendering.</param>
-    explicit Sprite( const Image& image, const BlendMode& blendMode = {} ) noexcept
-    : image { &image }
-    , rect { 0, 0, static_cast<int32_t>( image.getWidth() ), static_cast<int32_t>( image.getHeight() ) }
+    explicit Sprite( std::shared_ptr<Image> _image, const BlendMode& blendMode = {} ) noexcept
+    : image { std::move( _image ) }
+    , rect { 0, 0, static_cast<int32_t>( image->getWidth() ), static_cast<int32_t>( image->getHeight() ) }
     , blendMode { blendMode }
     {}
 
     /// <summary>
     /// Construct a sprite from a region of the image.
     /// </summary>
-    /// <param name="image">The image that contains the sprite sheet.</param>
+    /// <param name="_image">The image that contains the sprite sheet.</param>
     /// <param name="rect">The source rectangle of this sprite in the image.</param>
     /// <param name="blendMode">The blend mode to apply when rendering.</param>
-    Sprite( const Image& image, const Math::RectI& rect, const BlendMode& blendMode = {} ) noexcept
-    : image { &image }
-    , rect{rect}
+    Sprite( std::shared_ptr<Image> _image, const Math::RectI& rect, const BlendMode& blendMode = {} ) noexcept
+    : image { std::move( _image ) }
+    , rect { rect }
     , blendMode { blendMode }
     {}
-
-    Sprite( const Sprite& ) = default;
-
-    Sprite( Sprite&& other ) noexcept;
-
-    Sprite& operator=( const Sprite& ) = default;
-
-    Sprite& operator=( Sprite&& other ) noexcept;
 
     glm::ivec2 getUV() const noexcept
     {
@@ -63,7 +53,7 @@ public:
         return rect;
     }
 
-    const Image* getImage() const noexcept
+    std::shared_ptr<Image> getImage() const noexcept
     {
         return image;
     }
@@ -90,7 +80,7 @@ public:
 
 private:
     // The image that stores the pixels for this sprite.
-    const Image* image = nullptr;
+    std::shared_ptr<Image> image;
 
     // The source rectangle of this sprite in the image.
     Math::RectI rect;
@@ -101,30 +91,4 @@ private:
     // The blend mode to apply when rendering.
     BlendMode blendMode;
 };
-
-inline Sprite::Sprite( Sprite&& other ) noexcept
-: image{other.image}
-, rect{other.rect}
-, color{other.color}
-, blendMode{other.blendMode}
-{
-    other.image = nullptr;
-}
-
-inline Sprite& Sprite::operator=( Sprite&& other ) noexcept
-{
-    if ( this == &other )
-        return *this;
-
-    image = other.image;
-    rect  = other.rect;
-    color = other.color;
-    blendMode = other.blendMode;
-
-    other.image = nullptr;
-
-    return *this;
-}
-
-
 }  // namespace sr

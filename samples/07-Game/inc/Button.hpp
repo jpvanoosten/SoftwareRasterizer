@@ -12,7 +12,7 @@
 
 #include <functional>
 
-class Button
+class Button final
 {
 public:
     /// <summary>

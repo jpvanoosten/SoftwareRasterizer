@@ -20,34 +20,8 @@ public:
     /// <param name="spriteSheet">The sprite sheet to use for drawing the tile map.</param>
     /// <param name="gridWidth">The number of tiles in the width of the tile map.</param>
     /// <param name="gridHeight">The number of tiles in the height of the tile map.</param>
-    TileMap( SpriteSheet spriteSheet, uint32_t gridWidth, uint32_t gridHeight );
-
-    /// <summary>
-    /// Copy a tile map.
-    /// </summary>
-    /// <param name="copy">The tile map to copy to this one.</param>
-    TileMap( const TileMap& copy ) = default;
-
-    /// <summary>
-    /// Move a tile map to this one.
-    /// </summary>
-    /// <param name="other">The tile map to move.</param>
-    TileMap( TileMap&& other ) noexcept;
-
-    /// <summary>
-    /// Assign another tile map by copy.
-    /// </summary>
-    /// <param name="copy">The copy to assign to this tile map.</param>
-    /// <returns>A reference to this tile map.</returns>
-    TileMap& operator=( const TileMap& copy ) = default;
-
-    /// <summary>
-    /// Move another tile map this this one.
-    /// </summary>
-    /// <param name="other">The tile map to move to this one.</param>
-    /// <returns>A reference to this tile map.</returns>
-    TileMap& operator=( TileMap&& other ) noexcept;
-
+    TileMap( std::shared_ptr<SpriteSheet> spriteSheet, uint32_t gridWidth, uint32_t gridHeight );
+    
     /// <summary>
     /// Get the sprite ID at a specific X, Y coordinate in the tile map.
     /// Note: The top-left tile is at (0, 0) and the bottom-right tile is at (width - 1, height - 1).
@@ -98,7 +72,10 @@ public:
     /// <returns>The width (in pixels) of a sprite in the sprite sheet.</returns>
     uint32_t getSpriteWidth() const noexcept
     {
-        return spriteSheet.getSpriteWidth();
+        if ( spriteSheet )
+            return spriteSheet->getSpriteWidth();
+
+        return 0u;
     }
 
     /// <summary>
@@ -107,14 +84,17 @@ public:
     /// <returns>The height (in pixels) of a sprite in the sprite sheet.</returns>
     uint32_t getSpriteHeight() const noexcept
     {
-        return spriteSheet.getSpriteHeight();
+        if ( spriteSheet )
+            return spriteSheet->getSpriteHeight();
+
+        return 0u;
     }
 
     /// <summary>
     /// Get the sprite sheet associated with this tile map.
     /// </summary>
     /// <returns>A reference to the sprite sheet.</returns>
-    const SpriteSheet& getSpriteSheet() const noexcept
+    std::shared_ptr<SpriteSheet> getSpriteSheet() const noexcept
     {
         return spriteSheet;
     }
@@ -148,7 +128,7 @@ private:
     uint32_t gridHeight = 0u;
 
     // The sprite sheet to use for drawing the tilemap.
-    SpriteSheet      spriteSheet;
+    std::shared_ptr<SpriteSheet> spriteSheet;
     std::vector<int> spriteGrid;
 };
 }  // namespace sr

@@ -8,10 +8,11 @@
 #include <map>
 #include <string>
 
-class Character
+class Character final
 {
 public:
     Character() = default;
+    ~Character() = default;
 
     Character( const Character& copy );
     Character( Character&& other ) noexcept;

@@ -7,7 +7,7 @@
 
 #include <vector>
 
-class Player
+class Player final
 {
 public:
     enum class State
@@ -27,6 +27,7 @@ public:
 
     Player( const Player& copy );
     Player( Player&& other ) noexcept;
+    ~Player() = default;
 
     Player& operator=( const Player& copy );
     Player& operator=( Player&& other ) noexcept;
@@ -126,8 +127,6 @@ public:
     }
 
 private:
-    using CharacterList = std::vector<Character>;
-
     void startState( State newState );
     void endState( State oldState );
 
@@ -141,6 +140,8 @@ private:
     void  doWallJump( float deltaTime );
 
     // A list of possible character models.
+    using CharacterList = std::vector<Character>;
+
     CharacterList           characters;
     CharacterList::iterator currentCharacter = characters.end();
 

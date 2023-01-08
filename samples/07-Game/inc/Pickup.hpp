@@ -6,11 +6,12 @@
 #include <Math/Sphere.hpp>
 #include <SpriteSheet.hpp>
 
-class Pickup
+class Pickup final
 {
 public:
     Pickup() = default;
     Pickup( const sr::SpriteSheet& sprites, const Math::Sphere& collision );
+    ~Pickup() = default;
 
     /// <summary>
     /// Check to see if the player collides with this pickup.

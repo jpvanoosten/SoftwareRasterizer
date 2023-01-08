@@ -15,10 +15,11 @@
 
 #include <cstdint>
 
-class Game
+class Game final
 {
 public:
     Game( uint32_t screenWidth, uint32_t screenHeight );
+    ~Game() = default;
 
     Game( const Game& )            = delete;
     Game( Game&& )                 = delete;

@@ -31,7 +31,7 @@ public:
     /// <param name="spriteWidth">(optional) The width (in pixels) of a sprite in the sprite sheet. Default: image width.</param>
     /// <param name="spriteHeight">(optional) The height (in pixels) of a sprite in the sprite sheet. Default: image height.</param>
     /// <param name="blendMode">(optional) The blend mode to use when rendering the sprites in this sprite sheet. Default: No blending.</param>
-    SpriteSheet( const std::filesystem::path& fileName, std::optional<uint32_t> spriteWidth = {}, std::optional<uint32_t> spriteHeight = {}, const BlendMode& blendMode = {} );
+    explicit SpriteSheet( const std::filesystem::path& fileName, std::optional<uint32_t> spriteWidth = {}, std::optional<uint32_t> spriteHeight = {}, const BlendMode& blendMode = {} );
 
     /// <summary>
     /// Create a sprite sheet based on a set of rectangles in the source image.
@@ -40,6 +40,15 @@ public:
     /// <param name="rects">The rectangles for the sprites in the sprite sheet.</param>
     /// <param name="blendMode">(optional) The blend mode to use when rendering the sprites in this sprite sheet. Default: No blending.</param>
     SpriteSheet( const std::filesystem::path& fileName, std::span<const Math::RectI> rects, const BlendMode& blendMode = {} );
+
+    /// <summary>
+    /// Create a sprite sheet from an image and the size of the sprites within the image.
+    /// </summary>
+    /// <param name="image">The image that contains the sprite sheet.</param>
+    /// <param name="spriteWidth">(optional) The width (in pixels) of a sprite in the sprite sheet. Default: image width.</param>
+    /// <param name="spriteHeight">(optional) The height (in pixels) of a sprite in the sprite sheet. Default: image height.</param>
+    /// <param name="blendMode">(optional) The blend mode to use when rendering the sprites in this sprite sheet. Default: No blending.</param>
+    explicit SpriteSheet( std::shared_ptr<Image> image, std::optional<uint32_t> spriteWidth = {}, std::optional<uint32_t> spriteHeight = {}, const BlendMode& blendMode = {} );
 
     /// <summary>
     /// Copy constructor.
@@ -143,14 +152,15 @@ public:
     /// <param name="rows">(optional) The number of sprites in the y-axis. Default: 1</param>
     /// <param name="blendMode">(optional) The blending to apply to the sprites. Default: blending disabled.</param>
     /// <returns></returns>
-    static SpriteSheet fromGrid( const std::filesystem::path& fileName, uint32_t columns, uint32_t rows = 1, const BlendMode& blendMode = {} );
+    static std::shared_ptr<SpriteSheet> fromGrid( const std::filesystem::path& fileName, uint32_t columns, uint32_t rows = 1, const BlendMode& blendMode = {} );
 
 private:
     // Create a sprite sheet from a pre-loaded sprite image.
-    void init();
-
+    void initSpriteRects();
+    void initSprites();
+    
     // The image that contains the sprites.
-    Image image;
+    std::shared_ptr<Image> image;
 
     // The blend mode for the sprites.
     BlendMode blendMode;

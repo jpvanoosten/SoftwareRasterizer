@@ -5,7 +5,7 @@
 
 #include <Math/Transform2D.hpp>
 
-class Effect
+class Effect final
 {
 public:
     Effect() = default;

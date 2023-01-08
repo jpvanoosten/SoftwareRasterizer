@@ -2,38 +2,12 @@
 
 using namespace sr;
 
-TileMap::TileMap( SpriteSheet spriteSheet, uint32_t gridWidth, uint32_t gridHeight )
+TileMap::TileMap( std::shared_ptr<SpriteSheet> spriteSheet, uint32_t gridWidth, uint32_t gridHeight )
 : gridWidth { gridWidth }
 , gridHeight { gridHeight }
 , spriteSheet { std::move(spriteSheet) }
 , spriteGrid( static_cast<size_t>( gridWidth ) * gridHeight, -1 )
 {}
-
-TileMap::TileMap( TileMap&& other ) noexcept
-: gridWidth{other.gridWidth}
-, gridHeight{other.gridHeight}
-, spriteSheet{ std::move(other.spriteSheet) }
-, spriteGrid { std::move(other.spriteGrid) }
-{
-    other.gridWidth  = 0u;
-    other.gridHeight = 0u;
-}
-
-TileMap& TileMap::operator=( TileMap&& other ) noexcept
-{
-    if ( this == &other )
-        return *this;
-
-    gridWidth = other.gridWidth;
-    gridHeight = other.gridHeight;
-    spriteSheet = std::move( other.spriteSheet );
-    spriteGrid  = std::move( other.spriteGrid );
-
-    other.gridWidth = 0u;
-    other.gridHeight = 0u;
-
-    return *this;
-}
 
 int TileMap::operator()( size_t x, size_t y ) const noexcept
 {
@@ -63,9 +37,12 @@ void TileMap::setSpriteGrid( std::span<const int> _spriteGrid )
 
 void TileMap::draw( Image& image ) const
 {
-    const int spriteWidth  = static_cast<int>( spriteSheet.getSpriteWidth() );
-    const int spriteHeight = static_cast<int>( spriteSheet.getSpriteHeight() );
-    const int numSprites   = static_cast<int>( spriteSheet.getNumSprites() );
+    if ( !spriteSheet )
+        return;
+
+    const int spriteWidth  = static_cast<int>( spriteSheet->getSpriteWidth() );
+    const int spriteHeight = static_cast<int>( spriteSheet->getSpriteHeight() );
+    const int numSprites   = static_cast<int>( spriteSheet->getNumSprites() );
 
     int x = 0;
     int y = 0;
@@ -77,7 +54,7 @@ void TileMap::draw( Image& image ) const
             const int spriteId = spriteGrid[i * gridWidth + j];
             if ( spriteId >= 0 && spriteId < numSprites )
             {
-                image.drawSprite( spriteSheet[spriteId], x, y );
+                image.drawSprite( (*spriteSheet)[spriteId], x, y );
             }
             x += spriteWidth;
         }

@@ -4,6 +4,7 @@
 
 #include <BlendMode.hpp>
 #include <Color.hpp>
+#include <ResourceManager.hpp>
 
 using namespace Math;
 using namespace sr;
@@ -16,7 +17,10 @@ Level::Level( const ldtk::Project& project, const ldtk::World& world, const ldtk
     const std::filesystem::path projectPath = project.getFilePath().directory();
 
     // Load the fruit collected animation.
-    pickupCollected = SpriteAnim { projectPath / "Items/Fruits/Collected.png", 20, 32 };
+    {
+        auto spriteSheet = ResourceManager::loadSpriteSheet( projectPath / "Items/Fruits/Collected.png", 32, 32, BlendMode::AlphaBlend );
+        pickupCollected  = SpriteAnim { spriteSheet, 20 };
+    }
 
     // Load the fruit sprites.
     const auto& tilesets = project.allTilesets();
@@ -69,8 +73,10 @@ Level::Level( const ldtk::Project& project, const ldtk::World& world, const ldtk
     const auto& gridSize   = tilesLayer.getGridSize();
     const auto& tileSet    = tilesLayer.getTileset();
 
-    SpriteSheet spriteSheet = SpriteSheet( projectPath / tileSet.path, tileSet.tile_size, tileSet.tile_size, BlendMode::AlphaBlend );
-    tileMap                 = TileMap( std::move( spriteSheet ), gridSize.x, gridSize.y );
+    {
+        auto spriteSheet = ResourceManager::loadSpriteSheet( projectPath / tileSet.path, tileSet.tile_size, tileSet.tile_size, BlendMode::AlphaBlend );
+        tileMap          = TileMap( spriteSheet, gridSize.x, gridSize.y );
+    }
 
     for ( auto& tile: intGrid.allTiles() )
     {

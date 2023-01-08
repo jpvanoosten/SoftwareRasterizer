@@ -1,6 +1,7 @@
 #include "Font.hpp"
 
 #include <Image.hpp>
+#include <ResourceManager.hpp>
 #include <Sprite.hpp>
 #include <Timer.hpp>
 #include <Window.hpp>
@@ -30,7 +31,7 @@ int main( int argc, char* argv[] )
 
     Window window { L"05 - Copy Image", WINDOW_WIDTH, WINDOW_HEIGHT };
 
-    Image monaLisa = Image::fromFile( "assets/textures/Mona_Lisa.jpg" );
+    auto monaLisa = ResourceManager::loadImage( "assets/textures/Mona_Lisa.jpg" );
 
     // Image to render to.
     Image image { static_cast<uint32_t>( window.getWidth() ), static_cast<uint32_t>( window.getHeight() ) };
@@ -48,9 +49,9 @@ int main( int argc, char* argv[] )
         image.clear( Color::Black );
 
         // Center the image on screen and maintain the aspect ratio of the original image.
-        float aspectRatio = static_cast<float>( monaLisa.getWidth() ) / static_cast<float>( monaLisa.getHeight() );
-        float scaleWidth  = static_cast<float>( image.getWidth() ) / static_cast<float>( monaLisa.getWidth() );
-        float scaleHeight = static_cast<float>( image.getHeight() ) / static_cast<float>( monaLisa.getHeight() );
+        float aspectRatio = static_cast<float>( monaLisa->getWidth() ) / static_cast<float>( monaLisa->getHeight() );
+        float scaleWidth  = static_cast<float>( image.getWidth() ) / static_cast<float>( monaLisa->getWidth() );
+        float scaleHeight = static_cast<float>( image.getHeight() ) / static_cast<float>( monaLisa->getHeight() );
 
         int width;
         int height;
@@ -73,7 +74,7 @@ int main( int argc, char* argv[] )
         dstRect.left = ( static_cast<int>( image.getWidth() ) - width ) / 2;
         dstRect.top  = ( static_cast<int>( image.getHeight() ) - height ) / 2;
 
-        image.copy( monaLisa, {}, dstRect );
+        image.copy( *monaLisa, {}, dstRect );
 
         image.drawText( Font::Default, 10, 10, fps, Color::White );
 

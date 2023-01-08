@@ -4,6 +4,7 @@ set( TARGET_NAME 07-Game )
 
 set( INC_FILES
     inc/Background.hpp
+    inc/Box.hpp
     inc/Button.hpp
     inc/Character.hpp
     inc/Effect.hpp
@@ -18,6 +19,7 @@ set( INC_FILES
 set( SRC_FILES
     main.cpp
     src/Background.cpp
+    src/Box.cpp
     src/Button.cpp
     src/Character.cpp
     src/Effect.cpp

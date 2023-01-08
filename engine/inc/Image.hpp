@@ -23,9 +23,6 @@ class Font;
 
 struct SR_API Image final
 {
-    static Image fromFile( const std::filesystem::path& fileName );
-    static Image fromMemory( const Color* data, uint32_t width, uint32_t height );
-
     /// <summary>
     /// Default construct an image.
     /// The image is 0x0 with no buffer.

@@ -15,22 +15,6 @@
 using namespace sr;
 using namespace Math;
 
-Image Image::fromFile( const std::filesystem::path& fileName )
-{
-    return Image { fileName };
-}
-
-Image Image::fromMemory( const Color* data, uint32_t width, uint32_t height )
-{
-    if ( data == nullptr )
-        return {};
-
-    Image image { width, height };
-    memcpy_s( image.data(), static_cast<rsize_t>( image.m_width ) * image.m_height * sizeof( Color ), data, static_cast<rsize_t>( width ) * height * sizeof( Color ) );
-
-    return image;
-}
-
 Image::Image() = default;
 
 Image::Image( const std::filesystem::path& fileName )
@@ -484,7 +468,7 @@ void Image::drawAABB( AABB aabb, const Color& color, const BlendMode& blendMode,
 
 void Image::drawSprite( const Sprite& sprite, const Math::Transform2D& transform ) noexcept
 {
-    const Image* image = sprite.getImage();
+    std::shared_ptr<Image> image = sprite.getImage();
     if ( !image )
         return;
 
@@ -557,7 +541,7 @@ void Image::drawSprite( const Sprite& sprite, const Math::Transform2D& transform
 
 void Image::drawSprite( const Sprite& sprite, int x, int y ) noexcept
 {
-    const Image* image = sprite.getImage();
+    std::shared_ptr<Image> image = sprite.getImage();
     if ( !image )
         return;
 

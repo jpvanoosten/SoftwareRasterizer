@@ -1,18 +1,23 @@
-#include "Transition.hpp"
+#include <Transition.hpp>
+
+#include <ResourceManager.hpp>
 
 using namespace sr;
 
 Transition::Transition( const std::filesystem::path& fileName )
-: transition { fileName }
+: transition { ResourceManager::loadImage( fileName )}
 , sprite { transition, BlendMode::AlphaBlend }
 {
+    if ( !transition )
+        return;
+
     for ( int y = 0; y < 5; ++y )
     {
         for ( int x = 0; x < 7; ++x )
         {
             auto& t = transforms.emplace_back( glm::vec2 { x * 80, y * 64 } );
             // Center the anchor on the sprite.
-            t.setAnchor( glm::vec2 { transition.getWidth() / 2, transition.getHeight() / 2 } );
+            t.setAnchor( glm::vec2 { transition->getWidth() / 2, transition->getHeight() / 2 } );
         }
     }
 }
