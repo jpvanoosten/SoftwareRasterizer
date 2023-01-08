@@ -120,8 +120,8 @@ public:
     }
 
 private:
-    void startState( State newState );
-    void endState( State oldState );
+    void startState( State oldState, State newState );
+    void endState( State oldState, State newState );
 
     float doHorizontalMovement( float deltaTime );
     void  doIdle( float deltaTime );
@@ -172,6 +172,9 @@ private:
 
     // True if the player can double jump.
     bool canDoubleJump = true;
+
+    // Allow jumping when falling for a short time.
+    float fallTimer = 0.0f;
 
     // Player's current velocity.
     glm::vec2 velocity { 0 };

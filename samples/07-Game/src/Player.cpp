@@ -83,7 +83,7 @@ Player::Player( const Math::Transform2D& transform )
 void Player::reset()
 {
     auto iter = std::ranges::find( characters, currentCharacter );
-    if (iter == characters.end() || ++iter == characters.end())
+    if ( iter == characters.end() || ++iter == characters.end() )
     {
         iter = characters.begin();
     }
@@ -158,8 +158,8 @@ void Player::setState( State newState )
 {
     if ( state != newState )
     {
-        endState( state );
-        startState( newState );
+        endState( state, newState );
+        startState( state, newState );
         state = newState;
     }
 }
@@ -171,7 +171,7 @@ void Player::setCharacter( size_t characterId )
     currentCharacter->setAnimation( "Idle" );
 }
 
-void Player::startState( State newState )
+void Player::startState( State oldState, State newState )
 {
     switch ( newState )
     {
@@ -199,6 +199,16 @@ void Player::startState( State newState )
         break;
     case State::Falling:
         currentCharacter->setAnimation( "Fall" );
+        // Set the fall timer according to the previous state.
+        switch ( oldState )
+        {
+        case State::Idle:
+        case State::Run:
+        case State::LeftWallJump:
+        case State::RightWallJump:
+            fallTimer = 0.0f;
+            break;
+        }
         break;
     case State::LeftWallJump:
         transform.setScale( { -1, 1 } );
@@ -214,7 +224,7 @@ void Player::startState( State newState )
     }
 }
 
-void Player::endState( State oldState )
+void Player::endState( State oldState, State newState )
 {
 }
 
@@ -317,10 +327,15 @@ void Player::doFalling( float deltaTime )
 
     velocity.y -= gravity * deltaTime;
 
-    if ( canDoubleJump && Input::getButtonDown( "Jump" ) )
+    if ( Input::getButtonDown( "Jump" ) )
     {
-        setState( State::DoubleJump );
+        if ( fallTimer < 0.1f )  // Allow jumping for a short time after starting to fall.
+            setState( State::Jump );
+        else if ( canDoubleJump )
+            setState( State::DoubleJump );
     }
+
+    fallTimer += deltaTime;
 }
 
 void Player::doWallJump( float deltaTime )
