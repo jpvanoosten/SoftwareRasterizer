@@ -22,9 +22,9 @@ std::map<Player::State, std::string> stateToString = {
 
 using namespace sr;
 
-Character createCharacter( const std::filesystem::path& basePath )
+std::shared_ptr<Character> createCharacter( const std::filesystem::path& basePath )
 {
-    Character character;
+    auto character = std::make_shared<Character>();
 
     // Load the sprite sheets for the character.
     const auto doubleJump = ResourceManager::loadSpriteSheet( basePath / "Double Jump (32x32).png", 32, 32, BlendMode::AlphaBlend );
@@ -36,13 +36,13 @@ Character createCharacter( const std::filesystem::path& basePath )
     const auto wallJump   = ResourceManager::loadSpriteSheet( basePath / "Wall Jump (32x32).png", 32, 32, BlendMode::AlphaBlend );
 
     // Add the sprite animations for the character.
-    character.addAnimation( "Double Jump", SpriteAnim { doubleJump, 20 } );
-    character.addAnimation( "Fall", SpriteAnim { fall, 20 } );
-    character.addAnimation( "Hit", SpriteAnim { hit, 20 } );
-    character.addAnimation( "Idle", SpriteAnim { idle, 20 } );
-    character.addAnimation( "Jump", SpriteAnim { jump, 20 } );
-    character.addAnimation( "Run", SpriteAnim { run, 20 } );
-    character.addAnimation( "Wall Jump", SpriteAnim { wallJump, 20 } );
+    character->addAnimation( "Double Jump", SpriteAnim { doubleJump, 20 } );
+    character->addAnimation( "Fall", SpriteAnim { fall, 20 } );
+    character->addAnimation( "Hit", SpriteAnim { hit, 20 } );
+    character->addAnimation( "Idle", SpriteAnim { idle, 20 } );
+    character->addAnimation( "Jump", SpriteAnim { jump, 20 } );
+    character->addAnimation( "Run", SpriteAnim { run, 20 } );
+    character->addAnimation( "Wall Jump", SpriteAnim { wallJump, 20 } );
 
     return character;
 }
@@ -60,14 +60,13 @@ Player::Player( const Math::Transform2D& transform )
     characters.emplace_back( createCharacter( "assets/Pixel Adventure/Main Characters/Pink Man" ) );
     characters.emplace_back( createCharacter( "assets/Pixel Adventure/Main Characters/Virtual Guy" ) );
 
-    currentCharacter = characters.begin();
-
+    currentCharacter = characters[0];
     currentCharacter->setAnimation( "Idle" );
 }
 
 Player::Player( const Player& copy )
 : characters { copy.characters }
-, currentCharacter { characters.end() }
+, currentCharacter { copy.currentCharacter }
 , transform { copy.transform }
 , aabb { copy.aabb }
 , topAABB { copy.topAABB }
@@ -82,7 +81,7 @@ Player::Player( const Player& copy )
 
 Player::Player( Player&& other ) noexcept
 : characters { std::move( other.characters ) }
-, currentCharacter { characters.end() }
+, currentCharacter { std::move( other.currentCharacter ) }
 , transform { other.transform }
 , aabb { other.aabb }
 , topAABB { other.aabb }
@@ -101,7 +100,7 @@ Player& Player::operator=( const Player& copy )
         return *this;
 
     characters       = copy.characters;
-    currentCharacter = characters.end();
+    currentCharacter = copy.currentCharacter;
     transform        = copy.transform;
     aabb             = copy.aabb;
     topAABB          = copy.topAABB;
@@ -122,7 +121,7 @@ Player& Player::operator=( Player&& other ) noexcept
         return *this;
 
     characters       = std::move( other.characters );
-    currentCharacter = characters.end();
+    currentCharacter = std::move( other.currentCharacter );
     transform        = other.transform;
     aabb             = other.aabb;
     topAABB          = other.topAABB;
@@ -139,10 +138,12 @@ Player& Player::operator=( Player&& other ) noexcept
 
 void Player::reset()
 {
-    if ( ++currentCharacter == characters.end() )
+    auto iter = std::ranges::find( characters, currentCharacter );
+    if (iter == characters.end() || ++iter == characters.end())
     {
-        currentCharacter = characters.begin();
+        iter = characters.begin();
     }
+    currentCharacter = *iter;
 
     currentCharacter->setAnimation( "Idle" );
     setVelocity( glm::vec2 { 0 } );
@@ -186,7 +187,7 @@ void Player::update( float deltaTime ) noexcept
     // Dampen x velocity
     velocity.x = velocity.x / ( 1.0f + xDampen * deltaTime );
 
-    if ( currentCharacter != characters.end() )
+    if ( currentCharacter )
     {
         currentCharacter->update( deltaTime );
     }
@@ -194,7 +195,7 @@ void Player::update( float deltaTime ) noexcept
 
 void Player::draw( sr::Image& image ) const noexcept
 {
-    if ( currentCharacter != characters.end() )
+    if ( currentCharacter )
     {
         currentCharacter->draw( image, transform );
     }
@@ -222,7 +223,7 @@ void Player::setState( State newState )
 void Player::setCharacter( size_t characterId )
 {
     characterId      = characterId % characters.size();
-    currentCharacter = characters.begin() + characterId;
+    currentCharacter = characters[characterId];
     currentCharacter->setAnimation( "Idle" );
 }
 

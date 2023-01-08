@@ -140,10 +140,10 @@ private:
     void  doWallJump( float deltaTime );
 
     // A list of possible character models.
-    using CharacterList = std::vector<Character>;
+    using CharacterList = std::vector<std::shared_ptr<Character>>;
 
-    CharacterList           characters;
-    CharacterList::iterator currentCharacter = characters.end();
+    CharacterList              characters;
+    std::shared_ptr<Character> currentCharacter;
 
     // The player's transform.
     Math::Transform2D transform;
