@@ -8,6 +8,22 @@
 #include <iostream>
 #include <numbers>
 
+// How fast the player accelerates.
+const float Player::accel = 5e3f;
+// The maximum speed of the player.
+const float Player::maxSpeed = 150.0f;
+// Maximum jump height in pixels.
+const float Player::jumpHeight = 60.0f;
+// Jump time is the time (in seconds) to the apex of the jump.
+const float Player::jumpTime = 0.25f;
+// Gravity and jump speed are computed to achieve the desired jump parabola.
+// Source: https://2dengine.com/?p=platformers#Jumping
+// Source: https://jobtalle.com/2d_platformer_physics.html
+const float Player::gravity   = 2.0f * jumpHeight / ( jumpTime * jumpTime );
+const float Player::jumpSpeed = std::sqrt( 2.0f * jumpHeight * gravity );
+// How fast the player jumps off the wall.
+const float Player::wallJumpSpeed = 500.0f;
+
 // A map to convert the player state to a string (for debugging).
 std::map<Player::State, std::string> stateToString = {
     { Player::State::Idle, "Idle" },
@@ -62,78 +78,6 @@ Player::Player( const Math::Transform2D& transform )
 
     currentCharacter = characters[0];
     currentCharacter->setAnimation( "Idle" );
-}
-
-Player::Player( const Player& copy )
-: characters { copy.characters }
-, currentCharacter { copy.currentCharacter }
-, transform { copy.transform }
-, aabb { copy.aabb }
-, topAABB { copy.topAABB }
-, bottomAABB { copy.bottomAABB }
-, leftAABB { copy.leftAABB }
-, rightAABB { copy.rightAABB }
-, state { copy.state }
-, xDampen { copy.xDampen }
-, canDoubleJump { copy.canDoubleJump }
-, velocity { copy.velocity }
-{}
-
-Player::Player( Player&& other ) noexcept
-: characters { std::move( other.characters ) }
-, currentCharacter { std::move( other.currentCharacter ) }
-, transform { other.transform }
-, aabb { other.aabb }
-, topAABB { other.aabb }
-, bottomAABB { other.bottomAABB }
-, leftAABB { other.leftAABB }
-, rightAABB { other.rightAABB }
-, state { other.state }
-, xDampen { other.xDampen }
-, canDoubleJump { other.canDoubleJump }
-, velocity { other.velocity }
-{}
-
-Player& Player::operator=( const Player& copy )
-{
-    if ( this == &copy )
-        return *this;
-
-    characters       = copy.characters;
-    currentCharacter = copy.currentCharacter;
-    transform        = copy.transform;
-    aabb             = copy.aabb;
-    topAABB          = copy.topAABB;
-    bottomAABB       = copy.bottomAABB;
-    leftAABB         = copy.leftAABB;
-    rightAABB        = copy.rightAABB;
-    state            = copy.state;
-    xDampen          = copy.xDampen;
-    canDoubleJump    = copy.canDoubleJump;
-    velocity         = copy.velocity;
-
-    return *this;
-}
-
-Player& Player::operator=( Player&& other ) noexcept
-{
-    if ( this == &other )
-        return *this;
-
-    characters       = std::move( other.characters );
-    currentCharacter = std::move( other.currentCharacter );
-    transform        = other.transform;
-    aabb             = other.aabb;
-    topAABB          = other.topAABB;
-    bottomAABB       = other.bottomAABB;
-    leftAABB         = other.leftAABB;
-    rightAABB        = other.rightAABB;
-    state            = other.state;
-    xDampen          = other.xDampen;
-    canDoubleJump    = other.canDoubleJump;
-    velocity         = other.velocity;
-
-    return *this;
 }
 
 void Player::reset()

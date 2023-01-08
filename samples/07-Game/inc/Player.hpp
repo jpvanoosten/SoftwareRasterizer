@@ -25,13 +25,6 @@ public:
 
     explicit Player( const Math::Transform2D& transform = Math::Transform2D {} );
 
-    Player( const Player& copy );
-    Player( Player&& other ) noexcept;
-    ~Player() = default;
-
-    Player& operator=( const Player& copy );
-    Player& operator=( Player&& other ) noexcept;
-
     /// <summary>
     /// Reset the character (and choose a different character).
     /// </summary>
@@ -162,20 +155,20 @@ private:
     float xDampen = 50.0f;
 
     // How fast the player accelerates.
-    const float accel = 5e3f;
+    static const float accel;
     // The maximum speed of the player.
-    const float maxSpeed = 150.0f;
+    static const float maxSpeed;
     // Maximum jump height in pixels.
-    const float jumpHeight = 60.0f;
+    static const float jumpHeight;
     // Jump time is the time (in seconds) to the apex of the jump.
-    const float jumpTime = 0.25f;
+    static const float jumpTime;
     // Gravity and jump speed are computed to achieve the desired jump parabola.
     // Source: https://2dengine.com/?p=platformers#Jumping
     // Source: https://jobtalle.com/2d_platformer_physics.html
-    const float gravity   = 2.0f * jumpHeight / ( jumpTime * jumpTime );
-    const float jumpSpeed = std::sqrt( 2.0f * jumpHeight * gravity );
+    static const float gravity;
+    static const float jumpSpeed;
     // How fast the player jumps off the wall.
-    const float wallJumpSpeed = 500.0f;
+    static const float wallJumpSpeed;
 
     // True if the player can double jump.
     bool canDoubleJump = true;
