@@ -2812,24 +2812,10 @@
 							"__tile": null,
 							"__smartColor": "#D77643",
 							"iid": "ede9c5e0-7820-11ed-88b8-0f9908a4d122",
-							"width": 112,
+							"width": 144,
 							"height": 64,
 							"defUid": 77,
 							"px": [32,192],
-							"fieldInstances": [{ "__identifier": "OneWay", "__value": false, "__type": "Bool", "__tile": null, "defUid": 78, "realEditorValues": [] }]
-						},
-						{
-							"__identifier": "Collision",
-							"__grid": [18,28],
-							"__pivot": [0,0],
-							"__tags": [],
-							"__tile": null,
-							"__smartColor": "#D77643",
-							"iid": "f1323a20-7820-11ed-88b8-9f7ff4b31727",
-							"width": 32,
-							"height": 32,
-							"defUid": 77,
-							"px": [144,224],
 							"fieldInstances": [{ "__identifier": "OneWay", "__value": false, "__type": "Bool", "__tile": null, "defUid": 78, "realEditorValues": [] }]
 						},
 						{
@@ -2890,16 +2876,16 @@
 						},
 						{
 							"__identifier": "Collision",
-							"__grid": [22,30],
+							"__grid": [28,30],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": null,
 							"__smartColor": "#D77643",
 							"iid": "13b537f0-7820-11ed-88b8-7fa30340282b",
-							"width": 176,
+							"width": 128,
 							"height": 16,
 							"defUid": 77,
-							"px": [176,240],
+							"px": [224,240],
 							"fieldInstances": [{ "__identifier": "OneWay", "__value": false, "__type": "Bool", "__tile": null, "defUid": 78, "realEditorValues": [] }]
 						},
 						{
@@ -2957,6 +2943,20 @@
 							"defUid": 100,
 							"px": [248,224],
 							"fieldInstances": []
+						},
+						{
+							"__identifier": "Collision",
+							"__grid": [22,28],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#D77643",
+							"iid": "e26ad4d0-7820-11ed-8c3b-5f5e55467a6d",
+							"width": 48,
+							"height": 32,
+							"defUid": 77,
+							"px": [176,224],
+							"fieldInstances": [{ "__identifier": "OneWay", "__value": false, "__type": "Bool", "__tile": null, "defUid": 78, "realEditorValues": [] }]
 						}
 					]
 				}
