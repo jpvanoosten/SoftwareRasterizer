@@ -3,25 +3,49 @@
 
 using namespace sr;
 
-SpriteSheet::SpriteSheet( const std::filesystem::path& fileName, std::optional<uint32_t> spriteWidth, std::optional<uint32_t> spriteHeight, const BlendMode& blendMode )
+/// <summary>
+/// Helper function to compute the number of sprites in a specific dimension of the sprite sheet.
+/// </summary>
+/// <param name="imageSize">The size of the sprite sheet image.</param>
+/// <param name="spriteSize">The size of a single sprite.</param>
+/// <param name="padding">The padding between each sprite in the image.</param>
+/// <param name="margin">The spacing around the sprite atlas.</param>
+/// <returns></returns>
+constexpr uint32_t getNumSprites( uint32_t imageSize, uint32_t spriteSize, uint32_t padding, uint32_t margin )
+{
+    return ( imageSize + padding - 2 * margin ) / ( padding + spriteSize );
+}
+
+/// <summary>
+/// Helper function to compute the size of a sprite in a specific dimension of the sprite sheet.
+/// </summary>
+/// <param name="imageSize">The size of the sprite sheet image.</param>
+/// <param name="numSprites">The number of sprites.</param>
+/// <param name="padding">The padding between each sprite.</param>
+/// <param name="margin">The spacing around the sprite atlas.</param>
+/// <returns></returns>
+constexpr uint32_t getSpriteSize( uint32_t imageSize, uint32_t numSprites, uint32_t padding, uint32_t margin )
+{
+    return ( imageSize - 2 * margin - ( numSprites - 1 ) * padding ) / numSprites;
+}
+
+SpriteSheet::SpriteSheet( const std::filesystem::path& fileName, std::optional<uint32_t> spriteWidth, std::optional<uint32_t> spriteHeight, uint32_t padding, uint32_t margin, const BlendMode& blendMode )
 : image { ResourceManager::loadImage( fileName ) }
 , blendMode { blendMode }
+, padding { padding }
+, margin { margin }
 {
     if ( !image )
         return;
 
     if ( !spriteWidth )
-        spriteWidth = image->getWidth();
+        spriteWidth = image->getWidth() - 2 * margin;
 
     if ( !spriteHeight )
-        spriteHeight = image->getHeight();
+        spriteHeight = image->getHeight() - 2 * margin;
 
-    // Make sure the sprite width/height are evenly divisible by the image width/height.
-    assert( image->getWidth() % *spriteWidth == 0 );
-    assert( image->getHeight() % *spriteHeight == 0 );
-
-    columns = image->getWidth() / *spriteWidth;
-    rows    = image->getHeight() / *spriteHeight;
+    columns = ::getNumSprites( image->getWidth(), *spriteWidth, padding, margin );
+    rows    = ::getNumSprites( image->getHeight(), *spriteHeight, padding, margin );
 
     initSpriteRects();
     initSprites();
@@ -37,25 +61,23 @@ SpriteSheet::SpriteSheet( const std::filesystem::path& fileName, std::span<const
     initSprites();
 }
 
-SpriteSheet::SpriteSheet( std::shared_ptr<Image> _image, std::optional<uint32_t> spriteWidth, std::optional<uint32_t> spriteHeight, const BlendMode& blendMode )
+SpriteSheet::SpriteSheet( std::shared_ptr<Image> _image, std::optional<uint32_t> spriteWidth, std::optional<uint32_t> spriteHeight, uint32_t padding, uint32_t margin, const BlendMode& blendMode )
 : image { std::move( _image ) }
 , blendMode { blendMode }
+, padding { padding }
+, margin { margin }
 {
     if ( !image )
         return;
 
     if ( !spriteWidth )
-        spriteWidth = image->getWidth();
+        spriteWidth = image->getWidth() - 2 * margin;
 
     if ( !spriteHeight )
-        spriteHeight = image->getHeight();
+        spriteHeight = image->getHeight() - 2 * margin;
 
-    // Make sure the sprite width/height are evenly divisible by the image width/height.
-    assert( image->getWidth() % *spriteWidth == 0 );
-    assert( image->getHeight() % *spriteHeight == 0 );
-
-    columns = image->getWidth() / *spriteWidth;
-    rows    = image->getHeight() / *spriteHeight;
+    columns = ::getNumSprites( image->getWidth(), *spriteWidth, padding, margin );
+    rows    = ::getNumSprites( image->getHeight(), *spriteHeight, padding, margin );
 
     initSpriteRects();
     initSprites();
@@ -67,6 +89,8 @@ SpriteSheet::SpriteSheet( const SpriteSheet& copy )
 , spriteRects { copy.spriteRects }
 , columns { copy.columns }
 , rows { copy.rows }
+, padding { copy.padding }
+, margin { copy.margin }
 {
     initSprites();
 }
@@ -77,6 +101,8 @@ SpriteSheet::SpriteSheet( SpriteSheet&& other ) noexcept
 , spriteRects { std::move( other.spriteRects ) }
 , columns { other.columns }
 , rows { other.rows }
+, padding { other.padding }
+, margin { other.margin }
 {
     initSprites();
 
@@ -95,6 +121,8 @@ SpriteSheet& SpriteSheet::operator=( const SpriteSheet& copy )
     spriteRects = copy.spriteRects;
     columns     = copy.columns;
     rows        = copy.rows;
+    padding     = copy.padding;
+    margin      = copy.margin;
 
     initSprites();
 
@@ -111,11 +139,15 @@ SpriteSheet& SpriteSheet::operator=( SpriteSheet&& other ) noexcept
     spriteRects = std::move( other.spriteRects );
     columns     = other.columns;
     rows        = other.rows;
+    padding     = other.padding;
+    margin      = other.margin;
 
     initSprites();
 
     other.columns = 0u;
     other.rows    = 0u;
+    other.padding = 0u;
+    other.margin  = 0u;
     other.sprites.clear();
 
     return *this;
@@ -135,24 +167,20 @@ const Sprite& SpriteSheet::operator()( size_t i, size_t j ) const noexcept
     return operator[]( i* columns + j );
 }
 
-std::shared_ptr<SpriteSheet> SpriteSheet::fromGrid( const std::filesystem::path& fileName, uint32_t columns, uint32_t rows, const BlendMode& blendMode )
+std::shared_ptr<SpriteSheet> SpriteSheet::fromGrid( const std::filesystem::path& fileName, uint32_t columns, uint32_t rows, uint32_t padding, uint32_t margin, const BlendMode& blendMode )
 {
     std::shared_ptr<Image> image = ResourceManager::loadImage( fileName );
 
     if ( !image )
         return nullptr;
 
-    // Make sure the image can be split up evenly by the number of sprites.
-    assert( image->getWidth() % columns == 0 );
-    assert( image->getHeight() % rows == 0 );
-
     std::vector<Math::RectI> spriteRects;
     spriteRects.reserve( static_cast<size_t>( columns ) * rows );
 
-    const uint32_t w = image->getWidth() / columns;
-    const uint32_t h = image->getHeight() / rows;
+    const uint32_t w = ::getSpriteSize( image->getWidth(), columns, padding, margin );
+    const uint32_t h = ::getSpriteSize( image->getHeight(), rows, padding, margin );
 
-    return std::make_shared<SpriteSheet>( image, w, h, blendMode );
+    return std::make_shared<SpriteSheet>( image, w, h, padding, margin, blendMode );
 }
 
 void SpriteSheet::initSpriteRects()
@@ -163,14 +191,14 @@ void SpriteSheet::initSpriteRects()
     if ( !image )
         return;
 
-    const uint32_t w = image->getWidth() / columns;
-    const uint32_t h = image->getHeight() / rows;
+    const uint32_t w = ::getSpriteSize( image->getWidth(), columns, padding, margin );
+    const uint32_t h = ::getSpriteSize( image->getHeight(), rows, padding, margin );
 
     for ( uint32_t i = 0; i < rows; ++i )
     {
         for ( uint32_t j = 0; j < columns; ++j )
         {
-            spriteRects.emplace_back( j * w, i * h, w, h );
+            spriteRects.emplace_back( margin + j * ( w + padding ), margin + i * ( h + padding ), w, h );
         }
     }
 }

@@ -2957,6 +2957,20 @@
 							"defUid": 77,
 							"px": [176,224],
 							"fieldInstances": [{ "__identifier": "OneWay", "__value": false, "__type": "Bool", "__tile": null, "defUid": 78, "realEditorValues": [] }]
+						},
+						{
+							"__identifier": "Box",
+							"__grid": [36,28],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#0099DB",
+							"iid": "22568f10-7820-11ed-aff2-1972d15380b7",
+							"width": 16,
+							"height": 16,
+							"defUid": 100,
+							"px": [288,224],
+							"fieldInstances": []
 						}
 					]
 				}

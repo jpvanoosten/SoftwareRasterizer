@@ -18,7 +18,7 @@ Level::Level( const ldtk::Project& project, const ldtk::World& world, const ldtk
 
     // Load the fruit collected animation.
     {
-        auto spriteSheet = ResourceManager::loadSpriteSheet( projectPath / "Items/Fruits/Collected.png", 32, 32, BlendMode::AlphaBlend );
+        auto spriteSheet = ResourceManager::loadSpriteSheet( projectPath / "Items/Fruits/Collected.png", 32, 32, 0, 0, BlendMode::AlphaBlend );
         pickupCollected  = SpriteAnim { spriteSheet, 20 };
     }
 
@@ -28,7 +28,7 @@ Level::Level( const ldtk::Project& project, const ldtk::World& world, const ldtk
     {
         if ( tileset.hasTag( "Fruit" ) )
         {
-            SpriteSheet sprites { projectPath / tileset.path, tileset.tile_size, tileset.tile_size, BlendMode::AlphaBlend };
+            SpriteSheet sprites { projectPath / tileset.path, tileset.tile_size, tileset.tile_size, 0, 0, BlendMode::AlphaBlend };
             fruitSprites[tileset.name] = std::move( sprites );
         }
     }
@@ -72,7 +72,7 @@ Level::Level( const ldtk::Project& project, const ldtk::World& world, const ldtk
     const auto& tileSet    = tilesLayer.getTileset();
 
     {
-        auto spriteSheet = ResourceManager::loadSpriteSheet( projectPath / tileSet.path, tileSet.tile_size, tileSet.tile_size, BlendMode::AlphaBlend );
+        auto spriteSheet = ResourceManager::loadSpriteSheet( projectPath / tileSet.path, tileSet.tile_size, tileSet.tile_size, 0, 0, BlendMode::AlphaBlend );
         tileMap          = TileMap( spriteSheet, gridSize.x, gridSize.y );
     }
 

@@ -47,13 +47,13 @@ std::shared_ptr<Character> createCharacter( const std::filesystem::path& basePat
     auto character = std::make_shared<Character>();
 
     // Load the sprite sheets for the character.
-    const auto doubleJump = ResourceManager::loadSpriteSheet( basePath / "Double Jump (32x32).png", 32, 32, BlendMode::AlphaBlend );
-    const auto fall       = ResourceManager::loadSpriteSheet( basePath / "Fall (32x32).png", 32, 32, BlendMode::AlphaBlend );
-    const auto hit        = ResourceManager::loadSpriteSheet( basePath / "Hit (32x32).png", 32, 32, BlendMode::AlphaBlend );
-    const auto idle       = ResourceManager::loadSpriteSheet( basePath / "Idle (32x32).png", 32, 32, BlendMode::AlphaBlend );
-    const auto jump       = ResourceManager::loadSpriteSheet( basePath / "Jump (32x32).png", 32, 32, BlendMode::AlphaBlend );
-    const auto run        = ResourceManager::loadSpriteSheet( basePath / "Run (32x32).png", 32, 32, BlendMode::AlphaBlend );
-    const auto wallJump   = ResourceManager::loadSpriteSheet( basePath / "Wall Jump (32x32).png", 32, 32, BlendMode::AlphaBlend );
+    const auto doubleJump = ResourceManager::loadSpriteSheet( basePath / "Double Jump (32x32).png", 32, 32, 0, 0, BlendMode::AlphaBlend );
+    const auto fall       = ResourceManager::loadSpriteSheet( basePath / "Fall (32x32).png", 32, 32, 0, 0, BlendMode::AlphaBlend );
+    const auto hit        = ResourceManager::loadSpriteSheet( basePath / "Hit (32x32).png", 32, 32, 0, 0, BlendMode::AlphaBlend );
+    const auto idle       = ResourceManager::loadSpriteSheet( basePath / "Idle (32x32).png", 32, 32, 0, 0, BlendMode::AlphaBlend );
+    const auto jump       = ResourceManager::loadSpriteSheet( basePath / "Jump (32x32).png", 32, 32, 0, 0, BlendMode::AlphaBlend );
+    const auto run        = ResourceManager::loadSpriteSheet( basePath / "Run (32x32).png", 32, 32, 0, 0, BlendMode::AlphaBlend );
+    const auto wallJump   = ResourceManager::loadSpriteSheet( basePath / "Wall Jump (32x32).png", 32, 32, 0, 0, BlendMode::AlphaBlend );
 
     // Add the sprite animations for the character.
     character->addAnimation( "Double Jump", SpriteAnim { doubleJump, 20 } );

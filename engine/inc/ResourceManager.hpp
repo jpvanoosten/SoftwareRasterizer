@@ -25,9 +25,11 @@ public:
     /// <param name="filePath">The file path to the image.</param>
     /// <param name="spriteWidth">(optional) The width (in pixels) of a sprite in the sprite sheet. Default: image width.</param>
     /// <param name="spriteHeight">(optional) The height (in pixels) of a sprite in the sprite sheet. Default: image height.</param>
+    /// <param name="padding">(optional) The amount of space (in pixels) between each sprite in the sprite sheet. Default: 0.</param>
+    /// <param name="margin">(optional) The amount of space (in pixels) around the entire image. Default: 0.</param>
     /// <param name="blendMode">(optional) The blend mode to use when rendering the sprites in this sprite sheet. Default: No blending.</param>
     /// <returns>The loaded SpriteSheet.</returns>
-    static std::shared_ptr<SpriteSheet> loadSpriteSheet( const std::filesystem::path& filePath, std::optional<uint32_t> spriteWidth = {}, std::optional<uint32_t> spriteHeight = {}, const BlendMode blendMode = {} );
+    static std::shared_ptr<SpriteSheet> loadSpriteSheet( const std::filesystem::path& filePath, std::optional<uint32_t> spriteWidth = {}, std::optional<uint32_t> spriteHeight = {}, uint32_t padding = 0u, uint32_t margin = 0u, const BlendMode blendMode = {} );
 
     /// <summary>
     /// Unload all resources.

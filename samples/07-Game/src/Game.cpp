@@ -96,7 +96,7 @@ Game::Game( uint32_t screenWidth, uint32_t screenHeight )
     // Buttons
     {
         // Previous button.
-        SpriteSheet sheet { "assets/Pixel Adventure/Menu/Buttons/Previous.png", {}, {}, BlendMode::AlphaBlend };
+        SpriteSheet sheet { "assets/Pixel Adventure/Menu/Buttons/Previous.png", {}, {}, 0, 0, BlendMode::AlphaBlend };
         previousButton = Button { sheet };
         previousButton.setCallback( [this] {
             onPreviousClicked();
@@ -106,7 +106,7 @@ Game::Game( uint32_t screenWidth, uint32_t screenHeight )
     }
     {
         // Next button.
-        SpriteSheet sheet { "assets/Pixel Adventure/Menu/Buttons/Next.png", {}, {}, BlendMode::AlphaBlend };
+        SpriteSheet sheet { "assets/Pixel Adventure/Menu/Buttons/Next.png", {}, {}, 0, 0, BlendMode::AlphaBlend };
         nextButton = Button { sheet };
         nextButton.setCallback( [this] {
             onNextClicked();
@@ -114,7 +114,7 @@ Game::Game( uint32_t screenWidth, uint32_t screenHeight )
     }
     {
         // Restart button.
-        SpriteSheet sheet { "assets/Pixel Adventure/Menu/Buttons/Restart.png", {}, {}, BlendMode::AlphaBlend };
+        SpriteSheet sheet { "assets/Pixel Adventure/Menu/Buttons/Restart.png", {}, {}, 0, 0, BlendMode::AlphaBlend };
         restartButton = Button { sheet };
         restartButton.setCallback( [this] {
             onRestartClicked();
