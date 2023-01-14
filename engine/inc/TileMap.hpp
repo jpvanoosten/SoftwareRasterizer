@@ -18,30 +18,30 @@ public:
     /// Note: All tiles are initialized to -1.
     /// </summary>
     /// <param name="spriteSheet">The sprite sheet to use for drawing the tile map.</param>
-    /// <param name="gridWidth">The number of tiles in the width of the tile map.</param>
-    /// <param name="gridHeight">The number of tiles in the height of the tile map.</param>
-    TileMap( std::shared_ptr<SpriteSheet> spriteSheet, uint32_t gridWidth, uint32_t gridHeight );
+    /// <param name="columns">The number of columns in the tile map.</param>
+    /// <param name="rows">The number of rows in the tile map.</param>
+    TileMap( std::shared_ptr<SpriteSheet> spriteSheet, uint32_t columns, uint32_t rows );
     
     /// <summary>
-    /// Get the sprite ID at a specific X, Y coordinate in the tile map.
-    /// Note: The top-left tile is at (0, 0) and the bottom-right tile is at (width - 1, height - 1).
+    /// Get the sprite ID at the i^th row and the j^th column in the tile map.
+    /// Note: The top-left tile is at (0, 0) and the bottom-right tile is at (rows - 1, columns - 1).
     /// </summary>
-    /// <param name="x">The x-coordinate of the tile in the tile map.</param>
-    /// <param name="y">The y-coordinate of the tile in the tile map.</param>
+    /// <param name="i">The row of the tile in the tile map.</param>
+    /// <param name="j">The column of the tile in the tile map.</param>
     /// <returns>
     /// The sprite ID of the sprite in the sprite sheet at the specified grid coordinates.
     /// Returns -1 if there isn't a sprite at the specified grid coordinates.
     /// </returns>
-    int operator()( size_t x, size_t y ) const noexcept;
+    int operator()( size_t i, size_t j ) const noexcept;
 
     /// <summary>
-    /// Get a reference to a sprite ID at a specific X, Y coordinate in the tile map.
-    /// Note: The top-left tile is at (0, 0) and the bottom-right tile is at (width - 1, height - 1).
+    /// Get a reference to a sprite ID at the i^th row and the j^th column in the tile map.
+    /// Note: The top-left tile is at (0, 0) and the bottom-right tile is at (rows - 1, columns - 1).
     /// </summary>
-    /// <param name="x">The x-coordinate of the tile in the tile map. Must be in the range [0 ... width - 1]</param>
-    /// <param name="y">The y-coordinate of the tile in the tile map. Must be in the range [0 ... height - 1]</param>
+    /// <param name="i">The x-coordinate of the tile in the tile map. Must be in the range [0 ... rows - 1]</param>
+    /// <param name="j">The y-coordinate of the tile in the tile map. Must be in the range [0 ... columns - 1]</param>
     /// <returns>The sprite ID of the sprite in the sprite sheet at the specified grid coordinate.</returns>
-    int& operator()( size_t x, size_t y ) noexcept;
+    int& operator()( size_t i, size_t j ) noexcept;
 
     /// <summary>
     /// Clear the sprite grid (set all sprite values to -1).
@@ -49,21 +49,21 @@ public:
     void clear();
 
     /// <summary>
-    /// Get the number of tiles in the width of the tile map.
+    /// Get the number of columns in the tile map.
     /// </summary>
-    /// <returns>The number of tiles in the width of the tile map.</returns>
-    uint32_t getGridWidth() const noexcept
+    /// <returns>The number columns tile map.</returns>
+    uint32_t getColumns() const noexcept
     {
-        return gridWidth;
+        return columns;
     }
 
     /// <summary>
-    /// Get the number of tiles in the height of the tile map.
+    /// Get the number of rows in the tile map.
     /// </summary>
-    /// <returns>The number of tiles in the height of the tile map.</returns>
-    uint32_t getGridHeight() const noexcept
+    /// <returns>The number of rows in the tile map.</returns>
+    uint32_t getRows() const noexcept
     {
-        return gridHeight;
+        return rows;
     }
 
     /// <summary>
@@ -122,10 +122,10 @@ public:
     void draw( Image& image ) const;
 
 private:
-    // The width of the tile map (in tiles).
-    uint32_t gridWidth = 0u;
-    // The height of the tile map (in tiles)
-    uint32_t gridHeight = 0u;
+    // The number of columns in the tile map.
+    uint32_t columns = 0u;
+    // The number of rows in the tile map.
+    uint32_t rows = 0u;
 
     // The sprite sheet to use for drawing the tilemap.
     std::shared_ptr<SpriteSheet> spriteSheet;

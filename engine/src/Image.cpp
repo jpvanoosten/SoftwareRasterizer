@@ -468,6 +468,11 @@ void Image::drawAABB( AABB aabb, const Color& color, const BlendMode& blendMode,
 
 void Image::drawSprite( const Sprite& sprite, const Math::Transform2D& transform ) noexcept
 {
+    drawSprite( sprite, transform.getTransform() );
+}
+
+void Image::drawSprite( const Sprite& sprite, const glm::mat3& matrix ) noexcept
+{
     std::shared_ptr<Image> image = sprite.getImage();
     if ( !image )
         return;
@@ -476,8 +481,6 @@ void Image::drawSprite( const Sprite& sprite, const Math::Transform2D& transform
     const BlendMode   blendMode = sprite.getBlendMode();
     const glm::ivec2& uv        = sprite.getUV();
     const glm::ivec2& size      = sprite.getSize();
-
-    const glm::mat3& matrix = transform.getTransform();
 
     Vertex verts[] = {
         Vertex { { 0, 0 }, { uv.x, uv.y }, color },                              // Top-left

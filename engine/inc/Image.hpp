@@ -224,6 +224,13 @@ struct SR_API Image final
     void drawSprite( const Sprite& sprite, const Math::Transform2D& transform ) noexcept;
 
     /// <summary>
+    /// Draw a sprite on the screen using a 3x3 transformation matrix.
+    /// </summary>
+    /// <param name="sprite">The sprite the draw.</param>
+    /// <param name="matrix">The matrix to apply to the sprite before drawing.</param>
+    void drawSprite( const Sprite& sprite, const glm::mat3& matrix ) noexcept;
+
+    /// <summary>
     /// Draw a sprite on the screen without any transformation applied to the sprite.
     /// </summary>
     /// <param name="sprite">The sprite to draw.</param>

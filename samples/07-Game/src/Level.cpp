@@ -28,7 +28,7 @@ Level::Level( const ldtk::Project& project, const ldtk::World& world, const ldtk
     {
         if ( tileset.hasTag( "Fruit" ) )
         {
-            SpriteSheet sprites { projectPath / tileset.path, tileset.tile_size, tileset.tile_size, 0, 0, BlendMode::AlphaBlend };
+            auto sprites = ResourceManager::loadSpriteSheet( projectPath / tileset.path, tileset.tile_size, tileset.tile_size, static_cast<uint32_t>( tileset.padding ), static_cast<uint32_t>( tileset.spacing ), BlendMode::AlphaBlend );
             fruitSprites[tileset.name] = std::move( sprites );
         }
     }
@@ -72,20 +72,20 @@ Level::Level( const ldtk::Project& project, const ldtk::World& world, const ldtk
     const auto& tileSet    = tilesLayer.getTileset();
 
     {
-        auto spriteSheet = ResourceManager::loadSpriteSheet( projectPath / tileSet.path, tileSet.tile_size, tileSet.tile_size, 0, 0, BlendMode::AlphaBlend );
+        auto spriteSheet = ResourceManager::loadSpriteSheet( projectPath / tileSet.path, tileSet.tile_size, tileSet.tile_size, tileSet.padding, tileSet.spacing, BlendMode::AlphaBlend );
         tileMap          = TileMap( spriteSheet, gridSize.x, gridSize.y );
     }
 
     for ( auto& tile: intGrid.allTiles() )
     {
         const auto& gridPos             = tile.getGridPosition();
-        tileMap( gridPos.x, gridPos.y ) = tile.tileId;
+        tileMap( gridPos.y, gridPos.x ) = tile.tileId;
     }
 
     for ( auto& tile: tilesLayer.allTiles() )
     {
         const auto& gridPos             = tile.getGridPosition();
-        tileMap( gridPos.x, gridPos.y ) = tile.tileId;
+        tileMap( gridPos.y, gridPos.x ) = tile.tileId;
     }
 
     // Player start position

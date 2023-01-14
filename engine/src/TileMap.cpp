@@ -2,27 +2,27 @@
 
 using namespace sr;
 
-TileMap::TileMap( std::shared_ptr<SpriteSheet> spriteSheet, uint32_t gridWidth, uint32_t gridHeight )
-: gridWidth { gridWidth }
-, gridHeight { gridHeight }
+TileMap::TileMap( std::shared_ptr<SpriteSheet> spriteSheet, uint32_t columns, uint32_t rows )
+: columns { columns }
+, rows { rows }
 , spriteSheet { std::move(spriteSheet) }
-, spriteGrid( static_cast<size_t>( gridWidth ) * gridHeight, -1 )
+, spriteGrid( static_cast<size_t>( columns ) * rows, -1 )
 {}
 
-int TileMap::operator()( size_t x, size_t y ) const noexcept
+int TileMap::operator()( size_t i, size_t j ) const noexcept
 {
-    if ( x < gridWidth && y < gridHeight )
-        return spriteGrid[y * gridWidth + x];
+    if ( i < rows && j < columns )
+        return spriteGrid[i * columns + j];
 
     return -1;
 }
 
-int& TileMap::operator()( size_t x, size_t y ) noexcept
+int& TileMap::operator()( size_t i, size_t j ) noexcept
 {
-    assert( x < gridWidth );
-    assert( y < gridHeight );
+    assert( i < rows );
+    assert( j < columns );
 
-    return spriteGrid[y * gridWidth + x];
+    return spriteGrid[i * columns + j];
 }
 
 void TileMap::clear()
@@ -46,12 +46,12 @@ void TileMap::draw( Image& image ) const
 
     int x = 0;
     int y = 0;
-    for ( uint32_t i = 0u; i < gridHeight; ++i )
+    for ( uint32_t i = 0u; i < rows; ++i )
     {
         x = 0;
-        for ( uint32_t j = 0; j < gridWidth; ++j )
+        for ( uint32_t j = 0; j < columns; ++j )
         {
-            const int spriteId = spriteGrid[i * gridWidth + j];
+            const int spriteId = spriteGrid[i * columns + j];
             if ( spriteId >= 0 && spriteId < numSprites )
             {
                 image.drawSprite( (*spriteSheet)[spriteId], x, y );

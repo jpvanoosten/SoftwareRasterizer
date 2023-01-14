@@ -55,7 +55,7 @@ private:
     std::vector<Collider> colliders;
 
     // Fruit sprites.
-    std::map<std::string, sr::SpriteSheet> fruitSprites;
+    std::map<std::string, std::shared_ptr<sr::SpriteSheet>> fruitSprites;
 
     // All pickups
     std::vector<Pickup> allPickups;

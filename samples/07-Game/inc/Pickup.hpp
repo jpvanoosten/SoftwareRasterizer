@@ -10,7 +10,7 @@ class Pickup final
 {
 public:
     Pickup() = default;
-    Pickup( const sr::SpriteSheet& sprites, const Math::Sphere& collision );
+    Pickup( std::shared_ptr<sr::SpriteSheet> sprites, const Math::Sphere& collision );
     ~Pickup() = default;
 
     /// <summary>
@@ -50,7 +50,7 @@ private:
     Math::Transform2D      transform;
 
     // Shared sprite sheet for the pickup.
-    const sr::SpriteSheet* spriteSheet = nullptr;
+    std::shared_ptr<sr::SpriteSheet> spriteSheet;
 
     // Frame-rate for sprite animation.
     uint32_t frameRate = 20u;
