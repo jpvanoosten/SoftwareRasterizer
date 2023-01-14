@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Box.hpp"
 #include "Effect.hpp"
 #include "Pickup.hpp"
 #include "Player.hpp"
@@ -45,6 +46,7 @@ private:
     void updateCollisions( float deltaTime );
     void updatePickups( float deltaTime );
     void updateEffects( float deltaTime );
+    void updateBoxes( float deltaTime );
 
     const ldtk::World* world = nullptr;
     const ldtk::Level* level = nullptr;
@@ -56,6 +58,9 @@ private:
 
     // Fruit sprites.
     std::map<std::string, std::shared_ptr<sr::SpriteSheet>> fruitSprites;
+    // Box sprites.
+    std::map<std::string, Box> boxPrefabs;
+    
 
     // All pickups
     std::vector<Pickup> allPickups;
@@ -63,6 +68,9 @@ private:
     sr::SpriteAnim pickupCollected;
     // Currently playing effects.
     std::vector<Effect> effects;
+
+    // Boxes
+    std::vector<std::shared_ptr<Box>> boxes;
 
     // Tile map.
     sr::TileMap tileMap;

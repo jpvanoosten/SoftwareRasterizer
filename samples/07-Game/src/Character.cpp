@@ -63,7 +63,7 @@ void Character::update( float deltaTime )
     }
 }
 
-void Character::draw( sr::Image& image, const Math::Transform2D& transform )
+void Character::draw( sr::Image& image, const Math::Transform2D& transform ) const
 {
     if ( currentAnim != anims.end() )
     {

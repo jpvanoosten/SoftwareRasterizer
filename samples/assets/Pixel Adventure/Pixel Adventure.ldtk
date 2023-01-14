@@ -1027,11 +1027,11 @@
 			"maxCount": 0,
 			"limitScope": "PerLevel",
 			"limitBehavior": "MoveLastOne",
-			"pivotX": 0,
-			"pivotY": 0,
+			"pivotX": 0.5,
+			"pivotY": 1,
 			"fieldDefs": [
 				{
-					"identifier": "Boxes",
+					"identifier": "BoxType",
 					"doc": null,
 					"__type": "LocalEnum.Boxes",
 					"uid": 115,
@@ -1428,9 +1428,9 @@
 			{ "id": "Strawberry", "tileId": 7, "color": 11622983, "__tileSrcRect": [224,0,32,32] }
 		], "iconTilesetUid": 71, "externalRelPath": null, "externalFileChecksum": null, "tags": ["Fruits"] },
 		{ "identifier": "Boxes", "uid": 112, "values": [
-			{ "id": "Box0", "tileId": 0, "color": 10710100, "__tileSrcRect": [0,0,28,28] },
-			{ "id": "Box1", "tileId": 1, "color": 10313806, "__tileSrcRect": [28,0,28,28] },
-			{ "id": "Box2", "tileId": 2, "color": 9207170, "__tileSrcRect": [56,0,28,28] }
+			{ "id": "Box1", "tileId": 0, "color": 10710100, "__tileSrcRect": [0,0,28,28] },
+			{ "id": "Box2", "tileId": 1, "color": 10313806, "__tileSrcRect": [28,0,28,28] },
+			{ "id": "Box3", "tileId": 2, "color": 9207170, "__tileSrcRect": [56,0,28,28] }
 		], "iconTilesetUid": 113, "externalRelPath": null, "externalFileChecksum": null, "tags": [] }
 	], "externalEnums": [], "levelFields": [] },
 	"levels": [
@@ -2450,7 +2450,7 @@
 						{ "px": [448,208], "src": [224,80], "f": 0, "t": 124, "d": [418] },
 						{ "px": [464,208], "src": [0,16], "f": 0, "t": 22, "d": [419] },
 						{ "px": [0,224], "src": [32,80], "f": 0, "t": 112, "d": [420] },
-						{ "px": [176,224], "src": [192,80], "f": 0, "t": 122, "d": [431] },
+						{ "px": [144,224], "src": [192,80], "f": 0, "t": 122, "d": [429] },
 						{ "px": [416,224], "src": [192,80], "f": 0, "t": 122, "d": [446] },
 						{ "px": [432,224], "src": [208,96], "f": 0, "t": 145, "d": [447] },
 						{ "px": [448,224], "src": [224,96], "f": 0, "t": 146, "d": [448] },
@@ -2516,9 +2516,9 @@
 						4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,
 						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,
 						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-						0,0,1,1,1,1,1,1,1,0,4,5,5,5,5,5,5,5,5,5,5,5,5,0,0,0,0,0,0,0,0,0,1,1,1,
-						1,1,1,1,0,4,5,5,5,5,5,5,5,5,5,5,5,5,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,0,
+						0,0,0,0,0,0,0,1,1,1,1,1,1,1,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,1,1,1,1,1,1,1,0,4,5,5,5,5,5,5,5,5,5,5,5,0,0,0,0,0,0,0,0,0,0,1,1,1,
+						1,1,1,1,0,4,5,5,5,5,5,5,5,5,5,5,5,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,0,
 						4,5,5,5,5,5,5,5,5,5,5,5,5,5,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,0,4,5,5,5,5,
 						5,5,5,5,5,5,5,5,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 					],
@@ -2532,7 +2532,6 @@
 						{ "px": [128,208], "src": [112,80], "f": 0, "t": 117, "d": [98,398] },
 						{ "px": [144,208], "src": [112,80], "f": 0, "t": 117, "d": [98,399] },
 						{ "px": [160,208], "src": [112,80], "f": 0, "t": 117, "d": [98,400] },
-						{ "px": [176,208], "src": [112,80], "f": 0, "t": 117, "d": [98,401] },
 						{ "px": [32,224], "src": [112,80], "f": 0, "t": 117, "d": [98,422] },
 						{ "px": [48,224], "src": [112,80], "f": 0, "t": 117, "d": [98,423] },
 						{ "px": [64,224], "src": [112,80], "f": 0, "t": 117, "d": [98,424] },
@@ -2542,7 +2541,6 @@
 						{ "px": [128,224], "src": [112,80], "f": 0, "t": 117, "d": [98,428] },
 						{ "px": [144,224], "src": [112,80], "f": 0, "t": 117, "d": [98,429] },
 						{ "px": [160,224], "src": [112,80], "f": 0, "t": 117, "d": [98,430] },
-						{ "px": [176,224], "src": [112,80], "f": 0, "t": 117, "d": [98,431] },
 						{ "px": [32,240], "src": [112,80], "f": 0, "t": 117, "d": [98,452] },
 						{ "px": [48,240], "src": [112,80], "f": 0, "t": 117, "d": [98,453] },
 						{ "px": [64,240], "src": [112,80], "f": 0, "t": 117, "d": [98,454] },
@@ -2554,12 +2552,12 @@
 						{ "px": [160,240], "src": [112,80], "f": 0, "t": 117, "d": [98,460] },
 						{ "px": [176,240], "src": [112,80], "f": 0, "t": 117, "d": [98,461] },
 						{ "px": [192,240], "src": [112,80], "f": 0, "t": 117, "d": [98,462] },
-						{ "px": [192,208], "src": [128,80], "f": 0, "t": 118, "d": [97,402] },
+						{ "px": [176,208], "src": [128,80], "f": 0, "t": 118, "d": [97,401] },
 						{ "px": [208,240], "src": [128,80], "f": 0, "t": 118, "d": [97,463] },
 						{ "px": [16,208], "src": [96,80], "f": 0, "t": 116, "d": [96,391] },
 						{ "px": [16,224], "src": [96,80], "f": 0, "t": 116, "d": [96,421] },
 						{ "px": [16,240], "src": [96,80], "f": 0, "t": 116, "d": [96,451] },
-						{ "px": [192,224], "src": [144,80], "f": 0, "t": 119, "d": [94,432] },
+						{ "px": [176,224], "src": [144,80], "f": 0, "t": 119, "d": [94,431] },
 						{ "px": [32,192], "src": [112,64], "f": 0, "t": 95, "d": [93,362] },
 						{ "px": [48,192], "src": [112,64], "f": 0, "t": 95, "d": [93,363] },
 						{ "px": [64,192], "src": [112,64], "f": 0, "t": 95, "d": [93,364] },
@@ -2569,10 +2567,15 @@
 						{ "px": [128,192], "src": [112,64], "f": 0, "t": 95, "d": [93,368] },
 						{ "px": [144,192], "src": [112,64], "f": 0, "t": 95, "d": [93,369] },
 						{ "px": [160,192], "src": [112,64], "f": 0, "t": 95, "d": [93,370] },
-						{ "px": [176,192], "src": [112,64], "f": 0, "t": 95, "d": [93,371] },
+						{ "px": [192,224], "src": [112,64], "f": 0, "t": 95, "d": [93,432] },
 						{ "px": [16,192], "src": [96,64], "f": 0, "t": 94, "d": [92,361] },
-						{ "px": [192,192], "src": [128,64], "f": 0, "t": 96, "d": [91,372] },
+						{ "px": [176,192], "src": [128,64], "f": 0, "t": 96, "d": [91,371] },
 						{ "px": [208,224], "src": [128,64], "f": 0, "t": 96, "d": [91,433] },
+						{ "px": [368,176], "src": [112,16], "f": 0, "t": 29, "d": [32,353] },
+						{ "px": [384,176], "src": [112,16], "f": 0, "t": 29, "d": [32,354] },
+						{ "px": [400,176], "src": [112,16], "f": 0, "t": 29, "d": [32,355] },
+						{ "px": [416,176], "src": [112,16], "f": 0, "t": 29, "d": [32,356] },
+						{ "px": [432,176], "src": [112,16], "f": 0, "t": 29, "d": [32,357] },
 						{ "px": [368,192], "src": [112,16], "f": 0, "t": 29, "d": [32,383] },
 						{ "px": [384,192], "src": [112,16], "f": 0, "t": 29, "d": [32,384] },
 						{ "px": [400,192], "src": [112,16], "f": 0, "t": 29, "d": [32,385] },
@@ -2583,8 +2586,10 @@
 						{ "px": [400,208], "src": [112,16], "f": 0, "t": 29, "d": [32,415] },
 						{ "px": [416,208], "src": [112,16], "f": 0, "t": 29, "d": [32,416] },
 						{ "px": [432,208], "src": [112,16], "f": 0, "t": 29, "d": [32,417] },
+						{ "px": [448,176], "src": [128,16], "f": 0, "t": 30, "d": [40,358] },
 						{ "px": [448,192], "src": [128,16], "f": 0, "t": 30, "d": [40,388] },
 						{ "px": [448,208], "src": [128,16], "f": 0, "t": 30, "d": [40,418] },
+						{ "px": [352,176], "src": [96,16], "f": 0, "t": 28, "d": [39,352] },
 						{ "px": [352,192], "src": [96,16], "f": 0, "t": 28, "d": [39,382] },
 						{ "px": [352,224], "src": [112,32], "f": 0, "t": 51, "d": [107,442] },
 						{ "px": [368,224], "src": [112,32], "f": 0, "t": 51, "d": [107,443] },
@@ -2595,14 +2600,14 @@
 						{ "px": [448,224], "src": [112,32], "f": 0, "t": 51, "d": [107,448] },
 						{ "px": [336,224], "src": [96,32], "f": 0, "t": 50, "d": [105,441] },
 						{ "px": [352,208], "src": [160,16], "f": 0, "t": 32, "d": [36,412] },
-						{ "px": [368,176], "src": [112,0], "f": 0, "t": 7, "d": [17,353] },
-						{ "px": [384,176], "src": [112,0], "f": 0, "t": 7, "d": [17,354] },
-						{ "px": [400,176], "src": [112,0], "f": 0, "t": 7, "d": [17,355] },
-						{ "px": [416,176], "src": [112,0], "f": 0, "t": 7, "d": [17,356] },
-						{ "px": [432,176], "src": [112,0], "f": 0, "t": 7, "d": [17,357] },
-						{ "px": [352,176], "src": [96,0], "f": 0, "t": 6, "d": [38,352] },
+						{ "px": [368,160], "src": [112,0], "f": 0, "t": 7, "d": [17,323] },
+						{ "px": [384,160], "src": [112,0], "f": 0, "t": 7, "d": [17,324] },
+						{ "px": [400,160], "src": [112,0], "f": 0, "t": 7, "d": [17,325] },
+						{ "px": [416,160], "src": [112,0], "f": 0, "t": 7, "d": [17,326] },
+						{ "px": [432,160], "src": [112,0], "f": 0, "t": 7, "d": [17,327] },
+						{ "px": [352,160], "src": [96,0], "f": 0, "t": 6, "d": [38,322] },
 						{ "px": [336,208], "src": [96,0], "f": 0, "t": 6, "d": [38,411] },
-						{ "px": [448,176], "src": [128,0], "f": 0, "t": 8, "d": [37,358] }
+						{ "px": [448,160], "src": [128,0], "f": 0, "t": 8, "d": [37,328] }
 					],
 					"seed": 3796284,
 					"overrideTilesetUid": null,
@@ -2629,6 +2634,7 @@
 					"optionalRules": [],
 					"intGridCsv": [],
 					"autoLayerTiles": [
+						{ "px": [352,160], "src": [0,0], "f": 0, "t": 0, "d": [74,322] },
 						{ "px": [352,176], "src": [0,0], "f": 0, "t": 0, "d": [74,352] },
 						{ "px": [352,192], "src": [0,0], "f": 0, "t": 0, "d": [74,382] },
 						{ "px": [336,208], "src": [0,0], "f": 0, "t": 0, "d": [74,411] },
@@ -2720,7 +2726,7 @@
 							"__tile": null,
 							"__smartColor": "#D77643",
 							"iid": "ede9c5e0-7820-11ed-88b8-0f9908a4d122",
-							"width": 176,
+							"width": 160,
 							"height": 64,
 							"defUid": 77,
 							"px": [32,192],
@@ -2728,16 +2734,16 @@
 						},
 						{
 							"__identifier": "Collision",
-							"__grid": [44,22],
+							"__grid": [44,20],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": null,
 							"__smartColor": "#D77643",
 							"iid": "f6785320-7820-11ed-88b8-733ce8e18ad8",
 							"width": 128,
-							"height": 80,
+							"height": 96,
 							"defUid": 77,
-							"px": [352,176],
+							"px": [352,160],
 							"fieldInstances": [{ "__identifier": "OneWay", "__value": false, "__type": "Bool", "__tile": null, "defUid": 78, "realEditorValues": [] }]
 						},
 						{
@@ -2840,8 +2846,8 @@
 						},
 						{
 							"__identifier": "Box",
-							"__grid": [9,13],
-							"__pivot": [0,0],
+							"__grid": [9,15],
+							"__pivot": [0.5,1],
 							"__tags": [],
 							"__tile": { "tilesetUid": 113, "x": 0, "y": 0, "w": 28, "h": 28 },
 							"__smartColor": "#0099DB",
@@ -2849,27 +2855,30 @@
 							"width": 24,
 							"height": 24,
 							"defUid": 100,
-							"px": [72,104],
-							"fieldInstances": [{ "__identifier": "Boxes", "__value": "Box0", "__type": "LocalEnum.Boxes", "__tile": { "tilesetUid": 113, "x": 0, "y": 0, "w": 28, "h": 28 }, "defUid": 115, "realEditorValues": [] }]
+							"px": [72,128],
+							"fieldInstances": [{ "__identifier": "BoxType", "__value": "Box1", "__type": "LocalEnum.Boxes", "__tile": { "tilesetUid": 113, "x": 0, "y": 0, "w": 28, "h": 28 }, "defUid": 115, "realEditorValues": [{
+								"id": "V_String",
+								"params": ["Box1"]
+							}] }]
 						},
 						{
 							"__identifier": "Collision",
-							"__grid": [26,28],
+							"__grid": [24,28],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": null,
 							"__smartColor": "#D77643",
 							"iid": "e26ad4d0-7820-11ed-8c3b-5f5e55467a6d",
-							"width": 16,
+							"width": 32,
 							"height": 32,
 							"defUid": 77,
-							"px": [208,224],
+							"px": [192,224],
 							"fieldInstances": [{ "__identifier": "OneWay", "__value": false, "__type": "Bool", "__tile": null, "defUid": 78, "realEditorValues": [] }]
 						},
 						{
 							"__identifier": "Box",
-							"__grid": [15,13],
-							"__pivot": [0,0],
+							"__grid": [15,15],
+							"__pivot": [0.5,1],
 							"__tags": [],
 							"__tile": { "tilesetUid": 113, "x": 0, "y": 0, "w": 28, "h": 28 },
 							"__smartColor": "#0099DB",
@@ -2877,13 +2886,16 @@
 							"width": 24,
 							"height": 24,
 							"defUid": 100,
-							"px": [120,104],
-							"fieldInstances": [{ "__identifier": "Boxes", "__value": "Box0", "__type": "LocalEnum.Boxes", "__tile": { "tilesetUid": 113, "x": 0, "y": 0, "w": 28, "h": 28 }, "defUid": 115, "realEditorValues": [] }]
+							"px": [120,128],
+							"fieldInstances": [{ "__identifier": "BoxType", "__value": "Box1", "__type": "LocalEnum.Boxes", "__tile": { "tilesetUid": 113, "x": 0, "y": 0, "w": 28, "h": 28 }, "defUid": 115, "realEditorValues": [{
+								"id": "V_String",
+								"params": ["Box1"]
+							}] }]
 						},
 						{
 							"__identifier": "Box",
-							"__grid": [21,13],
-							"__pivot": [0,0],
+							"__grid": [21,15],
+							"__pivot": [0.5,1],
 							"__tags": [],
 							"__tile": { "tilesetUid": 113, "x": 0, "y": 0, "w": 28, "h": 28 },
 							"__smartColor": "#0099DB",
@@ -2891,13 +2903,16 @@
 							"width": 24,
 							"height": 24,
 							"defUid": 100,
-							"px": [168,104],
-							"fieldInstances": [{ "__identifier": "Boxes", "__value": "Box0", "__type": "LocalEnum.Boxes", "__tile": { "tilesetUid": 113, "x": 0, "y": 0, "w": 28, "h": 28 }, "defUid": 115, "realEditorValues": [] }]
+							"px": [168,128],
+							"fieldInstances": [{ "__identifier": "BoxType", "__value": "Box1", "__type": "LocalEnum.Boxes", "__tile": { "tilesetUid": 113, "x": 0, "y": 0, "w": 28, "h": 28 }, "defUid": 115, "realEditorValues": [{
+								"id": "V_String",
+								"params": ["Box1"]
+							}] }]
 						},
 						{
 							"__identifier": "Box",
-							"__grid": [21,21],
-							"__pivot": [0,0],
+							"__grid": [21,23],
+							"__pivot": [0.5,1],
 							"__tags": [],
 							"__tile": { "tilesetUid": 113, "x": 0, "y": 0, "w": 28, "h": 28 },
 							"__smartColor": "#0099DB",
@@ -2905,13 +2920,16 @@
 							"width": 24,
 							"height": 24,
 							"defUid": 100,
-							"px": [168,168],
-							"fieldInstances": [{ "__identifier": "Boxes", "__value": "Box0", "__type": "LocalEnum.Boxes", "__tile": { "tilesetUid": 113, "x": 0, "y": 0, "w": 28, "h": 28 }, "defUid": 115, "realEditorValues": [] }]
+							"px": [168,192],
+							"fieldInstances": [{ "__identifier": "BoxType", "__value": "Box1", "__type": "LocalEnum.Boxes", "__tile": { "tilesetUid": 113, "x": 0, "y": 0, "w": 28, "h": 28 }, "defUid": 115, "realEditorValues": [{
+								"id": "V_String",
+								"params": ["Box1"]
+							}] }]
 						},
 						{
 							"__identifier": "Box",
-							"__grid": [37,27],
-							"__pivot": [0,0],
+							"__grid": [38,29],
+							"__pivot": [0.5,1],
 							"__tags": [],
 							"__tile": { "tilesetUid": 113, "x": 28, "y": 0, "w": 28, "h": 28 },
 							"__smartColor": "#0099DB",
@@ -2919,16 +2937,16 @@
 							"width": 24,
 							"height": 24,
 							"defUid": 100,
-							"px": [296,216],
-							"fieldInstances": [{ "__identifier": "Boxes", "__value": "Box1", "__type": "LocalEnum.Boxes", "__tile": { "tilesetUid": 113, "x": 28, "y": 0, "w": 28, "h": 28 }, "defUid": 115, "realEditorValues": [{
+							"px": [304,240],
+							"fieldInstances": [{ "__identifier": "BoxType", "__value": "Box2", "__type": "LocalEnum.Boxes", "__tile": { "tilesetUid": 113, "x": 28, "y": 0, "w": 28, "h": 28 }, "defUid": 115, "realEditorValues": [{
 								"id": "V_String",
-								"params": ["Box1"]
+								"params": ["Box2"]
 							}] }]
 						},
 						{
 							"__identifier": "Box",
-							"__grid": [31,27],
-							"__pivot": [0,0],
+							"__grid": [32,29],
+							"__pivot": [0.5,1],
 							"__tags": [],
 							"__tile": { "tilesetUid": 113, "x": 28, "y": 0, "w": 28, "h": 28 },
 							"__smartColor": "#0099DB",
@@ -2936,16 +2954,16 @@
 							"width": 24,
 							"height": 24,
 							"defUid": 100,
-							"px": [248,216],
-							"fieldInstances": [{ "__identifier": "Boxes", "__value": "Box1", "__type": "LocalEnum.Boxes", "__tile": { "tilesetUid": 113, "x": 28, "y": 0, "w": 28, "h": 28 }, "defUid": 115, "realEditorValues": [{
+							"px": [256,240],
+							"fieldInstances": [{ "__identifier": "BoxType", "__value": "Box2", "__type": "LocalEnum.Boxes", "__tile": { "tilesetUid": 113, "x": 28, "y": 0, "w": 28, "h": 28 }, "defUid": 115, "realEditorValues": [{
 								"id": "V_String",
-								"params": ["Box1"]
+								"params": ["Box2"]
 							}] }]
 						},
 						{
 							"__identifier": "Box",
 							"__grid": [53,19],
-							"__pivot": [0,0],
+							"__pivot": [0.5,1],
 							"__tags": [],
 							"__tile": { "tilesetUid": 113, "x": 56, "y": 0, "w": 28, "h": 28 },
 							"__smartColor": "#0099DB",
@@ -2953,16 +2971,16 @@
 							"width": 24,
 							"height": 24,
 							"defUid": 100,
-							"px": [424,152],
-							"fieldInstances": [{ "__identifier": "Boxes", "__value": "Box2", "__type": "LocalEnum.Boxes", "__tile": { "tilesetUid": 113, "x": 56, "y": 0, "w": 28, "h": 28 }, "defUid": 115, "realEditorValues": [{
+							"px": [424,160],
+							"fieldInstances": [{ "__identifier": "BoxType", "__value": "Box3", "__type": "LocalEnum.Boxes", "__tile": { "tilesetUid": 113, "x": 56, "y": 0, "w": 28, "h": 28 }, "defUid": 115, "realEditorValues": [{
 								"id": "V_String",
-								"params": ["Box2"]
+								"params": ["Box3"]
 							}] }]
 						},
 						{
 							"__identifier": "Box",
 							"__grid": [46,10],
-							"__pivot": [0,0],
+							"__pivot": [0.5,1],
 							"__tags": [],
 							"__tile": { "tilesetUid": 113, "x": 56, "y": 0, "w": 28, "h": 28 },
 							"__smartColor": "#0099DB",
@@ -2970,16 +2988,16 @@
 							"width": 24,
 							"height": 24,
 							"defUid": 100,
-							"px": [368,80],
-							"fieldInstances": [{ "__identifier": "Boxes", "__value": "Box2", "__type": "LocalEnum.Boxes", "__tile": { "tilesetUid": 113, "x": 56, "y": 0, "w": 28, "h": 28 }, "defUid": 115, "realEditorValues": [{
+							"px": [368,88],
+							"fieldInstances": [{ "__identifier": "BoxType", "__value": "Box3", "__type": "LocalEnum.Boxes", "__tile": { "tilesetUid": 113, "x": 56, "y": 0, "w": 28, "h": 28 }, "defUid": 115, "realEditorValues": [{
 								"id": "V_String",
-								"params": ["Box2"]
+								"params": ["Box3"]
 							}] }]
 						},
 						{
 							"__identifier": "Box",
-							"__grid": [37,19],
-							"__pivot": [0,0],
+							"__grid": [38,19],
+							"__pivot": [0.5,1],
 							"__tags": [],
 							"__tile": { "tilesetUid": 113, "x": 28, "y": 0, "w": 28, "h": 28 },
 							"__smartColor": "#0099DB",
@@ -2987,10 +3005,10 @@
 							"width": 24,
 							"height": 24,
 							"defUid": 100,
-							"px": [296,152],
-							"fieldInstances": [{ "__identifier": "Boxes", "__value": "Box1", "__type": "LocalEnum.Boxes", "__tile": { "tilesetUid": 113, "x": 28, "y": 0, "w": 28, "h": 28 }, "defUid": 115, "realEditorValues": [{
+							"px": [304,160],
+							"fieldInstances": [{ "__identifier": "BoxType", "__value": "Box2", "__type": "LocalEnum.Boxes", "__tile": { "tilesetUid": 113, "x": 28, "y": 0, "w": 28, "h": 28 }, "defUid": 115, "realEditorValues": [{
 								"id": "V_String",
-								"params": ["Box1"]
+								"params": ["Box2"]
 							}] }]
 						}
 					]

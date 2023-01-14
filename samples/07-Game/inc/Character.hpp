@@ -8,11 +8,11 @@
 #include <map>
 #include <string>
 
-class Character final
+class Character
 {
 public:
     Character() = default;
-    ~Character() = default;
+    virtual ~Character() = default;
 
     Character( const Character& copy );
     Character( Character&& other ) noexcept;
@@ -39,14 +39,14 @@ public:
     /// Update the character's animation frame.
     /// </summary>
     /// <param name="deltaTime">The elapsed time (in seconds).</param>
-    void update( float deltaTime );
+    virtual void update( float deltaTime );
 
     /// <summary>
     /// Draw the character to the image.
     /// </summary>
     /// <param name="image">The image to render the character sprite to.</param>
     /// <param name="transform">The transform to apply.</param>
-    void draw( sr::Image& image, const Math::Transform2D& transform );
+    void draw( sr::Image& image, const Math::Transform2D& transform ) const;
 
 private:
     // A map of animation names to SpriteAnim(s)

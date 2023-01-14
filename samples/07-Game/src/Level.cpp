@@ -9,6 +9,23 @@
 using namespace Math;
 using namespace sr;
 
+Box loadBox( const std::filesystem::path& basePath, int hitPoints )
+{
+    Box box{hitPoints};
+
+    // First, load the sprite sheets for the box animations.
+    const auto idle = ResourceManager::loadSpriteSheet( basePath / "Idle.png", 28, 24, 0, 0, BlendMode::AlphaBlend );
+    const auto hit  = ResourceManager::loadSpriteSheet( basePath / "Hit (28x24).png", 28, 24, 0, 0, BlendMode::AlphaBlend );
+    const auto breakSprite = ResourceManager::loadSpriteSheet( basePath / "Break.png", 28, 24, 0, 0, BlendMode::AlphaBlend );
+
+    // Now add the sprite animations to the box.
+    box.addAnimation( "Idle", SpriteAnim { idle, 20 } );
+    box.addAnimation( "Hit", SpriteAnim { hit, 20 } );
+    box.addAnimation( "Break", SpriteAnim { breakSprite, 20 } );
+
+    return box;
+}
+
 Level::Level( const ldtk::Project& project, const ldtk::World& world, const ldtk::Level& level )
 : world { &world }
 , level { &level }
@@ -32,6 +49,11 @@ Level::Level( const ldtk::Project& project, const ldtk::World& world, const ldtk
             fruitSprites[tileset.name] = std::move( sprites );
         }
     }
+
+    // Load the box prefabs/prototypes.
+    boxPrefabs["Box1"] = loadBox( projectPath / "Items/Boxes/Box1", 1 );
+    boxPrefabs["Box2"] = loadBox( projectPath / "Items/Boxes/Box2", 3 );
+    boxPrefabs["Box3"] = loadBox( projectPath / "Items/Boxes/Box3", 5 );
 
     // Parse collisions.
     const auto& entities   = level.getLayer( "Entities" );
@@ -64,6 +86,21 @@ Level::Level( const ldtk::Project& project, const ldtk::World& world, const ldtk
         Sphere collider { { p.x, p.y, 0 }, 8.0f };
 
         allPickups.emplace_back( fruitSprite, collider );
+    }
+
+    // Parse boxes
+    const auto& boxEntities = entities.getEntitiesByName( "Box" );
+    for ( auto& box: boxEntities )
+    {
+        auto& e = box.get();
+        auto& p = e.getPosition();
+        auto& type = e.getField<ldtk::FieldType::Enum>( "BoxType" );
+
+        Box newBox = boxPrefabs[type->name];
+        newBox.setPosition( { p.x, p.y } );
+
+        auto b = boxes.emplace_back( std::make_shared<Box>(std::move( newBox )) );
+        b->setAnimation( "Idle" );
     }
 
     const auto& tilesLayer = level.getLayer( "Tiles" );
@@ -105,6 +142,8 @@ void Level::update( float deltaTime )
     updateCollisions( deltaTime );
     updatePickups( deltaTime );
     updateEffects( deltaTime );
+    updateBoxes( deltaTime );
+
 }
 
 void Level::updateCollisions( float deltaTime )
@@ -269,6 +308,18 @@ void Level::updateEffects( float deltaTime )
     }
 }
 
+void Level::updateBoxes( float deltaTime )
+{
+    for (auto iter = boxes.begin(); iter != boxes.end(); )
+    {
+        // TODO: Check player collision with boxes.
+
+
+        (*iter)->update( deltaTime );
+        ++iter;
+    }
+}
+
 void Level::reset()
 {
     player.setPosition( playerStart );
@@ -293,6 +344,11 @@ void Level::draw( sr::Image& image ) const
     for ( auto& effect: effects )
     {
         effect.draw( image );
+    }
+
+    for (auto& box : boxes)
+    {
+        box->draw( image );
     }
 
     player.draw( image );

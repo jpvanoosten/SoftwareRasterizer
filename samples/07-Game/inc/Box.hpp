@@ -1,11 +1,10 @@
 #pragma once
 
 #include "Character.hpp"
-#include "Player.hpp"
 
 #include <Math/AABB.hpp>
 
-class Box final
+class Box : public Character
 {
 public:
     enum class State
@@ -16,15 +15,19 @@ public:
     };
 
     Box() = default;
-    Box( const Character& boxCharacter, int hitPoints, const Math::AABB& collision );
-    ~Box() = default;
+    Box( int hitPoints );
+    Box( const Box& copy );
+    Box( Box&& other ) noexcept;
+    ~Box() override = default;
 
-    /// <summary>
-    /// Check to see if the player collides with this box.
-    /// </summary>
-    bool collides( const Player& player ) const noexcept
+    Box& operator=( const Box& copy );
+    Box& operator=( Box&& other ) noexcept;
+
+    void setPosition( const glm::vec2& position );
+
+    const Math::AABB& getAABB() const noexcept
     {
-        return player.getAABB().intersect( aabb );
+        return aabb;
     }
 
     /// <summary>
@@ -33,18 +36,20 @@ public:
     /// <returns></returns>
     int hit()
     {
-        if (hitPoints > 0)
+        if ( hitPoints > 0 )
         {
-            state = State::Hit;
-
+            setState( State::Hit );
+            --hitPoints;
         }
+
+        return hitPoints;
     }
 
     /// <summary>
     /// Update the box.
     /// </summary>
     /// <param name="deltaTime">The frame time (in seconds).</param>
-    void update( float deltaTime );
+    void update( float deltaTime ) override;
 
     /// <summary>
     /// Draw this box to the image.
@@ -54,14 +59,18 @@ public:
 
 private:
     void setState( State newState );
+    void startState( State newState );
+    void endState( State oldState );
 
-    Math::AABB aabb;
+    void updateIdle( float deltaTime );
+    void updateHit( float deltaTime );
+    void updateBreak( float deltaTime );
+
+    Math::AABB        aabb;
+    Math::Transform2D transform;
 
     State state = State::Idle;
 
     // How many hits it takes to destroy the box.
     int hitPoints = 0;
-
-    // The box "character"
-    const Character* character = nullptr;
 };

@@ -289,6 +289,13 @@ struct AABB
         return code;
     }
 
+    /// <summary>
+    /// Test if a line intersects this AABB.
+    /// Source: Real-time Collision Detection, Christer Ericson (2005)
+    /// </summary>
+    /// <param name="p0">The beginning of the line.</param>
+    /// <param name="p1">The end of the line.</param>
+    /// <returns>`true` if the line intersects this AABB.</returns>
     [[nodiscard]] bool intersect( const glm::vec3& p0, const glm::vec3& p1 ) const noexcept
     {
         const glm::vec3 c = center();            // AABB center point.
@@ -299,15 +306,15 @@ struct AABB
         // Translate to origin.
         m = m - c;
 
-        float adx = std::abs( d.x );
+        const float adx = std::abs( d.x );
         if ( std::abs( m.x ) > e.x + adx )
             return false;
 
-        float ady = std::abs( d.y );
+        const float ady = std::abs( d.y );
         if ( std::abs( m.y ) > e.y + ady )
             return false;
 
-        float adz = std::abs( d.z );
+        const float adz = std::abs( d.z );
         if ( std::abs( m.z ) > e.z + adz )
             return false;
 
@@ -347,7 +354,7 @@ struct AABB
     /// </summary>
     /// <param name="sphere">The sphere to test.</param>
     /// <returns>`true` if the sphere is colliding with this AABB, `false` otherwise.</returns>
-    bool intersect( const Sphere& sphere ) const noexcept
+    [[nodiscard]] bool intersect( const Sphere& sphere ) const noexcept
     {
         // Expand the AABB by the radius of the sphere.
         const AABB e { min - glm::vec3 { sphere.radius }, max + glm::vec3 { sphere.radius } };
