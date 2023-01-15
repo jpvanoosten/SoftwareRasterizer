@@ -34,12 +34,48 @@ public:
     void draw( sr::Image& image ) const;
 
     /// <summary>
+    /// Set the gravity for the pickup.
+    /// Set to 0 to disable gravity.
+    /// </summary>
+    /// <param name="g">The gravity to apply.</param>
+    void setGravity(float g)
+    {
+        gravity = g;
+    }
+
+    /// <summary>
     /// Get the transform of the pickup.
     /// </summary>
     /// <returns></returns>
-    const Math::Transform2D getTransform() const noexcept
+    const Math::Transform2D& getTransform() const noexcept
     {
         return transform;
+    }
+
+    const Math::Sphere& getCollider() const noexcept
+    {
+        return sphere;
+    }
+
+    const glm::vec2& getPosition() const noexcept
+    {
+        return transform.getPosition();
+    }
+
+    void setPosition( const glm::vec2& pos )
+    {
+        transform.setPosition( pos );
+        sphere.center = glm::vec3 { pos.x, pos.y, 0 };
+    }
+
+    const glm::vec2& getVelocity() const noexcept
+    {
+        return velocity;
+    }
+
+    void setVelocity( const glm::vec2& vel )
+    {
+        velocity = vel;
     }
 
 private:
@@ -57,4 +93,9 @@ private:
 
     // Animation time for determining the frame to draw for this pickup.
     float time = 0.0f;
+
+    // Whether to apply gravity for this pickup.
+    float gravity = 0.0f;
+    // Current velocity of the pickup.
+    glm::vec2 velocity{0};
 };

@@ -10,6 +10,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include <numbers>
 #include <optional>
 
 using namespace sr;
@@ -463,6 +464,36 @@ void Image::drawAABB( AABB aabb, const Color& color, const BlendMode& blendMode,
         }
     }
     break;
+    }
+}
+
+void Image::drawCircle( const Math::Sphere& sphere, const Color& color, const BlendMode& blendMode, FillMode fillMode ) noexcept
+{
+    drawCircle( glm::vec2 { sphere.center }, sphere.radius, color, blendMode, fillMode );
+}
+
+void Image::drawCircle( const glm::vec2& center, float radius, const Color& color, const BlendMode& blendMode, FillMode fillMode ) noexcept
+{
+    if ( !m_AABB.intersect( Sphere { glm::vec3 { center, 0 }, radius } ) )
+        return;
+
+    for ( int i = 0; i < 64; ++i )
+    {
+        const float a1 = static_cast<float>( i ) * std::numbers::pi_v<float> / 32.0f;
+        const float a2 = static_cast<float>( i + 1 ) * std::numbers::pi_v<float> / 32.0f;
+
+        const glm::vec2 p0 { center.x + std::cos( a1 ) * radius, center.y + std::sin( a1 ) * radius };
+        const glm::vec2 p1 { center.x + std::cos( a2 ) * radius, center.y + std::sin( a2 ) * radius };
+
+        switch ( fillMode )
+        {
+        case FillMode::WireFrame:
+            drawLine( p0, p1, color, blendMode );
+            break;
+        case FillMode::Solid:
+            drawTriangle( p0, p1, center, color, blendMode, fillMode );
+            break;
+        }
     }
 }
 

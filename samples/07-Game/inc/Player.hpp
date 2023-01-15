@@ -162,6 +162,8 @@ private:
     static const float jumpHeight;
     // Jump time is the time (in seconds) to the apex of the jump.
     static const float jumpTime;
+
+public:
     // Gravity and jump speed are computed to achieve the desired jump parabola.
     // Source: https://2dengine.com/?p=platformers#Jumping
     // Source: https://jobtalle.com/2d_platformer_physics.html
@@ -174,6 +176,7 @@ private:
     // How long before landing the user can trigger a jump.
     static const float jumpBuffer;
 
+private:
     // True if the player can double jump.
     bool canDoubleJump = true;
 

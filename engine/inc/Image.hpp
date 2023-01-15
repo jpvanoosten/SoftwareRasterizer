@@ -217,6 +217,25 @@ struct SR_API Image final
     void drawAABB( Math::AABB aabb, const Color& color, const BlendMode& blendMode = {}, FillMode fillMode = FillMode::Solid ) noexcept;
 
     /// <summary>
+    /// Draw a circle from a sphere.
+    /// </summary>
+    /// <param name="sphere">The sphere that represents the center point and radius of the circle.</param>
+    /// <param name="color">The color of the circle.</param>
+    /// <param name="blendMode">The blend mode to use.</param>
+    /// <param name="fillMode">The fill mode to use.</param>
+    void drawCircle( const Math::Sphere& sphere, const Color& color, const BlendMode& blendMode = {}, FillMode fillMode = FillMode::Solid ) noexcept;
+
+    /// <summary>
+    /// Draw a circle.
+    /// </summary>
+    /// <param name="center">The center point of the circle.</param>
+    /// <param name="radius">The radius of the circle.</param>
+    /// <param name="color">The color of the circle.</param>
+    /// <param name="blendMode">The blend mode to use.</param>
+    /// <param name="fillMode">The fill mode to use.</param>
+    void drawCircle( const glm::vec2& center, float radius, const Color& color, const BlendMode& blendMode = {}, FillMode fillMode = FillMode::Solid ) noexcept;
+
+    /// <summary>
     /// Draw a sprite on the screen using the given transform.
     /// </summary>
     /// <param name="sprite">The sprite to draw.</param>

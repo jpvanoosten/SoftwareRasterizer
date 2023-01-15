@@ -7,6 +7,12 @@
 #include <Color.hpp>
 #include <ResourceManager.hpp>
 
+#include <numbers>
+#include <random>
+
+static std::random_device rd;
+static std::minstd_rand   rng( rd() );
+
 using namespace Math;
 using namespace sr;
 
@@ -53,7 +59,7 @@ Level::Level( const ldtk::Project& project, const ldtk::World& world, const ldtk
 
     // Load the box prefabs/prototypes.
     boxPrefabs["Box1"] = loadBox( projectPath / "Items/Boxes/Box1", 1 );
-    boxPrefabs["Box2"] = loadBox( projectPath / "Items/Boxes/Box2", 3 );
+    boxPrefabs["Box2"] = loadBox( projectPath / "Items/Boxes/Box2", 5 );
     boxPrefabs["Box3"] = loadBox( projectPath / "Items/Boxes/Box3", 5 );
 
     // Parse collisions.
@@ -289,7 +295,63 @@ void Level::updatePickups( float deltaTime )
 
     // update remaining pickups.
     for ( auto& pickup: allPickups )
+    {
         pickup.update( deltaTime );
+
+        Sphere    pickupCollider = pickup.getCollider();
+        glm::vec2 pos            = pickup.getPosition();
+        glm::vec2 vel            = pickup.getVelocity();
+
+        // Check if the pickup collides with a level collider.
+        for ( auto& collider: colliders )
+        {
+            AABB colliderAABB = collider.aabb;
+            // Check to see if the pickup is colliding with the left edge of the collider.
+            Line leftEdge { { colliderAABB.min.x, colliderAABB.min.y, 0 }, { colliderAABB.min.x, colliderAABB.max.y, 0 } };
+            if ( pickupCollider.intersect( leftEdge ) )
+            {
+                // Set the position of the pickup to the left edge of the collider.
+                pos.x = colliderAABB.min.x - pickupCollider.radius;
+                // And negate the x velocity
+                vel.x = -vel.x;
+            }
+
+            // Check to see if the pickup is colliding with the right edge of the collider.
+            Line rightEdge { { colliderAABB.max.x, colliderAABB.min.y, 0 }, { colliderAABB.max.x, colliderAABB.max.y, 0 } };
+            if ( pickupCollider.intersect( rightEdge ) )
+            {
+                // Set the position of the pickup to the right edge of the collider.
+                pos.x = colliderAABB.max.x + pickupCollider.radius;
+                // And negate the x velocity.
+                vel.x = -vel.x;
+            }
+
+            // Check to see if the player is colliding with the top edge of the collider.
+            Line topEdge { { colliderAABB.min.x, colliderAABB.min.y, 0 }, { colliderAABB.max.x, colliderAABB.min.y, 0 } };
+            if ( pickupCollider.intersect( topEdge ) )
+            {
+                // Set the position of the pickup to the top edge of the collider.
+                pos.y = colliderAABB.min.y - pickupCollider.radius;
+                // And negate the velocity.
+                vel.y = -vel.y;
+            }
+
+            // Check to see if the pickup is colliding with the bottom edge of the collider.
+            Line bottomEdge { { colliderAABB.min.x, colliderAABB.max.y, 0 }, { colliderAABB.max.x, colliderAABB.max.y, 0 } };
+            if ( pickupCollider.intersect( bottomEdge ) )
+            {
+                // Set the position of the pickup to the bottom edge of the collider.
+                pos.y = colliderAABB.max.y + pickupCollider.radius;
+                // And negate the velocity.
+                vel.y = -vel.y;
+            }
+        }
+
+        // TODO: Fix collision detection (not yet correct)...
+        // Update the pickup's position and velocity.
+        //pickup.setPosition( pos );
+        //pickup.setVelocity( vel );
+    }
 }
 
 void Level::updateEffects( float deltaTime )
@@ -405,10 +467,17 @@ void Level::updateBoxes( float deltaTime )
         box->update( deltaTime );
 
         Box::State boxState = box->getState();
-        if (boxState == Box::State::Break)
+        if ( boxState == Box::State::Break )
         {
-            // TODO: Break the box:
             iter = boxes.erase( iter );
+
+            // Spawn some fruit out of the box.
+            addPickup( "Apple", glm::vec2 { boxCollider.center() } );
+            addPickup( "Banana", glm::vec2 { boxCollider.center() } );
+            addPickup( "Cherry", glm::vec2 { boxCollider.center() } );
+            addPickup( "Kiwi", glm::vec2 { boxCollider.center() } );
+            addPickup( "Melon", glm::vec2 { boxCollider.center() } );
+            addPickup( "Strawberry", glm::vec2 { boxCollider.center() } );
         }
         else
         {
@@ -426,17 +495,6 @@ void Level::updateBoxes( float deltaTime )
         else if ( onRightWall )
             player.setState( Player::State::RightWallJump );
     }
-
-    // If the player was wall jumping but is no longer touching a wall, then start falling.
-    if ( playerState == Player::State::LeftWallJump || playerState == Player::State::RightWallJump )
-    {
-        if ( !onLeftWall && !onRightWall )
-            player.setState( Player::State::Falling );
-    }
-
-    //// If the player was moving but is no longer colliding, then start falling.
-    // if ( playerState == Player::State::Run && !onGround )
-    //     player.setState( Player::State::Falling );
 
     // Update player position and velocity.
     player.setPosition( pos );
@@ -482,4 +540,22 @@ void Level::draw( sr::Image& image ) const
         image.drawAABB( collider.aabb, collider.isOneWay ? Color::Yellow : Color::Red, BlendMode::Disable, FillMode::WireFrame );
     }
 #endif
+}
+
+void Level::addPickup( std::string_view name, const glm::vec2& p )
+{
+    // Random distribution between 0..PI (for generating random vectors on a hemisphere).
+    static std::uniform_real_distribution dist { 0.0f, std::numbers::pi_v<float> };
+
+    auto&  fruitSprite = fruitSprites[std::string( name )];
+    Sphere collider { { p.x, p.y, 0 }, 8.0f };
+
+    // Generate a random initial velocity for the pickup.
+    const float angle = dist( rng );
+    float       x     = std::cos( angle ) * 200.0f;
+    float       y     = std::sin( angle ) * -300.0f;
+
+    auto& pickup = allPickups.emplace_back( fruitSprite, collider );
+    pickup.setVelocity( { x, y } );  // Give it some initial force.
+    pickup.setGravity( -Player::gravity );
 }

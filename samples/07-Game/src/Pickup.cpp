@@ -19,6 +19,18 @@ Pickup::Pickup( std::shared_ptr<sr::SpriteSheet> sprites, const Math::Sphere& co
 void Pickup::update( float deltaTime )
 {
     time += deltaTime;
+
+    if ( abs( gravity ) > 0.0f )
+    {
+        glm::vec2 vel = getVelocity();
+        glm::vec2 pos = getPosition();
+
+        vel.y -= gravity * deltaTime;
+        pos += vel * deltaTime;
+
+        setVelocity( vel );
+        setPosition( pos );
+    }
 }
 
 void Pickup::draw( sr::Image& image ) const
@@ -28,4 +40,8 @@ void Pickup::draw( sr::Image& image ) const
 
     const size_t frame = static_cast<size_t>( time * static_cast<float>( frameRate ) ) % spriteSheet->getNumSprites();
     image.drawSprite( ( *spriteSheet )[frame], transform );
+
+#if _DEBUG
+    image.drawCircle( sphere, sr::Color::Yellow, {}, sr::FillMode::WireFrame );
+#endif
 }

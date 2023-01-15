@@ -43,6 +43,9 @@ public:
     void draw( sr::Image& image ) const;
 
 private:
+    // Add a pickup with a name, initial position.
+    void addPickup( std::string_view name, const glm::vec2& pos );
+
     void updateCollisions( float deltaTime );
     void updatePickups( float deltaTime );
     void updateEffects( float deltaTime );

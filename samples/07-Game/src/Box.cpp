@@ -51,7 +51,7 @@ void Box::setPosition( const glm::vec2& position )
 {
     // A box sprite is 28x24 pixels, but the visual box is 20x20 pixels.
     // Position is the bottom-center point of the box.
-    aabb      = Math::AABB { glm::vec3 { position.x - 10, position.y - 20, 0 }, glm::vec3 { position.x + 10, position.y, 0 } };
+    aabb      = Math::AABB { glm::vec3 { position.x - 10, position.y - 20, 0 }, glm::vec3 { position.x + 9, position.y, 0 } };
     transform = Math::Transform2D { position };
     transform.setAnchor( glm::vec2 { 14, 22 } );
 }
