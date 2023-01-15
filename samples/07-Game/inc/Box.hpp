@@ -34,14 +34,13 @@ public:
     /// The player hit the box. Reduce the hit points by 1 and return the remaining hitpoints.
     /// </summary>
     /// <returns></returns>
-    int hit()
+    void hit()
     {
-        if ( hitPoints > 0 )
-        {
-            setState( State::Hit );
-            --hitPoints;
-        }
+        setState( State::Hit );
+    }
 
+    int getHitPoints() const noexcept
+    {
         return hitPoints;
     }
 
@@ -57,8 +56,22 @@ public:
     /// <param name="image"></param>
     void draw( sr::Image& image ) const;
 
-private:
+    /// <summary>
+    /// Set the state of the box.
+    /// </summary>
+    /// <param name="newState">The new state to set the box to.</param>
     void setState( State newState );
+
+    /// <summary>
+    /// Get the current state of the box.
+    /// </summary>
+    /// <returns>The current box state.</returns>
+    State getState() const noexcept
+    {
+        return state;
+    }
+
+private:
     void startState( State newState );
     void endState( State oldState );
 

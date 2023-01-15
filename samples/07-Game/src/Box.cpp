@@ -93,14 +93,40 @@ void Box::setState( State newState )
     }
 }
 
-void Box::startState( State newState ) {}
+void Box::startState( State newState )
+{
+    switch ( newState )
+    {
+    case State::Idle:
+        setAnimation( "Idle" );
+        break;
+    case State::Hit:
+        setAnimation( "Hit" );
+        break;
+    case State::Break:
+        // TODO: Break into pieces.
+        break;
+    }
+
+}
 void Box::endState( State oldState ) {}
 
 void Box::updateIdle( float deltaTime )
 {}
 
 void Box::updateHit( float deltaTime )
-{}
+{
+    const auto& hitAnim = getAnimation( "Hit" );
+    if ( hitAnim.isDone() )
+    {
+        // Reduce hit points
+        --hitPoints;
+        if ( hitPoints > 0 )
+            setState( State::Idle );
+        else
+            setState( State::Break );
+    }
+}
 
 void Box::updateBreak( float deltaTime )
 {}

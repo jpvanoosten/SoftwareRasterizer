@@ -1,4 +1,5 @@
 #include "LDtkLoader/Project.hpp"
+#include "Player.hpp"
 
 #include <Level.hpp>
 
@@ -11,11 +12,11 @@ using namespace sr;
 
 Box loadBox( const std::filesystem::path& basePath, int hitPoints )
 {
-    Box box{hitPoints};
+    Box box { hitPoints };
 
     // First, load the sprite sheets for the box animations.
-    const auto idle = ResourceManager::loadSpriteSheet( basePath / "Idle.png", 28, 24, 0, 0, BlendMode::AlphaBlend );
-    const auto hit  = ResourceManager::loadSpriteSheet( basePath / "Hit (28x24).png", 28, 24, 0, 0, BlendMode::AlphaBlend );
+    const auto idle        = ResourceManager::loadSpriteSheet( basePath / "Idle.png", 28, 24, 0, 0, BlendMode::AlphaBlend );
+    const auto hit         = ResourceManager::loadSpriteSheet( basePath / "Hit (28x24).png", 28, 24, 0, 0, BlendMode::AlphaBlend );
     const auto breakSprite = ResourceManager::loadSpriteSheet( basePath / "Break.png", 28, 24, 0, 0, BlendMode::AlphaBlend );
 
     // Now add the sprite animations to the box.
@@ -45,7 +46,7 @@ Level::Level( const ldtk::Project& project, const ldtk::World& world, const ldtk
     {
         if ( tileset.hasTag( "Fruit" ) )
         {
-            auto sprites = ResourceManager::loadSpriteSheet( projectPath / tileset.path, tileset.tile_size, tileset.tile_size, static_cast<uint32_t>( tileset.padding ), static_cast<uint32_t>( tileset.spacing ), BlendMode::AlphaBlend );
+            auto sprites               = ResourceManager::loadSpriteSheet( projectPath / tileset.path, tileset.tile_size, tileset.tile_size, static_cast<uint32_t>( tileset.padding ), static_cast<uint32_t>( tileset.spacing ), BlendMode::AlphaBlend );
             fruitSprites[tileset.name] = std::move( sprites );
         }
     }
@@ -92,14 +93,14 @@ Level::Level( const ldtk::Project& project, const ldtk::World& world, const ldtk
     const auto& boxEntities = entities.getEntitiesByName( "Box" );
     for ( auto& box: boxEntities )
     {
-        auto& e = box.get();
-        auto& p = e.getPosition();
+        auto& e    = box.get();
+        auto& p    = e.getPosition();
         auto& type = e.getField<ldtk::FieldType::Enum>( "BoxType" );
 
         Box newBox = boxPrefabs[type->name];
         newBox.setPosition( { p.x, p.y } );
 
-        auto b = boxes.emplace_back( std::make_shared<Box>(std::move( newBox )) );
+        auto b = boxes.emplace_back( std::make_shared<Box>( std::move( newBox ) ) );
         b->setAnimation( "Idle" );
     }
 
@@ -143,7 +144,6 @@ void Level::update( float deltaTime )
     updatePickups( deltaTime );
     updateEffects( deltaTime );
     updateBoxes( deltaTime );
-
 }
 
 void Level::updateCollisions( float deltaTime )
@@ -310,14 +310,137 @@ void Level::updateEffects( float deltaTime )
 
 void Level::updateBoxes( float deltaTime )
 {
-    for (auto iter = boxes.begin(); iter != boxes.end(); )
+    glm::vec2 vel        = player.getVelocity();
+    glm::vec2 pos        = player.getPosition();
+    AABB      playerAABB = player.getAABB();
+
+    // Number of pixels padding to account for collisions.
+    const float padding = 3.0f;
+
+    bool onGround    = false;
+    bool onLeftWall  = false;
+    bool onRightWall = false;
+
+    for ( auto iter = boxes.begin(); iter != boxes.end(); )
     {
-        // TODO: Check player collision with boxes.
+        auto& box = *iter;
 
+        AABB boxCollider = box->getAABB();
 
-        (*iter)->update( deltaTime );
-        ++iter;
+        // Check to see if the player is colliding with the left edge of the box.
+        Line leftEdge { { boxCollider.min.x, boxCollider.min.y + padding, 0 }, { boxCollider.min.x, boxCollider.max.y - padding, 0 } };
+        if ( playerAABB.intersect( leftEdge ) )
+        {
+            // Set the player's position to the left edge of the box.
+            pos.x = boxCollider.min.x - playerAABB.width() * 0.5f;
+            // And 0 the X velocity.
+            vel.x = 0.0f;
+
+            onRightWall = true;
+        }
+
+        // Check to see if the player is colliding with the right edge of the collider.
+        Line rightEdge { { boxCollider.max.x, boxCollider.min.y + padding, 0 }, { boxCollider.max.x, boxCollider.max.y - padding, 0 } };
+        if ( playerAABB.intersect( rightEdge ) )
+        {
+            // Set the player's position to the right edge of the collider.
+            pos.x = boxCollider.max.x + playerAABB.width() * 0.5f;
+            // And 0 the X velocity.
+            vel.x = 0.0f;
+
+            // Player is on a wall that is to the left of the player.
+            onLeftWall = true;
+        }
+
+        // Player is moving down (falling).
+        if ( vel.y < 0.0f )
+        {
+            // Check to see if the player is colliding with the top edge of the collider.
+            Line topEdge { { boxCollider.min.x + padding, boxCollider.min.y, 0 }, { boxCollider.max.x - padding, boxCollider.min.y, 0 } };
+            if ( playerAABB.intersect( topEdge ) )
+            {
+                // Set the player's position to the top of the AABB.
+                pos.y = boxCollider.min.y;
+                // And make the player jump off the box:
+                player.setState( Player::State::Jump );
+
+                // Jumping changes the player's velocity.
+                vel = player.getVelocity();
+
+                // Hit the box.
+                box->hit();
+            }
+        }
+        // Player is moving up.
+        else if ( vel.y > 0 )
+        {
+            // Check to see if the player is colliding with the bottom edge of the collider.
+            Line bottomEdge { { boxCollider.min.x + padding, boxCollider.max.y, 0 }, { boxCollider.max.x - padding, boxCollider.max.y, 0 } };
+            if ( playerAABB.intersect( bottomEdge ) )
+            {
+                // Set the player's position to the bottom of the collider.
+                pos.y = boxCollider.max.y + playerAABB.height();
+                // And 0 the Y velocity.
+                vel.y = 0.0f;
+
+                // Hit the box.
+                box->hit();
+
+                // And start falling
+                player.setState( Player::State::Falling );
+            }
+        }
+        // Player is Idle or running.
+        else
+        {
+            // Check to see if the player is colliding with the top edge of the collider.
+            Line topEdge { { boxCollider.min.x + padding, boxCollider.min.y, 0 }, { boxCollider.max.x - padding, boxCollider.min.y, 0 } };
+            if ( playerAABB.intersect( topEdge ) )
+            {
+                onGround = true;
+            }
+        }
+
+        // Update the box.
+        box->update( deltaTime );
+
+        Box::State boxState = box->getState();
+        if (boxState == Box::State::Break)
+        {
+            // TODO: Break the box:
+            iter = boxes.erase( iter );
+        }
+        else
+        {
+            ++iter;
+        }
     }
+
+    Player::State playerState = player.getState();
+
+    // If the player was falling and is touching a wall, then start wall jump
+    if ( playerState == Player::State::Falling )
+    {
+        if ( onLeftWall )
+            player.setState( Player::State::LeftWallJump );
+        else if ( onRightWall )
+            player.setState( Player::State::RightWallJump );
+    }
+
+    // If the player was wall jumping but is no longer touching a wall, then start falling.
+    if ( playerState == Player::State::LeftWallJump || playerState == Player::State::RightWallJump )
+    {
+        if ( !onLeftWall && !onRightWall )
+            player.setState( Player::State::Falling );
+    }
+
+    //// If the player was moving but is no longer colliding, then start falling.
+    // if ( playerState == Player::State::Run && !onGround )
+    //     player.setState( Player::State::Falling );
+
+    // Update player position and velocity.
+    player.setPosition( pos );
+    player.setVelocity( vel );
 }
 
 void Level::reset()
@@ -346,7 +469,7 @@ void Level::draw( sr::Image& image ) const
         effect.draw( image );
     }
 
-    for (auto& box : boxes)
+    for ( auto& box: boxes )
     {
         box->draw( image );
     }

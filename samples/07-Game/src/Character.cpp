@@ -55,6 +55,18 @@ void Character::setAnimation( std::string_view animName )
     }
 }
 
+const sr::SpriteAnim& Character::getAnimation( std::string_view animName ) const
+{
+    const auto iter = anims.find( std::string( animName ) );
+    if ( iter != anims.end() )
+        return iter->second;
+
+    std::cerr << "Animation with name: " << animName << " not found in animations.";
+
+    static sr::SpriteAnim emptyAnim;
+    return emptyAnim;
+}
+
 void Character::update( float deltaTime )
 {
     if ( currentAnim != anims.end() )

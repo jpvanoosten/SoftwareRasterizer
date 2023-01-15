@@ -36,6 +36,14 @@ public:
     void setAnimation( std::string_view animName );
 
     /// <summary>
+    /// Get an animation by name.
+    /// </summary>
+    /// <param name="animName">The name of the animation.</param>
+    /// <returns>A reference to the animation or an empty animation is the name is not found
+    /// in the animation map.</returns>
+    const sr::SpriteAnim& getAnimation( std::string_view animName ) const;
+
+    /// <summary>
     /// Update the character's animation frame.
     /// </summary>
     /// <param name="deltaTime">The elapsed time (in seconds).</param>
