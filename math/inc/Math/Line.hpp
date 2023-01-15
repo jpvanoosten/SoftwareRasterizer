@@ -1,27 +1,50 @@
 #pragma once
 
-#include <glm/vec3.hpp>
 #include <glm/geometric.hpp>
+#include <glm/vec3.hpp>
 
 namespace Math
 {
-    struct Line
+struct Line
+{
+    explicit Line( const glm::vec3& p0 = glm::vec3 { 0 }, const glm::vec3& p1 = glm::vec3 { 0 } )
+    : p0 { p0 }
+    , p1 { p1 }
+    {}
+
+    /// <summary>
+    /// Get the length of the line.
+    /// </summary>
+    /// <returns>The length of the line.</returns>
+    [[nodiscard]] float length() const noexcept
     {
-        explicit Line( const glm::vec3& p0 = glm::vec3 { 0 }, const glm::vec3& p1 = glm::vec3 { 0 } )
-            : p0{p0}
-            , p1{p1}
-        {}
+        return distance( p0, p1 );
+    }
 
-        /// <summary>
-        /// Get the length of the line.
-        /// </summary>
-        /// <returns>The length of the line.</returns>
-        [[nodiscard]] float length() const noexcept
-        {
-            return distance( p0, p1 );
-        }
+    /// <summary>
+    /// Compute the squared distance between this line and a point.
+    /// Source: Real-time Collision Detection, Christer Ericson (2005).
+    /// </summary>
+    /// <param name="p">The point the compute the distance to.</param>
+    /// <returns>The squared distance between a point and this line.</returns>
+    [[nodiscard]] float squareDistance( const glm::vec3& p ) const
+    {
+        const glm::vec3 dir   = p1 - p0;  // ab
+        const glm::vec3 diff0 = p - p0;   // ac
+        const glm::vec3 diff1 = p - p1;   // bc
 
-        glm::vec3 p0{0};
-        glm::vec3 p1{0};
-    };
-}
+        const float e = glm::dot( diff0, dir );
+        if ( e <= 0.0f )
+            return glm::dot( diff0, diff0 );
+
+        const float f = glm::dot( dir, dir );
+        if ( e >= f )
+            return glm::dot( diff1, diff1 );
+
+        return glm::dot( diff0, diff0 ) - e * e / f;
+    }
+
+    glm::vec3 p0 { 0 };
+    glm::vec3 p1 { 0 };
+};
+}  // namespace Math

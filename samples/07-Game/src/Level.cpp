@@ -306,6 +306,7 @@ void Level::updatePickups( float deltaTime )
         for ( auto& collider: colliders )
         {
             AABB colliderAABB = collider.aabb;
+
             // Check to see if the pickup is colliding with the left edge of the collider.
             Line leftEdge { { colliderAABB.min.x, colliderAABB.min.y, 0 }, { colliderAABB.min.x, colliderAABB.max.y, 0 } };
             if ( pickupCollider.intersect( leftEdge ) )
@@ -326,7 +327,7 @@ void Level::updatePickups( float deltaTime )
                 vel.x = -vel.x;
             }
 
-            // Check to see if the player is colliding with the top edge of the collider.
+            // Check to see if the pickup is colliding with the top edge of the collider.
             Line topEdge { { colliderAABB.min.x, colliderAABB.min.y, 0 }, { colliderAABB.max.x, colliderAABB.min.y, 0 } };
             if ( pickupCollider.intersect( topEdge ) )
             {
@@ -347,10 +348,12 @@ void Level::updatePickups( float deltaTime )
             }
         }
 
-        // TODO: Fix collision detection (not yet correct)...
+        // Dampen velocity.
+        vel /= 1.0f + 2.0f * deltaTime;
+
         // Update the pickup's position and velocity.
-        //pickup.setPosition( pos );
-        //pickup.setVelocity( vel );
+        pickup.setPosition( pos );
+        pickup.setVelocity( vel );
     }
 }
 

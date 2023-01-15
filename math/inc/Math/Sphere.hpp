@@ -41,26 +41,23 @@ struct Sphere
 
     /// <summary>
     /// Line/sphere intersection test.
-    /// Source: glm::gtx::intersectLineSphere
     /// </summary>
     /// <param name="p0">The beginning of the line.</param>
     /// <param name="p1">The end of the line.</param>
     /// <returns>`true` if the line intersects with this sphere, `false` otherwise.</returns>
     bool intersect( const glm::vec3& p0, const glm::vec3& p1 ) const
     {
-        const auto dir  = glm::normalize( p1 - p0 );
-        const auto diff = center - p0;
-        const auto t0   = glm::dot( diff, dir );
-        const auto d2   = glm::dot( diff, diff ) - t0 * t0;
-        if ( d2 > radius * radius )
-            return false;
-
-        return true;
+        return intersect( Line { p0, p1 } );
     }
 
-    bool intersect( const Line& line) const
+    /// <summary>
+    /// Line/sphere intersection test.
+    /// </summary>
+    /// <param name="line">The line to test for intersection.</param>
+    /// <returns>`true` if the line intersects with this sphere, `false` otherwise.</returns>
+    bool intersect( const Line& line ) const
     {
-        return intersect( line.p0, line.p1 );
+        return line.squareDistance( center ) < radius * radius;
     }
 
     glm::vec3 center { 0.0f };
