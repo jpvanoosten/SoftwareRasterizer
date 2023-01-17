@@ -177,31 +177,6 @@ void Level::updateCollisions( float deltaTime )
     {
         AABB colliderAABB = collider.aabb;
 
-        // Check to see if the player is colliding with the left edge of the collider.
-        Line leftEdge { { colliderAABB.min.x, colliderAABB.min.y + padding, 0 }, { colliderAABB.min.x, colliderAABB.max.y - padding, 0 } };
-        if ( !collider.isOneWay && playerAABB.intersect( leftEdge ) )
-        {
-            // Set the player's position to the left edge of the collider.
-            pos.x = colliderAABB.min.x - playerAABB.width() * 0.5f;
-            // And 0 the X velocity.
-            vel.x = 0.0f;
-
-            // On a wall that is right of the player.
-            onRightWall = true;
-        }
-        // Check to see if the player is colliding with the right edge of the collider.
-        Line rightEdge { { colliderAABB.max.x, colliderAABB.min.y + padding, 0 }, { colliderAABB.max.x, colliderAABB.max.y - padding, 0 } };
-        if ( !collider.isOneWay && playerAABB.intersect( rightEdge ) )
-        {
-            // Set the player's position to the right edge of the collider.
-            pos.x = colliderAABB.max.x + playerAABB.width() * 0.5f;
-            // And 0 the X velocity.
-            vel.x = 0.0f;
-
-            // Player is on a wall that is to the left of the player.
-            onLeftWall = true;
-        }
-
         // Player is moving down (falling).
         if ( vel.y < 0.0f )
         {
@@ -221,6 +196,8 @@ void Level::updateCollisions( float deltaTime )
                     player.setState( Player::State::Run );
 
                     onGround = true;
+
+                    continue;
                 }
             }
         }
@@ -238,6 +215,8 @@ void Level::updateCollisions( float deltaTime )
 
                 // And start falling
                 player.setState( Player::State::Falling );
+
+                continue;
             }
         }
         // Player is idle or running.
@@ -249,6 +228,35 @@ void Level::updateCollisions( float deltaTime )
             {
                 onGround = true;
             }
+        }
+
+        // Check to see if the player is colliding with the left edge of the collider.
+        Line leftEdge { { colliderAABB.min.x, colliderAABB.min.y + padding, 0 }, { colliderAABB.min.x, colliderAABB.max.y - padding, 0 } };
+        if ( !collider.isOneWay && playerAABB.intersect( leftEdge ) )
+        {
+            // Set the player's position to the left edge of the collider.
+            pos.x = colliderAABB.min.x - playerAABB.width() * 0.5f;
+            // And 0 the X velocity.
+            vel.x = 0.0f;
+
+            // On a wall that is right of the player.
+            onRightWall = true;
+
+            continue;
+        }
+        // Check to see if the player is colliding with the right edge of the collider.
+        Line rightEdge { { colliderAABB.max.x, colliderAABB.min.y + padding, 0 }, { colliderAABB.max.x, colliderAABB.max.y - padding, 0 } };
+        if ( !collider.isOneWay && playerAABB.intersect( rightEdge ) )
+        {
+            // Set the player's position to the right edge of the collider.
+            pos.x = colliderAABB.max.x + playerAABB.width() * 0.5f;
+            // And 0 the X velocity.
+            vel.x = 0.0f;
+
+            // Player is on a wall that is to the left of the player.
+            onLeftWall = true;
+
+            continue;
         }
     }
 
@@ -279,6 +287,57 @@ void Level::updateCollisions( float deltaTime )
     player.setVelocity( vel );
 }
 
+void Level::checkPickupCollision( const Sphere& pickupCollider, const AABB& colliderAABB, glm::vec2& pos, glm::vec2& vel )
+{
+    // Check to see if the pickup is colliding with the top edge of the collider.
+    Line topEdge { { colliderAABB.min.x, colliderAABB.min.y, 0 }, { colliderAABB.max.x, colliderAABB.min.y, 0 } };
+    if ( pickupCollider.intersect( topEdge ) )
+    {
+        // Set the position of the pickup to the top edge of the collider.
+        pos.y = colliderAABB.min.y - pickupCollider.radius;
+        // And negate the velocity.
+        vel.y = -vel.y;
+
+        return;
+    }
+
+    // Check to see if the pickup is colliding with the bottom edge of the collider.
+    Line bottomEdge { { colliderAABB.min.x, colliderAABB.max.y, 0 }, { colliderAABB.max.x, colliderAABB.max.y, 0 } };
+    if ( pickupCollider.intersect( bottomEdge ) )
+    {
+        // Set the position of the pickup to the bottom edge of the collider.
+        pos.y = colliderAABB.max.y + pickupCollider.radius;
+        // And negate the velocity.
+        vel.y = -vel.y;
+
+        return;
+    }
+
+    // Check to see if the pickup is colliding with the left edge of the collider.
+    Line leftEdge { { colliderAABB.min.x, colliderAABB.min.y, 0 }, { colliderAABB.min.x, colliderAABB.max.y, 0 } };
+    if ( pickupCollider.intersect( leftEdge ) )
+    {
+        // Set the position of the pickup to the left edge of the collider.
+        pos.x = colliderAABB.min.x - pickupCollider.radius;
+        // And negate the x velocity
+        vel.x = -vel.x;
+
+        return;
+    }
+
+    // Check to see if the pickup is colliding with the right edge of the collider.
+    Line rightEdge { { colliderAABB.max.x, colliderAABB.min.y, 0 }, { colliderAABB.max.x, colliderAABB.max.y, 0 } };
+    if ( pickupCollider.intersect( rightEdge ) )
+    {
+        // Set the position of the pickup to the right edge of the collider.
+        pos.x = colliderAABB.max.x + pickupCollider.radius;
+        // And negate the x velocity.
+        vel.x = -vel.x;
+
+        return;
+    }
+}
+
 void Level::updatePickups( float deltaTime )
 {
     for ( auto iter = allPickups.begin(); iter != allPickups.end(); )
@@ -306,46 +365,14 @@ void Level::updatePickups( float deltaTime )
         for ( auto& collider: colliders )
         {
             AABB colliderAABB = collider.aabb;
+            checkPickupCollision( pickupCollider, colliderAABB, pos, vel );
+        }
 
-            // Check to see if the pickup is colliding with the left edge of the collider.
-            Line leftEdge { { colliderAABB.min.x, colliderAABB.min.y, 0 }, { colliderAABB.min.x, colliderAABB.max.y, 0 } };
-            if ( pickupCollider.intersect( leftEdge ) )
-            {
-                // Set the position of the pickup to the left edge of the collider.
-                pos.x = colliderAABB.min.x - pickupCollider.radius;
-                // And negate the x velocity
-                vel.x = -vel.x;
-            }
-
-            // Check to see if the pickup is colliding with the right edge of the collider.
-            Line rightEdge { { colliderAABB.max.x, colliderAABB.min.y, 0 }, { colliderAABB.max.x, colliderAABB.max.y, 0 } };
-            if ( pickupCollider.intersect( rightEdge ) )
-            {
-                // Set the position of the pickup to the right edge of the collider.
-                pos.x = colliderAABB.max.x + pickupCollider.radius;
-                // And negate the x velocity.
-                vel.x = -vel.x;
-            }
-
-            // Check to see if the pickup is colliding with the top edge of the collider.
-            Line topEdge { { colliderAABB.min.x, colliderAABB.min.y, 0 }, { colliderAABB.max.x, colliderAABB.min.y, 0 } };
-            if ( pickupCollider.intersect( topEdge ) )
-            {
-                // Set the position of the pickup to the top edge of the collider.
-                pos.y = colliderAABB.min.y - pickupCollider.radius;
-                // And negate the velocity.
-                vel.y = -vel.y;
-            }
-
-            // Check to see if the pickup is colliding with the bottom edge of the collider.
-            Line bottomEdge { { colliderAABB.min.x, colliderAABB.max.y, 0 }, { colliderAABB.max.x, colliderAABB.max.y, 0 } };
-            if ( pickupCollider.intersect( bottomEdge ) )
-            {
-                // Set the position of the pickup to the bottom edge of the collider.
-                pos.y = colliderAABB.max.y + pickupCollider.radius;
-                // And negate the velocity.
-                vel.y = -vel.y;
-            }
+        // Collide with boxes.
+        for ( auto& box: boxes )
+        {
+            AABB boxCollider = box->getAABB();
+            checkPickupCollision( pickupCollider, boxCollider, pos, vel );
         }
 
         // Dampen velocity.
@@ -386,36 +413,11 @@ void Level::updateBoxes( float deltaTime )
     bool onLeftWall  = false;
     bool onRightWall = false;
 
-    for ( auto iter = boxes.begin(); iter != boxes.end(); )
+    for ( auto iter = boxes.begin(); iter != boxes.end(); ++iter)
     {
         auto& box = *iter;
 
         AABB boxCollider = box->getAABB();
-
-        // Check to see if the player is colliding with the left edge of the box.
-        Line leftEdge { { boxCollider.min.x, boxCollider.min.y + padding, 0 }, { boxCollider.min.x, boxCollider.max.y - padding, 0 } };
-        if ( playerAABB.intersect( leftEdge ) )
-        {
-            // Set the player's position to the left edge of the box.
-            pos.x = boxCollider.min.x - playerAABB.width() * 0.5f;
-            // And 0 the X velocity.
-            vel.x = 0.0f;
-
-            onRightWall = true;
-        }
-
-        // Check to see if the player is colliding with the right edge of the collider.
-        Line rightEdge { { boxCollider.max.x, boxCollider.min.y + padding, 0 }, { boxCollider.max.x, boxCollider.max.y - padding, 0 } };
-        if ( playerAABB.intersect( rightEdge ) )
-        {
-            // Set the player's position to the right edge of the collider.
-            pos.x = boxCollider.max.x + playerAABB.width() * 0.5f;
-            // And 0 the X velocity.
-            vel.x = 0.0f;
-
-            // Player is on a wall that is to the left of the player.
-            onLeftWall = true;
-        }
 
         // Player is moving down (falling).
         if ( vel.y < 0.0f )
@@ -434,6 +436,8 @@ void Level::updateBoxes( float deltaTime )
 
                 // Hit the box.
                 box->hit();
+
+                continue;
             }
         }
         // Player is moving up.
@@ -453,6 +457,8 @@ void Level::updateBoxes( float deltaTime )
 
                 // And start falling
                 player.setState( Player::State::Falling );
+
+                continue;
             }
         }
         // Player is Idle or running.
@@ -466,13 +472,47 @@ void Level::updateBoxes( float deltaTime )
             }
         }
 
+        // Check to see if the player is colliding with the left edge of the box.
+        Line leftEdge { { boxCollider.min.x, boxCollider.min.y + padding, 0 }, { boxCollider.min.x, boxCollider.max.y - padding, 0 } };
+        if ( playerAABB.intersect( leftEdge ) )
+        {
+            // Set the player's position to the left edge of the box.
+            pos.x = boxCollider.min.x - playerAABB.width() * 0.5f;
+            // And 0 the X velocity.
+            vel.x = 0.0f;
+
+            onRightWall = true;
+            continue;
+        }
+
+        // Check to see if the player is colliding with the right edge of the collider.
+        Line rightEdge { { boxCollider.max.x, boxCollider.min.y + padding, 0 }, { boxCollider.max.x, boxCollider.max.y - padding, 0 } };
+        if ( playerAABB.intersect( rightEdge ) )
+        {
+            // Set the player's position to the right edge of the collider.
+            pos.x = boxCollider.max.x + playerAABB.width() * 0.5f;
+            // And 0 the X velocity.
+            vel.x = 0.0f;
+
+            // Player is on a wall that is to the left of the player.
+            onLeftWall = true;
+            continue;
+        }
+    }
+
+    // Update the boxes.
+    for ( auto iter = boxes.begin(); iter != boxes.end(); )
+    {
+        auto& box = *iter;
+
         // Update the box.
         box->update( deltaTime );
 
         Box::State boxState = box->getState();
         if ( boxState == Box::State::Break )
         {
-            iter = boxes.erase( iter );
+            AABB boxCollider = box->getAABB();
+            iter             = boxes.erase( iter );
 
             // Spawn some fruit out of the box.
             addPickup( "Apple", glm::vec2 { boxCollider.center() } );

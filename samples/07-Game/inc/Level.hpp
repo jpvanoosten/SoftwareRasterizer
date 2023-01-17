@@ -45,7 +45,8 @@ public:
 private:
     // Add a pickup with a name, initial position.
     void addPickup( std::string_view name, const glm::vec2& pos );
-
+    // Check collision with a pickup and an AABB collider.
+    void checkPickupCollision( const Math::Sphere& pickupCollider, const Math::AABB& colliderAABB, glm::vec2& pos, glm::vec2& vel );
     void updateCollisions( float deltaTime );
     void updatePickups( float deltaTime );
     void updateEffects( float deltaTime );
