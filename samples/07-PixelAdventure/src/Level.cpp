@@ -71,11 +71,13 @@ Level::Level( const ldtk::Project& project, const ldtk::World& world, const ldtk
         auto& p      = e.getPosition();
         auto& s      = e.getSize();
         auto& oneWay = e.getField<ldtk::FieldType::Bool>( "OneWay" );
+        auto& trap   = e.getField<ldtk::FieldType::Bool>( "Trap" );
 
         Collider collider {
             .type     = ColliderType::Default,
             .aabb     = AABB { { p.x, p.y, 0.0 }, { p.x + s.x - 1, p.y + s.y - 1, 0.0f } },
             .isOneWay = oneWay ? *oneWay : false,
+            .isTrap   = trap ? *trap : false
         };
 
         colliders.push_back( collider );
@@ -413,7 +415,7 @@ void Level::updateBoxes( float deltaTime )
     bool onLeftWall  = false;
     bool onRightWall = false;
 
-    for ( auto iter = boxes.begin(); iter != boxes.end(); ++iter)
+    for ( auto iter = boxes.begin(); iter != boxes.end(); ++iter )
     {
         auto& box = *iter;
 
