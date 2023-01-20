@@ -49,6 +49,15 @@ public:
     void setState( State newState );
 
     /// <summary>
+    /// Check if the player is dead (this is used for level reloading).
+    /// </summary>
+    /// <returns></returns>
+    bool isDead() const noexcept
+    {
+        return state == State::Dead;
+    }
+
+    /// <summary>
     /// Get the current player's state.
     /// </summary>
     /// <returns></returns>

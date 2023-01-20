@@ -75,6 +75,20 @@ Game::Game( uint32_t screenWidth, uint32_t screenHeight )
         return back;
     } );
 
+    // Input to go to reload the current map.
+    Input::mapButtonDown( "Reload", []( std::span<const GamePadStateTracker> gamePadStates, const KeyboardStateTracker& keyboardState, const MouseStateTracker& mouseState ) {
+        bool b = false;
+
+        for ( auto& gamePadState: gamePadStates )
+        {
+            b = b || gamePadState.b == ButtonState::Pressed;
+        }
+
+        const bool enter = keyboardState.isKeyPressed( KeyCode::Enter );
+
+        return b || enter;
+    } );
+
     backgrounds.emplace_back( Background { "assets/Pixel Adventure/Background/Blue.png", 1.0f, { 0.0f, 1.0f }, 0.3f } );
     backgrounds.emplace_back( Background { "assets/Pixel Adventure/Background/Brown.png", 1.0f, { 0.0f, 1.0f }, 0.3f } );
     backgrounds.emplace_back( Background { "assets/Pixel Adventure/Background/Gray.png", 1.0f, { 0.0f, 1.0f }, 0.3f } );
@@ -157,10 +171,21 @@ void Game::Update()
         {
             onPreviousClicked();
         }
+        if ( Input::getButtonDown( "Reload" ) )
+        {
+            onRestartClicked();
+        }
 
         currentLevel.update( std::min( elapsedTime, physicsTick ) );
         elapsedTime -= physicsTick;
     } while ( elapsedTime > 0.0f );
+
+    // Check to see if the player died
+    if (currentLevel.getPlayer().isDead())
+    {
+        // Reload the level.
+        onRestartClicked();
+    }
 
     currentLevel.draw( image );
 

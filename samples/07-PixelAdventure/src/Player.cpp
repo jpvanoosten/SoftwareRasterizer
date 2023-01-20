@@ -67,14 +67,18 @@ std::shared_ptr<Character> createCharacter( const std::filesystem::path& basePat
     return character;
 }
 
-Player::Player( const Math::Transform2D& transform )
-: transform { transform }
+Player::Player( const Math::Transform2D& _transform )
+: transform { _transform }
 , aabb { { 7, 5, 0 }, { 25, 32, 0 } }  // Player is 32x32 pixels, but the AABB should be slightly smaller.
 , topAABB { { 7, 3, 0 }, { 25, 5, 0 } }
 , bottomAABB { { 7, 30, 0 }, { 25, 32, 0 } }
 , leftAABB { { 5, 5, 0 }, { 7, 29, 0 } }
 , rightAABB { { 25, 5, 0 }, { 27, 29, 0 } }
 {
+    // Player sprite is 32x32 pixels.
+    // Place the anchor point in the bottom center of the sprite.
+    transform.setAnchor( { 16, 32 } );
+
     characters.emplace_back( createCharacter( "assets/Pixel Adventure/Main Characters/Mask Dude" ) );
     characters.emplace_back( createCharacter( "assets/Pixel Adventure/Main Characters/Ninja Frog" ) );
     characters.emplace_back( createCharacter( "assets/Pixel Adventure/Main Characters/Pink Man" ) );
@@ -194,7 +198,9 @@ void Player::startState( State oldState, State newState )
         break;
     case State::Hit:
         currentCharacter->setAnimation( "Hit" );
-        velocity.y = jumpSpeed / 2.0f;
+        // Move the anchor point to the center of the player.
+        transform.setAnchor( { 16, 16 } );
+        velocity.y = jumpSpeed;
         break;
     case State::DoubleJump:
         currentCharacter->setAnimation( "Double Jump" );
@@ -302,13 +308,12 @@ void Player::doHit( float deltaTime )
     // Apply gravity:
     velocity.y -= gravity * deltaTime;
 
-    // Rotate the player
+    // Rotate the player while falling.
     transform.rotate( std::numbers::pi_v<float> * deltaTime );
 
     // If player is off the bottom of the screen...
     if ( transform.getPosition().y > 1000.0f )
     {
-        // TODO: Player dead... Reset level.
         setState( State::Dead );
     }
 }

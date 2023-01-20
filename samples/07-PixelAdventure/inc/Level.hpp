@@ -41,6 +41,11 @@ public:
     // Choose which character to use for this level.
     void setCharacter( size_t characterId );
 
+    const Player& getPlayer() const noexcept
+    {
+        return player;
+    }
+
     void draw( sr::Image& image ) const;
 
 private:
@@ -77,8 +82,10 @@ private:
     // Boxes
     std::vector<std::shared_ptr<Box>> boxes;
 
-    // Tile map.
+    // Level tile map.
     sr::TileMap tileMap;
+    // Separate tile map for spike traps.
+    sr::TileMap spikeMap;
 
     Player    player;
     glm::vec2 playerStart { 0 };

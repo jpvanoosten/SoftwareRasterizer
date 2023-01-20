@@ -72,12 +72,17 @@ Level::Level( const ldtk::Project& project, const ldtk::World& world, const ldtk
         auto& s      = e.getSize();
         auto& oneWay = e.getField<ldtk::FieldType::Bool>( "OneWay" );
         auto& trap   = e.getField<ldtk::FieldType::Bool>( "Trap" );
+        bool isTrap = trap ? *trap : false;
 
-        Collider collider {
+        // Add a few pixels padding if it is a spike trap.
+        int padding = isTrap ? 2 : 0;
+
+        Collider collider
+        {
             .type     = ColliderType::Default,
-            .aabb     = AABB { { p.x, p.y, 0.0 }, { p.x + s.x - 1, p.y + s.y - 1, 0.0f } },
+            .aabb     = AABB { { p.x + padding, p.y + padding, 0.0 }, { p.x + s.x - 1 - padding, p.y + s.y - 1 - padding, 0.0f } },
             .isOneWay = oneWay ? *oneWay : false,
-            .isTrap   = trap ? *trap : false
+            .isTrap   = isTrap
         };
 
         colliders.push_back( collider );
@@ -112,38 +117,51 @@ Level::Level( const ldtk::Project& project, const ldtk::World& world, const ldtk
         b->setAnimation( "Idle" );
     }
 
-    const auto& tilesLayer = level.getLayer( "Tiles" );
-    const auto& intGrid    = level.getLayer( "IntGrid" );  // TODO: Should probably rename this layer..
-    const auto& gridSize   = tilesLayer.getGridSize();
-    const auto& tileSet    = tilesLayer.getTileset();
-
+    // Parse the level tile map.
     {
+        const auto& tilesLayer = level.getLayer( "Tiles" );
+        const auto& intGrid    = level.getLayer( "IntGrid" );  // TODO: Should probably rename this layer..
+
+        const auto& gridSize = tilesLayer.getGridSize();
+        const auto& tileSet  = tilesLayer.getTileset();
+
         auto spriteSheet = ResourceManager::loadSpriteSheet( projectPath / tileSet.path, tileSet.tile_size, tileSet.tile_size, tileSet.padding, tileSet.spacing, BlendMode::AlphaBlend );
         tileMap          = TileMap( spriteSheet, gridSize.x, gridSize.y );
+
+        for ( auto& tile: intGrid.allTiles() )
+        {
+            const auto& gridPos             = tile.getGridPosition();
+            tileMap( gridPos.y, gridPos.x ) = tile.tileId;
+        }
+
+        for ( auto& tile: tilesLayer.allTiles() )
+        {
+            const auto& gridPos             = tile.getGridPosition();
+            tileMap( gridPos.y, gridPos.x ) = tile.tileId;
+        }
     }
 
-    for ( auto& tile: intGrid.allTiles() )
+    // Parse the spike traps.
     {
-        const auto& gridPos             = tile.getGridPosition();
-        tileMap( gridPos.y, gridPos.x ) = tile.tileId;
-    }
+        const auto& spikeLayer = level.getLayer( "Spike_Trap" );
 
-    for ( auto& tile: tilesLayer.allTiles() )
-    {
-        const auto& gridPos             = tile.getGridPosition();
-        tileMap( gridPos.y, gridPos.x ) = tile.tileId;
+        const auto& gridSize = spikeLayer.getGridSize();
+        const auto& tileSet  = spikeLayer.getTileset();
+
+        auto spriteSheet = ResourceManager::loadSpriteSheet( projectPath / tileSet.path, tileSet.tile_size, tileSet.tile_size, tileSet.padding, tileSet.spacing, BlendMode::AlphaBlend );
+        spikeMap         = TileMap( spriteSheet, gridSize.x, gridSize.y );
+
+        for ( auto& tile: spikeLayer.allTiles() )
+        {
+            const auto& gridPos              = tile.getGridPosition();
+            spikeMap( gridPos.y, gridPos.x ) = tile.tileId;
+        }
     }
 
     // Player start position
     const auto& startPos = entities.getEntitiesByName( "Player_Start" )[0].get();
     playerStart          = { startPos.getPosition().x, startPos.getPosition().y };
-
-    Transform2D playerTransform { { playerStart.x, playerStart.y } };
-    // Player sprite is 32x32 pixels.
-    // Place the anchor point in the bottom center of the sprite.
-    playerTransform.setAnchor( { 16, 32 } );
-
-    player.setTransform( playerTransform );
+    player.setPosition( playerStart );
 }
 
 void Level::update( float deltaTime )
@@ -163,6 +181,10 @@ void Level::updateCollisions( float deltaTime )
     // Update Player.
     player.update( deltaTime );
 
+    // If player is in the "Hit" state, then no collision occurs with the player.
+    if ( player.getState() == Player::State::Hit )
+        return;
+
     // Check player collision
     AABB playerAABB = player.getAABB();
 
@@ -175,6 +197,7 @@ void Level::updateCollisions( float deltaTime )
     bool onGround    = false;
     bool onLeftWall  = false;
     bool onRightWall = false;
+    bool isHit       = false;  // Set to true if the player hits a trap.
     for ( auto& collider: colliders )
     {
         AABB colliderAABB = collider.aabb;
@@ -194,10 +217,16 @@ void Level::updateCollisions( float deltaTime )
                     // And 0 the Y velocity.
                     vel.y = 0.0f;
 
-                    // And change state to running (to preserve momentum.)
-                    player.setState( Player::State::Run );
-
-                    onGround = true;
+                    if ( collider.isTrap )
+                    {
+                        isHit = true;
+                    }
+                    else
+                    {
+                        // And change state to running (to preserve momentum.)
+                        player.setState( Player::State::Run );
+                        onGround = true;
+                    }
 
                     continue;
                 }
@@ -215,8 +244,15 @@ void Level::updateCollisions( float deltaTime )
                 // And 0 the Y velocity.
                 vel.y = 0.0f;
 
-                // And start falling
-                player.setState( Player::State::Falling );
+                if ( collider.isTrap )
+                {
+                    isHit = true;
+                }
+                else
+                {
+                    // And start falling
+                    player.setState( Player::State::Falling );
+                }
 
                 continue;
             }
@@ -228,7 +264,14 @@ void Level::updateCollisions( float deltaTime )
             Line topEdge { { colliderAABB.min.x + padding, colliderAABB.min.y, 0 }, { colliderAABB.max.x - padding, colliderAABB.min.y, 0 } };
             if ( playerAABB.intersect( topEdge ) )
             {
-                onGround = true;
+                if ( collider.isTrap )
+                {
+                    isHit = true;
+                }
+                else
+                {
+                    onGround = true;
+                }
             }
         }
 
@@ -241,8 +284,15 @@ void Level::updateCollisions( float deltaTime )
             // And 0 the X velocity.
             vel.x = 0.0f;
 
-            // On a wall that is right of the player.
-            onRightWall = true;
+            if ( collider.isTrap )
+            {
+                isHit = true;
+            }
+            else
+            {
+                // On a wall that is right of the player.
+                onRightWall = true;
+            }
 
             continue;
         }
@@ -255,34 +305,51 @@ void Level::updateCollisions( float deltaTime )
             // And 0 the X velocity.
             vel.x = 0.0f;
 
-            // Player is on a wall that is to the left of the player.
-            onLeftWall = true;
+            if ( collider.isTrap )
+            {
+                isHit = true;
+            }
+            else
+            {
+                // Player is on a wall that is to the left of the player.
+                onLeftWall = true;
+            }
 
             continue;
         }
     }
 
-    Player::State playerState = player.getState();
-
-    // If the player was falling and is touching a wall, then start wall jump
-    if ( playerState == Player::State::Falling )
+    // If the player was hit...
+    if ( isHit )
     {
-        if ( onLeftWall )
-            player.setState( Player::State::LeftWallJump );
-        else if ( onRightWall )
-            player.setState( Player::State::RightWallJump );
+        player.setState( Player::State::Hit );
+        return;
     }
-
-    // If the player was wall jumping but is no longer touching a wall, then start falling.
-    if ( playerState == Player::State::LeftWallJump || playerState == Player::State::RightWallJump )
+    else
     {
-        if ( !onLeftWall && !onRightWall )
+
+        Player::State playerState = player.getState();
+
+        // If the player was falling and is touching a wall, then start wall jump
+        if ( playerState == Player::State::Falling )
+        {
+            if ( onLeftWall )
+                player.setState( Player::State::LeftWallJump );
+            else if ( onRightWall )
+                player.setState( Player::State::RightWallJump );
+        }
+
+        // If the player was wall jumping but is no longer touching a wall, then start falling.
+        if ( playerState == Player::State::LeftWallJump || playerState == Player::State::RightWallJump )
+        {
+            if ( !onLeftWall && !onRightWall )
+                player.setState( Player::State::Falling );
+        }
+
+        // If the player was moving but is no longer colliding, then start falling.
+        if ( playerState == Player::State::Run && !onGround )
             player.setState( Player::State::Falling );
     }
-
-    // If the player was moving but is no longer colliding, then start falling.
-    if ( playerState == Player::State::Run && !onGround )
-        player.setState( Player::State::Falling );
 
     // Update player position and velocity.
     player.setPosition( pos );
@@ -291,6 +358,10 @@ void Level::updateCollisions( float deltaTime )
 
 void Level::checkPickupCollision( const Sphere& pickupCollider, const AABB& colliderAABB, glm::vec2& pos, glm::vec2& vel )
 {
+    // If player is in the "Hit" state, then no collision can occur with the player.
+    if ( player.getState() == Player::State::Hit )
+        return;
+
     // Check to see if the pickup is colliding with the top edge of the collider.
     Line topEdge { { colliderAABB.min.x, colliderAABB.min.y, 0 }, { colliderAABB.max.x, colliderAABB.min.y, 0 } };
     if ( pickupCollider.intersect( topEdge ) )
@@ -342,16 +413,20 @@ void Level::checkPickupCollision( const Sphere& pickupCollider, const AABB& coll
 
 void Level::updatePickups( float deltaTime )
 {
-    for ( auto iter = allPickups.begin(); iter != allPickups.end(); )
+    // If player is in the "Hit" state, then no collision occurs with the player.
+    if ( player.getState() != Player::State::Hit )
     {
-        if ( iter->collides( player ) )
+        for ( auto iter = allPickups.begin(); iter != allPickups.end(); )
         {
-            // Play the collected animation at the pickup location.
-            effects.emplace_back( pickupCollected, iter->getTransform() );
-            iter = allPickups.erase( iter );
+            if ( iter->collides( player ) )
+            {
+                // Play the collected animation at the pickup location.
+                effects.emplace_back( pickupCollected, iter->getTransform() );
+                iter = allPickups.erase( iter );
+            }
+            else
+                ++iter;
         }
-        else
-            ++iter;
     }
 
     // update remaining pickups.
@@ -404,6 +479,10 @@ void Level::updateEffects( float deltaTime )
 
 void Level::updateBoxes( float deltaTime )
 {
+    // If player is in the "Hit" state, then no collision can occur with the player.
+    if ( player.getState() == Player::State::Hit )
+        return;
+
     glm::vec2 vel        = player.getVelocity();
     glm::vec2 pos        = player.getPosition();
     AABB      playerAABB = player.getAABB();
@@ -511,6 +590,7 @@ void Level::updateBoxes( float deltaTime )
         box->update( deltaTime );
 
         Box::State boxState = box->getState();
+        // If the box breaks.
         if ( boxState == Box::State::Break )
         {
             AABB boxCollider = box->getAABB();
@@ -561,6 +641,7 @@ void Level::setCharacter( size_t characterId )
 void Level::draw( sr::Image& image ) const
 {
     tileMap.draw( image );
+    spikeMap.draw( image );
 
     for ( auto& pickup: allPickups )
     {
