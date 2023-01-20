@@ -1,6 +1,6 @@
 cmake_minimum_required( VERSION 3.23.0 )
 
-set( TARGET_NAME 07-Game )
+set( TARGET_NAME 07-PixelAdventure )
 
 set( INC_FILES
     inc/Background.hpp
