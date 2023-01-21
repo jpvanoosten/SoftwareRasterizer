@@ -1,9 +1,12 @@
 cmake_minimum_required( VERSION 3.23.0 )
 
 set( INC_FILES
+    inc/Config.hpp
+    inc/Device.hpp
 )
 
 set( SRC_FILES
+    src/Device.cpp
 )
 
 set( ALL_FILES 
@@ -21,8 +24,8 @@ set_target_properties( Audio
 
 if(BUILD_SHARED_LIBS)
     target_compile_definitions( Audio
-        PRIVATE SoftwareRasterizer_EXPORTS
-        INTERFACE SoftwareRasterizer_IMPORTS
+        PRIVATE Audio_EXPORTS
+        INTERFACE Audio_IMPORTS
     )
 endif(BUILD_SHARED_LIBS)
 
@@ -31,6 +34,5 @@ target_include_directories( Audio
 )
 
 target_link_libraries( Audio
-    PUBLIC Math 
-    PRIVATE glew
+    PUBLIC OpenAL
 )
