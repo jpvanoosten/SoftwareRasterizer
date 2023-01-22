@@ -44,6 +44,7 @@ FetchContent_MakeAvailable( glew )
 message( STATUS "Fetching OpenAL..." )
 FetchContent_MakeAvailable( OpenAL )
 
+
 set_target_properties(
 	LDtkLoader glew uninstall
     PROPERTIES FOLDER externals
