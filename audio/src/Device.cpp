@@ -1,9 +1,8 @@
 #include <Device.hpp>
 
-#include <al.h>
-#include <alc.h>
-
 #include <iostream>
+
+#include "miniaudio.h"
 
 namespace Audio
 {
@@ -14,8 +13,7 @@ public:
     ~DeviceImpl();
 
 private:
-    ALCdevice*  m_pDevice  = nullptr;
-    ALCcontext* m_pContext = nullptr;
+    ma_engine engine;
 };
 
 }  // namespace Audio
@@ -24,41 +22,16 @@ using namespace Audio;
 
 DeviceImpl::DeviceImpl()
 {
-    // Create the audio device.
-    m_pDevice = alcOpenDevice( nullptr );
-    if ( m_pDevice )
+    if ( ma_engine_init(nullptr, &engine) != MA_SUCCESS )
     {
-        m_pContext = alcCreateContext( m_pDevice, nullptr );
-
-        if ( m_pContext )
-        {
-            alcMakeContextCurrent( m_pContext );
-        }
-        else
-        {
-            std::cerr << "An error occurred while creating the OpenAL context." << std::endl;
-        }
-    }
-    else
-    {
-        std::cerr << "An error occurred while creating the OpenAL device." << std::endl;
+        std::cerr << "Failed to initialize audio engine." << std::endl;
+        return;
     }
 }
 
 DeviceImpl::~DeviceImpl()
 {
-    alcMakeContextCurrent( nullptr );
-    if ( m_pContext )
-    {
-        alcDestroyContext( m_pContext );
-        m_pContext = nullptr;
-    }
-
-    if ( m_pDevice )
-    {
-        alcCloseDevice( m_pDevice );
-        m_pDevice = nullptr;
-    }
+    ma_engine_uninit( &engine );
 }
 
 std::unique_ptr<DeviceImpl> Device::instance = std::make_unique<DeviceImpl>();
