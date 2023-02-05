@@ -29,12 +29,11 @@ REM of Visual Studio detected on the user's computer. Supported version of Visua
 REM 	Visual Studio 2022
 REM     Visual Studio 2019
 REM 
-REM The solution files will be created in build_vs2019 if Visual Studio 2019 was detected or
-REM in build_vs2022 if Visual Studio 2022 was detected.
+REM The solution files will be created in out\build\vs16 if Visual Studio 2019 was detected or
+REM in out\build\vs17 if Visual Studio 2022 was detected.
 
 PUSHD "%~dp0"
 
-REM Update these lines if the currently installed version of Visual Studio is not 2017.
 SET VSWHERE="%~dp0\tools\vswhere\vswhere.exe"
 SET CMAKE="cmake"
 
