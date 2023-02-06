@@ -9,6 +9,7 @@ Sound::Sound( const Sound& )                = default;
 Sound::Sound( Sound&& ) noexcept            = default;
 Sound& Sound::operator=( const Sound& )     = default;
 Sound& Sound::operator=( Sound&& ) noexcept = default;
+
 Sound& Sound::operator=( nullptr_t ) noexcept
 {
     impl = nullptr;

@@ -28,6 +28,11 @@ public:
     void setCone( float innerConeAngle, float outerConeAngle, float outerGain = 1.0f );
     void getCone( float& innerConeAngle, float& outerConeAngle, float& outerGain ) const;
 
+    uint32_t getIndex() const noexcept
+    {
+        return index;
+    }
+
 private:
     uint32_t   index;
     ma_engine* engine = nullptr;

@@ -99,6 +99,12 @@ public:
     /// <returns>`true` if this object contains a valid pointer to implementation. `false` otherwise.</returns>
     explicit operator bool() const noexcept;
 
+    /// <summary>
+    /// Get the pointer to the implementation.
+    /// </summary>
+    /// <returns>The pointer to the listener implementation.</returns>
+    std::shared_ptr<ListenerImpl> get() const noexcept;
+
 protected:
     Listener( std::shared_ptr<ListenerImpl> impl );
 

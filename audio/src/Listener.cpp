@@ -72,3 +72,8 @@ Listener::operator bool() const noexcept
 {
     return impl != nullptr;
 }
+
+std::shared_ptr<ListenerImpl> Listener::get() const noexcept
+{
+    return impl;
+}
