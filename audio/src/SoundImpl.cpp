@@ -31,6 +31,26 @@ void SoundImpl::stop()
     ma_sound_stop( &sound );
 }
 
+bool SoundImpl::isPlaying() const
+{
+    return ma_sound_is_playing( &sound ) == MA_TRUE;
+}
+
+bool SoundImpl::isEnd() const
+{
+    return ma_sound_at_end( &sound ) == MA_TRUE;
+}
+
+void SoundImpl::setLooping( bool looping )
+{
+    ma_sound_set_looping( &sound, looping ? MA_TRUE : MA_FALSE );
+}
+
+bool SoundImpl::isLooping() const
+{
+    return ma_sound_is_looping( &sound ) == MA_TRUE;
+}
+
 void SoundImpl::setPinnedListener( const Listener& listener )
 {
     if ( const auto listenerImpl = listener.get() )
@@ -108,7 +128,7 @@ void SoundImpl::setCone( float innerConeAngle, float outerConeAngle, float outer
     ma_sound_set_cone( &sound, innerConeAngle, outerConeAngle, outerGain );
 }
 
-void SoundImpl::getCone( float& innerConeAngle, float& outerConeAngle, float& outerGain )
+void SoundImpl::getCone( float& innerConeAngle, float& outerConeAngle, float& outerGain ) const
 {
     ma_sound_get_cone( &sound, &innerConeAngle, &outerConeAngle, &outerGain );
 }
@@ -147,4 +167,79 @@ Sound::AttenuationModel SoundImpl::getAttenuationModel() const
     }
 
     return Sound::AttenuationModel::None;
+}
+
+void SoundImpl::setRollOff( float rollOff )
+{
+    ma_sound_set_rolloff( &sound, rollOff );
+}
+
+float SoundImpl::getRollOff() const
+{
+    return ma_sound_get_rolloff( &sound );
+}
+
+void SoundImpl::setMinGain( float minGain )
+{
+    ma_sound_set_min_gain( &sound, minGain );
+}
+
+float SoundImpl::getMinGain() const
+{
+    return ma_sound_get_min_gain( &sound );
+}
+
+void SoundImpl::setMaxGain( float maxGain )
+{
+    ma_sound_set_max_gain( &sound, maxGain );
+}
+
+float SoundImpl::getMaxGain() const
+{
+    return ma_sound_get_max_gain( &sound );
+}
+
+void SoundImpl::setMinDistance( float minDistance )
+{
+    ma_sound_set_min_distance( &sound, minDistance );
+}
+
+float SoundImpl::getMinDistance() const
+{
+    return ma_sound_get_min_distance( &sound );
+}
+
+void SoundImpl::setMaxDistance( float maxDistance )
+{
+    ma_sound_set_max_distance( &sound, maxDistance );
+}
+
+float SoundImpl::getMaxDistance() const
+{
+    return ma_sound_get_max_distance( &sound );
+}
+
+void SoundImpl::setDopplerFactor( float dopplerFactor )
+{
+    ma_sound_set_doppler_factor( &sound, dopplerFactor );
+}
+
+float SoundImpl::getDopplerFactor() const
+{
+    return ma_sound_get_doppler_factor( &sound );
+}
+
+void SoundImpl::setFade( float endVolume, uint64_t milliseconds )
+{
+    ma_sound_set_fade_in_milliseconds( &sound, -1.0f, endVolume, milliseconds );
+}
+
+void SoundImpl::setStartTime( uint64_t milliseconds )
+{
+    ma_sound_set_start_time_in_milliseconds( &sound, milliseconds );
+}
+
+void SoundImpl::setStopTime( uint64_t milliseconds )
+{
+    ma_sound_set_stop_time_in_milliseconds( &sound, milliseconds );
 }

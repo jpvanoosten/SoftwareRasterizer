@@ -1,14 +1,16 @@
+#include "Device.hpp"
+
 #include <Sound.hpp>
 #include "SoundImpl.hpp"
 
 using namespace Audio;
 
-Sound::Sound()                              = default;
-Sound::~Sound()                             = default;
-Sound::Sound( const Sound& )                = default;
-Sound::Sound( Sound&& ) noexcept            = default;
-Sound& Sound::operator=( const Sound& )     = default;
-Sound& Sound::operator=( Sound&& ) noexcept = default;
+Sound::Sound() = default;
+Sound::~Sound()                                                   = default;
+Sound::Sound( const Sound& )                                      = default;
+Sound::Sound( Sound&& ) noexcept                                  = default;
+Sound& Sound::operator=( const Sound& )                           = default;
+Sound& Sound::operator=( Sound&& ) noexcept                       = default;
 
 Sound& Sound::operator=( nullptr_t ) noexcept
 {
@@ -34,3 +36,203 @@ Sound::operator bool() const noexcept
 Sound::Sound( std::shared_ptr<SoundImpl> impl )
 : impl { std::move(impl) }
 {}
+
+void Sound::loadSound( const std::filesystem::path& filePath )
+{
+    *this = Device::loadSound( filePath );
+}
+
+void Sound::loadMusic( const std::filesystem::path& filePath )
+{
+    *this = Device::loadMusic( filePath );
+}
+
+void Sound::play()
+{
+    impl->play();
+}
+
+void Sound::stop()
+{
+    impl->stop();
+}
+
+bool Sound::isPlaying() const
+{
+    return impl->isPlaying();
+}
+
+bool Sound::isEnd() const
+{
+    return impl->isEnd();
+}
+
+void Sound::setLooping( bool looping )
+{
+    return impl->setLooping( looping );
+}
+
+bool Sound::isLooping() const
+{
+    return impl->isLooping();
+}
+
+void Sound::setPinnedListener( const Listener& listener )
+{
+    impl->setPinnedListener( listener );
+}
+
+void Sound::setVolume( float volume )
+{
+    impl->setVolume( volume );
+}
+
+float Sound::getVolume() const
+{
+    return impl->getVolume();
+}
+
+void Sound::setPan( float pan )
+{
+    impl->setPan( pan );
+}
+
+float Sound::getPan() const
+{
+    return impl->getPan();
+}
+
+void Sound::setPitch( float pitch )
+{
+    impl->setPitch( pitch );
+}
+
+float Sound::getPitch() const
+{
+    return impl->getPitch();
+}
+
+void Sound::setPosition( const glm::vec3& position )
+{
+    impl->setPosition( position );
+}
+
+glm::vec3 Sound::getPosition() const
+{
+    return impl->getPosition();
+}
+
+void Sound::setDirection( const glm::vec3& direction )
+{
+    impl->setDirection( direction );
+}
+
+glm::vec3 Sound::getDirection() const
+{
+    return impl->getDirection();
+}
+
+void Sound::setVelocity( const glm::vec3& velocity )
+{
+    impl->setVelocity( velocity );
+}
+
+glm::vec3 Sound::getVelocity() const
+{
+    return impl->getVelocity();
+}
+
+void Sound::setCone( float innerAngle, float outerAngle, float outerGain )
+{
+    impl->setCone( innerAngle, outerAngle, outerGain );
+}
+
+void Sound::getCone( float& innerAngle, float& outerAngle, float& outerGain ) const
+{
+    impl->getCone( innerAngle, outerGain, outerGain );
+}
+
+void Sound::setAttenuationModel( AttenuationModel attenuation )
+{
+    impl->setAttenuationModel( attenuation );
+}
+
+Sound::AttenuationModel Sound::getAttenuationModel() const
+{
+    return impl->getAttenuationModel();
+}
+
+void Sound::setRollOff( float rollOff )
+{
+    impl->setRollOff( rollOff );
+}
+
+float Sound::getRollOff() const
+{
+    return impl->getRollOff();
+}
+
+void Sound::setMinGain( float minGain )
+{
+    impl->setMinGain( minGain );
+}
+
+float Sound::getMinGain() const
+{
+    return impl->getMinGain();
+}
+
+void Sound::setMaxGain( float maxGain )
+{
+    impl->setMaxGain( maxGain );
+}
+
+float Sound::getMaxGain() const
+{
+    return impl->getMaxGain();
+}
+
+void Sound::setMinDistance( float minDistance )
+{
+    impl->setMinDistance( minDistance );
+}
+
+float Sound::getMinDistance() const
+{
+    return impl->getMinDistance();
+}
+
+void Sound::setMaxDistance( float maxDistance )
+{
+    impl->setMaxDistance( maxDistance );
+}
+
+float Sound::getMaxDistance() const
+{
+    return impl->getMaxDistance();
+}
+
+void Sound::setDopplerFactor( float dopplerFactor )
+{
+    impl->setDopplerFactor( dopplerFactor );
+}
+
+float Sound::getDopplerFactor() const
+{
+    return impl->getDopplerFactor();
+}
+
+void Sound::setFade( float endVolume, uint64_t milliseconds )
+{
+    impl->setFade( endVolume, milliseconds );
+}
+
+void Sound::setStartTime( uint64_t milliseconds )
+{
+    impl->setStartTime( milliseconds );
+}
+
+void Sound::setStopTime( uint64_t milliseconds )
+{
+    impl->setStopTime( milliseconds );
+}

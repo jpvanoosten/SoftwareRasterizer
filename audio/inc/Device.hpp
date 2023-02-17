@@ -2,7 +2,9 @@
 
 #include "Config.hpp"
 #include "Listener.hpp"
+#include "Sound.hpp"
 
+#include <filesystem>
 #include <glm/vec3.hpp>
 
 #include <memory>
@@ -32,6 +34,23 @@ public:
     /// <param name="listenerIndex">(optional) The listener index to retrieve. Default: 0</param>
     /// <returns>The listener at the specified index.</returns>
     static Listener getListener( uint32_t listenerIndex = 0 );
+
+    /// <summary>
+    /// Load a sound from a file.
+    /// Use this method for loading small sound effects.
+    /// </summary>
+    /// <param name="filePath">The path to the effect file to load.</param>
+    /// <returns>A valid sound or empty sound if the file is not valid.</returns>
+    static Sound loadSound( const std::filesystem::path& filePath );
+
+    /// <summary>
+    /// Load music from a file.
+    /// This is intended to be used to load larger, streaming sounds like background music.
+    /// </summary>
+    /// <param name="filePath">The path to the music file to load.</param>
+    /// <returns>A valid sound or empty sound if the file is not valid.</returns>
+    static Sound loadMusic( const std::filesystem::path& filePath );
+
 
     // Singleton class.
     Device() = delete;

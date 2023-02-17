@@ -6,6 +6,7 @@
 
 #include <glm/vec3.hpp>
 
+#include <chrono>
 #include <filesystem>
 
 namespace Audio
@@ -18,6 +19,12 @@ public:
 
     void play();
     void stop();
+
+    bool isPlaying() const;
+    bool isEnd() const;
+
+    void setLooping( bool looping );
+    bool isLooping() const;
 
     void setPinnedListener( const Listener& listener );
 
@@ -40,15 +47,38 @@ public:
     glm::vec3 getVelocity() const;
 
     void setCone( float innerConeAngle, float outerConeAngle, float outerGain );
-    void getCone( float& innerConeAngle, float& outerConeAngle, float& outerGain );
+    void getCone( float& innerConeAngle, float& outerConeAngle, float& outerGain ) const;
 
     void setAttenuationModel( Sound::AttenuationModel attenuation );
     Sound::AttenuationModel getAttenuationModel() const;
 
-protected:
+    void setRollOff( float rollOff );
+    float getRollOff() const;
+
+    void setMinGain( float minGain );
+    float getMinGain() const;
+
+    void setMaxGain( float maxGain );
+    float getMaxGain() const;
+
+    void setMinDistance( float minDistance );
+    float getMinDistance() const;
+
+    void setMaxDistance( float maxDistance );
+    float getMaxDistance() const;
+
+    void setDopplerFactor( float dopplerFactor );
+    float getDopplerFactor() const;
+
+    void setFade( float endVolume, uint64_t milliseconds );
+
+    void setStartTime( uint64_t milliseconds );
+    void setStopTime( uint64_t milliseconds );
+    
 private:
     ma_engine*      engine = nullptr;
     ma_sound_group* group  = nullptr;
     ma_sound        sound {};
 };
+
 }  // namespace Audio

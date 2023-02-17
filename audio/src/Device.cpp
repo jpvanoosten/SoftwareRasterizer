@@ -1,10 +1,10 @@
-#include "ListenerImpl.hpp"
-
 #include <Device.hpp>
 
-#include <iostream>
-
+#include "ListenerImpl.hpp"
 #include "miniaudio.h"
+#include "SoundImpl.hpp"
+
+#include <iostream>
 
 namespace Audio
 {
@@ -15,6 +15,13 @@ struct MakeListener : Listener
     {}
 };
 
+struct MakeSound : Sound
+{
+    MakeSound( std::shared_ptr<SoundImpl> impl)
+    : Sound( std::move( impl ) )
+    {}
+};
+
 class DeviceImpl
 {
 public:
@@ -22,7 +29,11 @@ public:
     ~DeviceImpl();
 
     Listener getListener( uint32_t listenerIndex );
-    void      setMasterVolume( float volume );
+    void     setMasterVolume( float volume );
+
+    Sound loadSound( const std::filesystem::path& filePath );
+
+    Sound loadMusic( const std::filesystem::path& filePath );
 
 private:
     ma_engine engine {};
@@ -63,6 +74,18 @@ void DeviceImpl::setMasterVolume( float volume )
     ma_engine_set_volume( &engine, volume );
 }
 
+Sound DeviceImpl::loadSound( const std::filesystem::path& filePath )
+{
+    auto sound = std::make_shared<SoundImpl>( filePath, &engine, nullptr, MA_SOUND_FLAG_DECODE );
+    return MakeSound( std::move( sound ) );
+}
+
+Sound DeviceImpl::loadMusic( const std::filesystem::path& filePath )
+{
+    auto sound = std::make_shared<SoundImpl>( filePath, &engine, nullptr, MA_SOUND_FLAG_STREAM | MA_SOUND_FLAG_NO_SPATIALIZATION );
+    return MakeSound( std::move( sound ) );
+}
+
 std::unique_ptr<DeviceImpl> Device::instance = std::make_unique<DeviceImpl>();
 
 void Device::setMasterVolume( float volume )
@@ -73,4 +96,14 @@ void Device::setMasterVolume( float volume )
 Listener Device::getListener( uint32_t listenerIndex )
 {
     return instance->getListener( listenerIndex );
+}
+
+Sound Device::loadSound( const std::filesystem::path& filePath )
+{
+    return instance->loadSound( filePath );
+}
+
+Sound Device::loadMusic( const std::filesystem::path& filePath )
+{
+    return instance->loadMusic( filePath );
 }

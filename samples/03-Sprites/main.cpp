@@ -56,10 +56,10 @@ int main( int argc, char* argv[] )
         image.clear( Color::Black );
 
         transform.rotate( timer.elapsedSeconds() );
-        //image.drawSprite( sprite, transform );
+        image.drawSprite( sprite, transform );
         int x = ( window.getWidth() - sprite.getSize().x ) / 2;
         int y = ( window.getHeight() - sprite.getSize().y ) / 2;
-        image.drawSprite( sprite, x, y );
+        //image.drawSprite( sprite, x, y );
 
         image.drawText( Font::Default, 10, 10, fps, Color::White );
 
