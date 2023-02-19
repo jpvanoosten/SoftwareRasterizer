@@ -55,6 +55,35 @@ public:
     void stop();
 
     /// <summary>
+    /// Get the duration of the sound in seconds.
+    /// </summary>
+    /// <returns>The duration of the sound (in seconds).</returns>
+    float getDurationInSeconds() const;
+
+    /// <summary>
+    /// Seek to a specific position in the sound.
+    /// Note: `duration` must be less than the duration of the sound.
+    /// </summary>
+    /// <typeparam name="Rep">The representation of the duration.</typeparam>
+    /// <typeparam name="Period">The period of the duration.</typeparam>
+    /// <param name="duration">The duration to seek to.</param>
+    template<typename Rep, typename Period=std::ratio<1>>
+    void seek( const std::chrono::duration<Rep, Period>& duration );
+
+    /// <summary>
+    /// Seek to a specific position (in milliseconds) in the sound.
+    /// </summary>
+    /// <param name="milliseconds">(optional) The milliseconds to seek to. Default: 0</param>
+    void seek( uint64_t milliseconds = 0ull );
+
+    /// <summary>
+    /// Restart the playing sound from the beginning.
+    /// This is useful if the sound is already playing, but you want to play it again from the beginning.
+    /// If you only want to seek to the beginning without playing the sound, use `seek(0)`.
+    /// </summary>
+    void restart();
+
+    /// <summary>
     /// Check if the sound is currently playing.
     /// </summary>
     /// <returns>`true` if the sound is playing, false otherwise.</returns>
@@ -349,6 +378,12 @@ protected:
 private:
     std::shared_ptr<SoundImpl> impl;
 };
+
+template<typename Rep, typename Period>
+void Sound::seek( const std::chrono::duration<Rep, Period>& duration )
+{
+    seek( std::chrono::duration_cast<std::chrono::milliseconds>( duration ).count() );
+}
 
 template<class Rep, class Period>
 void Sound::setFade( float endVolume, const std::chrono::duration<Rep, Period>& duration )

@@ -1,8 +1,8 @@
 #include <Device.hpp>
 
 #include "ListenerImpl.hpp"
-#include "miniaudio.h"
 #include "SoundImpl.hpp"
+#include "miniaudio.h"
 
 #include <iostream>
 
@@ -17,7 +17,7 @@ struct MakeListener : Listener
 
 struct MakeSound : Sound
 {
-    MakeSound( std::shared_ptr<SoundImpl> impl)
+    MakeSound( std::shared_ptr<SoundImpl> impl )
     : Sound( std::move( impl ) )
     {}
 };
@@ -62,10 +62,7 @@ DeviceImpl::DeviceImpl()
 
 DeviceImpl::~DeviceImpl()
 {
-    // static initialziation/unitialization causes a hang in miniaudio
-    // See: miniaudio.c@4390
-    // Current work-around is to not uninitalize the engine.
-//    ma_engine_uninit( &engine );
+    ma_engine_uninit( &engine );
 }
 
 Listener DeviceImpl::getListener( uint32_t listenerIndex )
@@ -94,8 +91,6 @@ Sound DeviceImpl::loadMusic( const std::filesystem::path& filePath )
     auto sound = std::make_shared<SoundImpl>( filePath, &engine, nullptr, MA_SOUND_FLAG_STREAM | MA_SOUND_FLAG_NO_SPATIALIZATION );
     return MakeSound( std::move( sound ) );
 }
-
-// std::unique_ptr<DeviceImpl> Device::instance = std::make_unique<DeviceImpl>();
 
 void Device::setMasterVolume( float volume )
 {

@@ -28,12 +28,12 @@ bool Listener::operator!=( nullptr_t ) const noexcept
     return impl != nullptr;
 }
 
-void Listener::setPos( const glm::vec3& pos )
+void Listener::setPosition( const glm::vec3& pos )
 {
     impl->setPosition( pos );
 }
 
-glm::vec3 Listener::getPos() const
+glm::vec3 Listener::getPosition() const
 {
     return impl->getPosition();
 }

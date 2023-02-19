@@ -214,7 +214,8 @@ void WindowWin32::init()
     if ( FAILED( hr ) )
     {
         const _com_error err( hr );  // I hope this never happens.
-        throw std::exception( err.ErrorMessage() );
+        std::cerr << "CoInitialize [ERROR]:" << err.ErrorMessage() << std::endl;
+        //        throw std::exception( err.ErrorMessage() );
     }
 
     WNDCLASSEXW wndClass {};

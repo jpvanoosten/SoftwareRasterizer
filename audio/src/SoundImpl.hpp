@@ -20,6 +20,10 @@ public:
     void play();
     void stop();
 
+    float getDurationInSeconds() const;
+
+    void seek( uint64_t milliseconds );
+
     bool isPlaying() const;
     bool isEnd() const;
 

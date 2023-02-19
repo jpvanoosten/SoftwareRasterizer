@@ -17,13 +17,13 @@ public:
     /// The global (world) position of the listener.
     /// </summary>
     /// <param name="pos">The position of the listener.</param>
-    void setPos( const glm::vec3& pos );
+    void setPosition( const glm::vec3& pos );
 
     /// <summary>
     /// Get the global (world) position of the listener.
     /// </summary>
     /// <returns>The position of the listener.</returns>
-    glm::vec3 getPos() const;
+    glm::vec3 getPosition() const;
 
     /// <summary>
     /// Set the forward direction vector of the listener.

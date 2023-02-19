@@ -31,6 +31,23 @@ void SoundImpl::stop()
     ma_sound_stop( &sound );
 }
 
+float SoundImpl::getDurationInSeconds() const
+{
+    float duration = 0.0f;
+    // ma_sound_get_length_in_seconds takes a non-const pointer (not sure why).
+    // To get around this, we need a const_cast on the this pointer :(.
+    ma_sound_get_length_in_seconds( &const_cast<SoundImpl*>(this)->sound, &duration );
+    return duration;
+}
+
+void SoundImpl::seek( uint64_t milliseconds )
+{
+    ma_uint32 sampleRate;
+    ma_sound_get_data_format( &sound, nullptr, nullptr, &sampleRate, nullptr, 0 );
+    const ma_uint64 pcmFrame = ( sampleRate * milliseconds ) / 1000;
+    ma_sound_seek_to_pcm_frame( &sound, pcmFrame );
+}
+
 bool SoundImpl::isPlaying() const
 {
     return ma_sound_is_playing( &sound ) == MA_TRUE;

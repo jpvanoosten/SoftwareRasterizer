@@ -1,5 +1,6 @@
 #include "Ball.hpp"
 
+#include <Device.hpp>
 #include <Font.hpp>
 #include <Image.hpp>
 #include <Math/Transform2D.hpp>
@@ -38,6 +39,9 @@ int main( int argc, char* argv[] )
     Ball ball { { WINDOW_WIDTH / 2.0f, WINDOW_HEIGHT / 2.0f } };
     ball.setVelocity( glm::vec2 { 1, -1 } * 200.0f );
 
+    // Set the audio listener to the center of the screen.
+    Audio::Device::getListener().setPosition( { WINDOW_WIDTH / 2.0f, WINDOW_HEIGHT / 2.0f, 0.0f } );
+
     // Load some bouncing sounds.
     std::vector<Audio::Sound> bounceSounds;
     bounceSounds.emplace_back( "assets/sounds/bounce-1.wav", Audio::Sound::Type::Sound );
@@ -45,12 +49,17 @@ int main( int argc, char* argv[] )
     bounceSounds.emplace_back( "assets/sounds/bounce-3.wav", Audio::Sound::Type::Sound );
     bounceSounds.emplace_back( "assets/sounds/bounce-4.wav", Audio::Sound::Type::Sound );
 
+    for ( auto& sound: bounceSounds )
+    {
+        sound.setAttenuationModel( Audio::Sound::AttenuationModel::Linear );
+    }
+
     std::minstd_rand                rng { std::random_device()() };
     std::uniform_int_distribution<> dist { 0, static_cast<int>( bounceSounds.size() - 1 ) };
 
     Audio::Sound bgMusic { "assets/sounds/piano-loops.wav", Audio::Sound::Type::Music };
 
-    bgMusic.setVolume( 0.2f ); // It's too loud!
+    bgMusic.setVolume( 0.2f );  // It's too loud!
 
     bgMusic.play();
 
@@ -71,28 +80,35 @@ int main( int argc, char* argv[] )
             c.center.x = c.radius;
             vel.x *= -1.0f;
             // Play a random bounce sound.
-            bounceSounds[dist( rng )].play();
+            bounceSounds[dist( rng )].restart();
         }
         else if ( c.right() >= static_cast<float>( image.getWidth() ) )
         {
             c.center.x = static_cast<float>( image.getWidth() ) - c.radius;
             vel.x *= -1.0f;
-            bounceSounds[dist( rng )].play();
+            bounceSounds[dist( rng )].restart();
         }
         if ( c.top() <= 0.0f )
         {
             c.center.y = c.radius;
             vel.y *= -1.0f;
-            bounceSounds[dist( rng )].play();
+            bounceSounds[dist( rng )].restart();
         }
         else if ( c.bottom() >= static_cast<float>( image.getHeight() ) )
         {
             c.center.y = static_cast<float>( image.getHeight() ) - c.radius;
             vel.y *= -1.0f;
-            bounceSounds[dist( rng )].play();
+            bounceSounds[dist( rng )].restart();
         }
         ball.setCircle( c );
         ball.setVelocity( vel );
+
+        // Update the sound positions.
+        for ( auto& sound: bounceSounds )
+        {
+            // Update the position of the sound to enable 3D spatialization of the sound effect.
+            sound.setPosition( glm::vec3 { ball.getPosition(), 0 } );
+        }
 
         image.clear( Color::Black );
 

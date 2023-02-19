@@ -5,15 +5,9 @@
 #include "Sound.hpp"
 
 #include <filesystem>
-#include <glm/vec3.hpp>
-
-#include <memory>
 
 namespace Audio
 {
-
-class DeviceImpl;
-
 class AUDIO_API Device
 {
 public:
@@ -51,16 +45,12 @@ public:
     /// <returns>A valid sound or empty sound if the file is not valid.</returns>
     static Sound loadMusic( const std::filesystem::path& filePath );
 
-
     // Singleton class.
-    Device() = delete;
-    ~Device() = delete;
-    Device( const Device& ) = delete;
-    Device( Device&& )      = delete;
+    Device()                           = delete;
+    ~Device()                          = delete;
+    Device( const Device& )            = delete;
+    Device( Device&& )                 = delete;
     Device& operator=( const Device& ) = delete;
-    Device& operator=(Device&&) = delete;
-
-private:
-    static std::unique_ptr<DeviceImpl> instance;
+    Device& operator=( Device&& )      = delete;
 };
 }  // namespace Audio

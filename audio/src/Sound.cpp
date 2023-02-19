@@ -70,6 +70,22 @@ void Sound::stop()
     impl->stop();
 }
 
+float Sound::getDurationInSeconds() const
+{
+    return impl->getDurationInSeconds();
+}
+
+void Sound::seek( uint64_t milliseconds )
+{
+    impl->seek( milliseconds );
+}
+
+void Sound::restart()
+{
+    seek( 0ull );
+    play();
+}
+
 bool Sound::isPlaying() const
 {
     return impl->isPlaying();

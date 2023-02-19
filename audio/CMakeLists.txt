@@ -25,19 +25,19 @@ set( ALL_FILES
     ../.clang-format
 )
 
-add_library( Audio ${ALL_FILES} )
+add_library( Audio STATIC ${ALL_FILES} )
 
 set_target_properties( Audio
     PROPERTIES
         CXX_STANDARD 20
 )
 
-if(BUILD_SHARED_LIBS)
-    target_compile_definitions( Audio
-        PRIVATE Audio_EXPORTS
-        INTERFACE Audio_IMPORTS
-    )
-endif(BUILD_SHARED_LIBS)
+#if(BUILD_SHARED_LIBS)
+#    target_compile_definitions( Audio
+#        PRIVATE Audio_EXPORTS
+#        INTERFACE Audio_IMPORTS
+#    )
+#endif(BUILD_SHARED_LIBS)
 
 target_include_directories( Audio
     PUBLIC inc
