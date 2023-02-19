@@ -31,7 +31,7 @@ int main( int argc, char* argv[] )
     const int WINDOW_WIDTH  = 800;
     const int WINDOW_HEIGHT = 600;
 
-    Window window { L"01-ClearScreen", WINDOW_WIDTH, WINDOW_HEIGHT };
+    Window window { L"08-Audio", WINDOW_WIDTH, WINDOW_HEIGHT };
     Image  image { WINDOW_WIDTH, WINDOW_HEIGHT };
 
     window.show();
@@ -39,7 +39,7 @@ int main( int argc, char* argv[] )
     Ball ball { { WINDOW_WIDTH / 2.0f, WINDOW_HEIGHT / 2.0f } };
     ball.setVelocity( glm::vec2 { 1, -1 } * 200.0f );
 
-    // Set the audio listener to the center of the screen.
+    // Set the audio listener to be in the center of the screen.
     Audio::Device::getListener().setPosition( { WINDOW_WIDTH / 2.0f, WINDOW_HEIGHT / 2.0f, 0.0f } );
 
     // Load some bouncing sounds.
@@ -51,14 +51,14 @@ int main( int argc, char* argv[] )
 
     for ( auto& sound: bounceSounds )
     {
+        // The default attenuation model is Inverse, but the linear attenuation model sounds better for this demo.
         sound.setAttenuationModel( Audio::Sound::AttenuationModel::Linear );
     }
 
     std::minstd_rand                rng { std::random_device()() };
     std::uniform_int_distribution<> dist { 0, static_cast<int>( bounceSounds.size() - 1 ) };
 
-    Audio::Sound bgMusic { "assets/sounds/piano-loops.wav", Audio::Sound::Type::Music };
-
+    Audio::Sound bgMusic { "assets/sounds/piano-loops.mp3", Audio::Sound::Type::Music };
     bgMusic.setVolume( 0.2f );  // It's too loud!
 
     bgMusic.play();
