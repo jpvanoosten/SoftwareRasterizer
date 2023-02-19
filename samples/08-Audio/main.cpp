@@ -3,12 +3,11 @@
 #include <Font.hpp>
 #include <Image.hpp>
 #include <Math/Transform2D.hpp>
-#include <ResourceManager.hpp>
-#include <Sprite.hpp>
 #include <Timer.hpp>
 #include <Window.hpp>
 
 #include <iostream>
+#include <random>
 
 using namespace sr;
 using namespace Math;
@@ -39,8 +38,21 @@ int main( int argc, char* argv[] )
     Ball ball { { WINDOW_WIDTH / 2.0f, WINDOW_HEIGHT / 2.0f } };
     ball.setVelocity( glm::vec2 { 1, -1 } * 200.0f );
 
-    Audio::Sound bounceSound;
-    bounceSound.loadSound( "assets/sounds/bit-bounce.wav" );
+    // Load some bouncing sounds.
+    std::vector<Audio::Sound> bounceSounds;
+    bounceSounds.emplace_back( "assets/sounds/bounce-1.wav", Audio::Sound::Type::Sound );
+    bounceSounds.emplace_back( "assets/sounds/bounce-2.wav", Audio::Sound::Type::Sound );
+    bounceSounds.emplace_back( "assets/sounds/bounce-3.wav", Audio::Sound::Type::Sound );
+    bounceSounds.emplace_back( "assets/sounds/bounce-4.wav", Audio::Sound::Type::Sound );
+
+    std::minstd_rand                rng { std::random_device()() };
+    std::uniform_int_distribution<> dist { 0, static_cast<int>( bounceSounds.size() - 1 ) };
+
+    Audio::Sound bgMusic { "assets/sounds/piano-loops.wav", Audio::Sound::Type::Music };
+
+    bgMusic.setVolume( 0.2f ); // It's too loud!
+
+    bgMusic.play();
 
     Timer       timer;
     double      totalTime  = 0.0;
@@ -58,21 +70,26 @@ int main( int argc, char* argv[] )
         {
             c.center.x = c.radius;
             vel.x *= -1.0f;
+            // Play a random bounce sound.
+            bounceSounds[dist( rng )].play();
         }
         else if ( c.right() >= static_cast<float>( image.getWidth() ) )
         {
             c.center.x = static_cast<float>( image.getWidth() ) - c.radius;
             vel.x *= -1.0f;
+            bounceSounds[dist( rng )].play();
         }
         if ( c.top() <= 0.0f )
         {
             c.center.y = c.radius;
             vel.y *= -1.0f;
+            bounceSounds[dist( rng )].play();
         }
         else if ( c.bottom() >= static_cast<float>( image.getHeight() ) )
         {
             c.center.y = static_cast<float>( image.getHeight() ) - c.radius;
             vel.y *= -1.0f;
+            bounceSounds[dist( rng )].play();
         }
         ball.setCircle( c );
         ball.setVelocity( vel );
@@ -105,11 +122,11 @@ int main( int argc, char* argv[] )
                     break;
                 }
                 break;
-            //case Event::Resize:
-            //    std::cout << std::format( "Resize: {},{}\n", e.resize.width, e.resize.height );
-            //    image.resize( e.resize.width, e.resize.height );
-            //    image.clear( Color::Black );
-            //    break;
+                // case Event::Resize:
+                //     std::cout << std::format( "Resize: {},{}\n", e.resize.width, e.resize.height );
+                //     image.resize( e.resize.width, e.resize.height );
+                //     image.clear( Color::Black );
+                //     break;
             }
         }
 

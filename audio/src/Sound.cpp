@@ -1,16 +1,16 @@
 #include "Device.hpp"
 
-#include <Sound.hpp>
 #include "SoundImpl.hpp"
+#include <Sound.hpp>
 
 using namespace Audio;
 
-Sound::Sound() = default;
-Sound::~Sound()                                                   = default;
-Sound::Sound( const Sound& )                                      = default;
-Sound::Sound( Sound&& ) noexcept                                  = default;
-Sound& Sound::operator=( const Sound& )                           = default;
-Sound& Sound::operator=( Sound&& ) noexcept                       = default;
+Sound::Sound()                              = default;
+Sound::~Sound()                             = default;
+Sound::Sound( const Sound& )                = default;
+Sound::Sound( Sound&& ) noexcept            = default;
+Sound& Sound::operator=( const Sound& )     = default;
+Sound& Sound::operator=( Sound&& ) noexcept = default;
 
 Sound& Sound::operator=( nullptr_t ) noexcept
 {
@@ -34,8 +34,21 @@ Sound::operator bool() const noexcept
 }
 
 Sound::Sound( std::shared_ptr<SoundImpl> impl )
-: impl { std::move(impl) }
+: impl { std::move( impl ) }
 {}
+
+Sound::Sound( const std::filesystem::path& filePath, Type type )
+{
+    switch ( type )
+    {
+    case Type::Sound:
+        loadSound( filePath );
+        break;
+    case Type::Music:
+        loadMusic( filePath );
+        break;
+    }
+}
 
 void Sound::loadSound( const std::filesystem::path& filePath )
 {

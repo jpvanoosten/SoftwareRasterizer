@@ -13,6 +13,12 @@ class SoundImpl;
 class AUDIO_API Sound
 {
 public:
+    enum class Type
+    {
+        Sound,  ///< A short sound effect.
+        Music,  ///< A longer sound like background music.
+    };
+
     enum class AttenuationModel
     {
         None,         ///< No distance attenuation and no spatialization.
@@ -20,6 +26,8 @@ public:
         Linear,       ///< Linear attenuation. Equivalent to OpenAL's AL_LINEAR_DISTANCE_CLAMPED.
         Exponential,  ///< Exponential attenuation. Equivalent to OpenAL's AL_EXPONENT_DISTANCE_CLAMPED.
     };
+
+    explicit Sound( const std::filesystem::path& filePath, Type type );
 
     /// <summary>
     /// Load a sound effect from a file.

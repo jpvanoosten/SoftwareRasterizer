@@ -28,6 +28,12 @@ public:
     DeviceImpl();
     ~DeviceImpl();
 
+    static DeviceImpl& get()
+    {
+        static DeviceImpl inst;
+        return inst;
+    }
+
     Listener getListener( uint32_t listenerIndex );
     void     setMasterVolume( float volume );
 
@@ -47,7 +53,7 @@ DeviceImpl::DeviceImpl()
     ma_engine_config config = ma_engine_config_init();
     config.listenerCount    = MA_ENGINE_MAX_LISTENERS;
 
-    if ( ma_engine_init( nullptr, &engine ) != MA_SUCCESS )
+    if ( ma_engine_init( &config, &engine ) != MA_SUCCESS )
     {
         std::cerr << "Failed to initialize audio engine." << std::endl;
         return;
@@ -56,7 +62,10 @@ DeviceImpl::DeviceImpl()
 
 DeviceImpl::~DeviceImpl()
 {
-    ma_engine_uninit( &engine );
+    // static initialziation/unitialization causes a hang in miniaudio
+    // See: miniaudio.c@4390
+    // Current work-around is to not uninitalize the engine.
+//    ma_engine_uninit( &engine );
 }
 
 Listener DeviceImpl::getListener( uint32_t listenerIndex )
@@ -86,24 +95,24 @@ Sound DeviceImpl::loadMusic( const std::filesystem::path& filePath )
     return MakeSound( std::move( sound ) );
 }
 
-std::unique_ptr<DeviceImpl> Device::instance = std::make_unique<DeviceImpl>();
+// std::unique_ptr<DeviceImpl> Device::instance = std::make_unique<DeviceImpl>();
 
 void Device::setMasterVolume( float volume )
 {
-    instance->setMasterVolume( volume );
+    DeviceImpl::get().setMasterVolume( volume );
 }
 
 Listener Device::getListener( uint32_t listenerIndex )
 {
-    return instance->getListener( listenerIndex );
+    return DeviceImpl::get().getListener( listenerIndex );
 }
 
 Sound Device::loadSound( const std::filesystem::path& filePath )
 {
-    return instance->loadSound( filePath );
+    return DeviceImpl::get().loadSound( filePath );
 }
 
 Sound Device::loadMusic( const std::filesystem::path& filePath )
 {
-    return instance->loadMusic( filePath );
+    return DeviceImpl::get().loadMusic( filePath );
 }

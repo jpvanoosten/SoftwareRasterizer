@@ -28,53 +28,53 @@ public:
 
     void setPinnedListener( const Listener& listener );
 
-    void setVolume( float volume );
+    void  setVolume( float volume );
     float getVolume() const;
 
-    void setPan( float pan );
+    void  setPan( float pan );
     float getPan() const;
 
-    void setPitch( float pitch );
+    void  setPitch( float pitch );
     float getPitch() const;
 
-    void setPosition( const glm::vec3& pos );
+    void      setPosition( const glm::vec3& pos );
     glm::vec3 getPosition() const;
 
-    void setDirection( const glm::vec3& dir );
+    void      setDirection( const glm::vec3& dir );
     glm::vec3 getDirection() const;
 
-    void setVelocity( const glm::vec3& vel );
+    void      setVelocity( const glm::vec3& vel );
     glm::vec3 getVelocity() const;
 
     void setCone( float innerConeAngle, float outerConeAngle, float outerGain );
     void getCone( float& innerConeAngle, float& outerConeAngle, float& outerGain ) const;
 
-    void setAttenuationModel( Sound::AttenuationModel attenuation );
+    void                    setAttenuationModel( Sound::AttenuationModel attenuation );
     Sound::AttenuationModel getAttenuationModel() const;
 
-    void setRollOff( float rollOff );
+    void  setRollOff( float rollOff );
     float getRollOff() const;
 
-    void setMinGain( float minGain );
+    void  setMinGain( float minGain );
     float getMinGain() const;
 
-    void setMaxGain( float maxGain );
+    void  setMaxGain( float maxGain );
     float getMaxGain() const;
 
-    void setMinDistance( float minDistance );
+    void  setMinDistance( float minDistance );
     float getMinDistance() const;
 
-    void setMaxDistance( float maxDistance );
+    void  setMaxDistance( float maxDistance );
     float getMaxDistance() const;
 
-    void setDopplerFactor( float dopplerFactor );
+    void  setDopplerFactor( float dopplerFactor );
     float getDopplerFactor() const;
 
     void setFade( float endVolume, uint64_t milliseconds );
 
     void setStartTime( uint64_t milliseconds );
     void setStopTime( uint64_t milliseconds );
-    
+
 private:
     ma_engine*      engine = nullptr;
     ma_sound_group* group  = nullptr;
