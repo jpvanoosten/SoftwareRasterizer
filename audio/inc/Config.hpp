@@ -9,7 +9,7 @@
     #define AUDIO_API AUDIO_EXPORT
     #define AUDIO_EXTERN
 #elif defined( Audio_IMPORTS )
-    #define AUDIO_API SR_IMPORT
+    #define AUDIO_API AUDIO_IMPORT
     #define AUDIO_EXTERN extern
 #else
     #define AUDIO_API

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Circle.hpp"
 #include "Line.hpp"
 #include "OutCodes.hpp"
 #include "Rect.hpp"
@@ -413,14 +414,18 @@ struct AABB
         return fromMinMax( sphere.min(), sphere.max() );
     }
 
+    static AABB fromCircle( const Circle& circle )
+    {
+        return fromMinMax( glm::vec3 { circle.min(), 0 }, glm::vec3 { circle.max(), 0 } );
+    }
+
     /// <summary>
     /// Construct an AABB that is the union of two AABBs.
-    /// Note: union is a keyword in C++, so I had to name this function unionAABB.
     /// </summary>
     /// <param name="a">The first AABB.</param>
     /// <param name="b">The second AABB.</param>
     /// <returns>The AABB that is the union of a and b.</returns>
-    static AABB unionAABB( const AABB& a, const AABB& b )
+    static AABB fromUnion( const AABB& a, const AABB& b )
     {
         return fromMinMax( glm::min( a.min, b.min ), glm::max( a.max, b.max ) );
     }
@@ -434,7 +439,7 @@ struct AABB
     /// <param name="a">The first AABB.</param>
     /// <param name="b">The second AABB.</param>
     /// <returns>The intersection of the two AABBs.</returns>
-    static AABB intersect( const AABB& a, const AABB& b )
+    static AABB fromIntersect( const AABB& a, const AABB& b )
     {
         return fromMinMax( glm::max( a.min, b.min ), glm::min( a.max, b.max ) );
     }

@@ -48,6 +48,16 @@ public:
         return { rect.width, rect.height };
     }
 
+    int getWidth() const noexcept
+    {
+        return rect.width;
+    }
+
+    int getHeight() const noexcept
+    {
+        return rect.height;
+    }
+
     const Math::RectI& getRect() const noexcept
     {
         return rect;

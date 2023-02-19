@@ -47,7 +47,7 @@ DeviceImpl::DeviceImpl()
     ma_engine_config config = ma_engine_config_init();
     config.listenerCount    = MA_ENGINE_MAX_LISTENERS;
 
-    if ( ma_engine_init( &config, &engine ) != MA_SUCCESS )
+    if ( ma_engine_init( nullptr, &engine ) != MA_SUCCESS )
     {
         std::cerr << "Failed to initialize audio engine." << std::endl;
         return;
