@@ -8,6 +8,9 @@ Website:       https://miniaud.io
 Documentation: https://miniaud.io/docs
 GitHub:        https://github.com/mackron/miniaudio
 */
+#define STB_VORBIS_HEADER_ONLY
+#include "stb_vorbis.c"    /* Enables Vorbis decoding. */
+
 #include "miniaudio.h"
 
 #ifndef miniaudio_c

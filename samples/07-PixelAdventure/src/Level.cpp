@@ -158,6 +158,27 @@ Level::Level( const ldtk::Project& project, const ldtk::World& world, const ldtk
         }
     }
 
+    // Load some background music.
+    auto bgFilePath = level.getField<ldtk::FieldType::FilePath>( "bg_music" );
+    bgMusic.loadMusic( projectPath / bgFilePath->directory() / bgFilePath->filename() );
+    bgMusic.setLooping( true );
+    bgMusic.setVolume( 0.2f );
+    bgMusic.play();
+
+    // Load some sound effects.
+    pickupSound.loadSound( "assets/sounds/8-bit-powerup.mp3" );
+    pickupSound.setVolume( 0.25f );
+
+    woodBreakSounds.emplace_back( "assets/sounds/wood_break_1.wav", Audio::Sound::Type::Sound );
+    woodBreakSounds.emplace_back( "assets/sounds/wood_break_2.wav", Audio::Sound::Type::Sound );
+    woodBreakSounds.emplace_back( "assets/sounds/wood_break_3.wav", Audio::Sound::Type::Sound );
+    woodBreakSounds.emplace_back( "assets/sounds/wood_break_4.wav", Audio::Sound::Type::Sound );
+    woodBreakSounds.emplace_back( "assets/sounds/wood_break_5.wav", Audio::Sound::Type::Sound );
+    woodBreakSounds.emplace_back( "assets/sounds/wood_break_6.wav", Audio::Sound::Type::Sound );
+    // Setup the random number generator for playing the wood break sounds effects.
+    rng.seed( std::random_device()() );
+    dist.param( std::uniform_int_distribution<>::param_type( 0, static_cast<int>( woodBreakSounds.size() ) - 1 ) );
+
     // Player start position
     const auto& startPos = entities.getEntitiesByName( "Player_Start" )[0].get();
     playerStart          = { startPos.getPosition().x, startPos.getPosition().y };
@@ -423,6 +444,7 @@ void Level::updatePickups( float deltaTime )
                 // Play the collected animation at the pickup location.
                 effects.emplace_back( pickupCollected, iter->getTransform() );
                 iter = allPickups.erase( iter );
+                pickupSound.replay();
             }
             else
                 ++iter;
@@ -518,6 +540,9 @@ void Level::updateBoxes( float deltaTime )
                 // Hit the box.
                 box->hit();
 
+                // Play a random box hit sound.
+                woodBreakSounds[dist(rng)].replay();
+
                 continue;
             }
         }
@@ -535,6 +560,8 @@ void Level::updateBoxes( float deltaTime )
 
                 // Hit the box.
                 box->hit();
+                // Play a random box hit sound.
+                woodBreakSounds[dist( rng )].replay();
 
                 // And start falling
                 player.setState( Player::State::Falling );

@@ -1,0 +1,33 @@
+https://joshuuu.itch.io/short-loopable-background-music:
+	* Puzzles.ogg
+	* Radiohead.ogg
+	* Sweet Treats.ogg
+
+https://pixabay.com/sound-effects/boing-sounds-35923/
+	* bounce-1.wav
+	* bounce-2.wav
+	* bounce-3.wav
+	* bounce-4.wav
+
+https://pixabay.com/sound-effects/8-bit-powerup-6768/
+	* 8-bit-powerup.mp3
+
+https://pixabay.com/sound-effects/jump-15984/
+	* jump.mp3
+
+https://pixabay.com/sound-effects/wood-break-40011/
+	* wood_break_1.wav
+	* wood_break_2.wav
+	* wood_break_3.wav
+	* wood_break_4.wav
+	* wood_break_5.wav
+	* wood_break_6.wav
+
+https://www.youtube.com/watch?v=RKRKJmpd9D8
+	* death.wav
+
+
+
+
+
+

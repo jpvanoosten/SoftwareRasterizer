@@ -81,7 +81,7 @@ public:
     /// This is useful if the sound is already playing, but you want to play it again from the beginning.
     /// If you only want to seek to the beginning without playing the sound, use `seek(0)`.
     /// </summary>
-    void restart();
+    void replay();
 
     /// <summary>
     /// Check if the sound is currently playing.

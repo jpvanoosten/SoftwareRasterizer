@@ -158,6 +158,10 @@ private:
     Math::AABB leftAABB;
     Math::AABB rightAABB;
 
+    // Sound effects.
+    Audio::Sound jumpSound;
+    Audio::Sound hitSound;
+
     // Player's current state.
     State state = State::Idle;
 

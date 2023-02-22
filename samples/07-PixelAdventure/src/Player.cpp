@@ -86,6 +86,13 @@ Player::Player( const Math::Transform2D& _transform )
 
     currentCharacter = characters[0];
     currentCharacter->setAnimation( "Idle" );
+
+    jumpSound.loadSound( "assets/sounds/jump.mp3" );
+    jumpSound.setVolume( 0.25f );
+
+    hitSound.loadSound( "assets/sounds/death.wav" );
+    hitSound.setVolume( 0.5f );
+
 }
 
 void Player::reset()
@@ -195,17 +202,20 @@ void Player::startState( State oldState, State newState )
         currentCharacter->setAnimation( "Jump" );
         velocity.y    = jumpSpeed;
         canDoubleJump = true;
+        jumpSound.replay();
         break;
     case State::Hit:
         currentCharacter->setAnimation( "Hit" );
         // Move the anchor point to the center of the player.
         transform.setAnchor( { 16, 16 } );
         velocity.y = jumpSpeed;
+        hitSound.replay();
         break;
     case State::DoubleJump:
         currentCharacter->setAnimation( "Double Jump" );
         velocity.y    = jumpSpeed;
         canDoubleJump = false;
+        jumpSound.replay();
         break;
     case State::Falling:
         currentCharacter->setAnimation( "Fall" );

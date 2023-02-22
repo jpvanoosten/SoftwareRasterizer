@@ -11,7 +11,7 @@
 	"iid": "8522f0d0-7820-11ed-9e2d-dfff8a54490f",
 	"jsonVersion": "1.2.5",
 	"appBuildId": 464870,
-	"nextUid": 146,
+	"nextUid": 147,
 	"identifierStyle": "Capitalize",
 	"toc": [],
 	"worldLayout": "Free",
@@ -1994,7 +1994,40 @@
 			{ "id": "Box2", "tileId": 1, "color": 10313806, "__tileSrcRect": [28,0,28,28] },
 			{ "id": "Box3", "tileId": 2, "color": 9207170, "__tileSrcRect": [56,0,28,28] }
 		], "iconTilesetUid": 113, "externalRelPath": null, "externalFileChecksum": null, "tags": [] }
-	], "externalEnums": [], "levelFields": [] },
+	], "externalEnums": [], "levelFields": [
+		{
+			"identifier": "bg_music",
+			"doc": "The background music to play for this level.",
+			"__type": "FilePath",
+			"uid": 146,
+			"type": "F_Path",
+			"isArray": false,
+			"canBeNull": false,
+			"arrayMinLength": null,
+			"arrayMaxLength": null,
+			"editorDisplayMode": "Hidden",
+			"editorDisplayPos": "Above",
+			"editorLinkStyle": "StraightArrow",
+			"editorAlwaysShow": false,
+			"editorShowInWorld": true,
+			"editorCutLongValues": true,
+			"editorTextSuffix": null,
+			"editorTextPrefix": null,
+			"useForSmartColor": false,
+			"min": null,
+			"max": null,
+			"regex": null,
+			"acceptFileTypes": [ ".wav", ".ogg", ".mp3", ".flac" ],
+			"defaultOverride": null,
+			"textLanguageMode": null,
+			"symmetricalRef": false,
+			"autoChainRef": true,
+			"allowOutOfLevelRef": true,
+			"allowedRefs": "OnlySame",
+			"allowedRefTags": [],
+			"tilesetUid": null
+		}
+	] },
 	"levels": [
 		{
 			"identifier": "Level_0",
@@ -2015,7 +2048,10 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": { "topLeftPx": [0,0], "scale": [7.5,7.5], "cropRect": [0,0,64,34.13333333333333] },
 			"externalRelPath": null,
-			"fieldInstances": [],
+			"fieldInstances": [{ "__identifier": "bg_music", "__value": "../sounds/Sweet Treats.ogg", "__type": "FilePath", "__tile": null, "defUid": 146, "realEditorValues": [{
+				"id": "V_String",
+				"params": ["../sounds/Sweet Treats.ogg"]
+			}] }],
 			"layerInstances": [
 				{
 					"__identifier": "Spike_Trap",
@@ -2975,7 +3011,10 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [],
+			"fieldInstances": [{ "__identifier": "bg_music", "__value": "../sounds/Puzzles.ogg", "__type": "FilePath", "__tile": null, "defUid": 146, "realEditorValues": [{
+				"id": "V_String",
+				"params": ["../sounds/Puzzles.ogg"]
+			}] }],
 			"layerInstances": [
 				{
 					"__identifier": "Spike_Trap",
@@ -3728,7 +3767,10 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [],
+			"fieldInstances": [{ "__identifier": "bg_music", "__value": "../sounds/Radiohead.ogg", "__type": "FilePath", "__tile": null, "defUid": 146, "realEditorValues": [{
+				"id": "V_String",
+				"params": ["../sounds/Radiohead.ogg"]
+			}] }],
 			"layerInstances": [
 				{
 					"__identifier": "Spike_Trap",

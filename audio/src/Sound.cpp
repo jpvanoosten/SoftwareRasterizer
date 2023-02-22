@@ -80,7 +80,7 @@ void Sound::seek( uint64_t milliseconds )
     impl->seek( milliseconds );
 }
 
-void Sound::restart()
+void Sound::replay()
 {
     seek( 0ull );
     play();

@@ -58,7 +58,8 @@ int main( int argc, char* argv[] )
     std::minstd_rand                rng { std::random_device()() };
     std::uniform_int_distribution<> dist { 0, static_cast<int>( bounceSounds.size() - 1 ) };
 
-    Audio::Sound bgMusic { "assets/sounds/piano-loops.mp3", Audio::Sound::Type::Music };
+    //Audio::Sound bgMusic { "assets/sounds/piano-loops.mp3", Audio::Sound::Type::Music };
+    Audio::Sound bgMusic { "assets/sounds/Sweet Treats.ogg", Audio::Sound::Type::Music };
     bgMusic.setVolume( 0.2f );  // It's too loud!
 
     bgMusic.play();
@@ -80,25 +81,25 @@ int main( int argc, char* argv[] )
             c.center.x = c.radius;
             vel.x *= -1.0f;
             // Play a random bounce sound.
-            bounceSounds[dist( rng )].restart();
+            bounceSounds[dist( rng )].replay();
         }
         else if ( c.right() >= static_cast<float>( image.getWidth() ) )
         {
             c.center.x = static_cast<float>( image.getWidth() ) - c.radius;
             vel.x *= -1.0f;
-            bounceSounds[dist( rng )].restart();
+            bounceSounds[dist( rng )].replay();
         }
         if ( c.top() <= 0.0f )
         {
             c.center.y = c.radius;
             vel.y *= -1.0f;
-            bounceSounds[dist( rng )].restart();
+            bounceSounds[dist( rng )].replay();
         }
         else if ( c.bottom() >= static_cast<float>( image.getHeight() ) )
         {
             c.center.y = static_cast<float>( image.getHeight() ) - c.radius;
             vel.y *= -1.0f;
-            bounceSounds[dist( rng )].restart();
+            bounceSounds[dist( rng )].replay();
         }
         ball.setCircle( c );
         ball.setVelocity( vel );

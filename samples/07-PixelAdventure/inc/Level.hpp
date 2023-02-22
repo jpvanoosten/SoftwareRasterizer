@@ -7,10 +7,13 @@
 
 #include <Image.hpp>
 #include <Math/AABB.hpp>
+#include <Sound.hpp>
 #include <TileMap.hpp>
 
 #include <LDtkLoader/Level.hpp>
 #include <LDtkLoader/World.hpp>
+
+#include <random>
 
 enum class ColliderType
 {
@@ -70,7 +73,6 @@ private:
     std::map<std::string, std::shared_ptr<sr::SpriteSheet>> fruitSprites;
     // Box sprites.
     std::map<std::string, Box> boxPrefabs;
-    
 
     // All pickups
     std::vector<Pickup> allPickups;
@@ -89,4 +91,11 @@ private:
 
     Player    player;
     glm::vec2 playerStart { 0 };
+
+    Audio::Sound bgMusic;
+    Audio::Sound pickupSound;
+    std::vector<Audio::Sound> woodBreakSounds;
+    std::minstd_rand          rng;
+    std::uniform_int_distribution<> dist;
+
 };

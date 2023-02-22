@@ -17,6 +17,7 @@ set( SRC_FILES
     src/Sound.cpp
     src/SoundImpl.hpp
     src/SoundImpl.cpp
+    src/stb_vorbis.c
 )
 
 set( ALL_FILES 
