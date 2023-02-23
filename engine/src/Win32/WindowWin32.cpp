@@ -183,6 +183,9 @@ WindowWin32::WindowWin32( std::wstring_view title, int width, int height )
 
     glDeleteShader( vertexShader );
     glDeleteShader( fragmentShader );
+
+    // Explicitly set v-sync (on some GPU's v-sync is initially disabled).
+    WindowWin32::setVSync( vSync );
 }
 
 WindowWin32::~WindowWin32()

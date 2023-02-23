@@ -93,7 +93,7 @@ public:
     /// Check if the sound is finished playing.
     /// Note: Looping sounds will always return false.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>`true` if the sound is finished playing, `false` otherwise.</returns>
     bool isEnd() const;
 
     /// <summary>

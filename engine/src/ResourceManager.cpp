@@ -23,10 +23,15 @@ std::shared_ptr<Image> ResourceManager::loadImage( const std::filesystem::path& 
     return iter->second;
 }
 
-std::shared_ptr<SpriteSheet> ResourceManager::loadSpriteSheet( const std::filesystem::path& filePath, std::optional<uint32_t> spriteWidth, std::optional<uint32_t> spriteHeight, uint32_t padding, uint32_t margin, const BlendMode blendMode )
+std::shared_ptr<SpriteSheet> ResourceManager::loadSpriteSheet( const std::filesystem::path& filePath, std::optional<uint32_t> spriteWidth, std::optional<uint32_t> spriteHeight, uint32_t padding, uint32_t margin, const BlendMode& blendMode )
 {
     auto image = loadImage( filePath );
     return std::make_shared<SpriteSheet>( image, spriteWidth, spriteHeight, padding, margin, blendMode );
+}
+
+std::shared_ptr<SpriteSheet> ResourceManager::loadSpriteSheet( const std::filesystem::path& filePath, std::span<const Math::RectI> spriteRects, const BlendMode& blendMode )
+{
+    return std::make_shared<SpriteSheet>( filePath, spriteRects, blendMode );
 }
 
 void ResourceManager::clear()

@@ -8,6 +8,7 @@ add_subdirectory(05-CopyImage)
 add_subdirectory(06-Fonts)
 add_subdirectory(07-PixelAdventure)
 add_subdirectory(08-Audio)
+add_subdirectory(09-Breakout)
 
 set_target_properties( 
 	01-ClearScreen 
@@ -18,6 +19,7 @@ set_target_properties(
 	06-Fonts
 	07-PixelAdventure
 	08-Audio
+	09-Breakout
 	PROPERTIES
 		FOLDER samples
 )

@@ -16,12 +16,12 @@ set( SR_VERSION ${SR_VERSION_MAJOR}.${SR_VERSION_MINOR}.${SR_VERSION_PATCH})
 # Use solution folders.
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
+project( SoftwareRasterizer VERSION ${SR_VERSION} LANGUAGES CXX )
+
 # Enable multi-processor builds in MSVC.
 if(MSVC)
     add_compile_options(/MP)
 endif(MSVC)
-
-project( SoftwareRasterizer VERSION ${SR_VERSION} LANGUAGES CXX )
 
 add_subdirectory(externals)
 add_subdirectory(math)

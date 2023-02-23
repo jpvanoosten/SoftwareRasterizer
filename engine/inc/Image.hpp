@@ -274,14 +274,30 @@ struct SR_API Image final
     /// <param name="y">The y-coordinate to plot.</param>
     /// <param name="src">The source color of the pixel to plot.</param>
     /// <param name="blendMode">The blend mode to apply.</param>
+    template<bool BoundsCheck = true, bool Blending = true>
     void plot( uint32_t x, uint32_t y, const Color& src, const BlendMode& blendMode = {} ) noexcept
     {
-        if ( x >= m_width || y >= m_height )
-            return;
+        if constexpr ( BoundsCheck )
+        {
+            if ( x >= m_width || y >= m_height )
+                return;
+        }
+        else
+        {
+            assert( x < m_width );
+            assert( y < m_height );
+        }
 
         const size_t i   = static_cast<size_t>( y ) * m_width + x;
-        const Color  dst = m_data[i];
-        m_data[i]        = blendMode.Blend( src, dst );
+        if constexpr ( Blending )
+        {
+            const Color dst = m_data[i];
+            m_data[i]       = blendMode.Blend( src, dst );
+        }
+        else
+        {
+            m_data[i] = src;
+        }
     }
 
     /// <summary>
