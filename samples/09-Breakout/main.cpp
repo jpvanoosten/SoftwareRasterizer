@@ -52,8 +52,8 @@ int main( int argc, char* argv[] )
         }
     }
 
-    const int WINDOW_WIDTH  = 1920;
-    const int WINDOW_HEIGHT = 1080;
+    constexpr int WINDOW_WIDTH  = 1920;
+    constexpr int WINDOW_HEIGHT = 1080;
 
     Window window { L"09 - Breakout", WINDOW_WIDTH, WINDOW_HEIGHT };
 
@@ -64,11 +64,14 @@ int main( int argc, char* argv[] )
     auto spriteSheet = SpriteSheet( "assets/Breakout/Sprite Sheet/Breakout_Tile_Free.png", spriteRects, BlendMode::AlphaBlend );
 
     Ball ball { { WINDOW_WIDTH / 2.0f, WINDOW_HEIGHT / 2.0f } };
-    ball.setVelocity( glm::vec2 { 1, -1 } * 200.0f );
+    ball.setVelocity( glm::vec2 { 1, -1 } * 300.0f );
 
     Image image { WINDOW_WIDTH, WINDOW_HEIGHT };
 
+    Image spaceBackground { "assets/textures/space_background.jpg" };
+
     window.show();
+    window.setFullscreen( true );
 
     Timer       timer;
     double      totalTime  = 0.0;
@@ -77,13 +80,41 @@ int main( int argc, char* argv[] )
 
     while ( window )
     {
+        /// Update ///
         timer.tick();
 
         ball.update( static_cast<float>( timer.elapsedSeconds() ) );
-        
 
-        image.resize( window.getWidth(), window.getHeight() );
-        image.clear( Color::Black );
+        // Check for collision with the sides of the screen.
+        {
+            auto c = ball.getCircle();
+            auto v = ball.getVelocity();
+            if ( c.center.x - c.radius < 0.0f )
+            {
+                c.center.x = c.radius;
+                v.x *= -1.0f;
+            }
+            else if ( c.center.x + c.radius > WINDOW_WIDTH )
+            {
+                c.center.x = WINDOW_WIDTH - c.radius;
+                v.x *= -1.0f;
+            }
+            if ( c.center.y - c.radius < 0.0f )
+            {
+                c.center.y = c.radius;
+                v.y *= -1.0f;
+            }
+            else if ( c.center.y + c.radius > WINDOW_HEIGHT )
+            {
+                c.center.y = WINDOW_HEIGHT - c.radius;
+                v.y *= -1.0f;
+            }
+            ball.setCircle( c );
+            ball.setVelocity( v );
+        }
+
+        /// Render ///
+        image.copy( spaceBackground, 0, 0 );
 
         ball.draw( image );
 
@@ -102,6 +133,18 @@ int main( int argc, char* argv[] )
             case Event::KeyPressed:
                 switch ( e.key.code )
                 {
+                case KeyCode::V:
+                    window.setVSync( !window.isVSync() );
+                    std::cout << "Vsync: " << window.isVSync() << std::endl;
+                    break;
+                case KeyCode::Enter:
+                    if ( e.key.alt )
+                    {
+                        [[fallthrough]];
+                    case KeyCode::F11:
+                        window.toggleFullscreen();
+                    }
+                    break;
                 case KeyCode::Escape:
                     window.destroy();
                     break;
