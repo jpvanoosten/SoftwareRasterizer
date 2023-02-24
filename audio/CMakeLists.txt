@@ -1,10 +1,10 @@
 cmake_minimum_required( VERSION 3.23.0 )
 
 set( INC_FILES
-    inc/Config.hpp
-    inc/Device.hpp
-    inc/Listener.hpp
-    inc/Sound.hpp
+    inc/Audio/Config.hpp
+    inc/Audio/Device.hpp
+    inc/Audio/Listener.hpp
+    inc/Audio/Sound.hpp
 )
 
 set( SRC_FILES

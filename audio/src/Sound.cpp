@@ -1,7 +1,7 @@
-#include "Device.hpp"
+#include <Audio/Device.hpp>
+#include <Audio/Sound.hpp>
 
 #include "SoundImpl.hpp"
-#include <Sound.hpp>
 
 using namespace Audio;
 

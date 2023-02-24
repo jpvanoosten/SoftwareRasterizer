@@ -1,7 +1,8 @@
 #pragma once
 
-#include "Listener.hpp"
-#include "Sound.hpp"
+#include <Audio/Listener.hpp>
+#include <Audio/Sound.hpp>
+
 #include "miniaudio.h"
 
 #include <glm/vec3.hpp>

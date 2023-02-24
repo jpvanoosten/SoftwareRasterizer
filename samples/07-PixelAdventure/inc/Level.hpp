@@ -5,9 +5,10 @@
 #include "Pickup.hpp"
 #include "Player.hpp"
 
-#include <Image.hpp>
+#include <Audio/Sound.hpp>
 #include <Math/AABB.hpp>
-#include <Sound.hpp>
+
+#include <Image.hpp>
 #include <TileMap.hpp>
 
 #include <LDtkLoader/Level.hpp>
@@ -92,10 +93,9 @@ private:
     Player    player;
     glm::vec2 playerStart { 0 };
 
-    Audio::Sound bgMusic;
-    Audio::Sound pickupSound;
-    std::vector<Audio::Sound> woodBreakSounds;
-    std::minstd_rand          rng;
+    Audio::Sound                    bgMusic;
+    Audio::Sound                    pickupSound;
+    std::vector<Audio::Sound>       woodBreakSounds;
+    std::minstd_rand                rng;
     std::uniform_int_distribution<> dist;
-
 };

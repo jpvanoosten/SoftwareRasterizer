@@ -4,7 +4,7 @@
 
 #include <Image.hpp>
 #include <Math/Transform2D.hpp>
-#include <Sound.hpp>
+#include <Audio/Sound.hpp>
 
 #include <vector>
 
