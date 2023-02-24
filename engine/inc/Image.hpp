@@ -388,11 +388,19 @@ struct SR_API Image final
         return { 0, 0, static_cast<int>( m_width ), static_cast<int>( m_height ) };
     }
 
+    /// <summary>
+    /// Get a pointer to the pixel buffer.
+    /// </summary>
+    /// <returns>A pointer to the pixel buffer.</returns>
     Color* data() noexcept
     {
         return m_data.get();
     }
 
+    /// <summary>
+    /// Get a read-only pointer to the pixel buffer.
+    /// </summary>
+    /// <returns>A read-only pointer to the pixel buffer.</returns>
     const Color* data() const noexcept
     {
         return m_data.get();
