@@ -472,6 +472,11 @@ void Image::drawCircle( const Math::Sphere& sphere, const Color& color, const Bl
     drawCircle( glm::vec2 { sphere.center }, sphere.radius, color, blendMode, fillMode );
 }
 
+void Image::drawCircle( const Math::Circle& circle, const Color& color, const BlendMode& blendMode, FillMode fillMode ) noexcept
+{
+    drawCircle( circle.center, circle.radius, color, blendMode, fillMode );
+}
+
 void Image::drawCircle( const glm::vec2& center, float radius, const Color& color, const BlendMode& blendMode, FillMode fillMode ) noexcept
 {
     if ( !m_AABB.intersect( Sphere { glm::vec3 { center, 0 }, radius } ) )
@@ -515,7 +520,7 @@ void Image::drawSprite( const Sprite& sprite, const glm::mat3& matrix ) noexcept
 
     Vertex verts[] = {
         Vertex { { 0, 0 }, { uv.x, uv.y }, color },                              // Top-left
-        Vertex { { size.x, 0 }, { uv.x + size.x, 0 }, color },                   // Top-right
+        Vertex { { size.x, 0 }, { uv.x + size.x, uv.y }, color },                // Top-right
         Vertex { { size.x, size.y }, { uv.x + size.x, uv.y + size.y }, color },  // Bottom-right
         Vertex { { 0, size.y }, { uv.x, uv.y + size.y }, color }                 // Bottom-left
     };

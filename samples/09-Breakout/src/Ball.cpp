@@ -3,6 +3,7 @@
 #include <ResourceManager.hpp>
 
 using namespace sr;
+using namespace Math;
 
 Ball::Ball()
 : sprite { ResourceManager::loadImage( "assets/Breakout/Sprite Sheet/Breakout_Tile_Free.png" ), { 1403, 652, 64, 64 }, BlendMode::AlphaBlend }
@@ -24,6 +25,10 @@ void Ball::update( float deltaTime )
 void Ball::draw( sr::Image& image )
 {
     image.drawSprite( sprite, static_cast<int>( position.x - circle.radius ), static_cast<int>( position.y - circle.radius ) );
+
+#if _DEBUG
+    image.drawCircle( circle, Color::Yellow, {}, FillMode::WireFrame );
+#endif
 }
 
 void Ball::setPosition( const glm::vec2& pos )
@@ -48,7 +53,7 @@ const glm::vec2& Ball::getVelocity() const
 
 void Ball::setCircle( const Math::Circle& _circle )
 {
-    circle = _circle;
+    circle   = _circle;
     position = circle.center;
 }
 

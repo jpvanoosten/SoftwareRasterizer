@@ -1,13 +1,24 @@
 #pragma once
 
-#include "Ball.hpp"
-#include "Paddle.hpp"
+#include "State.hpp"
 
+#include <Events.hpp>
 #include <Font.hpp>
+
+#include <memory>
 
 class Game
 {
 public:
+    enum class GameState
+    {
+        None,
+        MainMenu,
+        Playing,
+        Pause,
+        GameOver,
+    };
+
     Game( uint32_t screenWidth, uint32_t screenHeight );
 
     // Delete copy and move constructors and assign operators
@@ -16,20 +27,20 @@ public:
     Game& operator=( const Game& ) = delete;
     Game& operator=( Game&& )      = delete;
 
-    void update( double deltaTime );
+    void update( float deltaTime );
+
+    void processEvent( const sr::Event& event );
 
     const sr::Image& getImage() const;
 
 private:
-    // Check collisions with the ball.
-    void checkCollisions(Ball& ball);
+    void setState( GameState newState );
+
+    GameState              currentState = GameState::None;
+    std::unique_ptr<State> state;
 
     sr::Image image;
     // Fonts.
     sr::Font arial20;
     sr::Font arial24;
-
-    sr::Image backgroundImage;
-    Ball      ball;
-    Paddle    paddle;
 };

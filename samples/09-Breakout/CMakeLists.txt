@@ -4,21 +4,28 @@ set( TARGET_NAME 09-Breakout )
 
 set( INC_FILES
     inc/Ball.hpp
+    inc/Button.hpp
     inc/Game.hpp
+    inc/MainMenuState.hpp
     inc/Paddle.hpp
+    inc/PlayState.hpp
+    inc/State.hpp
     inc/tinyxml2.h
 )
 
 set( SRC_FILES
     main.cpp
     src/Ball.cpp
+    src/Button.cpp
     src/Game.cpp
+    src/MainMenuState.cpp
     src/Paddle.cpp
+    src/PlayState.cpp
     src/tinyxml2.cpp
 )
 
 
-set( ALL_FILES ${SRC_FILES} ${INC_FILES} )
+set( ALL_FILES ${SRC_FILES} ${INC_FILES} ../glm.natvis )
 
 add_executable( ${TARGET_NAME} ${ALL_FILES})
 

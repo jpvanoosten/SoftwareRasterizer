@@ -1,12 +1,25 @@
 #include <SpriteAnim.hpp>
+#include <numeric> // for std::iota.
 
 using namespace sr;
 
-SpriteAnim::SpriteAnim( std::shared_ptr<SpriteSheet> spriteSheet, uint32_t fps )
-: spriteSheet { std::move( spriteSheet ) }
+SpriteAnim::SpriteAnim( std::shared_ptr<SpriteSheet> _spriteSheet, float fps, std::span<const int> _frames )
+: spriteSheet { std::move( _spriteSheet ) }
 , frameRate { fps }
-, time { 0.0f }
-{}
+{
+    if ( _frames.empty() )
+    {
+        if (spriteSheet)
+        {
+            frames.resize( spriteSheet->getNumSprites() );
+            std::iota( frames.begin(), frames.end(), 0 );
+        }
+    }
+    else
+    {
+        frames = std::vector( _frames.begin(), _frames.end() );
+    }
+}
 
 SpriteAnim::operator const Sprite&() const noexcept
 {
@@ -17,7 +30,7 @@ const Sprite& SpriteAnim::operator[]( size_t i ) const noexcept
 {
     if ( spriteSheet )
     {
-        const size_t frame = i % spriteSheet->getNumSprites();
+        const size_t frame = frames[i % frames.size()];
         return ( *spriteSheet )[frame];
     }
 
@@ -29,8 +42,8 @@ const Sprite& SpriteAnim::at( float _time ) const noexcept
 {
     uint32_t frame = 0;
 
-    if ( spriteSheet && spriteSheet->getNumSprites() > 0 )
-        frame = static_cast<uint32_t>( _time * static_cast<float>( frameRate ) ) % spriteSheet->getNumSprites();
+    if ( spriteSheet )
+        frame = static_cast<uint32_t>( _time * frameRate );
 
     // Will return an empty sprite if spriteSheet is null.
     return operator[]( frame );
@@ -48,10 +61,7 @@ void SpriteAnim::reset() noexcept
 
 float SpriteAnim::getDuration() const noexcept
 {
-    if ( spriteSheet && spriteSheet->getNumSprites() > 0 )
-        return static_cast<float>( spriteSheet->getNumSprites() ) / static_cast<float>( frameRate );
-
-    return 0.0f;
+    return static_cast<float>( frames.size() ) / frameRate;
 }
 
 bool SpriteAnim::isDone() const noexcept

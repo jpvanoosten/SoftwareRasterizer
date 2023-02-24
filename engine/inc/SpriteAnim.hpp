@@ -15,7 +15,8 @@ public:
     /// </summary>
     /// <param name="spriteSheet">The sprite sheet that contains the sprites for the animation.</param>
     /// <param name="fps">(optional) The frame-rate of the animation. Default: 30 FPS.</param>
-    explicit SpriteAnim( std::shared_ptr<SpriteSheet> spriteSheet, uint32_t fps = 30u );
+    /// <param name="frames">(optional) The frames of the sprites in the sprite sheet. Default: Uses all of sprites of the sprite sheet.</param>
+    explicit SpriteAnim( std::shared_ptr<SpriteSheet> spriteSheet, float fps = 30.0f, std::span<const int> frames = {} );
 
     /// <summary>
     /// Allow conversion to sprite.
@@ -66,7 +67,8 @@ public:
 
 private:
     std::shared_ptr<SpriteSheet> spriteSheet;
-    uint32_t                     frameRate = 30u;  // Default to 30 FPS.
+    std::vector<int>             frames;
+    float                        frameRate = 30.0f;  // Default to 30 FPS.
     float                        time      = 0.0f;
 };
 }  // namespace sr

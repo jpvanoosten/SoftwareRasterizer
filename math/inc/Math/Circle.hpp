@@ -76,6 +76,16 @@ struct Circle
         return { center.x + radius, center.y + radius };
     }
 
+    bool intersect( const Circle& other ) const noexcept
+    {
+        float dx = center.x - other.center.x;
+        float dy = center.y - other.center.y;
+        float d = dx * dx + dy * dy;
+        float r = radius + other.radius;
+
+        return d < r * r;
+    }
+
     glm::vec2 center { 0 };
     float     radius { 0 };
 };

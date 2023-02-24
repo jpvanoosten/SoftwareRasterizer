@@ -225,6 +225,16 @@ struct SR_API Image final
     /// <param name="fillMode">The fill mode to use.</param>
     void drawCircle( const Math::Sphere& sphere, const Color& color, const BlendMode& blendMode = {}, FillMode fillMode = FillMode::Solid ) noexcept;
 
+
+    /// <summary>
+    /// Draw a circle.
+    /// </summary>
+    /// <param name="circle">The circle to draw.</param>
+    /// <param name="color">The color of the circle.</param>
+    /// <param name="blendMode">The blend mode to use.</param>
+    /// <param name="fillMode">The fill mode to use.</param>
+    void drawCircle( const Math::Circle& circle, const Color& color, const BlendMode& blendMode = {}, FillMode fillMode = FillMode::Solid ) noexcept;
+
     /// <summary>
     /// Draw a circle.
     /// </summary>
@@ -288,7 +298,7 @@ struct SR_API Image final
             assert( y < m_height );
         }
 
-        const size_t i   = static_cast<size_t>( y ) * m_width + x;
+        const size_t i = static_cast<size_t>( y ) * m_width + x;
         if constexpr ( Blending )
         {
             const Color dst = m_data[i];

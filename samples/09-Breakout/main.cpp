@@ -1,32 +1,10 @@
-#include "tinyxml2.h"
+#include "Input.hpp"
 
 #include <Game.hpp>
 #include <Timer.hpp>
 #include <Window.hpp>
 
 #include <iostream>
-
-// Parse the XML file and return a list of rects containing the sprites in the texture atlas.
-std::vector<Math::RectI> parseSpriteRects( const std::filesystem::path& xmlFile )
-{
-    tinyxml2::XMLDocument doc;
-    doc.LoadFile( xmlFile.string().c_str() );
-
-    tinyxml2::XMLElement* root = doc.RootElement();
-
-    std::vector<Math::RectI> rects;
-
-    for ( tinyxml2::XMLElement* subTexture = root->FirstChildElement( "SubTexture" ); subTexture != nullptr; subTexture = subTexture->NextSiblingElement( "SubTexture" ) )
-    {
-        int x      = subTexture->IntAttribute( "x" );
-        int y      = subTexture->IntAttribute( "y" );
-        int width  = subTexture->IntAttribute( "width" );
-        int height = subTexture->IntAttribute( "height" );
-        rects.emplace_back( x, y, width, height );
-    }
-
-    return rects;
-}
 
 int main( int argc, char* argv[] )
 {
@@ -54,11 +32,20 @@ int main( int argc, char* argv[] )
 
     sr::Timer timer;
 
+    // Maximum tick time for physics.
+    constexpr float physicsTick = 1.0f / 60.0f;
+
     while ( window )
     {
         timer.tick();
+        auto elapsedTime = static_cast<float>( timer.elapsedSeconds() );
 
-        game.update( timer.elapsedSeconds() );
+        do
+        {
+            sr::Input::update();
+            game.update( std::min( elapsedTime, physicsTick ) );
+            elapsedTime -= physicsTick;
+        } while ( elapsedTime > 0.0f );
 
         window.clear( sr::Color::Black );
         window.present( game.getImage() );
@@ -66,6 +53,9 @@ int main( int argc, char* argv[] )
         sr::Event e;
         while ( window.popEvent( e ) )
         {
+            // Allow the game to process events.
+            game.processEvent( e );
+
             switch ( e.type )
             {
             case sr::Event::Close:
