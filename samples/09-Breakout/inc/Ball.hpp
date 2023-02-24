@@ -9,6 +9,8 @@
 class Ball
 {
 public:
+    Ball();
+
     explicit Ball( const glm::vec2& position );
 
     void update( float deltaTime );

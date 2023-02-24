@@ -4,10 +4,15 @@
 
 using namespace sr;
 
+Ball::Ball()
+: sprite { ResourceManager::loadImage( "assets/Breakout/Sprite Sheet/Breakout_Tile_Free.png" ), { 1403, 652, 64, 64 }, BlendMode::AlphaBlend }
+, circle { position, 32.0f }
+{}
+
 Ball::Ball( const glm::vec2& position )
 : position { position }
 , sprite { ResourceManager::loadImage( "assets/Breakout/Sprite Sheet/Breakout_Tile_Free.png" ), { 1403, 652, 64, 64 }, BlendMode::AlphaBlend }
-, circle{position, 32.0f}
+, circle { position, 32.0f }
 {}
 
 void Ball::update( float deltaTime )
@@ -44,14 +49,10 @@ const glm::vec2& Ball::getVelocity() const
 void Ball::setCircle( const Math::Circle& _circle )
 {
     circle = _circle;
+    position = circle.center;
 }
 
 const Math::Circle& Ball::getCircle() const
 {
     return circle;
 }
-
-
-
-
-

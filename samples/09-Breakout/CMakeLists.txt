@@ -4,6 +4,7 @@ set( TARGET_NAME 09-Breakout )
 
 set( INC_FILES
     inc/Ball.hpp
+    inc/Game.hpp
     inc/Paddle.hpp
     inc/tinyxml2.h
 )
@@ -11,6 +12,7 @@ set( INC_FILES
 set( SRC_FILES
     main.cpp
     src/Ball.cpp
+    src/Game.cpp
     src/Paddle.cpp
     src/tinyxml2.cpp
 )
