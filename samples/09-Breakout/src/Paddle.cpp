@@ -55,7 +55,7 @@ const glm::vec2& Paddle::getPosition() const
 
 Math::AABB Paddle::getAABB() const
 {
-    return aabb * transform;
+    return transform * aabb;
 }
 
 bool Paddle::collidesWith( const Math::Circle& c ) const

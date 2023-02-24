@@ -1,9 +1,10 @@
 #include "Ball.hpp"
 
-#include <Device.hpp>
+#include <Audio/Device.hpp>
+#include <Math/Transform2D.hpp>
+
 #include <Font.hpp>
 #include <Image.hpp>
-#include <Math/Transform2D.hpp>
 #include <Timer.hpp>
 #include <Window.hpp>
 
@@ -58,7 +59,7 @@ int main( int argc, char* argv[] )
     std::minstd_rand                rng { std::random_device()() };
     std::uniform_int_distribution<> dist { 0, static_cast<int>( bounceSounds.size() - 1 ) };
 
-    //Audio::Sound bgMusic { "assets/sounds/piano-loops.mp3", Audio::Sound::Type::Music };
+    // Audio::Sound bgMusic { "assets/sounds/piano-loops.mp3", Audio::Sound::Type::Music };
     Audio::Sound bgMusic { "assets/sounds/Sweet Treats.ogg", Audio::Sound::Type::Music };
     bgMusic.setVolume( 0.2f );  // It's too loud!
 

@@ -1,7 +1,6 @@
 #include "Ball.hpp"
 
 #include <ResourceManager.hpp>
-#include <Sound.hpp>
 
 using namespace sr;
 using namespace Math;

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <Math/Transform2D.hpp>
-#include <Sound.hpp>
 #include <Sprite.hpp>
 
 #include <glm/vec2.hpp>

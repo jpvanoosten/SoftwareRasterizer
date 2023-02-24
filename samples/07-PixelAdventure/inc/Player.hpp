@@ -99,27 +99,27 @@ public:
 
     Math::AABB getAABB() const noexcept
     {
-        return aabb * transform;
+        return transform * aabb;
     }
 
     Math::AABB getTopAABB() const noexcept
     {
-        return topAABB * transform;
+        return transform * topAABB;
     }
 
     Math::AABB getBottomAABB() const noexcept
     {
-        return bottomAABB * transform;
+        return transform * bottomAABB;
     }
 
     Math::AABB getLeftAABB() const noexcept
     {
-        return leftAABB * transform;
+        return transform * leftAABB;
     }
 
     Math::AABB getRightAABB() const noexcept
     {
-        return rightAABB * transform;
+        return transform * rightAABB;
     }
 
     void setCharacter( size_t characterId );

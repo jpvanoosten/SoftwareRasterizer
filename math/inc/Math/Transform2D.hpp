@@ -126,7 +126,7 @@ private:
 /// <param name="aabb">The AABB to transform.</param>
 /// <param name="transform">The transformation to apply.</param>
 /// <returns>The transformed AABB.</returns>
-inline AABB operator*( const AABB& aabb, const Transform2D& transform )
+inline AABB operator*( const Transform2D& transform, const AABB& aabb )
 {
     auto& mat = transform.getTransform();
     const auto min = mat * glm::vec3 { aabb.min.x, aabb.min.y, 1 };

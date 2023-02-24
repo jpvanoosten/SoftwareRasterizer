@@ -3,6 +3,7 @@ cmake_minimum_required( VERSION 3.23.0 )
 set( INC_FILES
     inc/Math/AABB.hpp
     inc/Math/bitmask_operators.hpp
+    inc/Math/Camera2D.hpp
     inc/Math/Circle.hpp
     inc/Math/Line.hpp
     inc/Math/Math.hpp
@@ -13,6 +14,7 @@ set( INC_FILES
 )
 
 set( SRC_FILES
+    src/Camera2D.cpp
     src/Math.cpp
     src/Transform2D.cpp
 )
