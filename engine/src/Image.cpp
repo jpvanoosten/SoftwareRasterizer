@@ -643,9 +643,14 @@ void Image::drawText( const Font& font, int x, int y, std::string_view text, con
     font.drawText( *this, text, x, y, color );
 }
 
-constexpr int fast_floor( float x )
+constexpr int fast_floor( float x ) noexcept
 {
-    return static_cast<int>( x + 32768.0f ) - 32768;
+    return static_cast<int>( static_cast<double>( x ) + 1073741823.0 ) - 1073741823;
+}
+
+constexpr int fast_mod( int x, int y ) noexcept
+{
+    return x - y * fast_floor( static_cast<float>( x ) / static_cast<float>( y ) );
 }
 
 const Color& Image::sample( int u, int v, AddressMode addressMode ) const noexcept
@@ -657,8 +662,8 @@ const Color& Image::sample( int u, int v, AddressMode addressMode ) const noexce
     {
     case AddressMode::Wrap:
     {
-        u = u - w * fast_floor( static_cast<float>( u ) / static_cast<float>( w ) );
-        v = v - h * fast_floor( static_cast<float>( v ) / static_cast<float>( h ) );
+        u = fast_mod( u, w );
+        v = fast_mod( v, h );
     }
     break;
     case AddressMode::Mirror:
@@ -666,8 +671,8 @@ const Color& Image::sample( int u, int v, AddressMode addressMode ) const noexce
         const int U = u / w;
         const int V = v / h;
 
-        u = ( U % 2 == 0 ) ? u % w : w - ( u % w );
-        v = ( V % 2 == 0 ) ? v % h : h - ( v % h );
+        u = ( U % 2 == 0 ) ? fast_mod( u, w ) : ( w - 1 ) - fast_mod( u, w );
+        v = ( V % 2 == 0 ) ? fast_mod( v, h ) : ( h - 1 ) - fast_mod( v, h );
     }
     break;
     case AddressMode::Clamp:

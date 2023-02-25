@@ -11,6 +11,13 @@
 using namespace sr;
 using namespace Math;
 
+std::vector<Vertex> transformVerts( const Camera2D& camera, std::span<const Vertex> verts )
+{
+    std::vector<Vertex> transformedVerts { verts.begin(), verts.end() };
+    std::ranges::for_each( transformedVerts, [&camera]( Vertex& v ) { v.position = camera * v.position; } );
+    return transformedVerts;
+}
+
 int main( int argc, char* argv[] )
 {
     // Parse command-line arguments.
@@ -102,8 +109,8 @@ int main( int argc, char* argv[] )
         return std::clamp( rightX - left + right, -1.0f, 1.0f );
     } );
 
-    const int WINDOW_WIDTH  = 800;
-    const int WINDOW_HEIGHT = 600;
+    constexpr int WINDOW_WIDTH  = 800;
+    constexpr int WINDOW_HEIGHT = 600;
 
     Window   window { L"10 - Camera", WINDOW_WIDTH, WINDOW_HEIGHT };
     Image    image { WINDOW_WIDTH, WINDOW_HEIGHT };
@@ -117,11 +124,14 @@ int main( int argc, char* argv[] )
     uint64_t    frameCount = 0ull;
     std::string fps        = "FPS: 0";
 
-    constexpr glm::vec2 verts[] = {
-        { 400, 63 },   // Top point.
-        { 140, 512 },  // Bottom left.
-        { 660, 512 },  // Bottom right.
+    const Vertex verts[] = {
+        { { 0, 0 }, { -4, -3 } },                         // Top-left.
+        { { WINDOW_WIDTH, 0 }, { 4, -3 } },              // Top-right.
+        { { WINDOW_WIDTH, WINDOW_HEIGHT }, { 4, 3 } },  // Bottom-right.
+        { { 0, WINDOW_HEIGHT }, { -4, 3 } }              // Bottom-left.
     };
+
+    Image smiley( "assets/textures/Smiley.png" );
 
     while ( window )
     {
@@ -134,29 +144,25 @@ int main( int argc, char* argv[] )
         camera.rotate( Input::getAxis( "Rotate" ) * elapsedTime );
         camera.zoom( Input::getAxis( "Zoom" ) * elapsedTime );
 
-        image.clear( Color::White );
+        image.clear( Color::Black );
 
-        // Transform the triangle.
-        glm::vec2 p0 = camera * verts[0];
-        glm::vec2 p1 = camera * verts[1];
-        glm::vec2 p2 = camera * verts[2];
+        // Transform the quad.
+        auto newVerts = transformVerts( camera, verts );
 
-        // Draw a red triangle in the middle of the screen.
-        image.drawTriangle( p0, p1, p2, Color::Red );
-        // Draw a blue outline for the triangle.
-        image.drawTriangle( p0, p1, p2, Color::Blue, {}, FillMode::WireFrame );
+        // Draw smiley faces.
+        image.drawQuad( newVerts[0], newVerts[1], newVerts[2], newVerts[3], smiley );
 
-        image.drawText( Font::Default, 10, 10, fps, Color::Black );
+        image.drawText( Font::Default, 10, 10, fps, Color::White );
 
         float zoom     = camera.getZoom();
         float rotation = camera.getRotation();
         auto  position = camera.getPosition();
         auto  origin   = camera.getOrigin();
 
-        image.drawText( Font::Default, 10, 30, std::format( "Zoom    : {}", zoom ), Color::Black );
-        image.drawText( Font::Default, 10, 45, std::format( "Rotation: {}", rotation ), Color::Black );
-        image.drawText( Font::Default, 10, 60, std::format( "Position: {}, {}", position.x, position.y ), Color::Black );
-        image.drawText( Font::Default, 10, 75, std::format( "Origin  : {}, {}", origin.x, origin.y ), Color::Black );
+        image.drawText( Font::Default, 10, 30, std::format( "Zoom    : {}", zoom ), Color::White );
+        image.drawText( Font::Default, 10, 45, std::format( "Rotation: {}", rotation ), Color::White );
+        image.drawText( Font::Default, 10, 60, std::format( "Position: {}, {}", position.x, position.y ), Color::White );
+        image.drawText( Font::Default, 10, 75, std::format( "Origin  : {}, {}", origin.x, origin.y ), Color::White );
 
         window.present( image );
 
