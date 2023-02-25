@@ -1,5 +1,6 @@
 #include <Math/Camera2D.hpp>
 
+#include <glm/gtc/matrix_transform.hpp>
 #include <glm/trigonometric.hpp>
 
 using namespace Math;
@@ -15,32 +16,16 @@ const glm::mat3& Camera2D::getTransform() const noexcept
 {
     if ( m_TransformDirty )
     {
-        // TODO: Fix this....
-        // Zoom is not taken into consideration yet...
-        const float c  = glm::cos( m_Rotation );
-        const float s  = glm::sin( m_Rotation );
-        const float tx = -m_Origin.x * c - m_Origin.y * s + m_Position.x;
-        const float ty = m_Origin.x * s - m_Origin.y * c + m_Position.y;
+        auto transform = glm::translate( glm::rotate( glm::scale( glm::translate( glm::mat4 { 1.0f }, glm::vec3 { -m_Position + m_Origin, 0 } ), glm::vec3 { m_Zoom, m_Zoom, 1 } ), -m_Rotation, glm::vec3 { 0, 0, 1 } ), glm::vec3 { -m_Origin, 0 } );
 
         m_Transform = {
-            c, -s, 0.0f,
-            s, c, 0.0f,
-            tx, ty, 1.0f
+            transform[0][0], transform[0][1], transform[0][3],
+            transform[1][0], transform[1][1], transform[1][3],
+            transform[3][0], transform[3][1], transform[3][3]
         };
 
         m_TransformDirty = false;
     }
 
     return m_Transform;
-}
-
-const glm::mat3& Camera2D::getInverseTransform() const noexcept
-{
-    if ( m_InverseTransformDirty )
-    {
-        m_InverseTransform      = glm::inverse( getTransform() );
-        m_InverseTransformDirty = false;
-    }
-
-    return m_InverseTransform;
 }

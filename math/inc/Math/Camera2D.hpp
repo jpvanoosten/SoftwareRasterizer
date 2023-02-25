@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Transform2D.hpp"
+
 #include <glm/mat3x3.hpp>
 #include <glm/vec2.hpp>
 
@@ -18,14 +20,25 @@ public:
     explicit Camera2D( const glm::vec2& position = glm::vec2 { 0 }, const glm::vec2& origin = glm::vec2 { 0 }, float rotation = 0.0f, float zoom = 1.0f ) noexcept;
 
     /// <summary>
+    /// Reset the camera to its default state.
+    /// </summary>
+    void reset() noexcept
+    {
+        m_Position = glm::vec2 { 0 };
+        m_Origin = glm::vec2 { 0 };
+        m_Rotation = 0.0f;
+        m_Zoom     = 1.0f;
+        m_TransformDirty = true;
+    }
+
+    /// <summary>
     /// Set the position of the camera in screen space.
     /// </summary>
     /// <param name="pos">The position of the camera in 2D screen space.</param>
     void setPosition( const glm::vec2& pos ) noexcept
     {
-        m_Position              = pos;
-        m_TransformDirty        = true;
-        m_InverseTransformDirty = true;
+        m_Position       = pos;
+        m_TransformDirty = true;
     }
 
     /// <summary>
@@ -38,7 +51,7 @@ public:
     }
 
     /// <summary>
-    /// Translate the camera by the given translation.
+    /// Translate the camera's position.
     /// </summary>
     /// <param name="translation">The value to add to the current position of the camera.</param>
     void translate( const glm::vec2& translation ) noexcept
@@ -53,9 +66,8 @@ public:
     /// <param name="origin">The origin of zooming/rotating.</param>
     void setOrigin( const glm::vec2& origin ) noexcept
     {
-        m_Origin                = origin;
-        m_TransformDirty        = true;
-        m_InverseTransformDirty = true;
+        m_Origin         = origin;
+        m_TransformDirty = true;
     }
 
     /// <summary>
@@ -68,14 +80,22 @@ public:
     }
 
     /// <summary>
+    /// Move the origin of the camera.
+    /// </summary>
+    /// <param name="offset">The offset of the camera origin.</param>
+    void moveOrigin( const glm::vec2& offset ) noexcept
+    {
+        setOrigin( m_Origin + offset );
+    }
+
+    /// <summary>
     /// Set the current rotation of the camera (in radians).
     /// </summary>
     /// <param name="rot">The current rotation of the camera (in radians).</param>
     void setRotation( float rot ) noexcept
     {
-        m_Rotation              = rot;
-        m_TransformDirty        = true;
-        m_InverseTransformDirty = true;
+        m_Rotation       = rot;
+        m_TransformDirty = true;
     }
 
     /// <summary>
@@ -102,9 +122,8 @@ public:
     /// <param name="zoom">The zoom of the camera.</param>
     void setZoom( float zoom ) noexcept
     {
-        m_Zoom                  = zoom;
-        m_TransformDirty        = true;
-        m_InverseTransformDirty = true;
+        m_Zoom           = zoom;
+        m_TransformDirty = true;
     }
 
     /// <summary>
@@ -126,16 +145,10 @@ public:
     }
 
     /// <summary>
-    /// Get the transform of the camera.
+    /// Get the view matrix of the camera.
     /// </summary>
-    /// <returns>The camera's transform matrix.</returns>
+    /// <returns>The camera's view matrix.</returns>
     const glm::mat3& getTransform() const noexcept;
-
-    /// <summary>
-    /// Get the inverse transform of the camera.
-    /// </summary>
-    /// <returns>The camera's inverse transform matrix.</returns>
-    const glm::mat3& getInverseTransform() const noexcept;
 
     /// <summary>
     /// Transform a 2D point by the camera's transform.
@@ -144,17 +157,7 @@ public:
     /// <returns></returns>
     glm::vec2 transformPoint( const glm::vec2& point ) const noexcept
     {
-        return getInverseTransform() * glm::vec3( point, 1.0f );
-    }
-
-    /// <summary>
-    /// Transform a normal vector by the camera's transform.
-    /// </summary>
-    /// <param name="normal">The normal vector to transform.</param>
-    /// <returns>The transformed normal vector.</returns>
-    glm::vec2 transformNormal( const glm::vec2& normal ) const noexcept
-    {
-        return getInverseTransform() * glm::vec3( normal, 0.0f );
+        return getTransform() * glm::vec3( point, 1.0f );
     }
 
 private:
@@ -164,8 +167,22 @@ private:
     float     m_Zoom { 1.0f };
 
     mutable glm::mat3 m_Transform { 1 };
-    mutable glm::mat3 m_InverseTransform { 1 };
-    mutable bool      m_TransformDirty        = true;
-    mutable bool      m_InverseTransformDirty = true;
+    mutable bool      m_TransformDirty = true;
 };
+
+inline glm::vec2 operator*( const Camera2D& camera, const glm::vec2& point ) noexcept
+{
+    return camera.getTransform() * glm::vec3( point, 1.0f );
+}
+
+inline glm::vec3 operator*( const Camera2D& camera, const glm::vec3& v ) noexcept
+{
+    return camera.getTransform() * v;
+}
+
+inline glm::mat3 operator*( const Camera2D& camera, const Transform2D& transform ) noexcept
+{
+    return camera.getTransform() * transform.getTransform();
+}
+
 }  // namespace Math

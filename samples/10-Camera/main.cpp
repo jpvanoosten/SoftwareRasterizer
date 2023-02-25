@@ -105,8 +105,8 @@ int main( int argc, char* argv[] )
     const int WINDOW_WIDTH  = 800;
     const int WINDOW_HEIGHT = 600;
 
-    Window window { L"10 - Camera", WINDOW_WIDTH, WINDOW_HEIGHT };
-    Image  image { WINDOW_WIDTH, WINDOW_HEIGHT };
+    Window   window { L"10 - Camera", WINDOW_WIDTH, WINDOW_HEIGHT };
+    Image    image { WINDOW_WIDTH, WINDOW_HEIGHT };
     Camera2D camera;
     camera.setOrigin( { WINDOW_WIDTH * 0.5f, WINDOW_HEIGHT * 0.5f } );
 
@@ -118,9 +118,9 @@ int main( int argc, char* argv[] )
     std::string fps        = "FPS: 0";
 
     constexpr glm::vec2 verts[] = {
-        { WINDOW_WIDTH * 0.5f, WINDOW_HEIGHT * 0.25 },
-        { WINDOW_WIDTH * 0.25f, WINDOW_HEIGHT * 0.75f },
-        { WINDOW_WIDTH * 0.75f, WINDOW_HEIGHT * 0.75f },
+        { 400, 63 },   // Top point.
+        { 140, 512 },  // Bottom left.
+        { 660, 512 },  // Bottom right.
     };
 
     while ( window )
@@ -130,16 +130,16 @@ int main( int argc, char* argv[] )
 
         const float elapsedTime = static_cast<float>( timer.elapsedSeconds() );
 
-        camera.translate( glm::vec2{ Input::getAxis( "Horizontal" ), Input::getAxis( "Vertical" ) } * elapsedTime * 100.0f );
+        camera.translate( glm::vec2 { Input::getAxis( "Horizontal" ), Input::getAxis( "Vertical" ) } * elapsedTime * 100.0f );
         camera.rotate( Input::getAxis( "Rotate" ) * elapsedTime );
         camera.zoom( Input::getAxis( "Zoom" ) * elapsedTime );
 
         image.clear( Color::White );
 
         // Transform the triangle.
-        glm::vec2 p0 = camera.transformPoint( verts[0] );
-        glm::vec2 p1 = camera.transformPoint( verts[1] );
-        glm::vec2 p2 = camera.transformPoint( verts[2] );
+        glm::vec2 p0 = camera * verts[0];
+        glm::vec2 p1 = camera * verts[1];
+        glm::vec2 p2 = camera * verts[2];
 
         // Draw a red triangle in the middle of the screen.
         image.drawTriangle( p0, p1, p2, Color::Red );
@@ -147,6 +147,16 @@ int main( int argc, char* argv[] )
         image.drawTriangle( p0, p1, p2, Color::Blue, {}, FillMode::WireFrame );
 
         image.drawText( Font::Default, 10, 10, fps, Color::Black );
+
+        float zoom     = camera.getZoom();
+        float rotation = camera.getRotation();
+        auto  position = camera.getPosition();
+        auto  origin   = camera.getOrigin();
+
+        image.drawText( Font::Default, 10, 30, std::format( "Zoom    : {}", zoom ), Color::Black );
+        image.drawText( Font::Default, 10, 45, std::format( "Rotation: {}", rotation ), Color::Black );
+        image.drawText( Font::Default, 10, 60, std::format( "Position: {}, {}", position.x, position.y ), Color::Black );
+        image.drawText( Font::Default, 10, 75, std::format( "Origin  : {}, {}", origin.x, origin.y ), Color::Black );
 
         window.present( image );
 
@@ -161,6 +171,12 @@ int main( int argc, char* argv[] )
             case Event::KeyPressed:
                 switch ( e.key.code )
                 {
+                case KeyCode::R:
+                    camera.setOrigin( { WINDOW_WIDTH * 0.5f, WINDOW_HEIGHT * 0.5f } );
+                    camera.setPosition( { 0, 0 } );
+                    camera.setRotation( 0.0f );
+                    camera.setZoom( 1.0f );
+                    break;
                 case KeyCode::Escape:
                     window.destroy();
                     break;
