@@ -10,6 +10,12 @@ namespace Math
 class Camera2D
 {
 public:
+    enum class Space
+    {
+        Local,   ///< Translation is applied in the camera's local space.
+        World,   ///< Translation is applied in screen world coordinates.
+    };
+
     /// <summary>
     /// Initialize a 2D Camera.
     /// </summary>
@@ -24,10 +30,10 @@ public:
     /// </summary>
     void reset() noexcept
     {
-        m_Position = glm::vec2 { 0 };
-        m_Origin = glm::vec2 { 0 };
-        m_Rotation = 0.0f;
-        m_Zoom     = 1.0f;
+        m_Position       = glm::vec2 { 0 };
+        m_Origin         = glm::vec2 { 0 };
+        m_Rotation       = 0.0f;
+        m_Zoom           = 1.0f;
         m_TransformDirty = true;
     }
 
@@ -54,10 +60,8 @@ public:
     /// Translate the camera's position.
     /// </summary>
     /// <param name="translation">The value to add to the current position of the camera.</param>
-    void translate( const glm::vec2& translation ) noexcept
-    {
-        setPosition( m_Position + translation );
-    }
+    /// <param name="space">The space to apply the translation.</param>
+    void translate( const glm::vec2& translation, Space space = Space::Local ) noexcept;
 
     /// <summary>
     /// Set the origin of the camera.
@@ -158,6 +162,16 @@ public:
     glm::vec2 transformPoint( const glm::vec2& point ) const noexcept
     {
         return getTransform() * glm::vec3( point, 1.0f );
+    }
+
+    /// <summary>
+    /// Transform a 2D vector by the camera's transform.
+    /// </summary>
+    /// <param name="v">The vector to transform.</param>
+    /// <returns></returns>
+    glm::vec2 transformVector( const glm::vec2& v ) const noexcept
+    {
+        return getTransform() * glm::vec3( v, 0.0f );
     }
 
 private:

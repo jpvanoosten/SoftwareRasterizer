@@ -668,11 +668,8 @@ const Color& Image::sample( int u, int v, AddressMode addressMode ) const noexce
     break;
     case AddressMode::Mirror:
     {
-        const int U = u / w;
-        const int V = v / h;
-
-        u = ( U % 2 == 0 ) ? fast_mod( u, w ) : ( w - 1 ) - fast_mod( u, w );
-        v = ( V % 2 == 0 ) ? fast_mod( v, h ) : ( h - 1 ) - fast_mod( v, h );
+        u = u / w % 2 == 0 ? fast_mod( u, w ) : ( w - 1 ) - fast_mod( u, w );
+        v = v / h % 2 == 0 ? fast_mod( v, h ) : ( h - 1 ) - fast_mod( v, h );
     }
     break;
     case AddressMode::Clamp:

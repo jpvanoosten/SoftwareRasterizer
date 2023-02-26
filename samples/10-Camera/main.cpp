@@ -115,7 +115,6 @@ int main( int argc, char* argv[] )
     Window   window { L"10 - Camera", WINDOW_WIDTH, WINDOW_HEIGHT };
     Image    image { WINDOW_WIDTH, WINDOW_HEIGHT };
     Camera2D camera;
-    camera.setOrigin( { WINDOW_WIDTH * 0.5f, WINDOW_HEIGHT * 0.5f } );
 
     window.show();
 
@@ -141,6 +140,8 @@ int main( int argc, char* argv[] )
         const float elapsedTime = static_cast<float>( timer.elapsedSeconds() );
 
         camera.translate( glm::vec2 { Input::getAxis( "Horizontal" ), Input::getAxis( "Vertical" ) } * elapsedTime * 100.0f );
+        // Keep the origin in the center of the screen (relative to the position of the camera).
+        camera.setOrigin( camera.getPosition() + glm::vec2 { WINDOW_WIDTH * 0.5f, WINDOW_HEIGHT * 0.5f } );
         camera.rotate( Input::getAxis( "Rotate" ) * elapsedTime );
         camera.zoom( Input::getAxis( "Zoom" ) * elapsedTime );
 
@@ -178,10 +179,7 @@ int main( int argc, char* argv[] )
                 switch ( e.key.code )
                 {
                 case KeyCode::R:
-                    camera.setOrigin( { WINDOW_WIDTH * 0.5f, WINDOW_HEIGHT * 0.5f } );
-                    camera.setPosition( { 0, 0 } );
-                    camera.setRotation( 0.0f );
-                    camera.setZoom( 1.0f );
+                    camera.reset();
                     break;
                 case KeyCode::Escape:
                     window.destroy();
