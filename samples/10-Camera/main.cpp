@@ -112,6 +112,8 @@ int main( int argc, char* argv[] )
     constexpr int WINDOW_WIDTH  = 800;
     constexpr int WINDOW_HEIGHT = 600;
 
+    constexpr glm::vec2 WINDOW_CENTER { WINDOW_WIDTH * 0.5f, WINDOW_HEIGHT * 0.5f };
+
     Window   window { L"10 - Camera", WINDOW_WIDTH, WINDOW_HEIGHT };
     Image    image { WINDOW_WIDTH, WINDOW_HEIGHT };
     Camera2D camera;
@@ -124,12 +126,13 @@ int main( int argc, char* argv[] )
     std::string fps        = "FPS: 0";
 
     const Vertex verts[] = {
-        { { 0, 0 }, { -4, -3 } },                         // Top-left.
-        { { WINDOW_WIDTH, 0 }, { 4, -3 } },              // Top-right.
+        { { 0, 0 }, { -4, -3 } },                       // Top-left.
+        { { WINDOW_WIDTH, 0 }, { 4, -3 } },             // Top-right.
         { { WINDOW_WIDTH, WINDOW_HEIGHT }, { 4, 3 } },  // Bottom-right.
-        { { 0, WINDOW_HEIGHT }, { -4, 3 } }              // Bottom-left.
+        { { 0, WINDOW_HEIGHT }, { -4, 3 } }             // Bottom-left.
     };
 
+    // Load a smiley face image.
     Image smiley( "assets/textures/Smiley.png" );
 
     while ( window )
@@ -141,7 +144,7 @@ int main( int argc, char* argv[] )
 
         camera.translate( glm::vec2 { Input::getAxis( "Horizontal" ), Input::getAxis( "Vertical" ) } * elapsedTime * 100.0f );
         // Keep the origin in the center of the screen (relative to the position of the camera).
-        camera.setOrigin( camera.getPosition() + glm::vec2 { WINDOW_WIDTH * 0.5f, WINDOW_HEIGHT * 0.5f } );
+        camera.setOrigin( camera.getPosition() + WINDOW_CENTER );
         camera.rotate( Input::getAxis( "Rotate" ) * elapsedTime );
         camera.zoom( Input::getAxis( "Zoom" ) * elapsedTime );
 
@@ -152,6 +155,11 @@ int main( int argc, char* argv[] )
 
         // Draw smiley faces.
         image.drawQuad( newVerts[0], newVerts[1], newVerts[2], newVerts[3], smiley );
+
+        // Draw a crosshair in the center of the screen.
+        image.drawCircle( WINDOW_CENTER, 10.0f, Color::Yellow, {}, FillMode::WireFrame );
+        image.drawLine( WINDOW_CENTER - glm::vec2 { 10, 0 }, WINDOW_CENTER + glm::vec2 { 10, 0 }, Color::Red );
+        image.drawLine( WINDOW_CENTER - glm::vec2 { 0, 10 }, WINDOW_CENTER + glm::vec2 { 0, 10 }, Color::Green );
 
         image.drawText( Font::Default, 10, 10, fps, Color::White );
 

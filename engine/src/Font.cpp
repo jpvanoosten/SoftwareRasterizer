@@ -132,7 +132,7 @@ void Font::drawText( Image& image, std::string_view text, int x, int y, const Co
                 Vertex v3 { { q.x0, q.y1 }, { q.s0, q.t1 }, color };
 
                 image.drawQuad( v0, v1, v2, v3, *fontImage, AddressMode::Clamp, BlendMode::AlphaBlend );
-                // image.drawQuad( { q.x0, q.y0 }, { q.x1, q.y0 }, { q.x1, q.y1 }, { q.x0, q.y1 }, Color::Red, {}, FillMode::WireFrame );
+                // image.drawQuad( { q.x0, q.y0 }, { q.x1, q.y0 }, { q.x1, q.y1 }, { q.x0, q.y1 }, Color::Red, {}, FillMode::WireFrame ); // For debugging glyph quads.
             }
             else if ( *t == '\n' )
             {
