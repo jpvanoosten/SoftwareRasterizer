@@ -28,16 +28,16 @@ public:
     /// Update the scrolling background.
     /// </summary>
     /// <param name="timer">The timer used to update the texture offset.</param>
-    void update( const sr::Timer& timer );
+    void update( const Graphics::Timer& timer );
 
     /// <summary>
     /// Draw this background to the destination image.
     /// </summary>
     /// <param name="dst">The destination image to draw the background to.</param>
-    void draw( sr::Image& dst ) const;
+    void draw( Graphics::Image& dst ) const;
 
 private:
-    std::shared_ptr<sr::Image> backgroundImage;
+    std::shared_ptr<Graphics::Image> backgroundImage;
 
     glm::vec2 scrollDirection { 0.0f };
     float     scrollSpeed { 0.0f };

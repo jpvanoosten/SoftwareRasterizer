@@ -30,11 +30,11 @@ public:
     /// Draw the transition to the image.
     /// </summary>
     /// <param name="image"></param>
-    void draw( sr::Image& image ) const;
+    void draw( Graphics::Image& image ) const;
 
 private:
-    std::shared_ptr<sr::Image> transition;
-    sr::Sprite                 sprite;
+    std::shared_ptr<Graphics::Image> transition;
+    Graphics::Sprite                 sprite;
 
     float                          time     = 0.0f;
     const float                    maxScale = 3.2f;

@@ -57,13 +57,13 @@ public:
     /// Forward any window events to the button. This allows the button to handle mouse over/mouse clicked events.
     /// </summary>
     /// <param name="event">The event to process.</param>
-    void processEvents( const sr::Event& event );
+    void processEvents( const Graphics::Event& event );
 
     /// <summary>
     /// Draw this button to the image.
     /// </summary>
     /// <param name="image">The image to draw this button to.</param>
-    void draw( sr::Image& image );
+    void draw( Graphics::Image& image );
 
 private:
     void setState( State newState );
@@ -73,15 +73,15 @@ private:
     std::function<void()> onClick;
 
     std::string buttonText;
-    sr::Font    buttonFont;
+    Graphics::Font    buttonFont;
 
 
     Math::RectF rect;
     Math::AABB  aabb;
 
-    sr::Sprite defaultSprite;
-    sr::Sprite hoverSprite;
-    sr::Sprite pressedSprite;
+    Graphics::Sprite defaultSprite;
+    Graphics::Sprite hoverSprite;
+    Graphics::Sprite pressedSprite;
 
     State state   = State::Default;
     bool  enabled = true;

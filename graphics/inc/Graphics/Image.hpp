@@ -16,8 +16,9 @@
 
 #include <glm/vec2.hpp>
 
-namespace sr
+namespace Graphics
 {
+
 class Sprite;
 class Font;
 
@@ -413,4 +414,4 @@ private:
     Math::AABB                  m_AABB;
     aligned_unique_ptr<Color[]> m_data;
 };
-}  // namespace sr
+}  // namespace Graphics

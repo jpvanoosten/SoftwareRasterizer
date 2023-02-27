@@ -1,6 +1,6 @@
 #include <Effect.hpp>
 
-Effect::Effect( const sr::SpriteAnim& spriteAnim, const Math::Transform2D& transform )
+Effect::Effect( const Graphics::SpriteAnim& spriteAnim, const Math::Transform2D& transform )
 : spriteAnim{&spriteAnim}
 , transform{transform}
 {}
@@ -10,7 +10,7 @@ void Effect::update( float deltaTime )
     time += deltaTime;
 }
 
-void Effect::draw( sr::Image& image ) const
+void Effect::draw( Graphics::Image& image ) const
 {
     if ( spriteAnim )
         image.drawSprite( spriteAnim->at( time ), transform );

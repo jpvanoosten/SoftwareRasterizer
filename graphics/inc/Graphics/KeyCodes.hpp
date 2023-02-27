@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-namespace sr
+namespace Graphics
 {
     /// <summary>
     /// An enumeration for all of the virtual key codes on the keyboard.

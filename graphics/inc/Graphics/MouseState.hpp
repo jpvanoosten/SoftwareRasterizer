@@ -1,6 +1,6 @@
 #pragma once
 
-namespace sr
+namespace Graphics
 {
 /// <summary>
 /// The state of the mouse.
@@ -108,4 +108,4 @@ struct MouseState
     /// <returns>`true` if they are not equal, `false` otherwise.</returns>
     bool operator!=( const MouseState& ) const = default;
 };
-}  // namespace sr
+}  // namespace Graphics

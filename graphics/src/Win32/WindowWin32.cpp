@@ -17,7 +17,7 @@ extern "C"
     _declspec( dllexport ) DWORD NvOptimusEnablement = 0x00000001;
 }
 
-using namespace sr;
+using namespace Graphics;
 
 constexpr const wchar_t* WINDOW_CLASS_NAME = L"RasterizerWindow";
 HGLRC                    g_hTempContext;

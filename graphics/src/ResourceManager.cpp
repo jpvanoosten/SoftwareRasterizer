@@ -2,7 +2,7 @@
 
 #include <unordered_map>
 
-using namespace sr;
+using namespace Graphics;
 
 // Image store.
 std::unordered_map<std::filesystem::path, std::shared_ptr<Image>> g_ImageMap;

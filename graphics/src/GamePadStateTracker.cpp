@@ -2,7 +2,7 @@
 
 #include <cstring> // For memset.
 
-using namespace sr;
+using namespace Graphics;
 
 #define UPDATE_BUTTON_STATE( field ) static_cast<ButtonState>( ( !!state.buttons.field ) | ( ( !!state.buttons.field ^ !!lastState.buttons.field ) << 1 ) )
 #define UPDATE_DPAD_STATE( field )   static_cast<ButtonState>( ( !!state.dPad.field ) | ( ( !!state.dPad.field ^ !!lastState.dPad.field ) << 1 ) )

@@ -1,6 +1,6 @@
 #include <Graphics/KeyboardState.hpp>
 
-using namespace sr;
+using namespace Graphics;
 
 // Keyboard state is exactly 32 bytes.
 static_assert( sizeof( KeyboardState ) == ( 256 / 8 ) );

@@ -10,8 +10,8 @@ public:
     PlayState( int screenWidth, int screenHeight );
 
     void update( float deltaTime ) override;
-    void draw( sr::Image& image ) override;
-    void processEvent( const sr::Event& event ) override;
+    void draw( Graphics::Image& image ) override;
+    void processEvent( const Graphics::Event& event ) override;
 
 private:
     // Check collisions with the ball.
@@ -19,9 +19,9 @@ private:
 
     // This sprite sheet contains all of the sprites for the game
     // and is shared between all of the game objects.
-    std::shared_ptr<sr::SpriteSheet> spriteSheet;
+    std::shared_ptr<Graphics::SpriteSheet> spriteSheet;
 
-    sr::Image backgroundImage;
+    Graphics::Image backgroundImage;
     Ball      ball;
     Paddle    paddle;
 

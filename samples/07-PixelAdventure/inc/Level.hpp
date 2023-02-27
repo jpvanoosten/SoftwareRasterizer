@@ -50,7 +50,7 @@ public:
         return player;
     }
 
-    void draw( sr::Image& image ) const;
+    void draw( Graphics::Image& image ) const;
 
 private:
     // Add a pickup with a name, initial position.
@@ -71,14 +71,14 @@ private:
     std::vector<Collider> colliders;
 
     // Fruit sprites.
-    std::map<std::string, std::shared_ptr<sr::SpriteSheet>> fruitSprites;
+    std::map<std::string, std::shared_ptr<Graphics::SpriteSheet>> fruitSprites;
     // Box sprites.
     std::map<std::string, Box> boxPrefabs;
 
     // All pickups
     std::vector<Pickup> allPickups;
     // Sprite animation to play when a pickup is collected.
-    sr::SpriteAnim pickupCollected;
+    Graphics::SpriteAnim pickupCollected;
     // Currently playing effects.
     std::vector<Effect> effects;
 
@@ -86,9 +86,9 @@ private:
     std::vector<std::shared_ptr<Box>> boxes;
 
     // Level tile map.
-    sr::TileMap tileMap;
+    Graphics::TileMap tileMap;
     // Separate tile map for spike traps.
-    sr::TileMap spikeMap;
+    Graphics::TileMap spikeMap;
 
     Player    player;
     glm::vec2 playerStart { 0 };

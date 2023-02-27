@@ -3,7 +3,7 @@
 #include "Config.hpp"
 #include "KeyboardState.hpp"
 
-namespace sr
+namespace Graphics
 {
 class SR_API Keyboard
 {

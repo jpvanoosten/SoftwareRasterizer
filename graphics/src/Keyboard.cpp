@@ -1,6 +1,6 @@
 #include <Graphics/Keyboard.hpp>
 
-using namespace sr;
+using namespace Graphics;
 
 bool Keyboard::isConnected()
 {

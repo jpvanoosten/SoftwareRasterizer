@@ -3,7 +3,7 @@
 #include "Config.hpp"
 #include "GamePadState.hpp"
 
-namespace sr
+namespace Graphics
 {
 /// <summary>
 /// Dead-zone mode.
@@ -35,4 +35,4 @@ public:
     const GamePad& operator=( const GamePad& ) const = delete;
     const GamePad& operator=( GamePad&& ) const      = delete;
 };
-}  // namespace sr
+}  // namespace Graphics

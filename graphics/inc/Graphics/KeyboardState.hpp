@@ -3,7 +3,7 @@
 #include "Config.hpp"
 #include "KeyCodes.hpp"
 
-namespace sr
+namespace Graphics
 {
 /// <summary>
 /// A class that represents the current state of the keyboard.
@@ -256,4 +256,4 @@ struct SR_API KeyboardState
     bool operator==( const KeyboardState& ) const = default;
     bool operator!=( const KeyboardState& ) const = default;
 };
-}  // namespace sr
+}  // namespace Graphics

@@ -1,6 +1,6 @@
 #pragma once
 
-namespace sr
+namespace Graphics
 {
 
 /// <summary>

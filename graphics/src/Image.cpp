@@ -14,7 +14,7 @@
 #include <numbers>
 #include <optional>
 
-using namespace sr;
+using namespace Graphics;
 using namespace Math;
 
 Image::Image() = default;

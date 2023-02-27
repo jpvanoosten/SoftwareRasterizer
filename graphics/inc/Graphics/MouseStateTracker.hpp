@@ -4,7 +4,7 @@
 #include "Events.hpp"  // For ButtonState
 #include "MouseState.hpp"
 
-namespace sr
+namespace Graphics
 {
 /// <summary>
 /// The MouseStateTracker can be used to check if the state of the mouse buttons have
@@ -107,4 +107,4 @@ inline MouseState MouseStateTracker::getLastState() const noexcept
 {
     return lastState;
 }
-}  // namespace sr
+}  // namespace Graphics

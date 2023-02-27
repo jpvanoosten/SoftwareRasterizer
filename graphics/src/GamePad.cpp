@@ -2,7 +2,7 @@
 
 #include <algorithm>
 
-namespace sr
+namespace Graphics
 {
 float ApplyLinearDeadZone( float value, float maxValue, float deadZoneSize = 0.0f ) noexcept
 {
@@ -53,4 +53,4 @@ void ApplyStickDeadZone( float x, float y, DeadZone deadZoneMode, float maxValue
         break;
     }
 }
-}  // namespace sr
+}  // namespace Graphics

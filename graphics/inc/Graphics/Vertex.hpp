@@ -3,7 +3,7 @@
 #include "Color.hpp"
 #include <glm/vec2.hpp>
 
-namespace sr
+namespace Graphics
 {
 struct Vertex
 {
@@ -17,4 +17,4 @@ struct Vertex
     glm::vec2 texCoord { 0 };
     Color     color { Color::White };
 };
-}  // namespace sr
+}  // namespace Graphics

@@ -9,7 +9,7 @@ class Effect final
 {
 public:
     Effect() = default;
-    Effect( const sr::SpriteAnim& spriteAnim, const Math::Transform2D& transform );
+    Effect( const Graphics::SpriteAnim& spriteAnim, const Math::Transform2D& transform );
 
     /// <summary>
     /// Update the effect's animation.
@@ -21,7 +21,7 @@ public:
     /// Draw the effect to the image.
     /// </summary>
     /// <param name="image">The image to draw the effect to.</param>
-    void draw( sr::Image& image ) const;
+    void draw( Graphics::Image& image ) const;
 
     /// <summary>
     /// Check if the effect is done playing.
@@ -31,7 +31,7 @@ public:
     bool isDone() const noexcept;
 
 private:
-    const sr::SpriteAnim*  spriteAnim = nullptr;
+    const Graphics::SpriteAnim*  spriteAnim = nullptr;
     Math::Transform2D      transform;
     float                  time = 0.0f;
 };

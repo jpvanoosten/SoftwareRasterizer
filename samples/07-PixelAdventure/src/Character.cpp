@@ -34,7 +34,7 @@ Character& Character::operator=( Character&& other ) noexcept
     return *this;
 }
 
-void Character::addAnimation( std::string_view animName, sr::SpriteAnim anim )
+void Character::addAnimation( std::string_view animName, Graphics::SpriteAnim anim )
 {
     anims[std::string( animName )] = std::move( anim );
     currentAnim                    = anims.end();
@@ -55,7 +55,7 @@ void Character::setAnimation( std::string_view animName )
     }
 }
 
-const sr::SpriteAnim& Character::getAnimation( std::string_view animName ) const
+const Graphics::SpriteAnim& Character::getAnimation( std::string_view animName ) const
 {
     const auto iter = anims.find( std::string( animName ) );
     if ( iter != anims.end() )
@@ -63,7 +63,7 @@ const sr::SpriteAnim& Character::getAnimation( std::string_view animName ) const
 
     std::cerr << "Animation with name: " << animName << " not found in animations.";
 
-    static sr::SpriteAnim emptyAnim;
+    static Graphics::SpriteAnim emptyAnim;
     return emptyAnim;
 }
 
@@ -75,7 +75,7 @@ void Character::update( float deltaTime )
     }
 }
 
-void Character::draw( sr::Image& image, const Math::Transform2D& transform ) const
+void Character::draw( Graphics::Image& image, const Math::Transform2D& transform ) const
 {
     if ( currentAnim != anims.end() )
     {

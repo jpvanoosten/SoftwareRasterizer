@@ -1,6 +1,6 @@
 #include <Graphics/BlendMode.hpp>
 
-using namespace sr;
+using namespace Graphics;
 
 const BlendMode BlendMode::Disable { false };
 const BlendMode BlendMode::AlphaBlend { true, BlendFactor::SrcAlpha, BlendFactor::OneMinusSrcAlpha };

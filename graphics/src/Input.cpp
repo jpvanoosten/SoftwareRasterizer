@@ -7,7 +7,7 @@
 #include <map>
 #include <string>
 
-using namespace sr;
+using namespace Graphics;
 
 static GamePadStateTracker  g_GamePadStateTrackers[GamePad::MAX_PLAYERS];
 static KeyboardStateTracker g_KeyboardStateTracker;

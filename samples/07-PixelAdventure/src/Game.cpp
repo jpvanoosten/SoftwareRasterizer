@@ -5,7 +5,7 @@
 
 #include <string>
 
-using namespace sr;
+using namespace Graphics;
 using namespace Math;
 
 Game::Game( uint32_t screenWidth, uint32_t screenHeight )
@@ -233,7 +233,7 @@ void Game::Update()
     // timer.limitFPS( 25 );
 }
 
-void Game::processEvent( const sr::Event& _event )
+void Game::processEvent( const Graphics::Event& _event )
 {
     // Copy the event so we can modify it.
     Event event = _event;
@@ -275,7 +275,7 @@ void Game::processEvent( const sr::Event& _event )
     restartButton.processEvents( event );
 }
 
-void Game::onMouseMoved( sr::MouseMovedEventArgs& args )
+void Game::onMouseMoved( Graphics::MouseMovedEventArgs& args )
 {
     // Compute the mouse position relative to the game screen (which can be scaled if the window is resized).
     const glm::vec2 scale {
@@ -290,7 +290,7 @@ void Game::onMouseMoved( sr::MouseMovedEventArgs& args )
     mousePos = { args.x, args.y };
 }
 
-void Game::onResized( sr::ResizeEventArgs& args )
+void Game::onResized( Graphics::ResizeEventArgs& args )
 {
     const float aspectRatio = static_cast<float>( image.getWidth() ) / static_cast<float>( image.getHeight() );
     const float scaleWidth  = static_cast<float>( args.width ) / static_cast<float>( image.getWidth() );

@@ -27,7 +27,7 @@ public:
     /// </summary>
     /// <param name="animName">The name of the animation clip.</param>
     /// <param name="anim">The sprite animation.</param>
-    void addAnimation( std::string_view animName, sr::SpriteAnim anim );
+    void addAnimation( std::string_view animName, Graphics::SpriteAnim anim );
 
     /// <summary>
     /// Set the current animation frame.
@@ -41,7 +41,7 @@ public:
     /// <param name="animName">The name of the animation.</param>
     /// <returns>A reference to the animation or an empty animation is the name is not found
     /// in the animation map.</returns>
-    const sr::SpriteAnim& getAnimation( std::string_view animName ) const;
+    const Graphics::SpriteAnim& getAnimation( std::string_view animName ) const;
 
     /// <summary>
     /// Update the character's animation frame.
@@ -54,11 +54,11 @@ public:
     /// </summary>
     /// <param name="image">The image to render the character sprite to.</param>
     /// <param name="transform">The transform to apply.</param>
-    void draw( sr::Image& image, const Math::Transform2D& transform ) const;
+    void draw( Graphics::Image& image, const Math::Transform2D& transform ) const;
 
 private:
     // A map of animation names to SpriteAnim(s)
-    using AnimMap = std::map<std::string, sr::SpriteAnim>;
+    using AnimMap = std::map<std::string, Graphics::SpriteAnim>;
 
     AnimMap anims;
     AnimMap::iterator currentAnim = anims.end();

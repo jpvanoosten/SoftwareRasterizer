@@ -11,7 +11,7 @@
 #include <iostream>
 #include <random>
 
-using namespace sr;
+using namespace Graphics;
 using namespace Math;
 
 int main( int argc, char* argv[] )

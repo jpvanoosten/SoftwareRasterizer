@@ -12,7 +12,7 @@
 #include <optional>
 #include <span>
 
-namespace sr
+namespace Graphics
 {
 class SR_API SpriteSheet final
 {
@@ -187,4 +187,4 @@ private:
     std::vector<Sprite> sprites;
 };
 
-}  // namespace sr
+}  // namespace Graphics

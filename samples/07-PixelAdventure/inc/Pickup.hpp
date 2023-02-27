@@ -10,7 +10,7 @@ class Pickup final
 {
 public:
     Pickup() = default;
-    Pickup( std::shared_ptr<sr::SpriteSheet> sprites, const Math::Sphere& collision );
+    Pickup( std::shared_ptr<Graphics::SpriteSheet> sprites, const Math::Sphere& collision );
     ~Pickup() = default;
 
     /// <summary>
@@ -31,7 +31,7 @@ public:
     /// Draw this pickup to the specified image.
     /// </summary>
     /// <param name="image"></param>
-    void draw( sr::Image& image ) const;
+    void draw( Graphics::Image& image ) const;
 
     /// <summary>
     /// Set the gravity for the pickup.
@@ -86,7 +86,7 @@ private:
     Math::Transform2D transform;
 
     // Shared sprite sheet for the pickup.
-    std::shared_ptr<sr::SpriteSheet> spriteSheet;
+    std::shared_ptr<Graphics::SpriteSheet> spriteSheet;
 
     // Frame-rate for sprite animation.
     uint32_t frameRate = 20u;

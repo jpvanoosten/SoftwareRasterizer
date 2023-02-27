@@ -1,6 +1,6 @@
 #include <Graphics/Window.hpp>
 
-using namespace sr;
+using namespace Graphics;
 
 #if defined(_WIN32)
 #include "Win32/WindowWin32.hpp"

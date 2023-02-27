@@ -8,7 +8,7 @@
 
 #include <filesystem>
 
-namespace sr
+namespace Graphics
 {
 class Image;
 
@@ -63,4 +63,4 @@ private:
     std::unique_ptr<stbtt_bakedchar[]> bakedChar;
     std::vector<unsigned char>         fontData;
 };
-}  // namespace sr
+}  // namespace Graphics

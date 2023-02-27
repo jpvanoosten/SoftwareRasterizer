@@ -10,7 +10,7 @@
 #include <span>
 #include <string_view>
 
-namespace sr
+namespace Graphics
 {
 /// <summary>
 /// An AxisCallback function takes a GamePadStateTracker (for each connected GamePad), KeyboardStateTracker, and a MouseStateTracker and returns
@@ -170,4 +170,4 @@ public:
     Input& operator=( const Input& ) = delete;
     Input& operator=( Input&& )      = delete;
 };
-}  // namespace sr
+}  // namespace Graphics

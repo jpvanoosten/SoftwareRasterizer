@@ -7,7 +7,7 @@
 
 #include <mutex>
 
-using namespace sr;
+using namespace Graphics;
 
 static MouseState g_globalState {};
 static std::mutex g_stateMutex;

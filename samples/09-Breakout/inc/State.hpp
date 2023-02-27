@@ -7,8 +7,8 @@ class State
 {
 public:
     virtual void update( float deltaTime )              = 0;
-    virtual void draw( sr::Image& image )               = 0;
-    virtual void processEvent( const sr::Event& event ) = 0;
+    virtual void draw( Graphics::Image& image )               = 0;
+    virtual void processEvent( const Graphics::Event& event ) = 0;
 
     virtual ~State() = default;
 

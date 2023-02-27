@@ -2,7 +2,7 @@
 
 #include <Graphics/ResourceManager.hpp>
 
-using namespace sr;
+using namespace Graphics;
 using namespace Math;
 
 Ball::Ball( const glm::vec2& pos )
@@ -21,7 +21,7 @@ void Ball::update( float dt )
     circle.center = pos;
 }
 
-void Ball::draw( sr::Image& image ) const
+void Ball::draw( Graphics::Image& image ) const
 {
     image.drawSprite( sprite, transform );
 }

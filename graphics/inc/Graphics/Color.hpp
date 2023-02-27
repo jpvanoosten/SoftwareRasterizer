@@ -7,7 +7,7 @@
 #include <compare>
 #include <cstdint>
 
-namespace sr
+namespace Graphics
 {
 struct SR_API alignas( 4 ) Color
 {
@@ -246,4 +246,4 @@ constexpr Color max( const Color& c1, const Color& c2 )
     return { r, g, b, a };
 }
 
-}  // namespace sr
+}  // namespace Graphics

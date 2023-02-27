@@ -54,7 +54,7 @@ public:
     /// Draw this box to the image.
     /// </summary>
     /// <param name="image"></param>
-    void draw( sr::Image& image ) const;
+    void draw( Graphics::Image& image ) const;
 
     /// <summary>
     /// Set the state of the box.

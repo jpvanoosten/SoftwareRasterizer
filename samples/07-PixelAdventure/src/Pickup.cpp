@@ -6,7 +6,7 @@ static std::random_device             rd;
 static std::minstd_rand               rng( rd() );
 static std::uniform_real_distribution dist { 0.0f, 1.0f };
 
-Pickup::Pickup( std::shared_ptr<sr::SpriteSheet> sprites, const Math::Sphere& collision )
+Pickup::Pickup( std::shared_ptr<Graphics::SpriteSheet> sprites, const Math::Sphere& collision )
 : sphere { collision }
 , transform { collision.center }
 , spriteSheet { std::move( sprites ) }
@@ -33,7 +33,7 @@ void Pickup::update( float deltaTime )
     }
 }
 
-void Pickup::draw( sr::Image& image ) const
+void Pickup::draw( Graphics::Image& image ) const
 {
     if ( !spriteSheet || spriteSheet->getNumSprites() == 0 )
         return;
@@ -42,6 +42,6 @@ void Pickup::draw( sr::Image& image ) const
     image.drawSprite( ( *spriteSheet )[frame], transform );
 
 #if _DEBUG
-    image.drawCircle( sphere, sr::Color::Yellow, {}, sr::FillMode::WireFrame );
+    image.drawCircle( sphere, Graphics::Color::Yellow, {}, Graphics::FillMode::WireFrame );
 #endif
 }

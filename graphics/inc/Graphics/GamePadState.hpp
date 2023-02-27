@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-namespace sr
+namespace Graphics
 {
 struct GamePadState
 {
@@ -297,4 +297,4 @@ inline bool operator!=( const GamePadState& lhs, const GamePadState& rhs )
     return !( lhs == rhs );
 }
 
-}  // namespace sr
+}  // namespace Graphics

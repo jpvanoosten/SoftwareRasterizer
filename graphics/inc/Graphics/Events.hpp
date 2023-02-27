@@ -2,7 +2,7 @@
 
 #include "KeyCodes.hpp"
 
-namespace sr
+namespace Graphics
 {
 /// <summary>
 /// State of a key on the keyboard.
@@ -413,4 +413,4 @@ struct Event
         MouseWheelEventArgs mouseWheel;
     };
 };
-}  // namespace sr
+}  // namespace Graphics

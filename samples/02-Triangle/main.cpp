@@ -5,7 +5,7 @@
 
 #include <iostream>
 
-using namespace sr;
+using namespace Graphics;
 
 int main( int argc, char* argv[] )
 {

@@ -2,7 +2,7 @@
 
 #include <cstring> // For memset.
 
-using namespace sr;
+using namespace Graphics;
 
 
 KeyboardStateTracker::KeyboardStateTracker() noexcept    // NOLINT(cppcoreguidelines-pro-type-member-init)

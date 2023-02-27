@@ -3,7 +3,7 @@
 #include "Config.hpp"
 #include "SpriteSheet.hpp"
 
-namespace sr
+namespace Graphics
 {
 class SR_API SpriteAnim
 {
@@ -71,4 +71,4 @@ private:
     float                        frameRate = 30.0f;  // Default to 30 FPS.
     float                        time      = 0.0f;
 };
-}  // namespace sr
+}  // namespace Graphics

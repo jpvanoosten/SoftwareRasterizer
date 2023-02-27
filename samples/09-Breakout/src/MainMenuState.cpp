@@ -6,5 +6,5 @@ MainMenuState::MainMenuState( int screenWidth, int screenHeight )
 {}
 
 void MainMenuState::update( float deltaTime ) {}
-void MainMenuState::draw( sr::Image& image ) {}
-void MainMenuState::processEvent( const sr::Event& event ) {}
+void MainMenuState::draw( Graphics::Image& image ) {}
+void MainMenuState::processEvent( const Graphics::Event& event ) {}

@@ -1,6 +1,6 @@
 #include <Graphics/Color.hpp>
 
-using namespace sr;
+using namespace Graphics;
 
 const Color Color::Black{ 0, 0, 0 };
 const Color Color::White{ 255, 255, 255 };

@@ -4,7 +4,7 @@
 #include <Graphics/Image.hpp>
 #include <Graphics/Window.hpp>
 
-using namespace sr;
+using namespace Graphics;
 using namespace Math;
 
 int main( int argc, char* argv[] )

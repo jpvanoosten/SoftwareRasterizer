@@ -6,7 +6,7 @@
 
 #include <filesystem>
 
-namespace sr
+namespace Graphics
 {
 class SR_API TileMap final
 {
@@ -131,4 +131,4 @@ private:
     std::shared_ptr<SpriteSheet> spriteSheet;
     std::vector<int> spriteGrid;
 };
-}  // namespace sr
+}  // namespace Graphics

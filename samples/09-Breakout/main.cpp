@@ -26,11 +26,11 @@ int main( int argc, char* argv[] )
 
     Game game { WINDOW_WIDTH, WINDOW_HEIGHT };
 
-    sr::Window window { L"09 - Breakout", WINDOW_WIDTH, WINDOW_HEIGHT };
+    Graphics::Window window { L"09 - Breakout", WINDOW_WIDTH, WINDOW_HEIGHT };
     window.show();
     window.setFullscreen( true );
 
-    sr::Timer timer;
+    Graphics::Timer timer;
 
     // Maximum tick time for physics.
     constexpr float physicsTick = 1.0f / 60.0f;
@@ -42,15 +42,15 @@ int main( int argc, char* argv[] )
 
         do
         {
-            sr::Input::update();
+            Graphics::Input::update();
             game.update( std::min( elapsedTime, physicsTick ) );
             elapsedTime -= physicsTick;
         } while ( elapsedTime > 0.0f );
 
-        window.clear( sr::Color::Black );
+        window.clear( Graphics::Color::Black );
         window.present( game.getImage() );
 
-        sr::Event e;
+        Graphics::Event e;
         while ( window.popEvent( e ) )
         {
             // Allow the game to process events.
@@ -58,25 +58,25 @@ int main( int argc, char* argv[] )
 
             switch ( e.type )
             {
-            case sr::Event::Close:
+            case Graphics::Event::Close:
                 window.destroy();
                 break;
-            case sr::Event::KeyPressed:
+            case Graphics::Event::KeyPressed:
                 switch ( e.key.code )
                 {
-                case sr::KeyCode::V:
+                case Graphics::KeyCode::V:
                     window.setVSync( !window.isVSync() );
                     std::cout << "Vsync: " << window.isVSync() << std::endl;
                     break;
-                case sr::KeyCode::Enter:
+                case Graphics::KeyCode::Enter:
                     if ( e.key.alt )
                     {
                         [[fallthrough]];
-                    case sr::KeyCode::F11:
+                    case Graphics::KeyCode::F11:
                         window.toggleFullscreen();
                     }
                     break;
-                case sr::KeyCode::Escape:
+                case Graphics::KeyCode::Escape:
                     window.destroy();
                     break;
                 }

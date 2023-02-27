@@ -2,7 +2,7 @@
 
 #include <Graphics/ResourceManager.hpp>
 
-using namespace sr;
+using namespace Graphics;
 using namespace Math;
 
 Ball::Ball()
@@ -22,7 +22,7 @@ void Ball::update( float deltaTime )
     circle.center = position;
 }
 
-void Ball::draw( sr::Image& image )
+void Ball::draw( Graphics::Image& image )
 {
     image.drawSprite( sprite, static_cast<int>( position.x - circle.radius ), static_cast<int>( position.y - circle.radius ) );
 

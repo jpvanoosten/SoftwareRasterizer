@@ -29,9 +29,9 @@ public:
 
     void update( float deltaTime );
 
-    void processEvent( const sr::Event& event );
+    void processEvent( const Graphics::Event& event );
 
-    const sr::Image& getImage() const;
+    const Graphics::Image& getImage() const;
 
 private:
     void setState( GameState newState );
@@ -39,8 +39,8 @@ private:
     GameState              currentState = GameState::None;
     std::unique_ptr<State> state;
 
-    sr::Image image;
+    Graphics::Image image;
     // Fonts.
-    sr::Font arial20;
-    sr::Font arial24;
+    Graphics::Font arial20;
+    Graphics::Font arial24;
 };

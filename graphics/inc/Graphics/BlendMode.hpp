@@ -3,7 +3,7 @@
 #include "Color.hpp"
 #include "Config.hpp"
 
-namespace sr
+namespace Graphics
 {
 
 /// <summary>
@@ -238,4 +238,4 @@ constexpr Color BlendMode::Blend( const Color& srcColor, const Color& dstColor )
     return { RGB.r, RGB.g, RGB.b, A };
 }
 
-}  // namespace sr
+}  // namespace Graphics

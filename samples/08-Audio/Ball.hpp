@@ -12,7 +12,7 @@ public:
 
     void update( float dt );
 
-    void draw( sr::Image& image ) const;
+    void draw( Graphics::Image& image ) const;
 
     void setCircle( const Math::Circle& circle );
     const Math::Circle& getCircle() const;
@@ -24,7 +24,7 @@ public:
     const glm::vec2& getVelocity() const;
 
 private:
-    sr::Sprite        sprite;
+    Graphics::Sprite        sprite;
     Math::Transform2D transform;
     Math::Circle      circle;
     glm::vec2         velocity{0};

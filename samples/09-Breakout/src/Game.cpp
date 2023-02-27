@@ -5,7 +5,7 @@
 #include <Graphics/Input.hpp>
 #include <Graphics/KeyCodes.hpp>
 
-using namespace sr;
+using namespace Graphics;
 using namespace Math;
 
 Game::Game( uint32_t screenWidth, uint32_t screenHeight )
@@ -45,7 +45,7 @@ Game::Game( uint32_t screenWidth, uint32_t screenHeight )
 
         const bool space = keyboardState.isKeyPressed( KeyCode::Space );
         const bool up    = keyboardState.isKeyPressed( KeyCode::Up );
-        const bool w     = keyboardState.isKeyPressed( sr::KeyCode::W );
+        const bool w     = keyboardState.isKeyPressed( Graphics::KeyCode::W );
 
         return a || space || up || w;
     } );
@@ -53,7 +53,7 @@ Game::Game( uint32_t screenWidth, uint32_t screenHeight )
     setState( GameState::Playing );
 }
 
-void Game::processEvent( const sr::Event& event )
+void Game::processEvent( const Graphics::Event& event )
 {
     state->processEvent( event );
 }
@@ -77,11 +77,11 @@ void Game::update( float deltaTime )
     state->draw( image );
 
     // Draw an FPS counter in the corner of the screen.
-    image.drawText( arial20, 6, 20, fps, sr::Color::Black );
-    image.drawText( arial20, 4, 18, fps, sr::Color::White );
+    image.drawText( arial20, 6, 20, fps, Graphics::Color::Black );
+    image.drawText( arial20, 4, 18, fps, Graphics::Color::White );
 }
 
-const sr::Image& Game::getImage() const
+const Graphics::Image& Game::getImage() const
 {
     return image;
 }

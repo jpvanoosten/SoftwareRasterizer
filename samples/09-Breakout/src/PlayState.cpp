@@ -4,7 +4,7 @@
 
 #include "tinyxml2.h"
 
-using namespace sr;
+using namespace Graphics;
 using namespace tinyxml2;
 using namespace Math;
 
@@ -36,7 +36,7 @@ PlayState::PlayState( int screenWidth, int screenHeight )
 , screenHeight { screenHeight }
 {
     // Load the game sprites.
-    spriteSheet = std::make_shared<SpriteSheet>( "assets/Breakout/Sprite Sheet/Breakout_Tile_Free.png", parseSpriteRects( "assets/Breakout/Sprite Sheet/Breakout_Tile_Free.xml" ), sr::BlendMode::AlphaBlend );
+    spriteSheet = std::make_shared<SpriteSheet>( "assets/Breakout/Sprite Sheet/Breakout_Tile_Free.png", parseSpriteRects( "assets/Breakout/Sprite Sheet/Breakout_Tile_Free.xml" ), Graphics::BlendMode::AlphaBlend );
 
     paddle = Paddle { spriteSheet, { static_cast<float>( screenWidth ) / 2.0f, static_cast<float>( screenHeight ) - 100.0f } };
 
@@ -67,7 +67,7 @@ void PlayState::update( float deltaTime )
     checkCollisions( ball );
 }
 
-void PlayState::draw( sr::Image& image )
+void PlayState::draw( Graphics::Image& image )
 {
     image.copy( backgroundImage, 0, 0 );
 
@@ -75,7 +75,7 @@ void PlayState::draw( sr::Image& image )
     ball.draw( image );
 }
 
-void PlayState::processEvent( const sr::Event& event )
+void PlayState::processEvent( const Graphics::Event& event )
 {
     
 }

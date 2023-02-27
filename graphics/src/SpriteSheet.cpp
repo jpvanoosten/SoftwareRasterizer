@@ -1,7 +1,7 @@
 #include <Graphics/ResourceManager.hpp>
 #include <Graphics/SpriteSheet.hpp>
 
-using namespace sr;
+using namespace Graphics;
 
 /// <summary>
 /// Helper function to compute the number of sprites in a specific dimension of the sprite sheet.

@@ -5,7 +5,7 @@
 
 #include <glm/vec2.hpp>
 
-namespace sr
+namespace Graphics
 {
 class Window;
 
@@ -102,4 +102,4 @@ public:
     Mouse& operator=( const Mouse& ) const = delete;
     Mouse& operator=( Mouse&& ) const      = delete;
 };
-}  // namespace sr
+}  // namespace Graphics

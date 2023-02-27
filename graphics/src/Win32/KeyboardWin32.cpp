@@ -4,7 +4,7 @@
 
 #include <mutex>
 
-using namespace sr;
+using namespace Graphics;
 
 static_assert( sizeof( KeyboardState ) == 256 / 8 );
 

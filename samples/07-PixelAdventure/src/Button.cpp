@@ -1,6 +1,6 @@
 #include "Button.hpp"
 
-using namespace sr;
+using namespace Graphics;
 using namespace Math;
 
 Transform2D operator+( Transform2D t, const glm::vec2& v )
@@ -15,7 +15,7 @@ Transform2D operator-( Transform2D t, const glm::vec2& v )
     return t;
 }
 
-Button::Button( const sr::SpriteSheet& sheet, const Math::Transform2D& transform, const std::function<void()>& onClick )
+Button::Button( const Graphics::SpriteSheet& sheet, const Math::Transform2D& transform, const std::function<void()>& onClick )
 : spriteSheet { sheet }
 , transform { transform }
 , onClick { onClick }
@@ -32,7 +32,7 @@ Button::Button( const sr::SpriteSheet& sheet, const Math::Transform2D& transform
     } );
 }
 
-void Button::processEvents( const sr::Event& event )
+void Button::processEvents( const Graphics::Event& event )
 {
     if ( !enabled )
         return;
@@ -59,7 +59,7 @@ void Button::processEvents( const sr::Event& event )
     }
 }
 
-void Button::draw( sr::Image& image )
+void Button::draw( Graphics::Image& image )
 {
     if ( !enabled )
         return;

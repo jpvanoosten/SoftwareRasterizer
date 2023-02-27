@@ -7,7 +7,7 @@
 #include <filesystem>
 #include <memory>
 
-namespace sr
+namespace Graphics
 {
 class SR_API ResourceManager final
 {
@@ -55,4 +55,4 @@ public:
     ResourceManager& operator=( ResourceManager&& )      = delete;
 };
 
-}  // namespace sr
+}  // namespace Graphics

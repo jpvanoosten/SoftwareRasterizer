@@ -8,8 +8,8 @@ public:
     MainMenuState(int screenWidth, int screenHeight);
 
     void update( float deltaTime ) override;
-    void draw( sr::Image& image ) override;
-    void processEvent( const sr::Event& event ) override;
+    void draw( Graphics::Image& image ) override;
+    void processEvent( const Graphics::Event& event ) override;
 
 private:
     int screenWidth;

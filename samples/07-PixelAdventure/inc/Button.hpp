@@ -33,7 +33,7 @@ public:
     /// <param name="sheet">A sprite sheet that contains the sprites for the button states.</param>
     /// <param name="transform">The transform to place the button on the screen.</param>
     /// <param name="onClick">The callback function to invoke when the button is clicked.</param>
-    Button( const sr::SpriteSheet& sheet, const Math::Transform2D& transform = Math::Transform2D {}, const std::function<void()>& onClick = {} );
+    Button( const Graphics::SpriteSheet& sheet, const Math::Transform2D& transform = Math::Transform2D {}, const std::function<void()>& onClick = {} );
 
     void setTransform( const Math::Transform2D& transform ) noexcept
     {
@@ -89,23 +89,23 @@ public:
     /// Forward any window events to the button. This allows the button to handle mouse over/mouse clicked events.
     /// </summary>
     /// <param name="event">The event to process.</param>
-    void processEvents( const sr::Event& event );
+    void processEvents( const Graphics::Event& event );
 
     /// <summary>
     /// Draw this sprite to the image.
     /// </summary>
     /// <param name="image">The image to draw this button to.</param>
-    void draw( sr::Image& image );
+    void draw( Graphics::Image& image );
 
 private:
     void setState( State newState );
     void endState( State oldState );
     void startState( State newState );
 
-    sr::SpriteSheet       spriteSheet;
+    Graphics::SpriteSheet       spriteSheet;
     Math::Transform2D     transform;
     Math::AABB            aabb;
-    sr::Timer             animTimer;
+    Graphics::Timer             animTimer;
     Curve<float>          animCurve;
     std::function<void()> onClick;
     State                 state   = State::Default;

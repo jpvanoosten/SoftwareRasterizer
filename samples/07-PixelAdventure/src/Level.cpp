@@ -14,7 +14,7 @@ static std::random_device rd;
 static std::minstd_rand   rng( rd() );
 
 using namespace Math;
-using namespace sr;
+using namespace Graphics;
 
 Box loadBox( const std::filesystem::path& basePath, int hitPoints )
 {
@@ -665,7 +665,7 @@ void Level::setCharacter( size_t characterId )
     player.setCharacter( characterId );
 }
 
-void Level::draw( sr::Image& image ) const
+void Level::draw( Graphics::Image& image ) const
 {
     tileMap.draw( image );
     spikeMap.draw( image );

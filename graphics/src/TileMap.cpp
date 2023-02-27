@@ -1,6 +1,6 @@
 #include <Graphics/TileMap.hpp>
 
-using namespace sr;
+using namespace Graphics;
 
 TileMap::TileMap( std::shared_ptr<SpriteSheet> spriteSheet, uint32_t columns, uint32_t rows )
 : columns { columns }

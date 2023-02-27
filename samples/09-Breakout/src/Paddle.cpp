@@ -1,11 +1,11 @@
 #include <Paddle.hpp>
 
-using namespace sr;
+using namespace Graphics;
 using namespace Math;
 
 Paddle::Paddle() {}
 
-Paddle::Paddle( const std::shared_ptr<sr::SpriteSheet>& spriteSheet, const glm::vec2& pos )
+Paddle::Paddle( const std::shared_ptr<Graphics::SpriteSheet>& spriteSheet, const glm::vec2& pos )
 : aabb { { 30, 0, 0 }, { 210, 64, 0 } }
 , leftCircle{ {0, 0}, 32 }
 , rightCircle( {0, 0}, 32 )
@@ -27,7 +27,7 @@ void Paddle::update( float deltaTime )
     gunsSpriteAnim.update( deltaTime );
 }
 
-void Paddle::draw( sr::Image& image )
+void Paddle::draw( Graphics::Image& image )
 {
     image.drawSprite( defaultSpriteAnim, transform );
 

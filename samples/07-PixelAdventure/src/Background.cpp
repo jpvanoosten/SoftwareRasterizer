@@ -2,21 +2,21 @@
 
 #include <Graphics/ResourceManager.hpp>
 
-using namespace sr;
+using namespace Graphics;
 
 Background::Background( const std::filesystem::path& filePath, float scale, const glm::vec2& scrollDirection, float scrollSpeed )
-: backgroundImage { sr::ResourceManager::loadImage( filePath ) }
+: backgroundImage { Graphics::ResourceManager::loadImage( filePath ) }
 , scrollDirection { scrollDirection }
 , scrollSpeed { scrollSpeed }
 , scale { scale }
 {}
 
-void Background::update( const sr::Timer& timer )
+void Background::update( const Graphics::Timer& timer )
 {
     textureOffset -= scrollDirection * scrollSpeed * static_cast<float>( timer.elapsedSeconds() );
 }
 
-void Background::draw( sr::Image& dst ) const
+void Background::draw( Graphics::Image& dst ) const
 {
     if ( !backgroundImage )
         return;

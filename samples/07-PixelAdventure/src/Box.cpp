@@ -1,6 +1,6 @@
 #include <Box.hpp>
 
-using namespace sr;
+using namespace Graphics;
 
 Box::Box( int hitPoints )
 : Character()
@@ -74,7 +74,7 @@ void Box::update( float deltaTime )
     }
 }
 
-void Box::draw( sr::Image& image ) const
+void Box::draw( Graphics::Image& image ) const
 {
     Character::draw( image, transform );
 

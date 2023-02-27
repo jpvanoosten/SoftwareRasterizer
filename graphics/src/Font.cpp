@@ -8,7 +8,7 @@
 #include <vector>
 
 namespace fs = std::filesystem;
-using namespace sr;
+using namespace Graphics;
 
 const Font Font::Default {};
 

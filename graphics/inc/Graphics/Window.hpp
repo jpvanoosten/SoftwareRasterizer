@@ -9,7 +9,7 @@
 
 #include <memory>
 
-namespace sr
+namespace Graphics
 {
 class WindowImpl;
 
@@ -129,4 +129,4 @@ public:
 private:
     std::unique_ptr<WindowImpl> pImpl;
 };
-}  // namespace sr
+}  // namespace Graphics

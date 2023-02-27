@@ -2,7 +2,7 @@
 
 #include <numeric> // for std::iota.
 
-using namespace sr;
+using namespace Graphics;
 
 SpriteAnim::SpriteAnim( std::shared_ptr<SpriteSheet> _spriteSheet, float fps, std::span<const int> _frames )
 : spriteSheet { std::move( _spriteSheet ) }

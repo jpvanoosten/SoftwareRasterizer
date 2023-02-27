@@ -13,7 +13,7 @@
 // Forward declaration of Windows callback function.
 LRESULT CALLBACK WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam );
 
-namespace sr
+namespace Graphics
 {
 class SR_API WindowWin32 : public WindowImpl
 {
@@ -91,4 +91,4 @@ private:
     GLuint            m_ShaderProgram;  ///< Shader program.
     std::queue<Event> m_eventQueue;
 };
-}  // namespace sr
+}  // namespace Graphics

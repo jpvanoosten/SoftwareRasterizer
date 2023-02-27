@@ -12,11 +12,11 @@ class Paddle
 public:
     Paddle();
 
-    Paddle( const std::shared_ptr<sr::SpriteSheet>& spriteSheet, const glm::vec2& pos );
+    Paddle( const std::shared_ptr<Graphics::SpriteSheet>& spriteSheet, const glm::vec2& pos );
 
     void update( float deltaTime );
 
-    void draw( sr::Image& image );
+    void draw( Graphics::Image& image );
 
     void             setPosition( const glm::vec2& pos );
     const glm::vec2& getPosition() const;
@@ -36,6 +36,6 @@ private:
 
     Math::Transform2D transform;
 
-    sr::SpriteAnim defaultSpriteAnim;
-    sr::SpriteAnim gunsSpriteAnim;
+    Graphics::SpriteAnim defaultSpriteAnim;
+    Graphics::SpriteAnim gunsSpriteAnim;
 };

@@ -41,7 +41,7 @@ public:
     /// Draw the player to the image.
     /// </summary>
     /// <param name="image">The image to draw the player to.</param>
-    void draw( sr::Image& image ) const noexcept;
+    void draw( Graphics::Image& image ) const noexcept;
 
     /// <summary>
     /// Set the state of the player.

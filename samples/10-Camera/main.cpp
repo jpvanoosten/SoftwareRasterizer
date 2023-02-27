@@ -8,7 +8,7 @@
 
 #include <iostream>
 
-using namespace sr;
+using namespace Graphics;
 using namespace Math;
 
 std::vector<Vertex> transformVerts( const Camera2D& camera, std::span<const Vertex> verts )

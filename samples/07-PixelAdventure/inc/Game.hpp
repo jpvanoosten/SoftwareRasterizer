@@ -29,15 +29,15 @@ public:
 
     void Update();
 
-    const sr::Image& getImage() const noexcept
+    const Graphics::Image& getImage() const noexcept
     {
         return image;
     }
 
-    void processEvent( const sr::Event& event );
+    void processEvent( const Graphics::Event& event );
 
-    void onMouseMoved( sr::MouseMovedEventArgs& args );
-    void onResized( sr::ResizeEventArgs& args );
+    void onMouseMoved( Graphics::MouseMovedEventArgs& args );
+    void onResized( Graphics::ResizeEventArgs& args );
 
     // Button handlers.
     void onPreviousClicked();
@@ -56,8 +56,8 @@ protected:
 
     ldtk::Project project;
 
-    sr::Image image;
-    sr::Timer timer;
+    Graphics::Image image;
+    Graphics::Timer timer;
 
     // Maximum tick time for physics.
     const float physicsTick = 1.0f / 60.0f;
@@ -70,8 +70,8 @@ protected:
     glm::ivec2 mousePos;
 
     // Fonts.
-    sr::Font arial20;
-    sr::Font arial24;
+    Graphics::Font arial20;
+    Graphics::Font arial24;
 
     // Backgrounds
     using BackgroundList = std::vector<Background>;

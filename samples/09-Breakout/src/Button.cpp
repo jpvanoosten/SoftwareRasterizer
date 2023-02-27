@@ -1,8 +1,8 @@
 #include "Button.hpp"
 
-using namespace sr;
+using namespace Graphics;
 
-void Button::draw( sr::Image& image )
+void Button::draw( Graphics::Image& image )
 {
     if ( !enabled )
         return;
@@ -22,7 +22,7 @@ void Button::draw( sr::Image& image )
 #endif
 }
 
-void Button::processEvents( const sr::Event& event )
+void Button::processEvents( const Graphics::Event& event )
 {
     if ( !enabled )
         return;

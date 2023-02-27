@@ -3,7 +3,7 @@
 #include "Config.hpp"
 #include "KeyboardState.hpp"
 
-namespace sr
+namespace Graphics
 {
 class SR_API KeyboardStateTracker
 {
@@ -26,4 +26,4 @@ public:
 private:
     KeyboardState lastState;
 };
-}  // namespace sr
+}  // namespace Graphics

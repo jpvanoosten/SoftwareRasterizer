@@ -6,7 +6,7 @@
 #include <span>
 #include <vector>
 
-namespace sr
+namespace Graphics
 {
 /// <summary>
 /// Helper functions for reading/writing files.
@@ -82,4 +82,4 @@ void File::writeFile( const std::filesystem::path& path, std::span<T> data, std:
     output.write( reinterpret_cast<char*>( data.data() ), data.size() * sizeof( T ) );
 }
 
-}  // namespace sr
+}  // namespace Graphics

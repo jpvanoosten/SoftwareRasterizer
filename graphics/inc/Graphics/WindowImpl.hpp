@@ -8,7 +8,7 @@
 
 #include <memory>
 
-namespace sr
+namespace Graphics
 {
 class SR_API WindowImpl
 {
@@ -37,4 +37,4 @@ protected:
     WindowImpl& operator=( const WindowImpl& ) = default;
     WindowImpl& operator=( WindowImpl&& )      = default;
 };
-}  // namespace sr
+}  // namespace Graphics

@@ -8,7 +8,7 @@
 
 #include <glm/vec2.hpp>
 
-namespace sr
+namespace Graphics
 {
 class SR_API Sprite final
 {
@@ -101,4 +101,4 @@ private:
     // The blend mode to apply when rendering.
     BlendMode blendMode;
 };
-}  // namespace sr
+}  // namespace Graphics

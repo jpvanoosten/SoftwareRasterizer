@@ -40,7 +40,7 @@ std::map<Player::State, std::string> stateToString = {
     { Player::State::RightWallJump, "Right Wall Jump" }
 };
 
-using namespace sr;
+using namespace Graphics;
 
 std::shared_ptr<Character> createCharacter( const std::filesystem::path& basePath )
 {
@@ -152,7 +152,7 @@ void Player::update( float deltaTime ) noexcept
     }
 }
 
-void Player::draw( sr::Image& image ) const noexcept
+void Player::draw( Graphics::Image& image ) const noexcept
 {
     if ( currentCharacter )
     {

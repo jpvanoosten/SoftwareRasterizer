@@ -13,16 +13,16 @@
 // Link the xinput.lib library.
 #pragma comment( lib, "xinput.lib" )
 
-namespace sr
+namespace Graphics
 {
 // Defined in GamePad.cpp
 float ApplyLinearDeadZone( float value, float maxValue, float deadZoneSize = 0.0f ) noexcept;
 void  ApplyStickDeadZone( float x, float y, DeadZone deadZoneMode, float maxValue, float deadZoneSize, float& resultX,
                           float& resultY ) noexcept;
 
-}  // namespace sr
+}  // namespace Graphics
 
-using namespace sr;
+using namespace Graphics;
 
 //const int GamePad::MAX_PLAYERS = XUSER_MAX_COUNT;
 

@@ -4,7 +4,7 @@
 
 #include <chrono>
 
-namespace sr
+namespace Graphics
 {
     class SR_API Timer
     {

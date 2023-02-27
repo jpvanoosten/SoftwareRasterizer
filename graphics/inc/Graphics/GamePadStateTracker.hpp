@@ -4,7 +4,7 @@
 #include "Events.hpp"  // For ButtonState
 #include "GamePadState.hpp"
 
-namespace sr
+namespace Graphics
 {
 class SR_API GamePadStateTracker
 {
@@ -72,4 +72,4 @@ inline GamePadState GamePadStateTracker::getLastState() const noexcept
     return lastState;
 }
 
-}  // namespace sr
+}  // namespace Graphics
