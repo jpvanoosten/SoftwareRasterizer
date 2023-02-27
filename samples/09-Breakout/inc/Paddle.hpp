@@ -4,6 +4,7 @@
 #include <Graphics/SpriteAnim.hpp>
 
 #include <Math/AABB.hpp>
+#include <Math/Camera2D.hpp>
 
 #include <glm/vec2.hpp>
 
@@ -16,7 +17,7 @@ public:
 
     void update( float deltaTime );
 
-    void draw( Graphics::Image& image );
+    void draw( Graphics::Image& image, const Math::Camera2D& camera );
 
     void             setPosition( const glm::vec2& pos );
     const glm::vec2& getPosition() const;

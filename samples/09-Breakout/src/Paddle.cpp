@@ -3,6 +3,16 @@
 using namespace Graphics;
 using namespace Math;
 
+inline Circle operator*(const Camera2D& camera, const Circle& c )
+{
+    return { camera * c.center, camera.getZoom() * c.radius };
+}
+
+AABB operator*(const Camera2D& camera, const AABB& aabb )
+{
+    return { camera * aabb.min, camera * aabb.max };
+}
+
 Paddle::Paddle() {}
 
 Paddle::Paddle( const std::shared_ptr<Graphics::SpriteSheet>& spriteSheet, const glm::vec2& pos )
@@ -18,6 +28,7 @@ Paddle::Paddle( const std::shared_ptr<Graphics::SpriteSheet>& spriteSheet, const
     defaultSpriteAnim = SpriteAnim { spriteSheet, 15, defaultAnimFrames };
     gunsSpriteAnim    = SpriteAnim { spriteSheet, 15, gunsAnimFrames };
 
+    // Set the anchor point to the center of the paddle.
     transform.setAnchor( { 121.5, 32 } );
 }
 
@@ -27,14 +38,14 @@ void Paddle::update( float deltaTime )
     gunsSpriteAnim.update( deltaTime );
 }
 
-void Paddle::draw( Graphics::Image& image )
+void Paddle::draw( Graphics::Image& image, const Math::Camera2D& camera )
 {
-    image.drawSprite( defaultSpriteAnim, transform );
+    image.drawSprite( defaultSpriteAnim, camera * transform );
 
 #if _DEBUG
-    image.drawAABB( getAABB(), Color::Yellow, {}, FillMode::WireFrame );
-    image.drawCircle( leftCircle, Color::Yellow, {}, FillMode::WireFrame );
-    image.drawCircle( rightCircle, Color::Yellow, {}, FillMode::WireFrame );
+    image.drawAABB( camera * getAABB(), Color::Yellow, {}, FillMode::WireFrame );
+    image.drawCircle( camera * leftCircle, Color::Yellow, {}, FillMode::WireFrame );
+    image.drawCircle( camera * rightCircle, Color::Yellow, {}, FillMode::WireFrame );
 #endif
 }
 

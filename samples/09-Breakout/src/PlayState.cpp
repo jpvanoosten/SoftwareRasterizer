@@ -30,54 +30,121 @@ std::vector<RectI> parseSpriteRects( const std::filesystem::path& xmlFile )
     return rects;
 }
 
-PlayState::PlayState( int screenWidth, int screenHeight )
+PlayState::PlayState( int _screenWidth, int _screenHeight )
 : backgroundImage { "assets/textures/space_background.jpg" }
-, screenWidth { screenWidth }
-, screenHeight { screenHeight }
+, width { _screenWidth * 2 }
+, height { _screenHeight * 2 }
 {
     // Load the game sprites.
     spriteSheet = std::make_shared<SpriteSheet>( "assets/Breakout/Sprite Sheet/Breakout_Tile_Free.png", parseSpriteRects( "assets/Breakout/Sprite Sheet/Breakout_Tile_Free.xml" ), Graphics::BlendMode::AlphaBlend );
 
-    paddle = Paddle { spriteSheet, { static_cast<float>( screenWidth ) / 2.0f, static_cast<float>( screenHeight ) - 100.0f } };
+    // Setup the camera.
+    camera.setZoom( 0.5f );
 
-    ball.setPosition( { static_cast<float>( screenWidth ) / 2.0f, static_cast<float>( screenHeight ) / 2.0f } );
-    ball.setVelocity( glm::vec2 { 1, -1 } * 300.0f );
+    // Set the paddle to the middle of the play area.
+    paddle = Paddle { spriteSheet, glm::vec2 { static_cast<float>( width ) / 2.0f, static_cast<float>( height ) - 200.0f } };
 }
 
 void PlayState::update( float deltaTime )
 {
-    const auto w = static_cast<float>( screenWidth );
-
-    // Update the paddle.
+    switch ( state )
     {
-        auto pos = paddle.getPosition();
-        pos.x += Input::getAxis( "Horizontal" ) * paddleSpeed;
-
-        if ( pos.x < 0.0f )
-            pos.x = 0.0f;
-        else if ( pos.x >= w )
-            pos.x = w;
-
-        paddle.setPosition( pos );
-
-        paddle.update( deltaTime );
+    case State::Start:
+        doStart( deltaTime );
+        break;
+    case State::Playing:
+        doPlaying( deltaTime );
+        break;
+    case State::Dead:
+        break;
     }
-
-    ball.update( deltaTime );
-    checkCollisions( ball );
 }
 
 void PlayState::draw( Graphics::Image& image )
 {
     image.copy( backgroundImage, 0, 0 );
 
-    paddle.draw( image );
-    ball.draw( image );
+    paddle.draw( image, camera );
+    ball.draw( image, camera );
 }
 
-void PlayState::processEvent( const Graphics::Event& event )
+void PlayState::setState( State newState )
 {
-    
+    if ( state != newState )
+    {
+        endState( state );
+        state = newState;
+        startState( state );
+    }
+}
+
+void PlayState::startState( State newState )
+{
+    switch ( newState )
+    {
+    case State::Start:
+        break;
+    case State::Playing:
+        break;
+    case State::Dead:
+        break;
+    }
+}
+
+void PlayState::endState( State oldState )
+{
+    switch ( oldState )
+    {
+    case State::Start:
+        break;
+    case State::Playing:
+        break;
+    case State::Dead:
+        break;
+    }
+}
+
+void PlayState::doStart( float deltaTime )
+{
+    updatePaddle( deltaTime );
+    auto p    = paddle.getPosition();
+    auto aabb = paddle.getAABB();
+
+    // In the start state, the ball is attached to the paddle until the user presses the fire button.
+    auto c = ball.getCircle();
+    c.center      = { p.x, aabb.min.y - c.radius };
+    ball.setCircle( c );
+
+    if ( Input::getButtonDown( "Fire" ) )
+    {
+        ball.setVelocity( glm::vec2 { 0.0f, 1.0f } * ballSpeed );
+        setState( State::Playing );
+    }
+}
+
+void PlayState::doPlaying( float deltaTime )
+{
+    updatePaddle( deltaTime );
+
+    ball.update( deltaTime );
+
+    checkCollisions( ball );
+}
+
+void PlayState::updatePaddle( float deltaTime )
+{
+    const auto w = static_cast<float>( width );
+
+    auto pos = paddle.getPosition();
+    pos.x += Input::getAxis( "Horizontal" ) * paddleSpeed * deltaTime;
+
+    if ( pos.x < 0.0f )
+        pos.x = 0.0f;
+    else if ( pos.x >= w )
+        pos.x = w;
+
+    paddle.setPosition( pos );
+    paddle.update( deltaTime );
 }
 
 void PlayState::checkCollisions( Ball& ball )
@@ -85,8 +152,8 @@ void PlayState::checkCollisions( Ball& ball )
     auto c = ball.getCircle();
     auto v = ball.getVelocity();
 
-    const auto w = static_cast<float>( screenWidth );
-    const auto h = static_cast<float>( screenHeight );
+    const auto w = static_cast<float>( width );
+    const auto h = static_cast<float>( height );
 
     if ( c.center.x - c.radius <= 0 )
     {

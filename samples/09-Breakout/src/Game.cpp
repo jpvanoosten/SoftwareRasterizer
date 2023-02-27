@@ -35,7 +35,7 @@ Game::Game( uint32_t screenWidth, uint32_t screenHeight )
     } );
 
     // Input that controls shooting.
-    Input::mapButtonDown( "Shoot", []( std::span<const GamePadStateTracker> gamePadStates, const KeyboardStateTracker& keyboardState, const MouseStateTracker& mouseState ) {
+    Input::mapButtonDown( "Fire", []( std::span<const GamePadStateTracker> gamePadStates, const KeyboardStateTracker& keyboardState, const MouseStateTracker& mouseState ) {
         bool a = false;
 
         for ( auto& gamePadState: gamePadStates )

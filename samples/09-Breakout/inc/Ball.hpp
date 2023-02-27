@@ -3,6 +3,7 @@
 #include <Graphics/Image.hpp>
 #include <Graphics/Sprite.hpp>
 
+#include <Math/Camera2D.hpp>
 #include <Math/Circle.hpp>
 
 #include <glm/vec2.hpp>
@@ -16,7 +17,7 @@ public:
 
     void update( float deltaTime );
 
-    void draw( Graphics::Image& image );
+    void draw( Graphics::Image& image, const Math::Camera2D& camera );
 
     void setPosition( const glm::vec2& pos );
     const glm::vec2& getPosition() const;
@@ -28,9 +29,9 @@ public:
     const Math::Circle& getCircle() const;
     
 private:
-    glm::vec2 position{0};
-    glm::vec2 velocity{0};
+    Math::Transform2D transform;
+    Math::Circle      circle;
+    glm::vec2         velocity { 0 };
 
     Graphics::Sprite sprite;
-    Math::Circle circle;
 };

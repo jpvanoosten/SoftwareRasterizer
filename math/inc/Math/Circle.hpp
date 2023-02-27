@@ -76,6 +76,11 @@ struct Circle
         return { center.x + radius, center.y + radius };
     }
 
+    /// <summary>
+    /// Circle-circle intersection test.
+    /// </summary>
+    /// <param name="other">The other circle to test for intersection with.</param>
+    /// <returns>`true` if the circles are overlapping, `false` otherwise.</returns>
     bool intersect( const Circle& other ) const noexcept
     {
         float dx = center.x - other.center.x;
