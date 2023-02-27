@@ -2,8 +2,8 @@
 #include <MainMenuState.hpp>
 #include <PlayState.hpp>
 
-#include <Input.hpp>
-#include <KeyCodes.hpp>
+#include <Graphics/Input.hpp>
+#include <Graphics/KeyCodes.hpp>
 
 using namespace sr;
 using namespace Math;

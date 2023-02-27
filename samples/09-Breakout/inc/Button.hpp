@@ -1,9 +1,9 @@
 #pragma once
 
-#include <Events.hpp>
-#include <Font.hpp>
-#include <Image.hpp>
-#include <SpriteSheet.hpp>
+#include <Graphics/Events.hpp>
+#include <Graphics/Font.hpp>
+#include <Graphics/Image.hpp>
+#include <Graphics/SpriteSheet.hpp>
 
 #include <functional>
 

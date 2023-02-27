@@ -1,6 +1,6 @@
-#include "Input.hpp"
-
 #include <PlayState.hpp>
+
+#include <Graphics/Input.hpp>
 
 #include "tinyxml2.h"
 

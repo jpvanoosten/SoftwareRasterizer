@@ -1,7 +1,7 @@
 #pragma once
 
-#include <Image.hpp>
-#include <Sprite.hpp>
+#include <Graphics/Image.hpp>
+#include <Graphics/Sprite.hpp>
 
 #include <filesystem>
 

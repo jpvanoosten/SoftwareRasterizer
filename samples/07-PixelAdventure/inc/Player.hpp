@@ -2,9 +2,9 @@
 
 #include "Character.hpp"
 
-#include <Image.hpp>
-#include <Math/Transform2D.hpp>
 #include <Audio/Sound.hpp>
+#include <Graphics/Image.hpp>
+#include <Math/Transform2D.hpp>
 
 #include <vector>
 

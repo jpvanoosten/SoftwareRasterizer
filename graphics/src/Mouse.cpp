@@ -1,4 +1,4 @@
-#include <MouseStateTracker.hpp>
+#include <Graphics/MouseStateTracker.hpp>
 
 #include <cstring> // memset
 

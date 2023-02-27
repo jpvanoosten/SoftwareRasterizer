@@ -1,4 +1,4 @@
-#include "Timer.hpp"
+#include <Graphics/Timer.hpp>
 
 using namespace sr;
 using std::chrono::high_resolution_clock;

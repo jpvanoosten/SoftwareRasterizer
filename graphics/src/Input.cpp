@@ -1,8 +1,7 @@
-#include <Input.hpp>
-
-#include <GamePad.hpp>
-#include <Keyboard.hpp>
-#include <Mouse.hpp>
+#include <Graphics/Input.hpp>
+#include <Graphics/GamePad.hpp>
+#include <Graphics/Keyboard.hpp>
+#include <Graphics/Mouse.hpp>
 
 #include <algorithm>
 #include <map>

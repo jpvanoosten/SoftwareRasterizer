@@ -1,10 +1,9 @@
-#include "Font.hpp"
-
-#include <Image.hpp>
-#include <ResourceManager.hpp>
-#include <Sprite.hpp>
-#include <Timer.hpp>
-#include <Window.hpp>
+#include <Graphics/Font.hpp>
+#include <Graphics/Image.hpp>
+#include <Graphics/ResourceManager.hpp>
+#include <Graphics/Sprite.hpp>
+#include <Graphics/Timer.hpp>
+#include <Graphics/Window.hpp>
 
 #include <iostream>
 
@@ -31,7 +30,7 @@ int main( int argc, char* argv[] )
 
     Window window { L"03 - Sprites", WINDOW_WIDTH, WINDOW_HEIGHT };
 
-    auto monaLisa = ResourceManager::loadImage( "assets/textures/Mona_Lisa.jpg" );
+    auto        monaLisa = ResourceManager::loadImage( "assets/textures/Mona_Lisa.jpg" );
     Sprite      sprite { monaLisa };
     Transform2D transform;
 
@@ -59,7 +58,7 @@ int main( int argc, char* argv[] )
         image.drawSprite( sprite, transform );
         int x = ( window.getWidth() - sprite.getSize().x ) / 2;
         int y = ( window.getHeight() - sprite.getSize().y ) / 2;
-        //image.drawSprite( sprite, x, y );
+        // image.drawSprite( sprite, x, y );
 
         image.drawText( Font::Default, 10, 10, fps, Color::White );
 

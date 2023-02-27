@@ -1,8 +1,8 @@
-#include "Input.hpp"
+#include "Game.hpp"
 
-#include <Game.hpp>
-#include <Timer.hpp>
-#include <Window.hpp>
+#include <Graphics/Input.hpp>
+#include <Graphics/Timer.hpp>
+#include <Graphics/Window.hpp>
 
 #include <iostream>
 

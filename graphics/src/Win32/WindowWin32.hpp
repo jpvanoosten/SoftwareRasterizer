@@ -2,9 +2,9 @@
 
 #include "IncludeWin32.hpp"
 
-#include <Config.hpp>
-#include <Events.hpp>
-#include <WindowImpl.hpp>
+#include <Graphics/Config.hpp>
+#include <Graphics/Events.hpp>
+#include <Graphics/WindowImpl.hpp>
 
 #include <GL/glew.h>
 

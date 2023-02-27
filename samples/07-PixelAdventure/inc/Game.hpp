@@ -5,11 +5,12 @@
 #include "Level.hpp"
 #include "Transition.hpp"
 
-#include <Events.hpp>
-#include <Font.hpp>
-#include <Image.hpp>
+#include <Graphics/Events.hpp>
+#include <Graphics/Font.hpp>
+#include <Graphics/Image.hpp>
+#include <Graphics/Timer.hpp>
+
 #include <Math/Rect.hpp>
-#include <Timer.hpp>
 
 #include <LDtkLoader/Project.hpp>
 
@@ -78,10 +79,10 @@ protected:
     BackgroundList::iterator currentBackground;
 
     // Level transition effect.
-    Transition  transition;
-    const float transitionDuration = 0.3f;
-    float       transitionTime     = transitionDuration;
-    TransitionState transitionState = TransitionState::None;
+    Transition      transition;
+    const float     transitionDuration = 0.3f;
+    float           transitionTime     = transitionDuration;
+    TransitionState transitionState    = TransitionState::None;
 
     // Buttons
     Button previousButton;

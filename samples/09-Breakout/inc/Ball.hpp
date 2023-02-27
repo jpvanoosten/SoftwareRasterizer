@@ -1,7 +1,8 @@
 #pragma once
 
-#include <Image.hpp>
-#include <Sprite.hpp>
+#include <Graphics/Image.hpp>
+#include <Graphics/Sprite.hpp>
+
 #include <Math/Circle.hpp>
 
 #include <glm/vec2.hpp>

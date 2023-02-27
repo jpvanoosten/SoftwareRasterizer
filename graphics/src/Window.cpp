@@ -1,4 +1,4 @@
-#include "Window.hpp"
+#include <Graphics/Window.hpp>
 
 using namespace sr;
 

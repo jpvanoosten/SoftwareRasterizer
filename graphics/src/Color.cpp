@@ -1,4 +1,4 @@
-#include "Color.hpp"
+#include <Graphics/Color.hpp>
 
 using namespace sr;
 

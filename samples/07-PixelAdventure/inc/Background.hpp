@@ -1,7 +1,7 @@
 #pragma once
 
-#include <Image.hpp>
-#include <Timer.hpp>
+#include <Graphics/Image.hpp>
+#include <Graphics/Timer.hpp>
 
 #include <glm/vec2.hpp>
 

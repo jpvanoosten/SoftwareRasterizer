@@ -2,10 +2,10 @@
 
 #include "Curve.hpp"
 
-#include <Events.hpp>
-#include <Image.hpp>
-#include <SpriteSheet.hpp>
-#include <Timer.hpp>
+#include <Graphics/Events.hpp>
+#include <Graphics/Image.hpp>
+#include <Graphics/SpriteSheet.hpp>
+#include <Graphics/Timer.hpp>
 
 #include <Math/AABB.hpp>
 #include <Math/Transform2D.hpp>

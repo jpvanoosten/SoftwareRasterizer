@@ -5,8 +5,8 @@
 
 #include "IncludeWin32.hpp"
 
-#include <GamePad.hpp>
-#include <Timer.hpp>
+#include <Graphics/GamePad.hpp>
+#include <Graphics/Timer.hpp>
 
 #include <Xinput.h>
 

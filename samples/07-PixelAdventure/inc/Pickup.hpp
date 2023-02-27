@@ -2,9 +2,9 @@
 
 #include "Player.hpp"
 
-#include <Image.hpp>
+#include <Graphics/Image.hpp>
+#include <Graphics/SpriteSheet.hpp>
 #include <Math/Sphere.hpp>
-#include <SpriteSheet.hpp>
 
 class Pickup final
 {
@@ -38,7 +38,7 @@ public:
     /// Set to 0 to disable gravity.
     /// </summary>
     /// <param name="g">The gravity to apply.</param>
-    void setGravity(float g)
+    void setGravity( float g )
     {
         gravity = g;
     }
@@ -83,7 +83,7 @@ private:
     Math::Sphere sphere;
 
     // Transform for this pickup.
-    Math::Transform2D      transform;
+    Math::Transform2D transform;
 
     // Shared sprite sheet for the pickup.
     std::shared_ptr<sr::SpriteSheet> spriteSheet;
@@ -97,5 +97,5 @@ private:
     // Whether to apply gravity for this pickup.
     float gravity = 0.0f;
     // Current velocity of the pickup.
-    glm::vec2 velocity{0};
+    glm::vec2 velocity { 0 };
 };

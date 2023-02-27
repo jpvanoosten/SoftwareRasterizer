@@ -1,4 +1,5 @@
-#include <SpriteAnim.hpp>
+#include <Graphics/SpriteAnim.hpp>
+
 #include <numeric> // for std::iota.
 
 using namespace sr;

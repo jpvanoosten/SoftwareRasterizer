@@ -1,8 +1,8 @@
-#include <Font.hpp>
-#include <Image.hpp>
-#include <Input.hpp>
-#include <Timer.hpp>
-#include <Window.hpp>
+#include <Graphics/Font.hpp>
+#include <Graphics/Image.hpp>
+#include <Graphics/Input.hpp>
+#include <Graphics/Timer.hpp>
+#include <Graphics/Window.hpp>
 
 #include <Math/Camera2D.hpp>
 

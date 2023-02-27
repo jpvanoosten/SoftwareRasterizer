@@ -1,5 +1,5 @@
-#include <Mouse.hpp>
-#include <Window.hpp>
+#include <Graphics/Mouse.hpp>
+#include <Graphics/Window.hpp>
 
 #include "IncludeWin32.hpp"
 

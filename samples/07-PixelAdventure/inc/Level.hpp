@@ -8,8 +8,8 @@
 #include <Audio/Sound.hpp>
 #include <Math/AABB.hpp>
 
-#include <Image.hpp>
-#include <TileMap.hpp>
+#include <Graphics/Image.hpp>
+#include <Graphics/TileMap.hpp>
 
 #include <LDtkLoader/Level.hpp>
 #include <LDtkLoader/World.hpp>

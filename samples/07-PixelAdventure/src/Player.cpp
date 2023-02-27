@@ -1,9 +1,9 @@
 #include <Player.hpp>
 
-#include <Font.hpp>
-#include <Input.hpp>
-#include <ResourceManager.hpp>
-#include <SpriteAnim.hpp>
+#include <Graphics/Font.hpp>
+#include <Graphics/Input.hpp>
+#include <Graphics/ResourceManager.hpp>
+#include <Graphics/SpriteAnim.hpp>
 
 #include <iostream>
 #include <numbers>

@@ -1,4 +1,4 @@
-#include <GamePadStateTracker.hpp>
+#include <Graphics/GamePadStateTracker.hpp>
 
 #include <cstring> // For memset.
 

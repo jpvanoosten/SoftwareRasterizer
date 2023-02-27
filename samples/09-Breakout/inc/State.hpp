@@ -1,7 +1,7 @@
 #pragma once
 
-#include <Events.hpp>
-#include <Image.hpp>
+#include <Graphics/Events.hpp>
+#include <Graphics/Image.hpp>
 
 class State
 {

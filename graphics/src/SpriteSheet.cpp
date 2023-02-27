@@ -1,5 +1,5 @@
-#include <ResourceManager.hpp>
-#include <SpriteSheet.hpp>
+#include <Graphics/ResourceManager.hpp>
+#include <Graphics/SpriteSheet.hpp>
 
 using namespace sr;
 

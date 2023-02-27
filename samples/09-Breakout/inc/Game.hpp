@@ -2,8 +2,8 @@
 
 #include "State.hpp"
 
-#include <Events.hpp>
-#include <Font.hpp>
+#include <Graphics/Events.hpp>
+#include <Graphics/Font.hpp>
 
 #include <memory>
 

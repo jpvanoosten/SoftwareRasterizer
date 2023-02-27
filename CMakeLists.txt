@@ -26,7 +26,7 @@ endif(MSVC)
 add_subdirectory(externals)
 add_subdirectory(math)
 add_subdirectory(audio)
-add_subdirectory(engine)
+add_subdirectory(graphics)
 
 if(SR_BUILD_SAMPLES)
     add_subdirectory(samples)

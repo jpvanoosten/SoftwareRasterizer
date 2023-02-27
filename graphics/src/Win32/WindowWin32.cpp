@@ -26,11 +26,11 @@ HGLRC                    g_hTempContext;
 thread_local HGLRC currentContext = nullptr;
 
 const char* g_VertexShader = {
-#include <VertexShader.glsl>
+#include "../VertexShader.glsl"
 };
 
 const char* g_FragmentShader = {
-#include <FragmentShader.glsl>
+#include "../FragmentShader.glsl"
 };
 
 extern void Keyboard_ProcessMessage( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam );

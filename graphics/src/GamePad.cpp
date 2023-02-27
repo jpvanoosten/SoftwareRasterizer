@@ -1,4 +1,4 @@
-#include <GamePad.hpp>
+#include <Graphics/GamePad.hpp>
 
 #include <algorithm>
 

@@ -3,10 +3,10 @@
 #include <Audio/Device.hpp>
 #include <Math/Transform2D.hpp>
 
-#include <Font.hpp>
-#include <Image.hpp>
-#include <Timer.hpp>
-#include <Window.hpp>
+#include <Graphics/Font.hpp>
+#include <Graphics/Image.hpp>
+#include <Graphics/Timer.hpp>
+#include <Graphics/Window.hpp>
 
 #include <iostream>
 #include <random>

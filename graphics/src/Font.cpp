@@ -1,6 +1,6 @@
-#include <File.hpp>
-#include <Font.hpp>
-#include <Image.hpp>
+#include <Graphics/File.hpp>
+#include <Graphics/Font.hpp>
+#include <Graphics/Image.hpp>
 
 #include <stb_easy_font.h>
 

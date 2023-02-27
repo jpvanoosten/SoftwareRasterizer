@@ -1,8 +1,8 @@
-#include "Input.hpp"
-
 #include <Game.hpp>
-#include <Image.hpp>
-#include <Window.hpp>
+
+#include <Graphics/Input.hpp>
+#include <Graphics/Image.hpp>
+#include <Graphics/Window.hpp>
 
 using namespace sr;
 using namespace Math;

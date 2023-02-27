@@ -1,12 +1,13 @@
-#include "Image.hpp"
-#include "Font.hpp"
-#include "Sprite.hpp"
-#include "Vertex.hpp"
-#include "stb_image.h"
-#include "stb_image_write.h"
+#include <Graphics/Image.hpp>
+#include <Graphics/Font.hpp>
+#include <Graphics/Sprite.hpp>
+#include <Graphics/Vertex.hpp>
 
 #include <Math/AABB.hpp>
 #include <Math/Math.hpp>
+
+#include <stb_image.h>
+#include <stb_image_write.h>
 
 #include <algorithm>
 #include <iostream>

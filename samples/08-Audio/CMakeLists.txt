@@ -21,7 +21,7 @@ set_target_properties( ${TARGET_NAME}
 )
 
 target_link_libraries( ${TARGET_NAME}
-    PUBLIC SoftwareRasterizer Audio
+    PUBLIC Graphics Audio
 )
 
 # Set Local Debugger Settings (Command Arguments and Environment Variables)

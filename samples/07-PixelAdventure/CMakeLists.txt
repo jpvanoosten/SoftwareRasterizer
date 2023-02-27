@@ -40,7 +40,7 @@ set_target_properties( ${TARGET_NAME}
 )
 
 target_link_libraries( ${TARGET_NAME} 
-    PUBLIC SoftwareRasterizer Math Audio LDtkLoader
+    PUBLIC Graphics Math Audio LDtkLoader
 )
 
 target_include_directories( ${TARGET_NAME}

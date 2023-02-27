@@ -1,7 +1,7 @@
 #pragma once
 
-#include <Image.hpp>
-#include <SpriteAnim.hpp>
+#include <Graphics/Image.hpp>
+#include <Graphics/SpriteAnim.hpp>
 
 #include <Math/AABB.hpp>
 

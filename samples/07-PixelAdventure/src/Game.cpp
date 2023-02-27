@@ -1,9 +1,8 @@
 #include <Game.hpp>
 
-#include <Color.hpp>
-#include <Input.hpp>
+#include <Graphics/Color.hpp>
+#include <Graphics/Input.hpp>
 
-#include <numbers>
 #include <string>
 
 using namespace sr;

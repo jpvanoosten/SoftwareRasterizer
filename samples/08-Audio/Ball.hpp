@@ -1,7 +1,7 @@
 #pragma once
 
+#include <Graphics/Sprite.hpp>
 #include <Math/Transform2D.hpp>
-#include <Sprite.hpp>
 
 #include <glm/vec2.hpp>
 

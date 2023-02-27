@@ -1,10 +1,8 @@
-#include "Font.hpp"
-
-#include <Image.hpp>
-#include <ResourceManager.hpp>
-#include <Sprite.hpp>
-#include <Timer.hpp>
-#include <Window.hpp>
+#include <Graphics/Font.hpp>
+#include <Graphics/Image.hpp>
+#include <Graphics/ResourceManager.hpp>
+#include <Graphics/Timer.hpp>
+#include <Graphics/Window.hpp>
 
 #include <iostream>
 
