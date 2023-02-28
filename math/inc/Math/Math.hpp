@@ -130,6 +130,14 @@ inline bool pointInsideTriangle( const glm::vec3& p, const glm::vec3& a, const g
 }
 
 
+/// <summary>
+/// Test to see if a point p is contained in a triangle (a, b, c).
+/// </summary>
+/// <param name="p">The point to test for containment.</param>
+/// <param name="a">The first triangle point.</param>
+/// <param name="b">The second triangle point.</param>
+/// <param name="c">The third triangle point.</param>
+/// <returns>true if the point is contained in the triangle, false otherwise.</returns>
 inline bool pointInsideTriangle( const glm::vec2& p, const glm::vec2& a, const glm::vec2& b, const glm::vec2& c ) noexcept
 {
     const glm::vec3 bc = barycentric( a, b, c, p );

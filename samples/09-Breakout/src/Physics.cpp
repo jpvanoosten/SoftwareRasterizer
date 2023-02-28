@@ -6,6 +6,25 @@ using namespace Math;
 
 namespace Physics
 {
+std::optional<HitInfo> collidesWith( const Math::Circle& c1, const Math::Circle& c2 )
+{
+    const float dx = c2.center.x - c1.center.x;
+    const float dy = c2.center.y - c1.center.y;
+    const float d  = dx * dx + dy * dy;
+    const float r  = c1.radius + c2.radius;
+
+    if (d < r * r)
+    {
+        const glm::vec2 n = glm::normalize( glm::vec2 { dx, dy } );
+        // The point of contact is the center of the overlapping areas of the circles.
+        const glm::vec2 p = ( ( c1.center + n * c1.radius ) + ( c2.center - n * c2.radius ) ) * 0.5f;
+
+        return HitInfo { n, p };
+    }
+
+    // No intersection found.
+    return {};
+}
 
 std::optional<HitInfo> collidesWith( const Math::Line& line, const Math::Circle& c )
 {

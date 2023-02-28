@@ -26,6 +26,12 @@ https://pixabay.com/sound-effects/wood-break-40011/
 https://www.youtube.com/watch?v=RKRKJmpd9D8
 	* death.wav
 
+https://www.kenney.nl/assets/ui-audio
+	* click1.ogg
+	* click2.ogg
+	* switch2.ogg
+	* switch3.ogg
+
 
 
 

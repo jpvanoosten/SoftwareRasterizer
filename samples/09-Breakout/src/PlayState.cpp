@@ -111,8 +111,8 @@ void PlayState::doStart( float deltaTime )
     auto aabb = paddle.getAABB();
 
     // In the start state, the ball is attached to the paddle until the user presses the fire button.
-    auto c = ball.getCircle();
-    c.center      = { p.x, aabb.min.y - c.radius };
+    auto c   = ball.getCircle();
+    c.center = { p.x, aabb.min.y - c.radius };
     ball.setCircle( c );
 
     if ( Input::getButtonDown( "Fire" ) )
@@ -179,9 +179,9 @@ void PlayState::checkCollisions( Ball& ball )
 
     if ( const auto hit = paddle.collidesWith( ball ) )
     {
-        c.center = hit->point;
-        // TODO: Compute the reflection vector about the hit normal.
-        v.y *= -1;
+        c.center = hit->point + hit->normal * c.radius;
+        // Reflect the velocity of the ball about the hit normal.
+        v = glm::reflect( v, hit->normal );
     }
 
     ball.setCircle( c );

@@ -73,5 +73,20 @@ Math::AABB Paddle::getAABB() const
 
 std::optional<Physics::HitInfo> Paddle::collidesWith( const Ball& ball ) const
 {
-    return Physics::collidesWith( aabb, ball.getCircle(), ball.getVelocity() );
+    const auto& c = ball.getCircle();
+
+    if ( const auto hit = Physics::collidesWith( getAABB(), ball.getCircle(), ball.getVelocity() ) )
+    {
+        return hit;
+    }
+    if ( const auto hit = Physics::collidesWith( leftCircle, c ) )
+    {
+        return hit;
+    }
+    if ( const auto hit = Physics::collidesWith( rightCircle, c ) )
+    {
+        return hit;
+    }
+
+    return {};
 }
