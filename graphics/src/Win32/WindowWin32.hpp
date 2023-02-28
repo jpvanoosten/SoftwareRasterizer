@@ -27,6 +27,8 @@ public:
 
     void setVSync( bool enabled ) override;
 
+    void toggleVSync() override;
+
     bool isVSync() const noexcept override;
 
     void clear( const Color& color ) override;

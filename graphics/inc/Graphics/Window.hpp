@@ -78,6 +78,11 @@ public:
     void setVSync( bool enabled );
 
     /// <summary>
+    /// Toggles vsync on/off.
+    /// </summary>
+    void toggleVSync();
+
+    /// <summary>
     /// Check to see if v-sync is enabled.
     /// </summary>
     /// <returns>`true` if v-sync is enabled, or `false` otherwise.</returns>

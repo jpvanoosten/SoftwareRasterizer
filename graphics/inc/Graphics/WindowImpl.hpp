@@ -26,6 +26,7 @@ public:
     virtual void         setFullscreen( bool fullscreen ) = 0;
     virtual bool         isFullscreen() const noexcept    = 0;
     virtual void         toggleFullscreen()               = 0;
+    virtual void         toggleVSync()                    = 0;
 
 protected:
     friend struct std::default_delete<WindowImpl>;  // Allow default delete access to the protected destructor.

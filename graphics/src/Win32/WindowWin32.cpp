@@ -291,6 +291,11 @@ void WindowWin32::setVSync( bool enabled )
     }
 }
 
+void WindowWin32::toggleVSync()
+{
+    setVSync( !vSync );
+}
+
 bool WindowWin32::isVSync() const noexcept
 {
     return vSync;

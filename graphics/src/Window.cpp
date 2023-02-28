@@ -56,6 +56,11 @@ void Window::setVSync( bool enabled )
     pImpl->setVSync( enabled );
 }
 
+void Window::toggleVSync()
+{
+    pImpl->toggleVSync();
+}
+
 bool Window::isVSync() const noexcept
 {
     return pImpl->isVSync();

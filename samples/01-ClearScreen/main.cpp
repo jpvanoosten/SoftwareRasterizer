@@ -43,6 +43,9 @@ int main( int argc, char* argv[] )
             case Event::KeyPressed:
                 switch ( e.key.code )
                 {
+                case KeyCode::V:
+                    window.toggleVSync();
+                    break;
                 case KeyCode::Escape:
                     window.destroy();
                     break;
