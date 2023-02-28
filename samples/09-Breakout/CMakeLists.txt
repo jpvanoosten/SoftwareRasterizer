@@ -8,6 +8,7 @@ set( INC_FILES
     inc/Game.hpp
     inc/MainMenuState.hpp
     inc/Paddle.hpp
+    inc/Physics.hpp
     inc/PlayState.hpp
     inc/State.hpp
     inc/tinyxml2.h
@@ -20,6 +21,7 @@ set( SRC_FILES
     src/Game.cpp
     src/MainMenuState.cpp
     src/Paddle.cpp
+    src/Physics.cpp
     src/PlayState.cpp
     src/tinyxml2.cpp
 )

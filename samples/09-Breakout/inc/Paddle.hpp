@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Physics.hpp"
+
 #include <Graphics/Image.hpp>
 #include <Graphics/SpriteAnim.hpp>
 
@@ -7,6 +9,8 @@
 #include <Math/Camera2D.hpp>
 
 #include <glm/vec2.hpp>
+
+class Ball;
 
 class Paddle
 {
@@ -27,8 +31,9 @@ public:
     /// <summary>
     /// Check for collision with the paddle.
     /// </summary>
-    /// <param name="c">The circle to check for collision with.</param>
-    bool collidesWith( const Math::Circle& c ) const;
+    /// <param name="ball">The ball to check for collision with.</param>
+    /// <returns>An optional HitInfo structure if a collision occurred.</returns>
+    std::optional<Physics::HitInfo> collidesWith( const Ball& ball ) const;
 
 private:
     Math::AABB        aabb;

@@ -1,14 +1,16 @@
+#include "Ball.hpp"
+
 #include <Paddle.hpp>
 
 using namespace Graphics;
 using namespace Math;
 
-inline Circle operator*(const Camera2D& camera, const Circle& c )
+inline Circle operator*( const Camera2D& camera, const Circle& c )
 {
     return { camera * c.center, camera.getZoom() * c.radius };
 }
 
-AABB operator*(const Camera2D& camera, const AABB& aabb )
+AABB operator*( const Camera2D& camera, const AABB& aabb )
 {
     return { camera * aabb.min, camera * aabb.max };
 }
@@ -17,8 +19,8 @@ Paddle::Paddle() {}
 
 Paddle::Paddle( const std::shared_ptr<Graphics::SpriteSheet>& spriteSheet, const glm::vec2& pos )
 : aabb { { 30, 0, 0 }, { 210, 64, 0 } }
-, leftCircle{ {0, 0}, 32 }
-, rightCircle( {0, 0}, 32 )
+, leftCircle { { 0, 0 }, 32 }
+, rightCircle( { 0, 0 }, 32 )
 , transform { pos }
 {
     // The animation frames in the sprite sheet for the various states of the paddle.
@@ -69,8 +71,7 @@ Math::AABB Paddle::getAABB() const
     return transform * aabb;
 }
 
-bool Paddle::collidesWith( const Math::Circle& c ) const
+std::optional<Physics::HitInfo> Paddle::collidesWith( const Ball& ball ) const
 {
-    return getAABB().intersect( Sphere { glm::vec3 { c.center, 0 }, c.radius } ) ||
-           leftCircle.intersect( c ) || rightCircle.intersect( c );
+    return Physics::collidesWith( aabb, ball.getCircle(), ball.getVelocity() );
 }

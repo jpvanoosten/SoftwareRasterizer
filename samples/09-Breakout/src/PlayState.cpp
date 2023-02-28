@@ -177,8 +177,10 @@ void PlayState::checkCollisions( Ball& ball )
         v.y *= -1;
     }
 
-    if ( paddle.collidesWith( c ) )
+    if ( const auto hit = paddle.collidesWith( ball ) )
     {
+        c.center = hit->point;
+        // TODO: Compute the reflection vector about the hit normal.
         v.y *= -1;
     }
 

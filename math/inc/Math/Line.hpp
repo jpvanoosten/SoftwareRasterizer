@@ -22,6 +22,22 @@ struct Line
     }
 
     /// <summary>
+    /// Compute the closest point on this line to a point.
+    /// </summary>
+    /// <param name="p">The point to test.</param>
+    /// <returns>The closest point on this line to `p`.</returns>
+    glm::vec3 closestPoint( const glm::vec3& p ) const
+    {
+        const glm::vec3 ab = p1 - p0;  // ab
+        // Project p onto ab, computing parameterized position d(t) = a + t * (b - a)
+        float t = glm::dot( p - p0, ab ) / glm::dot( ab, ab );
+        // Clamp t to the closest endpoint.
+        t = glm::clamp( t, 0.0f, 1.0f );
+        // Compute the projected position from the clamped t value.
+        return p0 + t * ab;
+    }
+
+    /// <summary>
     /// Compute the squared distance between this line and a point.
     /// Source: Real-time Collision Detection, Christer Ericson (2005).
     /// </summary>

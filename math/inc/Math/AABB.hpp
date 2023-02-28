@@ -365,6 +365,20 @@ struct AABB
     }
 
     /// <summary>
+    /// Test if a circle is colliding with this AABB.
+    /// </summary>
+    /// <param name="circle">The circle to test.</param>
+    /// <returns>`true` if the circle is colliding with this AABB, `false` otherwise.</returns>
+    [[nodiscard]] bool intersect( const Circle& circle ) const noexcept
+    {
+        // Expand the AABB by the radius of the circle.
+        const AABB e { min - glm::vec3 { circle.radius }, max + glm::vec3 { circle.radius } };
+
+        // Test if the center point of the circle is in the expanded AABB.
+        return e.contains( glm::vec3 { circle.center, 0 } );
+    }
+
+    /// <summary>
     /// Construct an AABB from min & max points.
     /// </summary>
     /// <param name="min">The min point.</param>
