@@ -54,7 +54,6 @@ int main( int argc, char* argv[] )
             case Event::EndResize:
                 std::cout << std::format( "Resize: {},{}\n", e.resize.width, e.resize.height );
                 image.resize( e.resize.width, e.resize.height );
-                image.clear( Color::Black );
                 break;
             }
         }
