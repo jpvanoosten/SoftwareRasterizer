@@ -6,6 +6,8 @@
 
 #include <iostream>
 
+using namespace Graphics;
+
 int main( int argc, char* argv[] )
 {
     // Parse command-line arguments.
@@ -26,11 +28,14 @@ int main( int argc, char* argv[] )
 
     Game game { WINDOW_WIDTH, WINDOW_HEIGHT };
 
-    Graphics::Window window { L"09 - Breakout", WINDOW_WIDTH, WINDOW_HEIGHT };
+    Window window { L"09 - Breakout", WINDOW_WIDTH, WINDOW_HEIGHT };
     window.show();
     window.setFullscreen( true );
 
-    Graphics::Timer timer;
+    Timer       timer;
+    float       totalTime  = 0.0f;
+    uint64_t    frameCount = 0ull;
+    std::string fps        = "FPS: 0";
 
     // Maximum tick time for physics.
     constexpr float physicsTick = 1.0f / 60.0f;
@@ -39,18 +44,25 @@ int main( int argc, char* argv[] )
     {
         timer.tick();
         auto elapsedTime = static_cast<float>( timer.elapsedSeconds() );
+        totalTime += elapsedTime;
+        ++frameCount;
 
         do
         {
-            Graphics::Input::update();
+            Input::update();
             game.update( std::min( elapsedTime, physicsTick ) );
             elapsedTime -= physicsTick;
         } while ( elapsedTime > 0.0f );
 
-        window.clear( Graphics::Color::Black );
-        window.present( game.getImage() );
+        auto& image = game.getImage();
 
-        Graphics::Event e;
+        // Draw the FPS counter.
+        image.drawText( Font::Default, 10, 10, fps, Color::White );
+
+        window.clear( Color::Black );
+        window.present( image );
+
+        Event e;
         while ( window.popEvent( e ) )
         {
             // Allow the game to process events.
@@ -58,30 +70,40 @@ int main( int argc, char* argv[] )
 
             switch ( e.type )
             {
-            case Graphics::Event::Close:
+            case Event::Close:
                 window.destroy();
                 break;
-            case Graphics::Event::KeyPressed:
+            case Event::KeyPressed:
                 switch ( e.key.code )
                 {
-                case Graphics::KeyCode::V:
+                case KeyCode::V:
                     window.setVSync( !window.isVSync() );
                     std::cout << "Vsync: " << window.isVSync() << std::endl;
                     break;
-                case Graphics::KeyCode::Enter:
+                case KeyCode::Enter:
                     if ( e.key.alt )
                     {
                         [[fallthrough]];
-                    case Graphics::KeyCode::F11:
+                    case KeyCode::F11:
                         window.toggleFullscreen();
                     }
                     break;
-                case Graphics::KeyCode::Escape:
+                case KeyCode::Escape:
                     window.destroy();
                     break;
                 }
                 break;
             }
+        }
+
+        if ( totalTime > 1.0f )
+        {
+            fps = std::format( "FPS: {:.3f}", static_cast<float>( frameCount ) / totalTime );
+
+            std::cout << fps << std::endl;
+
+            frameCount = 0;
+            totalTime  = 0.0f;
         }
     }
 }

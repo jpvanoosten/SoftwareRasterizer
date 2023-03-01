@@ -31,7 +31,7 @@ public:
 
     void processEvent( const Graphics::Event& event );
 
-    const Graphics::Image& getImage() const;
+    Graphics::Image& getImage();
 
 private:
     void setState( GameState newState );

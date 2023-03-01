@@ -60,28 +60,11 @@ void Game::processEvent( const Graphics::Event& event )
 
 void Game::update( float deltaTime )
 {
-    static float       totalTime = 0.0;
-    static uint64_t    frames    = 0;
-    static std::string fps       = "FPS: 0";
-
-    ++frames;
-    totalTime += deltaTime;
-    if ( totalTime > 1.0f )
-    {
-        fps       = std::format( "FPS: {:.3f}", static_cast<float>( frames ) / totalTime );
-        frames    = 0;
-        totalTime = 0.0;
-    }
-
     state->update( deltaTime );
     state->draw( image );
-
-    // Draw an FPS counter in the corner of the screen.
-    image.drawText( arial20, 6, 20, fps, Graphics::Color::Black );
-    image.drawText( arial20, 4, 18, fps, Graphics::Color::White );
 }
 
-const Graphics::Image& Game::getImage() const
+Graphics::Image& Game::getImage()
 {
     return image;
 }
