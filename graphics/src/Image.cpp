@@ -135,7 +135,7 @@ void Image::clear( const Color& color ) noexcept
 {
     Color* p = data();
 
-#pragma omp parallel for num_threads(4)
+#pragma omp parallel for
     for ( int i = 0; i < static_cast<int>( m_width * m_height ); ++i )
         p[i] = color;
 }
@@ -187,7 +187,7 @@ void Image::copy( const Image& srcImage, std::optional<Math::RectI> srcRect, std
     // Pointer to destination image data.
     Color* dst = data();
 
-#pragma omp parallel for firstprivate( srcAABB, dstAABB, dstImage, sW, sH, dW, dH, iW, iH ) num_threads( 4 )
+#pragma omp parallel for firstprivate( srcAABB, dstAABB, dstImage, sW, sH, dW, dH, iW, iH )
     for ( int i = 0; i < iA; ++i )
     {
         const int x  = i % iW;
@@ -235,7 +235,7 @@ void Image::copy( const Image& srcImage, int x, int y )
     const Color*   src      = srcImage.data();
     Color*         dst      = data();
 
-#pragma omp parallel for firstprivate( w, h, sX, sY, dX, dY ) num_threads( 4 )
+#pragma omp parallel for firstprivate( w, h, sX, sY, dX, dY )
     for ( int i = 0; i < h; ++i )
         memcpy_s( dst + ( i + dY ) * m_width + dX, w * sizeof( Color ), src + ( i + sY ) * srcWidth + sX, w * sizeof( Color ) );
 }
@@ -301,7 +301,7 @@ void Image::drawTriangle( const glm::vec2& p0, const glm::vec2& p1, const glm::v
         const int height = static_cast<int>( aabb.height() );
         const int area   = width * height;
 
-#pragma omp parallel for firstprivate( aabb, width, height, area ) num_threads( 4 )
+#pragma omp parallel for firstprivate( aabb, width, height, area )
         for ( int i = 0; i < area; ++i )
         {
             const int x = ( i % width ) + static_cast<int>( aabb.min.x );
@@ -348,7 +348,7 @@ void Image::drawQuad( const glm::vec2& p0, const glm::vec2& p1, const glm::vec2&
         // Clamp to the size of the screen.
         aabb.clamp( m_AABB );
 
-#pragma omp parallel for schedule( dynamic ) firstprivate( aabb, indicies, verts ) num_threads( 4 )
+#pragma omp parallel for schedule( dynamic ) firstprivate( aabb, indicies, verts )
         for ( int y = static_cast<int>( aabb.min.y ); y <= static_cast<int>( aabb.max.y ); ++y )
         {
             for ( int x = static_cast<int>( aabb.min.x ); x <= static_cast<int>( aabb.max.x ); ++x )
@@ -401,7 +401,7 @@ void Image::drawQuad( const Vertex& v0, const Vertex& v1, const Vertex& v2, cons
 
     const BlendMode blendMode = _blendMode;
 
-#pragma omp parallel for schedule( dynamic ) firstprivate( aabb, indicies, verts, addressMode, blendMode ) num_threads( 4 )
+#pragma omp parallel for schedule( dynamic ) firstprivate( aabb, indicies, verts, addressMode, blendMode )
     for ( int y = static_cast<int>( aabb.min.y ); y < static_cast<int>( aabb.max.y ); ++y )
     {
         for ( int x = static_cast<int>( aabb.min.x ); x < static_cast<int>( aabb.max.x ); ++x )
@@ -456,7 +456,7 @@ void Image::drawAABB( AABB aabb, const Color& color, const BlendMode& blendMode,
         const int height = static_cast<int>( aabb.height() );
         const int area   = width * height;
 
-#pragma omp parallel for firstprivate( aabb, width, area ) num_threads( 4 )
+#pragma omp parallel for firstprivate( aabb, width, area )
         for ( int i = 0; i < area; ++i )
         {
             const int x = ( i % width ) + static_cast<int>( aabb.min.x );
@@ -553,7 +553,7 @@ void Image::drawSprite( const Sprite& sprite, const glm::mat3& matrix ) noexcept
         1, 2, 3
     };
 
-#pragma omp parallel for schedule( dynamic ) firstprivate( aabb, indicies, verts, color, blendMode ) num_threads( 4 )
+#pragma omp parallel for schedule( dynamic ) firstprivate( aabb, indicies, verts, color, blendMode )
     for ( int y = static_cast<int>( aabb.min.y ); y < static_cast<int>( aabb.max.y ); ++y )
     {
         for ( int x = static_cast<int>( aabb.min.x ); x < static_cast<int>( aabb.max.x ); ++x )
@@ -622,7 +622,7 @@ void Image::drawSprite( const Sprite& sprite, int x, int y ) noexcept
     const Color* src = image->data();
     Color*       dst = data();
 
-#pragma omp parallel for firstprivate( w, h, a, iW, color, blendMode ) num_threads( 4 )
+#pragma omp parallel for firstprivate( w, h, a, iW, color, blendMode )
     for ( int i = 0; i < a; ++i )
     {
         const int x  = i % w;
