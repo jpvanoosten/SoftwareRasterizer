@@ -127,6 +127,17 @@ struct SR_API Image final
     /// <param name="y">The y-coordinate of the top-left corner of the destination image.</param>
     void copy( const Image& srcImage, int x, int y );
 
+        /// <summary>
+    /// Draw a line on the image.
+    /// </summary>
+    /// <param name="x0">The x-coordinate of the start point of the line.</param>
+    /// <param name="y0">The y-coordinate of the start point of the line.</param>
+    /// <param name="x1">The x-coordinate of the end point of the line.</param>
+    /// <param name="y1">The y-coordinate of the end point of the line.</param>
+    /// <param name="color">The color of the line.</param>
+    /// <param name="blendMode">The blend mode to use.</param>
+    void drawLine( float x0, float y0, float x1, float y1, const Color& color, const BlendMode& blendMode = {} ) noexcept;
+
     /// <summary>
     /// Draw a line on the image.
     /// </summary>
@@ -136,7 +147,10 @@ struct SR_API Image final
     /// <param name="y1">The y-coordinate of the end point of the line.</param>
     /// <param name="color">The color of the line.</param>
     /// <param name="blendMode">The blend mode to use.</param>
-    void drawLine( int x0, int y0, int x1, int y1, const Color& color, const BlendMode& blendMode = {} ) noexcept;
+    void drawLine( int x0, int y0, int x1, int y1, const Color& color, const BlendMode& blendMode = {} ) noexcept
+    {
+        drawLine( static_cast<float>( x0 ), static_cast<float>( y0 ), static_cast<float>( x1 ), static_cast<float>( y1 ), color, blendMode );
+    }
 
     /// <summary>
     /// Draw a line on the image.
@@ -159,7 +173,7 @@ struct SR_API Image final
     /// <param name="blendMode">The blend mode to use.</param>
     void drawLine( const glm::vec2& p0, const glm::vec2& p1, const Color& color, const BlendMode& blendMode = {} ) noexcept
     {
-        drawLine( static_cast<int>( p0.x ), static_cast<int>( p0.y ), static_cast<int>( p1.x ), static_cast<int>( p1.y ), color, blendMode );
+        drawLine( p0.x, p0.y, p1.x, p1.y, color, blendMode );
     }
 
     /// <summary>
@@ -170,7 +184,7 @@ struct SR_API Image final
     /// <param name="blendMode">The blend mode to use.</param>
     void drawLine( const Math::Line& line, const Color& color, const BlendMode& blendMode = {} ) noexcept
     {
-        drawLine( glm::vec2 { line.p0 }, glm::vec2 { line.p1 }, color, blendMode );
+        drawLine( line.p0.x, line.p0.y, line.p1.x, line.p1.y, color, blendMode );
     }
 
     /// <summary>
@@ -408,6 +422,9 @@ struct SR_API Image final
     }
 
 private:
+    // Draws a line assuming the coordinates are already clipped.
+    void drawLine_internal( int x0, int y0, int x1, int y1, const Color& color, const BlendMode& blendMode = {} ) noexcept;
+
     uint32_t m_width  = 0u;
     uint32_t m_height = 0u;
     // Axis-aligned bounding box used for screen clipping.

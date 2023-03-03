@@ -266,28 +266,74 @@ struct AABB
     /// Compute the outcode of a point.
     /// Source: https://en.wikipedia.org/wiki/Cohen%E2%80%93Sutherland_algorithm
     /// </summary>
+    /// <param name="x">The x-component to test.</param>
+    /// <param name="y">The y-component to test.</param>
+    /// <param name="z">The z-component to test.</param>
+    /// <returns>The OutCode of the point relative to this AABB.</returns>
+    OutCode computeOutCode( float x, float y, float z ) const noexcept
+    {
+        OutCode code = OutCode::Inside;
+
+        if ( x < min.x )
+            code |= OutCode::Left;
+        else if ( x > max.x )
+            code |= OutCode::Right;
+
+        if ( y < min.y )
+            code |= OutCode::Bottom;
+        else if ( y > max.y )
+            code |= OutCode::Top;
+
+        if ( z < min.z )
+            code |= OutCode::Near;
+        else if ( z > max.z )
+            code |= OutCode::Far;
+
+        return code;
+    }
+
+    /// <summary>
+    /// Compute the outcode of a point.
+    /// Source: https://en.wikipedia.org/wiki/Cohen%E2%80%93Sutherland_algorithm
+    /// </summary>
     /// <param name="p">The point to test.</param>
     /// <returns>The OutCode of the point relative to this AABB.</returns>
     OutCode computeOutCode( const glm::vec3& p ) const noexcept
     {
+        return computeOutCode( p.x, p.y, p.z );
+    }
+
+    /// <summary>
+    /// Compute the outcode of a point.
+    /// Source: https://en.wikipedia.org/wiki/Cohen%E2%80%93Sutherland_algorithm
+    /// </summary>
+    /// <returns>The OutCode of the point relative to this AABB.</returns>
+    OutCode computeOutCode( float x, float y ) const noexcept
+    {
         OutCode code = OutCode::Inside;
 
-        if ( p.x < min.x )
+        if ( x < min.x )
             code |= OutCode::Left;
-        else if ( p.x > max.x )
+        else if ( x > max.x )
             code |= OutCode::Right;
 
-        if ( p.y < min.y )
+        if ( y < min.y )
             code |= OutCode::Bottom;
-        else if ( p.y > max.y )
+        else if ( y > max.y )
             code |= OutCode::Top;
 
-        if ( p.z < min.z )
-            code |= OutCode::Near;
-        else if ( p.z > max.z )
-            code |= OutCode::Far;
-
         return code;
+    }
+
+    /// <summary>
+    /// Compute the outcode of a point.
+    /// Source: https://en.wikipedia.org/wiki/Cohen%E2%80%93Sutherland_algorithm
+    /// </summary>
+    /// <param name="p">The point to test.</param>
+    /// <returns>The OutCode of the point relative to this AABB.</returns>
+    OutCode computeOutCode( const glm::vec2& p ) const noexcept
+    {
+        return computeOutCode( p.x, p.y );
     }
 
     /// <summary>

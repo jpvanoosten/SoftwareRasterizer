@@ -1,5 +1,5 @@
-#include <Graphics/Image.hpp>
 #include <Graphics/Font.hpp>
+#include <Graphics/Image.hpp>
 #include <Graphics/Sprite.hpp>
 #include <Graphics/Vertex.hpp>
 
@@ -55,7 +55,7 @@ Image::Image( const Image& copy )
 Image::Image( Image&& move ) noexcept
 : m_width { move.m_width }
 , m_height { move.m_height }
-, m_AABB { { 0, 0, 0 }, { m_width, m_height, 0 } }
+, m_AABB { move.m_AABB }
 , m_data { std::move( move.m_data ) }
 {
     move.m_width  = 0u;
@@ -79,7 +79,7 @@ Image& Image::operator=( Image&& image ) noexcept
 {
     m_width  = image.m_width;
     m_height = image.m_height;
-    m_AABB   = AABB { { 0, 0, 0 }, { m_width, m_height, 0 } };
+    m_AABB   = image.m_AABB;
 
     m_data = std::move( image.m_data );
 
@@ -98,7 +98,7 @@ void Image::resize( uint32_t width, uint32_t height )
     m_height = height;
     m_AABB   = {
         { 0, 0, 0 },
-        { m_width, m_height, 0 }
+        { m_width - 1, m_height - 1, 0 }
     };
 
     // Align color buffer to 64-byte boundary for better cache alignment on 64-bit architectures.
@@ -241,7 +241,7 @@ void Image::copy( const Image& srcImage, int x, int y )
 }
 
 // Source: https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
-void Image::drawLine( int x0, int y0, int x1, int y1, const Color& color, const BlendMode& blendMode ) noexcept
+void Image::drawLine_internal( int x0, int y0, int x1, int y1, const Color& color, const BlendMode& blendMode ) noexcept
 {
     const int dx = std::abs( x1 - x0 );
     const int dy = -std::abs( y1 - y0 );
@@ -252,7 +252,7 @@ void Image::drawLine( int x0, int y0, int x1, int y1, const Color& color, const 
 
     while ( true )
     {
-        plot( x0, y0, color, blendMode );
+        plot<false>( x0, y0, color, blendMode );
         const int e2 = err * 2;
 
         if ( e2 >= dy )
@@ -272,6 +272,81 @@ void Image::drawLine( int x0, int y0, int x1, int y1, const Color& color, const 
             y0 += sy;
         }
     }
+}
+
+// Source: https://en.wikipedia.org/wiki/Cohen%E2%80%93Sutherland_algorithm
+void Image::drawLine( float x0, float y0, float x1, float y1, const Color& color, const BlendMode& blendMode ) noexcept
+{
+    const float xmin = m_AABB.min.x;
+    const float ymin = m_AABB.min.y;
+    const float xmax = m_AABB.max.x;
+    const float ymax = m_AABB.max.y;
+
+    OutCode oc0    = m_AABB.computeOutCode( x0, y0 );
+    OutCode oc1    = m_AABB.computeOutCode( x1, y1 );
+    bool    accept = false;
+
+    while ( true )
+    {
+        if ( ( oc0 | oc1 ) == 0 )
+        {
+            // Both points are inside the image; trivially accept and exit loop.
+            accept = true;
+            break;
+        }
+        if ( ( oc0 & oc1 ) != 0 )
+        {
+            // Both points are outside the image and share an outside zone.
+            // So the entire line is outside the image.
+            break;
+        }
+
+        // Calculate the line segment to clip from an outside
+        // point to an intersection with the edge of the image.
+        const OutCode oc = oc1 > oc0 ? oc1 : oc0;
+
+        float x = 0.0f, y = 0.0f;
+
+        // Now find the intersection point.
+        if ( oc == OutCode::Top )  // Point is above the image.
+        {
+            x = x0 + ( x1 - x0 ) * ( ymax - y0 ) / ( y1 - y0 );
+            y = ymax;
+        }
+        else if ( oc == OutCode::Bottom )  // Point is below the image.
+        {
+            x = x0 + ( x1 - x0 ) * ( ymin - y0 ) / ( y1 - y0 );
+            y = ymin;
+        }
+        else if ( oc == OutCode::Right )  // Point is to the right of the image.
+        {
+            y = y0 + ( y1 - y0 ) * ( xmax - x0 ) / ( x1 - x0 );
+            x = xmax;
+        }
+        else if ( oc == OutCode::Left )  // Point is to the left of the image.
+        {
+            y = y0 + ( y1 - y0 ) * ( xmin - x0 ) / ( x1 - x0 );
+            x = xmin;
+        }
+
+        // Now we move the outside point to the intersection point to clip
+        // and get ready for the next pass.
+        if ( oc == oc0 )
+        {
+            x0  = x;
+            y0  = y;
+            oc0 = m_AABB.computeOutCode( x0, y0 );
+        }
+        else
+        {
+            x1  = x;
+            y1  = y;
+            oc1 = m_AABB.computeOutCode( x1, y1 );
+        }
+    }
+
+    if ( accept )
+        drawLine_internal( static_cast<int>( x0 ), static_cast<int>( y0 ), static_cast<int>( x1 ), static_cast<int>( y1 ), color, blendMode );
 }
 
 void Image::drawTriangle( const glm::vec2& p0, const glm::vec2& p1, const glm::vec2& p2, const Color& color, const BlendMode& blendMode, FillMode fillMode ) noexcept
@@ -308,7 +383,7 @@ void Image::drawTriangle( const glm::vec2& p0, const glm::vec2& p1, const glm::v
             const int y = ( i / width ) + static_cast<int>( aabb.min.y );
 
             if ( pointInsideTriangle( { x, y }, p0, p1, p2 ) )
-                plot( x, y, color, blendMode );
+                plot<false>( x, y, color, blendMode );
         }
     }
     break;
