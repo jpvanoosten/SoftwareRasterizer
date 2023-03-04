@@ -29,6 +29,7 @@ int main( int argc, char* argv[] )
     Image  image { WINDOW_WIDTH, WINDOW_HEIGHT };
 
     window.show();
+    window.setVSync( false );
 
     Timer       timer;
     double      totalTime  = 0.0;

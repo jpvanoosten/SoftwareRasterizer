@@ -1,3 +1,9 @@
+#define USE_OPENMP 1
+
+#if !USE_OPENMP
+    #include "thread_pool.hpp"
+#endif
+
 #include <Graphics/Font.hpp>
 #include <Graphics/Image.hpp>
 #include <Graphics/Sprite.hpp>
@@ -16,6 +22,11 @@
 
 using namespace Graphics;
 using namespace Math;
+
+#if !USE_OPENMP
+using namespace BS;
+static thread_pool pool;
+#endif
 
 Image::Image() = default;
 
@@ -101,7 +112,7 @@ void Image::resize( uint32_t width, uint32_t height )
         { m_width - 1, m_height - 1, 0 }
     };
 
-    // Align color buffer to 64-byte boundary for better cache alignment on 64-bit architectures.
+    // Align color buffer to 64-byte boundary for better cache alignment.
     m_data = make_aligned_unique<Color[], 64>( static_cast<uint64_t>( width ) * height );
 }
 
@@ -135,9 +146,17 @@ void Image::clear( const Color& color ) noexcept
 {
     Color* p = data();
 
-#pragma omp parallel for
+#if USE_OPENMP
+    #pragma omp parallel for
     for ( int i = 0; i < static_cast<int>( m_width * m_height ); ++i )
         p[i] = color;
+#else
+    pool.push_loop( static_cast<int>( m_width * m_height ), [&]( int a, int b ) {
+        for ( int i = a; i < b; ++i )
+            p[i] = color;
+    } );
+    pool.wait_for_tasks();
+#endif
 }
 
 void Image::copy( const Image& srcImage, std::optional<Math::RectI> srcRect, std::optional<Math::RectI> dstRect, const BlendMode& blendMode )
@@ -173,12 +192,12 @@ void Image::copy( const Image& srcImage, std::optional<Math::RectI> srcRect, std
     const int dH = static_cast<int>( dstAABB.height() );
 
     // Clamp the dstAABB to the bounds of this image (to prevent writing outside of this image's bounds).
-    AABB dstImage = dstAABB.clamped( m_AABB );
+    dstAABB.clamp( m_AABB );
 
     // Clamped image width.
-    const int iW = static_cast<int>( dstImage.width() );
+    const int iW = static_cast<int>( dstAABB.width() );
     // Clamped image height.
-    const int iH = static_cast<int>( dstImage.height() );
+    const int iH = static_cast<int>( dstAABB.height() );
     // Clamped image area
     const int iA = iW * iH;
 
@@ -187,13 +206,14 @@ void Image::copy( const Image& srcImage, std::optional<Math::RectI> srcRect, std
     // Pointer to destination image data.
     Color* dst = data();
 
-#pragma omp parallel for firstprivate( srcAABB, dstAABB, dstImage, sW, sH, dW, dH, iW, iH )
+#if USE_OPENMP
+    #pragma omp parallel for firstprivate( srcAABB, dstAABB, sW, sH, dW, dH, iW, iH )
     for ( int i = 0; i < iA; ++i )
     {
         const int x  = i % iW;
         const int y  = i / iW;
-        const int dx = x + static_cast<int>( dstImage.min.x );
-        const int dy = y + static_cast<int>( dstImage.min.y );
+        const int dx = x + static_cast<int>( dstAABB.min.x );
+        const int dy = y + static_cast<int>( dstAABB.min.y );
         const int sx = ( x * sW / dW ) + static_cast<int>( srcAABB.min.x );
         const int sy = ( y * sH / dH ) + static_cast<int>( srcAABB.min.y );
 
@@ -202,6 +222,25 @@ void Image::copy( const Image& srcImage, std::optional<Math::RectI> srcRect, std
 
         dst[dy * m_width + dx] = blendMode.Blend( sC, dC );
     }
+#else
+    pool.push_loop( iA, [&, srcAABB, dstAABB, sW, sH, dW, dH, iW, blendMode]( int a, int b ) {
+        for ( int i = a; i < b; ++i )
+        {
+            const int x  = i % iW;
+            const int y  = i / iW;
+            const int dx = x + static_cast<int>( dstAABB.min.x );
+            const int dy = y + static_cast<int>( dstAABB.min.y );
+            const int sx = ( x * sW / dW ) + static_cast<int>( srcAABB.min.x );
+            const int sy = ( y * sH / dH ) + static_cast<int>( srcAABB.min.y );
+
+            const Color sC = src[sy * srcImage.getWidth() + sx];
+            const Color dC = dst[dy * m_width + dx];
+
+            dst[dy * m_width + dx] = blendMode.Blend( sC, dC );
+        }
+    } );
+    pool.wait_for_tasks();
+#endif
 }
 
 void Image::copy( const Image& srcImage, int x, int y )
@@ -301,7 +340,8 @@ void Image::drawTriangle( const glm::vec2& p0, const glm::vec2& p1, const glm::v
         // Clamp the triangle AABB to the screen bounds.
         aabb.clamp( m_AABB );
 
-#pragma omp parallel for schedule( dynamic ) firstprivate( aabb )
+#if USE_OPENMP
+    #pragma omp parallel for schedule( dynamic ) firstprivate( aabb )
         for ( int y = static_cast<int>( aabb.min.y ); y <= static_cast<int>( aabb.max.y ); ++y )
         {
             for ( int x = static_cast<int>( aabb.min.x ); x <= static_cast<int>( aabb.max.x ); ++x )
@@ -310,6 +350,21 @@ void Image::drawTriangle( const glm::vec2& p0, const glm::vec2& p1, const glm::v
                     plot<false>( x, y, color, blendMode );
             }
         }
+#else
+        const int width  = static_cast<int>( aabb.width() + 1.0f );
+        const int height = static_cast<int>( aabb.height() + 1.0f );
+        const int area   = width * height;
+
+        pool.push_loop( area, [&, width, aabb, color, blendMode, p0, p1, p2]( int a, int b ) {
+            for ( int i = a; i < b; ++i )
+            {
+                const int x = ( i % width ) + static_cast<int>( aabb.min.x );
+                const int y = ( i / width ) + static_cast<int>( aabb.min.y );
+                if ( pointInsideTriangle( { x, y }, p0, p1, p2 ) )
+                    plot<false>( x, y, color, blendMode );
+            }
+        } );
+#endif
     }
     break;
     }
@@ -348,7 +403,8 @@ void Image::drawQuad( const glm::vec2& p0, const glm::vec2& p1, const glm::vec2&
         // Clamp to the size of the screen.
         aabb.clamp( m_AABB );
 
-#pragma omp parallel for schedule( dynamic ) firstprivate( aabb, indicies, verts )
+#if USE_OPENMP
+    #pragma omp parallel for schedule( dynamic ) firstprivate( aabb, indicies, verts )
         for ( int y = static_cast<int>( aabb.min.y ); y <= static_cast<int>( aabb.max.y ); ++y )
         {
             for ( int x = static_cast<int>( aabb.min.x ); x <= static_cast<int>( aabb.max.x ); ++x )
@@ -367,6 +423,33 @@ void Image::drawQuad( const glm::vec2& p0, const glm::vec2& p1, const glm::vec2&
                 }
             }
         }
+#else
+        const int width  = static_cast<int>( aabb.width() + 1.0f );
+        const int height = static_cast<int>( aabb.height() + 1.0f );
+        const int area   = width * height;
+
+        pool.push_loop( area, [&, width, aabb, color, blendMode]( int a, int b ) {
+            for ( int i = a; i < b; ++i )
+            {
+                const int x = ( i % width ) + static_cast<int>( aabb.min.x );
+                const int y = ( i / width ) + static_cast<int>( aabb.min.y );
+
+                for ( uint32_t idx = 0; idx < std::size( indicies ); idx += 3 )
+                {
+                    const uint32_t i0 = indicies[idx + 0];
+                    const uint32_t i1 = indicies[idx + 1];
+                    const uint32_t i2 = indicies[idx + 2];
+
+                    glm::vec3 bc = barycentric( verts[i0], verts[i1], verts[i2], { x, y } );
+                    if ( barycentricInside( bc ) )
+                    {
+                        plot<false>( static_cast<uint32_t>( x ), static_cast<uint32_t>( y ), color, blendMode );
+                    }
+                }
+            }
+        } );
+        pool.wait_for_tasks();
+#endif
     }
     break;
     }

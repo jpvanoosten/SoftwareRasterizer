@@ -35,6 +35,7 @@ int main( int argc, char* argv[] )
     Image image { static_cast<uint32_t>( window.getWidth() ), static_cast<uint32_t>( window.getHeight() ) };
 
     window.show();
+    window.setVSync( false );
 
     Timer    timer;
     double   totalTime  = 0.0;
