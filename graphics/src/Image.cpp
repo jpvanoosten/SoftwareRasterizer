@@ -98,7 +98,7 @@ void Image::resize( uint32_t width, uint32_t height )
     m_height = height;
     m_AABB   = {
         { 0, 0, 0 },
-        { m_width, m_height, 0 }
+        { m_width - 1, m_height - 1, 0 }
     };
 
     // Align color buffer to 64-byte boundary for better cache alignment on 64-bit architectures.
@@ -244,8 +244,7 @@ void Image::copy( const Image& srcImage, int x, int y )
 void Image::drawLine( int x0, int y0, int x1, int y1, const Color& color, const BlendMode& blendMode ) noexcept
 {
     // Shrink the image AABB by 1 pixel to prevent drawing the line outside of the image bounds.
-    const AABB aabb { m_AABB.min, m_AABB.max - glm::vec3 { 1, 1, 0 } };
-    if ( !aabb.clip( x0, y0, x1, y1 ) )
+    if ( !m_AABB.clip( x0, y0, x1, y1 ) )
         return;
 
     const int dx = std::abs( x1 - x0 );
@@ -300,7 +299,7 @@ void Image::drawTriangle( const glm::vec2& p0, const glm::vec2& p1, const glm::v
     case FillMode::Solid:
     {
         // Clamp the triangle AABB to the screen bounds.
-        aabb.clamp( { m_AABB.min, m_AABB.max - glm::vec3 { 1, 1, 0 } } );
+        aabb.clamp( m_AABB );
 
 #pragma omp parallel for schedule( dynamic ) firstprivate( aabb )
         for ( int y = static_cast<int>( aabb.min.y ); y <= static_cast<int>( aabb.max.y ); ++y )
@@ -347,7 +346,7 @@ void Image::drawQuad( const glm::vec2& p0, const glm::vec2& p1, const glm::vec2&
         };
 
         // Clamp to the size of the screen.
-        aabb.clamp( { m_AABB.min, m_AABB.max - glm::vec3{ 1, 1, 0 } } );
+        aabb.clamp( m_AABB );
 
 #pragma omp parallel for schedule( dynamic ) firstprivate( aabb, indicies, verts )
         for ( int y = static_cast<int>( aabb.min.y ); y <= static_cast<int>( aabb.max.y ); ++y )
@@ -388,7 +387,7 @@ void Image::drawQuad( const Vertex& v0, const Vertex& v1, const Vertex& v2, cons
         return;
 
     // Clamp to the size of the screen.
-    aabb.clamp( { m_AABB.min, m_AABB.max - glm::vec3{ 1, 1, 0 } } );
+    aabb.clamp( m_AABB );
 
     Vertex verts[] = {
         v0, v1, v2, v3
@@ -451,7 +450,7 @@ void Image::drawAABB( AABB aabb, const Color& color, const BlendMode& blendMode,
     case FillMode::Solid:
     {
         // Clamp to screen bounds.
-        aabb.clamp( { m_AABB.min, m_AABB.max - glm::vec3 { 1, 1, 0 } } );
+        aabb.clamp( m_AABB );
 
 #pragma omp parallel for schedule( dynamic ) firstprivate( aabb )
         for ( int y = static_cast<int>( aabb.min.y ); y <= static_cast<int>( aabb.max.y ); ++y )
@@ -528,7 +527,7 @@ void Image::drawSprite( const Sprite& sprite, const glm::mat3& matrix ) noexcept
         return;
 
     // Clamp to the size of the screen.
-    aabb.clamp( { m_AABB.min, m_AABB.max - glm::vec3 { 1, 1, 0 } } );
+    aabb.clamp( m_AABB );
 
     // Index buffer for the two triangles of the quad.
     const uint32_t indicies[] = {
