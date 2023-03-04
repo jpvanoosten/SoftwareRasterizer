@@ -98,7 +98,7 @@ void Image::resize( uint32_t width, uint32_t height )
     m_height = height;
     m_AABB   = {
         { 0, 0, 0 },
-        { m_width - 1, m_height - 1, 0 }
+        { m_width, m_height, 0 }
     };
 
     // Align color buffer to 64-byte boundary for better cache alignment on 64-bit architectures.
@@ -145,7 +145,7 @@ void Image::copy( const Image& srcImage, std::optional<Math::RectI> srcRect, std
     // If the source rectangle is not provided, use the entire source image.
     AABB srcAABB = AABB::fromRect( srcRect ? *srcRect : srcImage.getRect() );
     // If the destination rect is not provided, use the entire source image.
-    // I assume that the "expected behaviour" of this method to copy the source image to the
+    // I assume that the "expected behaviour" of this method is to copy the source image to the
     // destination image (without scaling) even if that results in clipping of the source image.
     AABB dstAABB = AABB::fromRect( dstRect ? *dstRect : srcImage.getRect() );
 
@@ -241,8 +241,13 @@ void Image::copy( const Image& srcImage, int x, int y )
 }
 
 // Source: https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
-void Image::drawLine_internal( int x0, int y0, int x1, int y1, const Color& color, const BlendMode& blendMode ) noexcept
+void Image::drawLine( int x0, int y0, int x1, int y1, const Color& color, const BlendMode& blendMode ) noexcept
 {
+    // Shrink the image AABB by 1 pixel to prevent drawing the line outside of the image bounds.
+    const AABB aabb { m_AABB.min, m_AABB.max - glm::vec3 { 1, 1, 0 } };
+    if ( !aabb.clip( x0, y0, x1, y1 ) )
+        return;
+
     const int dx = std::abs( x1 - x0 );
     const int dy = -std::abs( y1 - y0 );
     const int sx = x0 < x1 ? 1 : -1;
@@ -274,81 +279,6 @@ void Image::drawLine_internal( int x0, int y0, int x1, int y1, const Color& colo
     }
 }
 
-// Source: https://en.wikipedia.org/wiki/Cohen%E2%80%93Sutherland_algorithm
-void Image::drawLine( float x0, float y0, float x1, float y1, const Color& color, const BlendMode& blendMode ) noexcept
-{
-    const float xmin = m_AABB.min.x;
-    const float ymin = m_AABB.min.y;
-    const float xmax = m_AABB.max.x;
-    const float ymax = m_AABB.max.y;
-
-    OutCode oc0    = m_AABB.computeOutCode( x0, y0 );
-    OutCode oc1    = m_AABB.computeOutCode( x1, y1 );
-    bool    accept = false;
-
-    while ( true )
-    {
-        if ( ( oc0 | oc1 ) == 0 )
-        {
-            // Both points are inside the image; trivially accept and exit loop.
-            accept = true;
-            break;
-        }
-        if ( ( oc0 & oc1 ) != 0 )
-        {
-            // Both points are outside the image and share an outside zone.
-            // So the entire line is outside the image.
-            break;
-        }
-
-        // Calculate the line segment to clip from an outside
-        // point to an intersection with the edge of the image.
-        const OutCode oc = oc1 > oc0 ? oc1 : oc0;
-
-        float x = 0.0f, y = 0.0f;
-
-        // Now find the intersection point.
-        if ( oc == OutCode::Top )  // Point is above the image.
-        {
-            x = x0 + ( x1 - x0 ) * ( ymax - y0 ) / ( y1 - y0 );
-            y = ymax;
-        }
-        else if ( oc == OutCode::Bottom )  // Point is below the image.
-        {
-            x = x0 + ( x1 - x0 ) * ( ymin - y0 ) / ( y1 - y0 );
-            y = ymin;
-        }
-        else if ( oc == OutCode::Right )  // Point is to the right of the image.
-        {
-            y = y0 + ( y1 - y0 ) * ( xmax - x0 ) / ( x1 - x0 );
-            x = xmax;
-        }
-        else if ( oc == OutCode::Left )  // Point is to the left of the image.
-        {
-            y = y0 + ( y1 - y0 ) * ( xmin - x0 ) / ( x1 - x0 );
-            x = xmin;
-        }
-
-        // Now we move the outside point to the intersection point to clip
-        // and get ready for the next pass.
-        if ( oc == oc0 )
-        {
-            x0  = x;
-            y0  = y;
-            oc0 = m_AABB.computeOutCode( x0, y0 );
-        }
-        else
-        {
-            x1  = x;
-            y1  = y;
-            oc1 = m_AABB.computeOutCode( x1, y1 );
-        }
-    }
-
-    if ( accept )
-        drawLine_internal( static_cast<int>( x0 ), static_cast<int>( y0 ), static_cast<int>( x1 ), static_cast<int>( y1 ), color, blendMode );
-}
-
 void Image::drawTriangle( const glm::vec2& p0, const glm::vec2& p1, const glm::vec2& p2, const Color& color, const BlendMode& blendMode, FillMode fillMode ) noexcept
 {
     // Create an AABB for the triangle.
@@ -370,20 +300,16 @@ void Image::drawTriangle( const glm::vec2& p0, const glm::vec2& p1, const glm::v
     case FillMode::Solid:
     {
         // Clamp the triangle AABB to the screen bounds.
-        aabb.clamp( m_AABB );
+        aabb.clamp( { m_AABB.min, m_AABB.max - glm::vec3 { 1, 1, 0 } } );
 
-        const int width  = static_cast<int>( aabb.width() );
-        const int height = static_cast<int>( aabb.height() );
-        const int area   = width * height;
-
-#pragma omp parallel for firstprivate( aabb, width, height, area )
-        for ( int i = 0; i < area; ++i )
+#pragma omp parallel for schedule( dynamic ) firstprivate( aabb )
+        for ( int y = static_cast<int>( aabb.min.y ); y <= static_cast<int>( aabb.max.y ); ++y )
         {
-            const int x = ( i % width ) + static_cast<int>( aabb.min.x );
-            const int y = ( i / width ) + static_cast<int>( aabb.min.y );
-
-            if ( pointInsideTriangle( { x, y }, p0, p1, p2 ) )
-                plot<false>( x, y, color, blendMode );
+            for ( int x = static_cast<int>( aabb.min.x ); x <= static_cast<int>( aabb.max.x ); ++x )
+            {
+                if ( pointInsideTriangle( { x, y }, p0, p1, p2 ) )
+                    plot<false>( x, y, color, blendMode );
+            }
         }
     }
     break;
@@ -421,7 +347,7 @@ void Image::drawQuad( const glm::vec2& p0, const glm::vec2& p1, const glm::vec2&
         };
 
         // Clamp to the size of the screen.
-        aabb.clamp( m_AABB );
+        aabb.clamp( { m_AABB.min, m_AABB.max - glm::vec3{ 1, 1, 0 } } );
 
 #pragma omp parallel for schedule( dynamic ) firstprivate( aabb, indicies, verts )
         for ( int y = static_cast<int>( aabb.min.y ); y <= static_cast<int>( aabb.max.y ); ++y )
@@ -437,7 +363,7 @@ void Image::drawQuad( const glm::vec2& p0, const glm::vec2& p1, const glm::vec2&
                     glm::vec3 bc = barycentric( verts[i0], verts[i1], verts[i2], { x, y } );
                     if ( barycentricInside( bc ) )
                     {
-                        plot( static_cast<uint32_t>( x ), static_cast<uint32_t>( y ), color, blendMode );
+                        plot<false>( static_cast<uint32_t>( x ), static_cast<uint32_t>( y ), color, blendMode );
                     }
                 }
             }
@@ -462,7 +388,7 @@ void Image::drawQuad( const Vertex& v0, const Vertex& v1, const Vertex& v2, cons
         return;
 
     // Clamp to the size of the screen.
-    aabb.clamp( m_AABB );
+    aabb.clamp( { m_AABB.min, m_AABB.max - glm::vec3{ 1, 1, 0 } } );
 
     Vertex verts[] = {
         v0, v1, v2, v3
@@ -477,9 +403,9 @@ void Image::drawQuad( const Vertex& v0, const Vertex& v1, const Vertex& v2, cons
     const BlendMode blendMode = _blendMode;
 
 #pragma omp parallel for schedule( dynamic ) firstprivate( aabb, indicies, verts, addressMode, blendMode )
-    for ( int y = static_cast<int>( aabb.min.y ); y < static_cast<int>( aabb.max.y ); ++y )
+    for ( int y = static_cast<int>( aabb.min.y ); y <= static_cast<int>( aabb.max.y ); ++y )
     {
-        for ( int x = static_cast<int>( aabb.min.x ); x < static_cast<int>( aabb.max.x ); ++x )
+        for ( int x = static_cast<int>( aabb.min.x ); x <= static_cast<int>( aabb.max.x ); ++x )
         {
             for ( uint32_t i = 0; i < std::size( indicies ); i += 3 )
             {
@@ -496,7 +422,7 @@ void Image::drawQuad( const Vertex& v0, const Vertex& v1, const Vertex& v2, cons
                     // Sample the texture.
                     const Color c = image.sample( texCoord.x, texCoord.y, addressMode ) * color;
                     // Plot.
-                    plot( static_cast<uint32_t>( x ), static_cast<uint32_t>( y ), c, blendMode );
+                    plot<false>( static_cast<uint32_t>( x ), static_cast<uint32_t>( y ), c, blendMode );
                 }
             }
         }
@@ -525,37 +451,24 @@ void Image::drawAABB( AABB aabb, const Color& color, const BlendMode& blendMode,
     case FillMode::Solid:
     {
         // Clamp to screen bounds.
-        aabb.clamp( m_AABB );
+        aabb.clamp( { m_AABB.min, m_AABB.max - glm::vec3 { 1, 1, 0 } } );
 
-        const int width  = static_cast<int>( aabb.width() );
-        const int height = static_cast<int>( aabb.height() );
-        const int area   = width * height;
-
-#pragma omp parallel for firstprivate( aabb, width, area )
-        for ( int i = 0; i < area; ++i )
+#pragma omp parallel for schedule( dynamic ) firstprivate( aabb )
+        for ( int y = static_cast<int>( aabb.min.y ); y <= static_cast<int>( aabb.max.y ); ++y )
         {
-            const int x = ( i % width ) + static_cast<int>( aabb.min.x );
-            const int y = ( i / width ) + static_cast<int>( aabb.min.y );
-            plot( x, y, color, blendMode );
+            for ( int x = static_cast<int>( aabb.min.x ); x <= static_cast<int>( aabb.max.x ); ++x )
+            {
+                plot<false>( x, y, color, blendMode );
+            }
         }
     }
     break;
     }
 }
 
-void Image::drawCircle( const Math::Sphere& sphere, const Color& color, const BlendMode& blendMode, FillMode fillMode ) noexcept
+void Image::drawCircle( const Math::Circle& c, const Color& color, const BlendMode& blendMode, FillMode fillMode ) noexcept
 {
-    drawCircle( glm::vec2 { sphere.center }, sphere.radius, color, blendMode, fillMode );
-}
-
-void Image::drawCircle( const Math::Circle& circle, const Color& color, const BlendMode& blendMode, FillMode fillMode ) noexcept
-{
-    drawCircle( circle.center, circle.radius, color, blendMode, fillMode );
-}
-
-void Image::drawCircle( const glm::vec2& center, float radius, const Color& color, const BlendMode& blendMode, FillMode fillMode ) noexcept
-{
-    if ( !m_AABB.intersect( Sphere { glm::vec3 { center, 0 }, radius } ) )
+    if ( !m_AABB.intersect( c ) )
         return;
 
     for ( int i = 0; i < 64; ++i )
@@ -563,8 +476,8 @@ void Image::drawCircle( const glm::vec2& center, float radius, const Color& colo
         const float a1 = static_cast<float>( i ) * std::numbers::pi_v<float> / 32.0f;
         const float a2 = static_cast<float>( i + 1 ) * std::numbers::pi_v<float> / 32.0f;
 
-        const glm::vec2 p0 { center.x + std::cos( a1 ) * radius, center.y + std::sin( a1 ) * radius };
-        const glm::vec2 p1 { center.x + std::cos( a2 ) * radius, center.y + std::sin( a2 ) * radius };
+        const glm::vec2 p0 { c.center.x + std::cos( a1 ) * c.radius, c.center.y + std::sin( a1 ) * c.radius };
+        const glm::vec2 p1 { c.center.x + std::cos( a2 ) * c.radius, c.center.y + std::sin( a2 ) * c.radius };
 
         switch ( fillMode )
         {
@@ -572,15 +485,10 @@ void Image::drawCircle( const glm::vec2& center, float radius, const Color& colo
             drawLine( p0, p1, color, blendMode );
             break;
         case FillMode::Solid:
-            drawTriangle( p0, p1, center, color, blendMode, fillMode );
+            drawTriangle( p0, p1, c.center, color, blendMode, fillMode );
             break;
         }
     }
-}
-
-void Image::drawSprite( const Sprite& sprite, const Math::Transform2D& transform ) noexcept
-{
-    drawSprite( sprite, transform.getTransform() );
 }
 
 void Image::drawSprite( const Sprite& sprite, const glm::mat3& matrix ) noexcept
@@ -620,7 +528,7 @@ void Image::drawSprite( const Sprite& sprite, const glm::mat3& matrix ) noexcept
         return;
 
     // Clamp to the size of the screen.
-    aabb.clamp( m_AABB );
+    aabb.clamp( { m_AABB.min, m_AABB.max - glm::vec3 { 1, 1, 0 } } );
 
     // Index buffer for the two triangles of the quad.
     const uint32_t indicies[] = {
@@ -629,9 +537,9 @@ void Image::drawSprite( const Sprite& sprite, const glm::mat3& matrix ) noexcept
     };
 
 #pragma omp parallel for schedule( dynamic ) firstprivate( aabb, indicies, verts, color, blendMode )
-    for ( int y = static_cast<int>( aabb.min.y ); y < static_cast<int>( aabb.max.y ); ++y )
+    for ( int y = static_cast<int>( aabb.min.y ); y <= static_cast<int>( aabb.max.y ); ++y )
     {
-        for ( int x = static_cast<int>( aabb.min.x ); x < static_cast<int>( aabb.max.x ); ++x )
+        for ( int x = static_cast<int>( aabb.min.x ); x <= static_cast<int>( aabb.max.x ); ++x )
         {
             for ( uint32_t i = 0; i < std::size( indicies ); i += 3 )
             {
@@ -647,7 +555,7 @@ void Image::drawSprite( const Sprite& sprite, const glm::mat3& matrix ) noexcept
                     // Sample the sprite's texture.
                     const Color c = image->sample( texCoord.x, texCoord.y, AddressMode::Clamp ) * color;
                     // Plot.
-                    plot( static_cast<uint32_t>( x ), static_cast<uint32_t>( y ), c, blendMode );
+                    plot<false>( static_cast<uint32_t>( x ), static_cast<uint32_t>( y ), c, blendMode );
                 }
             }
         }

@@ -127,7 +127,7 @@ struct SR_API Image final
     /// <param name="y">The y-coordinate of the top-left corner of the destination image.</param>
     void copy( const Image& srcImage, int x, int y );
 
-        /// <summary>
+    /// <summary>
     /// Draw a line on the image.
     /// </summary>
     /// <param name="x0">The x-coordinate of the start point of the line.</param>
@@ -136,7 +136,7 @@ struct SR_API Image final
     /// <param name="y1">The y-coordinate of the end point of the line.</param>
     /// <param name="color">The color of the line.</param>
     /// <param name="blendMode">The blend mode to use.</param>
-    void drawLine( float x0, float y0, float x1, float y1, const Color& color, const BlendMode& blendMode = {} ) noexcept;
+    void drawLine( int x0, int y0, int x1, int y1, const Color& color, const BlendMode& blendMode = {} ) noexcept;
 
     /// <summary>
     /// Draw a line on the image.
@@ -147,9 +147,9 @@ struct SR_API Image final
     /// <param name="y1">The y-coordinate of the end point of the line.</param>
     /// <param name="color">The color of the line.</param>
     /// <param name="blendMode">The blend mode to use.</param>
-    void drawLine( int x0, int y0, int x1, int y1, const Color& color, const BlendMode& blendMode = {} ) noexcept
+    void drawLine( float x0, float y0, float x1, float y1, const Color& color, const BlendMode& blendMode = {} ) noexcept
     {
-        drawLine( static_cast<float>( x0 ), static_cast<float>( y0 ), static_cast<float>( x1 ), static_cast<float>( y1 ), color, blendMode );
+        drawLine( static_cast<int>( x0 ), static_cast<int>( y0 ), static_cast<int>( x1 ), static_cast<int>( y1 ), color, blendMode );
     }
 
     /// <summary>
@@ -232,16 +232,6 @@ struct SR_API Image final
     void drawAABB( Math::AABB aabb, const Color& color, const BlendMode& blendMode = {}, FillMode fillMode = FillMode::Solid ) noexcept;
 
     /// <summary>
-    /// Draw a circle from a sphere.
-    /// </summary>
-    /// <param name="sphere">The sphere that represents the center point and radius of the circle.</param>
-    /// <param name="color">The color of the circle.</param>
-    /// <param name="blendMode">The blend mode to use.</param>
-    /// <param name="fillMode">The fill mode to use.</param>
-    void drawCircle( const Math::Sphere& sphere, const Color& color, const BlendMode& blendMode = {}, FillMode fillMode = FillMode::Solid ) noexcept;
-
-
-    /// <summary>
     /// Draw a circle.
     /// </summary>
     /// <param name="circle">The circle to draw.</param>
@@ -251,6 +241,18 @@ struct SR_API Image final
     void drawCircle( const Math::Circle& circle, const Color& color, const BlendMode& blendMode = {}, FillMode fillMode = FillMode::Solid ) noexcept;
 
     /// <summary>
+    /// Draw a circle from a sphere.
+    /// </summary>
+    /// <param name="sphere">The sphere that represents the center point and radius of the circle.</param>
+    /// <param name="color">The color of the circle.</param>
+    /// <param name="blendMode">The blend mode to use.</param>
+    /// <param name="fillMode">The fill mode to use.</param>
+    void drawCircle( const Math::Sphere& sphere, const Color& color, const BlendMode& blendMode, FillMode fillMode ) noexcept
+    {
+        drawCircle( Math::Circle { sphere.center, sphere.radius }, color, blendMode, fillMode );
+    }
+
+    /// <summary>
     /// Draw a circle.
     /// </summary>
     /// <param name="center">The center point of the circle.</param>
@@ -258,14 +260,10 @@ struct SR_API Image final
     /// <param name="color">The color of the circle.</param>
     /// <param name="blendMode">The blend mode to use.</param>
     /// <param name="fillMode">The fill mode to use.</param>
-    void drawCircle( const glm::vec2& center, float radius, const Color& color, const BlendMode& blendMode = {}, FillMode fillMode = FillMode::Solid ) noexcept;
-
-    /// <summary>
-    /// Draw a sprite on the screen using the given transform.
-    /// </summary>
-    /// <param name="sprite">The sprite to draw.</param>
-    /// <param name="transform">The transform to apply to the sprite.</param>
-    void drawSprite( const Sprite& sprite, const Math::Transform2D& transform ) noexcept;
+    void drawCircle( const glm::vec2& center, float radius, const Color& color, const BlendMode& blendMode, FillMode fillMode ) noexcept
+    {
+        drawCircle( Math::Circle { center, radius }, color, blendMode, fillMode );
+    }
 
     /// <summary>
     /// Draw a sprite on the screen using a 3x3 transformation matrix.
@@ -273,6 +271,16 @@ struct SR_API Image final
     /// <param name="sprite">The sprite the draw.</param>
     /// <param name="matrix">The matrix to apply to the sprite before drawing.</param>
     void drawSprite( const Sprite& sprite, const glm::mat3& matrix ) noexcept;
+
+    /// <summary>
+    /// Draw a sprite on the screen using the given transform.
+    /// </summary>
+    /// <param name="sprite">The sprite to draw.</param>
+    /// <param name="transform">The transform to apply to the sprite.</param>
+    void drawSprite( const Sprite& sprite, const Math::Transform2D& transform ) noexcept
+    {
+        drawSprite( sprite, transform.getTransform() );
+    }
 
     /// <summary>
     /// Draw a sprite on the screen without any transformation applied to the sprite.
@@ -422,9 +430,6 @@ struct SR_API Image final
     }
 
 private:
-    // Draws a line assuming the coordinates are already clipped.
-    void drawLine_internal( int x0, int y0, int x1, int y1, const Color& color, const BlendMode& blendMode = {} ) noexcept;
-
     uint32_t m_width  = 0u;
     uint32_t m_height = 0u;
     // Axis-aligned bounding box used for screen clipping.
