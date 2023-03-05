@@ -26,9 +26,9 @@ public:
     /// Load a font from a font file.
     /// </summary>
     /// <param name="fontFile">The TrueType font to load.</param>
-    /// <param name="size">(optional) The size of the font (in pixels) to generate.</param>
-    /// <param name="firstChar">(optional) The first character in the font texture.</param>
-    /// <param name="numChars">(optional) The number of characters in the font texture.</param>
+    /// <param name="size">(optional) The size of the font (in pixels) to generate. Default: 12</param>
+    /// <param name="firstChar">(optional) The first character in the font texture. Default: ' '.</param>
+    /// <param name="numChars">(optional) The number of characters in the font texture. Default: 96.</param>
     Font( const std::filesystem::path& fontFile, float size = 12.0f, uint32_t firstChar = 32u, uint32_t numChars = 96u);
 
     /// <summary>
@@ -42,6 +42,14 @@ public:
     {
         return size;
     }
+
+    // Font's can't be copied or moved (yet).
+    Font( const Font& font ) = delete;
+    Font( Font&& font )      = delete;
+    ~Font()                  = default;
+
+    Font& operator=( const Font& font )     = delete;
+    Font& operator=( Font&& font ) noexcept = delete;
 
     /// <summary>
     /// Default font uses stb_easy_font for quad font rendering.

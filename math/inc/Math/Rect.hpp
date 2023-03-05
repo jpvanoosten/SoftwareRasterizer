@@ -30,6 +30,11 @@ struct Rect
         return top + height;
     }
 
+    glm::vec<2, T> center() const noexcept
+    {
+        return { left + width / T(2), top + height / T(2) };
+    }
+
     glm::vec<2, T> topLeft() const noexcept
     {
         return { left, top };

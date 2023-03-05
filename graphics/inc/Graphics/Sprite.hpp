@@ -88,6 +88,15 @@ public:
         blendMode = _blendMode;
     }
 
+    /// <summary>
+    /// Allow for explicit conversion to bool.
+    /// </summary>
+    /// <returns>`true` if the sprite has a valid image, `false` otherwise.</returns>
+    explicit operator bool() const noexcept
+    {
+        return image != nullptr;
+    }
+
 private:
     // The image that stores the pixels for this sprite.
     std::shared_ptr<Image> image;
