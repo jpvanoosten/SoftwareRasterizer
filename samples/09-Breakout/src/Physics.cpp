@@ -15,9 +15,10 @@ std::optional<HitInfo> collidesWith( const Math::Circle& c1, const Math::Circle&
 
     if (d < r * r)
     {
+        // The normal is in the direction of c1 to c2.
         const glm::vec2 n = glm::normalize( glm::vec2 { dx, dy } );
-        // The point of contact is the center of the overlapping areas of the circles.
-        const glm::vec2 p = ( ( c1.center + n * c1.radius ) + ( c2.center - n * c2.radius ) ) * 0.5f;
+        // The contact point is on c1.
+        const glm::vec2 p = c1.center + n * c1.radius;
 
         return HitInfo { n, p };
     }

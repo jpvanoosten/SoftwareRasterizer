@@ -17,6 +17,11 @@ struct HitInfo
 
 /// <summary>
 /// Circle-circle collision.
+/// Note: When there is contact, the resulting normal is from c1 to c2 and the contact point is on c1.
+/// <code>
+/// normal = glm::normalize( c2.center - c1.center );
+/// point = c1.center + n * c1.radius;
+/// </code>
 /// </summary>
 /// <param name="c1">The first circle to check.</param>
 /// <param name="c2">The second circle to check.</param>
