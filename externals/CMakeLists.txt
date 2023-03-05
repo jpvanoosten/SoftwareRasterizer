@@ -8,11 +8,6 @@ FetchContent_Declare(
   GIT_TAG        0.9.9.8
 )
 FetchContent_Declare(
-	LDtkLoader
-	GIT_REPOSITORY https://github.com/jpvanoosten/LDtkLoader.git
-	GIT_TAG		   master
-)
-FetchContent_Declare(
 	glew
 	GIT_REPOSITORY https://github.com/jpvanoosten/glew.git
 )
@@ -20,14 +15,11 @@ FetchContent_Declare(
 message( STATUS "Fetching glm..." )
 FetchContent_MakeAvailable(glm)
 
-message( STATUS "Fetching LDtkLoader..." )
-FetchContent_MakeAvailable(LDtkLoader)
-
 message( STATUS "Fetching glew..." )
 FetchContent_MakeAvailable( glew )
 
 set_target_properties(
-	LDtkLoader glew uninstall
+	glew uninstall
     PROPERTIES FOLDER externals
 )
 

@@ -47,3 +47,6 @@ target_include_directories( Audio
 target_link_libraries( Audio
     PUBLIC glm
 )
+
+install(TARGETS Audio)
+install( DIRECTORY inc/Audio DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} )

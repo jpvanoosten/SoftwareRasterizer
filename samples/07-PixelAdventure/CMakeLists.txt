@@ -2,6 +2,20 @@ cmake_minimum_required( VERSION 3.23.0 )
 
 set( TARGET_NAME 07-PixelAdventure )
 
+FetchContent_Declare(
+	LDtkLoader
+	GIT_REPOSITORY https://github.com/jpvanoosten/LDtkLoader.git
+	GIT_TAG		   master
+)
+
+message( STATUS "Fetching LDtkLoader..." )
+FetchContent_MakeAvailable(LDtkLoader)
+
+set_target_properties(
+	LDtkLoader
+    PROPERTIES FOLDER externals
+)
+
 set( INC_FILES
     inc/Background.hpp
     inc/Box.hpp

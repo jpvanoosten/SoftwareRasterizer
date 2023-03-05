@@ -113,3 +113,6 @@ if(OpenMP_CXX_FOUND)
         PUBLIC OpenMP::OpenMP_CXX
     )
 endif(OpenMP_CXX_FOUND)
+
+install(TARGETS Graphics)
+install( DIRECTORY inc/Graphics DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} )

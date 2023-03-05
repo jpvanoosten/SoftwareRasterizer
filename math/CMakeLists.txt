@@ -39,3 +39,6 @@ target_include_directories( Math
 target_link_libraries( Math
     PUBLIC glm
 )
+
+install(TARGETS Math)
+install( DIRECTORY inc/Math DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} )
