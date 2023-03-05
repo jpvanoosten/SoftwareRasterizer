@@ -104,7 +104,7 @@ target_link_libraries( Graphics
 )
 
 find_package(OpenMP)
-if(OpenMP_FOUND)
+if(OpenMP_CXX_FOUND)
     target_include_directories( Graphics
         PRIVATE ${OpenMP_CXX_INCLUDE_DIRS}
     )
@@ -112,4 +112,4 @@ if(OpenMP_FOUND)
     target_link_libraries( Graphics
         PUBLIC OpenMP::OpenMP_CXX
     )
-endif(OpenMP_FOUND)
+endif(OpenMP_CXX_FOUND)
