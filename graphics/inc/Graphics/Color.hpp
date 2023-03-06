@@ -49,6 +49,32 @@ struct SR_API alignas( 4 ) Color
     /// <returns>This color with a given alpha value.</returns>
     constexpr Color withAlpha( uint8_t alpha ) const noexcept;
 
+    /// <summary>
+    /// Construct a color using floating-point values in the range [0 .. 1].
+    /// </summary>
+    /// <param name="r">The red color component.</param>
+    /// <param name="g">The green color component.</param>
+    /// <param name="b">The blue color component.</param>
+    /// <param name="a">)(optional) The alpha component. Default: 1.0f</param>
+    /// <returns>The color.</returns>
+    static constexpr Color fromFloats( float r, float g, float b, float a = 1.0 ) noexcept;
+
+    /// <summary>
+    /// Construct a color from a 32-bit unsigned integer (usually expressed as a hexadecimal value).
+    /// The color is expressed as:
+    /// 0xAARRGGBB
+    /// The alpha (AA) values can be omitted from the hex value, but the default alpha value will be 0.
+    /// So (transparent) Red is:
+    /// 0xFF0000
+    /// And (transparent) Green is:
+    /// 0xFF00
+    /// And (transparent) Blue is:
+    /// 0xFF
+    /// </summary>
+    /// <param name="color"></param>
+    /// <returns></returns>
+    static constexpr Color fromHex( uint32_t color ) noexcept;
+
     union
     {
         uint32_t argb;
@@ -214,13 +240,33 @@ constexpr Color Color::withAlpha( uint8_t alpha ) const noexcept
     return { r, g, b, alpha };
 }
 
+constexpr Color Color::fromFloats( float _r, float _g, float _b, float _a ) noexcept
+{
+    const uint8_t r = static_cast<uint8_t>( _r * 255.0f );
+    const uint8_t g = static_cast<uint8_t>( _g * 255.0f );
+    const uint8_t b = static_cast<uint8_t>( _b * 255.0f );
+    const uint8_t a = static_cast<uint8_t>( _a * 255.0f );
+
+    return { r, g, b, a };
+}
+
+constexpr Color Color::fromHex( uint32_t color ) noexcept
+{
+    const uint8_t a = static_cast<uint8_t>( (color & 0xFF000000) >> 24 );
+    const uint8_t r = static_cast<uint8_t>( (color & 0x00FF0000) >> 16 );
+    const uint8_t g = static_cast<uint8_t>( (color & 0x0000FF00) >> 8 );
+    const uint8_t b = static_cast<uint8_t>( (color & 0x000000FF) >> 0 );
+
+    return { r, g, b, a };
+}
+
 /// <summary>
 /// Return the component-wise minimum of two colors.
 /// </summary>
 /// <param name="c1">The first color.</param>
 /// <param name="c2">The second color.</param>
 /// <returns>The component-wise minimum of the two colors.</returns>
-constexpr Color min(const Color& c1, const Color& c2)
+constexpr Color min( const Color& c1, const Color& c2 )
 {
     const auto b = std::min( c1.b, c2.b );
     const auto g = std::min( c1.g, c2.g );

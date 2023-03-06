@@ -94,7 +94,7 @@ inline glm::vec3 barycentric( const glm::vec3& a, const glm::vec3& b, const glm:
 /// <param name="b">The second triangle vertex.</param>
 /// <param name="c">The third triangle vertex.</param>
 /// <param name="p">The point to compute the barycentric coordinates for.</param>
-/// <returns></returns>
+/// <returns>The barycentric coordinates for triangle (`a`, `b`, `c`) at point `p`.</returns>
 inline glm::vec3 barycentric( const glm::vec2& a, const glm::vec2& b, const glm::vec2& c, const glm::vec2& p )
 {
     glm::vec3 u = cross( glm::vec3{ c.x - a.x, b.x - a.x, a.x - p.x }, glm::vec3{ c.y - a.y, b.y - a.y, a.y - p.y } );

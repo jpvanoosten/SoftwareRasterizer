@@ -36,7 +36,7 @@ public:
     /// </summary>
     /// <param name="text">The text to write.</param>
     /// <returns>The size of the are needed to render this font.</returns>
-    glm::ivec2 getSize( std::string_view text ) const noexcept;
+    glm::vec2 getSize( std::string_view text ) const noexcept;
 
     float getFontSize() const noexcept
     {

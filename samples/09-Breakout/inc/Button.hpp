@@ -32,7 +32,14 @@ public:
     /// <param name="onClick">(optional) The callback function to invoke when the button is clicked. Default: none</param>
     Button( std::string_view text, std::shared_ptr<Graphics::Font> font, const Graphics::Color& color = Graphics::Color::White, const Math::RectF& rect = {}, std::function<void()> onClick = {} );
 
+    void setSprite( State state, const Graphics::Sprite& sprite );
+
     void setRect( const Math::RectF& rect ) noexcept;
+
+    Math::AABB getAABB() const noexcept
+    {
+        return transform * aabb;
+    }
 
     void setCallback( std::function<void()> _onClick ) noexcept
     {

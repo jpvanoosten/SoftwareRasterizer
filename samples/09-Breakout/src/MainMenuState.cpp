@@ -8,11 +8,30 @@ using namespace Graphics;
 MainMenuState::MainMenuState( int screenWidth, int screenHeight )
 : screenWidth { screenWidth }
 , screenHeight { screenHeight }
-, buttonFont { ResourceManager::loadFont( "assets/fonts/kenvector_future.ttf", buttonHeight ) }
+, buttonFont { ResourceManager::loadFont( "assets/fonts/kenvector_future.ttf", 40 ) }
 , startButton { "play", buttonFont, Color::White }
 , quitButton { "quit", buttonFont, Color::White }
 {
+    // Load some sprites for the buttons.
+    auto defaultButtonImage = ResourceManager::loadImage( "assets/textures/buttons/blue_button00.png" );
+    auto hoverButtonImage   = ResourceManager::loadImage( "assets/textures/buttons/blue_button00.png" );
+    auto pressedButtonImage = ResourceManager::loadImage( "assets/textures/buttons/blue_button01.png" );
+
+    Sprite defaultSprite( defaultButtonImage, BlendMode::AlphaBlend );
+    Sprite hoverSprite( hoverButtonImage, BlendMode::AlphaBlend );
+    Sprite pressedSprite( pressedButtonImage, BlendMode::AlphaBlend );
+
+    defaultSprite.setColor( { 245, 245, 245 } );
+    pressedSprite.setColor( { 200, 200, 200 } );
+
+    startButton.setSprite( Button::State::Default, defaultSprite );
+    startButton.setSprite( Button::State::Hover, hoverSprite );
+    startButton.setSprite( Button::State::Pressed, pressedSprite );
     startButton.setRect( { static_cast<float>( screenWidth - buttonWidth ) / 2.0f, static_cast<float>( screenHeight - buttonHeight ) / 2.0f, static_cast<float>( buttonWidth ), static_cast<float>( buttonHeight ) } );
+
+    quitButton.setSprite( Button::State::Default, defaultSprite );
+    quitButton.setSprite( Button::State::Hover, hoverSprite );
+    quitButton.setSprite( Button::State::Pressed, pressedSprite );
     quitButton.setRect( { static_cast<float>( screenWidth - buttonWidth ) / 2.0f, static_cast<float>( screenHeight - buttonHeight ) / 2.0f + buttonHeight * 2.0f, static_cast<float>( buttonWidth ), static_cast<float>( buttonHeight ) } );
 
     startButton.setCallback( [this] {

@@ -71,7 +71,7 @@ Font::Font( const std::filesystem::path& fontFile, float size, uint32_t firstCha
     }
 }
 
-glm::ivec2 Font::getSize( std::string_view text ) const noexcept
+glm::vec2 Font::getSize( std::string_view text ) const noexcept
 {
     float width  = 0.0f;
     float height = 0.0f;

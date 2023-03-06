@@ -19,7 +19,7 @@ private:
     int screenWidth;
     int screenHeight;
 
-    static const int buttonWidth  = 200;
+    static const int buttonWidth  = 190;
     static const int buttonHeight = 50;
 
     std::shared_ptr<Graphics::Font> buttonFont;

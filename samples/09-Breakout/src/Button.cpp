@@ -1,5 +1,7 @@
 #include "Button.hpp"
 
+#include "glm/trigonometric.hpp"
+
 #include <iostream>
 
 using namespace Graphics;
@@ -14,11 +16,30 @@ Button::Button( std::string_view text, std::shared_ptr<Font> font, const Graphic
     setRect( rect );
 }
 
+void Button::setSprite( State _state, const Graphics::Sprite& sprite )
+{
+    switch ( _state )
+    {
+    case State::Default:
+        defaultSprite = sprite;
+        break;
+    case State::Hover:
+        hoverSprite = sprite;
+        break;
+    case State::Pressed:
+        pressedSprite = sprite;
+        break;
+    default: ;
+    }
+}
+
 void Button::setRect( const Math::RectF& rect ) noexcept
 {
-    aabb = AABB::fromRect( rect );
-    transform.setPosition( rect.center() );
-    transform.setAnchor( rect.center() - rect.topLeft() );
+    aabb = AABB { { 0, 0, 0 }, { rect.width, rect.height, 0 } };
+    const glm::vec2 anchor { rect.width / 2.0f, rect.height };
+    transform.setPosition( rect.topLeft() + anchor );
+    //transform.setPosition( rect.topLeft() );
+    transform.setAnchor( anchor );
 }
 
 void Button::draw( Graphics::Image& image )
@@ -41,18 +62,22 @@ void Button::draw( Graphics::Image& image )
     // Draw the sprite for the button (if there is one)
     if ( sprite )
     {
-        image.drawSprite( *sprite, transform );
+        auto t = transform;
+        auto s = sprite->getSize();
+        t.setAnchor( { s.x / 2, s.y } );
+        image.drawSprite( *sprite, t );
     }
     // Draw the button text.
     if ( buttonFont && !buttonText.empty() )
     {
-        const auto size = buttonFont->getSize( buttonText ) / 2;
-        const auto pos  = transform.getPosition() - glm::vec2 { size.x, -size.y };
-        image.drawText( *buttonFont, static_cast<int>( pos.x ), static_cast<int>( pos.y ), buttonText, textColor );
+        // Center the text on the button.
+        const auto size = buttonFont->getSize( buttonText );
+        const auto pos  = glm::vec2 { getAABB().center() } - glm::vec2 { size.x, -size.y } / 2.0f;
+        image.drawText( *buttonFont, static_cast<int>( pos.x ), static_cast<int>( pos.y + (state == State::Pressed ? 5.0f : 0.0f)), buttonText, textColor );
     }
 
 #if _DEBUG
-    image.drawAABB( aabb, Color::Yellow, {}, FillMode::WireFrame );
+    image.drawAABB( getAABB(), Color::Yellow, {}, FillMode::WireFrame );
 #endif
 }
 
@@ -64,7 +89,7 @@ void Button::processEvents( const Graphics::Event& event )
     switch ( event.type )
     {
     case Event::MouseMoved:
-        if ( aabb.contains( { event.mouseMove.x, event.mouseMove.y, 0 } ) )
+        if ( getAABB().contains( { event.mouseMove.x, event.mouseMove.y, 0 } ) )
             setState( State::Hover );
         else
             setState( State::Default );
