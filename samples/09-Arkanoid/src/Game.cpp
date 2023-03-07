@@ -10,8 +10,7 @@ using namespace Math;
 
 Game::Game( uint32_t screenWidth, uint32_t screenHeight )
 : image { screenWidth, screenHeight }
-, arial20 { "assets/fonts/arial.ttf", 20 }
-, arial24 { "assets/fonts/arial.ttf", 24 }
+, arcadeN{ "assets/fonts/ARCADE_N.ttf", 8 }
 {
     // Input that controls the horizontal movement of the paddle.
     Input::mapAxis( "Horizontal", []( std::span<const GamePadStateTracker> gamePadStates, const KeyboardStateTracker& keyboardState, const MouseStateTracker& mouseState ) {
@@ -62,6 +61,31 @@ void Game::update( float deltaTime )
 {
     state->update( deltaTime );
     state->draw( image );
+
+    // Draw the score board.
+    {
+        // Player 1
+        image.drawText( arcadeN, 26, 9, "1UP", Color::Red );
+        // Draw P1 score right-aligned.
+        const auto score = std::format( "{:02d}", score1 );
+        const auto size  = glm::ivec2(arcadeN.getSize( score ));
+        image.drawText( arcadeN, 56 - size.x, 18, score, Color::White );
+    }
+    {
+        // High score
+        image.drawText( arcadeN, 73, 8, "HIGH SCORE", Color::Red );
+        const auto score = std::format( "{:02d}", highScore );
+        const auto size  = glm::ivec2( arcadeN.getSize( score ) );
+        image.drawText( arcadeN, 136 - size.x, 18, score, Color::White );
+    }
+    {
+        // Player 2
+        image.drawText( arcadeN, 177, 9, "2UP", Color::Red );
+        // Draw P2 score right-aligned.
+        const auto score = std::format( "{:02d}", score2 );
+        const auto size  = glm::ivec2( arcadeN.getSize( score ) );
+        image.drawText( arcadeN, 208 - size.x, 18, score, Color::White );
+    }
 }
 
 Graphics::Image& Game::getImage()
@@ -76,10 +100,10 @@ void Game::setState( GameState newState )
         switch ( newState )
         {
         case GameState::MainMenu:
-            state = std::make_unique<MainMenuState>( image.getWidth(), image.getHeight() );
+            state = std::make_unique<MainMenuState>( *this );
             break;
         case GameState::Playing:
-            state = std::make_unique<PlayState>( image.getWidth(), image.getHeight() );
+            state = std::make_unique<PlayState>( *this );
             break;
         }
     }

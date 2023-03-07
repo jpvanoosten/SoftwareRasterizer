@@ -41,6 +41,13 @@ private:
 
     Graphics::Image image;
     // Fonts.
-    Graphics::Font arial20;
-    Graphics::Font arial24;
+    Graphics::Font arcadeN;
+
+    // Player 1 score.
+    int score1 = 0;
+    // Player 2 score.
+    int score2 = 0;
+    // Current high score.
+    int highScore = 50000;
+    
 };

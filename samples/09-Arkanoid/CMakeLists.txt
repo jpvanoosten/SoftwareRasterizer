@@ -1,6 +1,6 @@
 cmake_minimum_required( VERSION 3.23.0 )
 
-set( TARGET_NAME 09-Breakout )
+set( TARGET_NAME 09-Arkanoid )
 
 set( INC_FILES
     inc/Ball.hpp

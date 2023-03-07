@@ -6,6 +6,8 @@
 
 #include <Math/Camera2D.hpp>
 
+class Game;
+
 class PlayState : public State
 {
 public:
@@ -16,7 +18,7 @@ public:
         Dead,
     };
 
-    PlayState( int screenWidth, int screenHeight );
+    PlayState( Game& game );
 
     void update( float deltaTime ) override;
     void draw( Graphics::Image& image ) override;
@@ -34,6 +36,8 @@ private:
     // Check collisions with the ball.
     void checkCollisions( Ball& ball );
 
+    Game& game;
+
     State state = State::Start;
 
     // This sprite sheet contains all of the sprites for the game
@@ -48,9 +52,9 @@ private:
     Paddle    paddle;
 
     // Size of the play area.
-    int width;
-    int height;
+    int screenWidth;
+    int screenHeight;
 
-    const float paddleSpeed = 2000.0f;  // pixels per second
-    const float ballSpeed = 1000.0f;    // pixels per second
+    const float paddleSpeed = 200.0f;  // pixels per second
+    const float ballSpeed = 100.0f;    // pixels per second
 };

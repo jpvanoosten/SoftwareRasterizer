@@ -1,3 +1,5 @@
+#include "Game.hpp"
+
 #include <MainMenuState.hpp>
 #include <iostream>
 
@@ -5,44 +7,13 @@
 
 using namespace Graphics;
 
-MainMenuState::MainMenuState( int screenWidth, int screenHeight )
-: screenWidth { screenWidth }
-, screenHeight { screenHeight }
-, buttonFont { ResourceManager::loadFont( "assets/fonts/kenvector_future.ttf", 40 ) }
-, startButton { "play", buttonFont, Color::White }
-, quitButton { "quit", buttonFont, Color::White }
+MainMenuState::MainMenuState( Game& game )
+: game { game }
+, screenWidth( static_cast<int>( game.getImage().getWidth() ) )
+, screenHeight( static_cast<int>( game.getImage().getHeight() ) )
 {
-    // Load some sprites for the buttons.
-    auto defaultButtonImage = ResourceManager::loadImage( "assets/textures/buttons/blue_button00.png" );
-    auto hoverButtonImage   = ResourceManager::loadImage( "assets/textures/buttons/blue_button00.png" );
-    auto pressedButtonImage = ResourceManager::loadImage( "assets/textures/buttons/blue_button01.png" );
-
-    Sprite defaultSprite( defaultButtonImage, BlendMode::AlphaBlend );
-    Sprite hoverSprite( hoverButtonImage, BlendMode::AlphaBlend );
-    Sprite pressedSprite( pressedButtonImage, BlendMode::AlphaBlend );
-
-    defaultSprite.setColor( { 245, 245, 245 } );
-    pressedSprite.setColor( { 200, 200, 200 } );
-
-    startButton.setSprite( Button::State::Default, defaultSprite );
-    startButton.setSprite( Button::State::Hover, hoverSprite );
-    startButton.setSprite( Button::State::Pressed, pressedSprite );
-    startButton.setRect( { static_cast<float>( screenWidth - buttonWidth ) / 2.0f, static_cast<float>( screenHeight - buttonHeight ) / 2.0f, static_cast<float>( buttonWidth ), static_cast<float>( buttonHeight ) } );
-
-    quitButton.setSprite( Button::State::Default, defaultSprite );
-    quitButton.setSprite( Button::State::Hover, hoverSprite );
-    quitButton.setSprite( Button::State::Pressed, pressedSprite );
-    quitButton.setRect( { static_cast<float>( screenWidth - buttonWidth ) / 2.0f, static_cast<float>( screenHeight - buttonHeight ) / 2.0f + buttonHeight * 2.0f, static_cast<float>( buttonWidth ), static_cast<float>( buttonHeight ) } );
-
-    startButton.setCallback( [this] {
-        // TODO: What to do when the start button is pressed?
-        std::cout << "Start pressed!" << std::endl;
-    } );
-
-    quitButton.setCallback( [this] {
-        // TODO: What to do when the quit button is pressed?
-        std::cout << "Quit pressed!" << std::endl;
-    } );
+    auto shipImage = ResourceManager::loadImage( "assets/Arkanoid/ship.png" );
+    arkanoidSprite = Sprite( shipImage, { 0, 0, 193, 42 }, BlendMode::AlphaBlend );
 }
 
 void MainMenuState::update( float deltaTime )
@@ -54,8 +25,7 @@ void MainMenuState::draw( Graphics::Image& image )
 {
     image.clear( Color::Black );
 
-    startButton.draw( image );
-    quitButton.draw( image );
+    image.drawSprite( arkanoidSprite, 16, 63 );
 }
 
 void MainMenuState::processEvent( const Graphics::Event& _event )
@@ -95,9 +65,6 @@ void MainMenuState::processEvent( const Graphics::Event& _event )
     case Event::EndResize:
         break;
     }
-
-    startButton.processEvents( event );
-    quitButton.processEvents( event );
 }
 
 void MainMenuState::onMouseMoved( Graphics::MouseMovedEventArgs& args )

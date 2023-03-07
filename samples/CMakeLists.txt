@@ -8,7 +8,7 @@ add_subdirectory(05-CopyImage)
 add_subdirectory(06-Fonts)
 add_subdirectory(07-PixelAdventure)
 add_subdirectory(08-Audio)
-add_subdirectory(09-Breakout)
+add_subdirectory(09-Arkanoid)
 add_subdirectory(10-Camera)
 
 set_target_properties( 
@@ -20,7 +20,7 @@ set_target_properties(
 	06-Fonts
 	07-PixelAdventure
 	08-Audio
-	09-Breakout
+	09-Arkanoid
 	10-Camera
 	PROPERTIES
 		FOLDER samples

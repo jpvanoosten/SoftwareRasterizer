@@ -23,8 +23,8 @@ int main( int argc, char* argv[] )
         }
     }
 
-    constexpr int WINDOW_WIDTH  = 1920;
-    constexpr int WINDOW_HEIGHT = 1080;
+    constexpr int WINDOW_WIDTH  = 224;
+    constexpr int WINDOW_HEIGHT = 300;
 
     Game game { WINDOW_WIDTH, WINDOW_HEIGHT };
 
@@ -54,13 +54,8 @@ int main( int argc, char* argv[] )
             elapsedTime -= physicsTick;
         } while ( elapsedTime > 0.0f );
 
-        auto& image = game.getImage();
-
-        // Draw the FPS counter.
-        image.drawText( Font::Default, 10, 10, fps, Color::White );
-
         window.clear( Color::Black );
-        window.present( image );
+        window.present( game.getImage() );
 
         Event e;
         while ( window.popEvent( e ) )

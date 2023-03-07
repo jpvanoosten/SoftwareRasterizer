@@ -1,3 +1,5 @@
+#include "Game.hpp"
+
 #include <PlayState.hpp>
 
 #include <Graphics/Input.hpp>
@@ -30,10 +32,11 @@ std::vector<RectI> parseSpriteRects( const std::filesystem::path& xmlFile )
     return rects;
 }
 
-PlayState::PlayState( int _screenWidth, int _screenHeight )
-: backgroundImage { "assets/textures/space_background.jpg" }
-, width { _screenWidth * 2 }
-, height { _screenHeight * 2 }
+PlayState::PlayState( Game& game )
+: game { game }
+, backgroundImage { "assets/textures/space_background.jpg" }
+, screenWidth{ static_cast<int>( game.getImage().getWidth() ) }
+, screenHeight{ static_cast<int>( game.getImage().getHeight() ) }
 {
     // Load the game sprites.
     spriteSheet = std::make_shared<SpriteSheet>( "assets/Breakout/Sprite Sheet/Breakout_Tile_Free.png", parseSpriteRects( "assets/Breakout/Sprite Sheet/Breakout_Tile_Free.xml" ), Graphics::BlendMode::AlphaBlend );
@@ -42,7 +45,7 @@ PlayState::PlayState( int _screenWidth, int _screenHeight )
     camera.setZoom( 0.5f );
 
     // Set the paddle to the middle of the play area.
-    paddle = Paddle { spriteSheet, glm::vec2 { static_cast<float>( width ) / 2.0f, static_cast<float>( height ) - 200.0f } };
+    paddle = Paddle { spriteSheet, glm::vec2 { static_cast<float>( screenWidth ) / 2.0f, static_cast<float>( screenHeight ) - 200.0f } };
 }
 
 void PlayState::update( float deltaTime )
@@ -133,7 +136,7 @@ void PlayState::doPlaying( float deltaTime )
 
 void PlayState::updatePaddle( float deltaTime )
 {
-    const auto w = static_cast<float>( width );
+    const auto w = static_cast<float>( screenWidth );
 
     auto pos = paddle.getPosition();
     pos.x += Input::getAxis( "Horizontal" ) * paddleSpeed * deltaTime;
@@ -152,8 +155,8 @@ void PlayState::checkCollisions( Ball& ball )
     auto c = ball.getCircle();
     auto v = ball.getVelocity();
 
-    const auto w = static_cast<float>( width );
-    const auto h = static_cast<float>( height );
+    const auto w = static_cast<float>( screenWidth );
+    const auto h = static_cast<float>( screenHeight );
 
     if ( c.center.x - c.radius <= 0 )
     {
