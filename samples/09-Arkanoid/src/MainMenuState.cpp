@@ -11,6 +11,8 @@ MainMenuState::MainMenuState( Game& game )
 : game { game }
 , screenWidth( static_cast<int>( game.getImage().getWidth() ) )
 , screenHeight( static_cast<int>( game.getImage().getHeight() ) )
+, arcadeN { "assets/fonts/ARCADE_N.TTF", 8, 32, 138 }
+, coprgtb { "assets/fonts/COPRGTB.TTF", 24 }
 {
     auto shipImage = ResourceManager::loadImage( "assets/Arkanoid/ship.png" );
     arkanoidSprite = Sprite( shipImage, { 0, 0, 193, 42 }, BlendMode::AlphaBlend );
@@ -26,6 +28,25 @@ void MainMenuState::draw( Graphics::Image& image )
     image.clear( Color::Black );
 
     image.drawSprite( arkanoidSprite, 16, 63 );
+
+    int coins = game.getCoins();
+    if (coins > 0)
+    {
+        image.drawText( arcadeN, 97, 140, "PUSH", Color::White );
+        if ( coins < 2 )
+        {
+            image.drawText( arcadeN, 33, 168, "ONLY 1 PLAYER BUTTON", Color::White );
+        }
+        else
+        {
+            image.drawText( arcadeN, 34, 168, "1 OR 2 PLAYER BUTTON", Color::White );
+        }
+    }
+
+    image.drawText( coprgtb, 73, 225, "TAITO", Color::Red );
+    image.drawText( arcadeN, 16, 243, L"© 1986 TAITO CORP JAPAN", Color::White );
+    image.drawText( arcadeN, 33, 261, "ALL RIGHTS RESERVED", Color::White );
+    image.drawText( arcadeN, 145, 298, std::format( "CREDIT{:3d}", coins ), Color::White );
 }
 
 void MainMenuState::processEvent( const Graphics::Event& _event )

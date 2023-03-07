@@ -59,6 +59,7 @@ public:
 private:
     friend class Image;
 
+    void drawText( Image& image, std::wstring_view text, int x, int y, const Color& color ) const;
     void drawText( Image& image, std::string_view text, int x, int y, const Color& color ) const;
 
     // The font size.

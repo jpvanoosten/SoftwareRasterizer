@@ -31,7 +31,12 @@ public:
 
     void processEvent( const Graphics::Event& event );
 
-    Graphics::Image& getImage();
+    Graphics::Image& getImage() noexcept;
+
+    int getCoins() const noexcept
+    {
+        return coins;
+    }
 
 private:
     void setState( GameState newState );
@@ -43,6 +48,8 @@ private:
     // Fonts.
     Graphics::Font arcadeN;
 
+    int numPlayers = 2;
+    int coins      = 0;
     // Player 1 score.
     int score1 = 0;
     // Player 2 score.

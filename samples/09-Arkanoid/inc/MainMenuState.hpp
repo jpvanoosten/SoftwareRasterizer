@@ -24,6 +24,8 @@ private:
     int screenHeight;
 
     Graphics::Sprite arkanoidSprite;
+    Graphics::Font   arcadeN;
+    Graphics::Font   coprgtb;
 
     // The game rectangle in the Window's coordinate frame.
     // Used for translating mouse coordinates.

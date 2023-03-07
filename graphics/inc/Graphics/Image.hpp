@@ -299,6 +299,7 @@ struct SR_API Image final
     /// <param name="text">The text to print to the screen.</param>
     /// <param name="color">The color of the text to draw on the screen.</param>
     void drawText( const Font& font, int x, int y, std::string_view text, const Color& color ) noexcept;
+    void drawText( const Font& font, int x, int y, std::wstring_view text, const Color& color ) noexcept;
 
     /// <summary>
     /// Plot a single pixel to the image. Out-of-bounds coordinates are discarded.

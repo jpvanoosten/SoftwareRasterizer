@@ -10,7 +10,7 @@ using namespace Math;
 
 Game::Game( uint32_t screenWidth, uint32_t screenHeight )
 : image { screenWidth, screenHeight }
-, arcadeN{ "assets/fonts/ARCADE_N.ttf", 8 }
+, arcadeN { "assets/fonts/ARCADE_N.ttf", 9 }
 {
     // Input that controls the horizontal movement of the paddle.
     Input::mapAxis( "Horizontal", []( std::span<const GamePadStateTracker> gamePadStates, const KeyboardStateTracker& keyboardState, const MouseStateTracker& mouseState ) {
@@ -49,6 +49,35 @@ Game::Game( uint32_t screenWidth, uint32_t screenHeight )
         return a || space || up || w;
     } );
 
+    // Input that controls adding coins.
+    Input::mapButtonDown( "Coin", []( std::span<const GamePadStateTracker> gamePadStates, const KeyboardStateTracker& keyboardState, const MouseStateTracker& mouseState ) {
+        bool back = false;
+
+        for ( auto& gamePadState: gamePadStates )
+        {
+            back = back || gamePadState.back == ButtonState::Pressed;
+        }
+
+        const bool enter = keyboardState.isKeyPressed( KeyCode::Enter );
+
+        return back || enter;
+    } );
+
+    // Player 1 start.
+    Input::mapButtonDown( "Start 1", []( std::span<const GamePadStateTracker> gamePadStates, const KeyboardStateTracker& keyboardState, const MouseStateTracker& mouseState ) {
+        const bool start = gamePadStates[0].start == ButtonState::Pressed;
+        const bool _1    = keyboardState.isKeyPressed( KeyCode::D1 );
+
+        return start || _1;
+    } );
+    // Player 2 start.
+    Input::mapButtonDown( "Start 2", []( std::span<const GamePadStateTracker> gamePadStates, const KeyboardStateTracker& keyboardState, const MouseStateTracker& mouseState ) {
+        const bool start = gamePadStates[1].start == ButtonState::Pressed;
+        const bool _2    = keyboardState.isKeyPressed( KeyCode::D2 );
+
+        return start || _2;
+    } );
+
     setState( GameState::MainMenu );
 }
 
@@ -59,36 +88,40 @@ void Game::processEvent( const Graphics::Event& event )
 
 void Game::update( float deltaTime )
 {
+    // Check if the coin button was pressed.
+    if ( Input::getButtonDown( "Coin" ) )
+    {
+        coins = std::min( 99, coins + 1 );
+    }
+
     state->update( deltaTime );
     state->draw( image );
 
     // Draw the score board.
     {
         // Player 1
-        image.drawText( arcadeN, 26, 9, "1UP", Color::Red );
+        image.drawText( arcadeN, 26, 8, "1UP", Color::Red );
         // Draw P1 score right-aligned.
-        const auto score = std::format( "{:02d}", score1 );
-        const auto size  = glm::ivec2(arcadeN.getSize( score ));
-        image.drawText( arcadeN, 56 - size.x, 18, score, Color::White );
+        const auto score = std::format( "{:6d}", score1 );
+        image.drawText( arcadeN, 8, 17, score, Color::White );
     }
     {
         // High score
         image.drawText( arcadeN, 73, 8, "HIGH SCORE", Color::Red );
-        const auto score = std::format( "{:02d}", highScore );
-        const auto size  = glm::ivec2( arcadeN.getSize( score ) );
-        image.drawText( arcadeN, 136 - size.x, 18, score, Color::White );
+        const auto score = std::format( "{:6d}", highScore );
+        image .drawText( arcadeN, 88, 17, score, Color::White );
     }
+    if ( numPlayers > 1 )
     {
         // Player 2
-        image.drawText( arcadeN, 177, 9, "2UP", Color::Red );
+        image.drawText( arcadeN, 177, 8, "2UP", Color::Red );
         // Draw P2 score right-aligned.
-        const auto score = std::format( "{:02d}", score2 );
-        const auto size  = glm::ivec2( arcadeN.getSize( score ) );
-        image.drawText( arcadeN, 208 - size.x, 18, score, Color::White );
+        const auto score = std::format( "{:6d}", score2 );
+        image.drawText( arcadeN, 160, 17, score, Color::White );
     }
 }
 
-Graphics::Image& Game::getImage()
+Graphics::Image& Game::getImage() noexcept
 {
     return image;
 }

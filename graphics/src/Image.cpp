@@ -626,6 +626,11 @@ void Image::drawText( const Font& font, int x, int y, std::string_view text, con
     font.drawText( *this, text, x, y, color );
 }
 
+void Image::drawText( const Font& font, int x, int y, std::wstring_view text, const Color& color ) noexcept
+{
+    font.drawText( *this, text, x, y, color );
+}
+
 constexpr int fast_floor( float x ) noexcept
 {
     return static_cast<int>( static_cast<double>( x ) + 1073741823.0 ) - 1073741823;
