@@ -39,13 +39,13 @@ PlayState::PlayState( Game& game )
 , screenHeight{ static_cast<int>( game.getImage().getHeight() ) }
 {
     // Load the game sprites.
-    spriteSheet = std::make_shared<SpriteSheet>( "assets/Breakout/Sprite Sheet/Breakout_Tile_Free.png", parseSpriteRects( "assets/Breakout/Sprite Sheet/Breakout_Tile_Free.xml" ), Graphics::BlendMode::AlphaBlend );
+    spriteSheet = std::make_shared<SpriteSheet>( "assets/Arkanoid/vaus.png", parseSpriteRects( "assets/Arkanoid/vaus.xml" ), BlendMode::AlphaBlend );
 
     // Setup the camera.
     camera.setZoom( 0.5f );
 
     // Set the paddle to the middle of the play area.
-    paddle = Vaus { spriteSheet, glm::vec2 { static_cast<float>( screenWidth ) / 2.0f, static_cast<float>( screenHeight ) - 200.0f } };
+    vaus = Vaus { spriteSheet, glm::vec2 { static_cast<float>( screenWidth ) / 2.0f, static_cast<float>( screenHeight ) - 17.0f } };
 }
 
 void PlayState::update( float deltaTime )
@@ -67,7 +67,7 @@ void PlayState::draw( Graphics::Image& image )
 {
     image.copy( backgroundImage, 0, 0 );
 
-    paddle.draw( image, camera );
+    vaus.draw( image, camera );
     ball.draw( image, camera );
 }
 
@@ -110,8 +110,8 @@ void PlayState::endState( State oldState )
 void PlayState::doStart( float deltaTime )
 {
     updatePaddle( deltaTime );
-    auto p    = paddle.getPosition();
-    auto aabb = paddle.getAABB();
+    auto p    = vaus.getPosition();
+    auto aabb = vaus.getAABB();
 
     // In the start state, the ball is attached to the paddle until the user presses the fire button.
     auto c   = ball.getCircle();
@@ -138,7 +138,7 @@ void PlayState::updatePaddle( float deltaTime )
 {
     const auto w = static_cast<float>( screenWidth );
 
-    auto pos = paddle.getPosition();
+    auto pos = vaus.getPosition();
     pos.x += Input::getAxis( "Horizontal" ) * paddleSpeed * deltaTime;
 
     if ( pos.x < 0.0f )
@@ -146,8 +146,8 @@ void PlayState::updatePaddle( float deltaTime )
     else if ( pos.x >= w )
         pos.x = w;
 
-    paddle.setPosition( pos );
-    paddle.update( deltaTime );
+    vaus.setPosition( pos );
+    vaus.update( deltaTime );
 }
 
 void PlayState::checkCollisions( Ball& ball )
@@ -180,7 +180,7 @@ void PlayState::checkCollisions( Ball& ball )
         v.y *= -1;
     }
 
-    if ( const auto hit = paddle.collidesWith( ball ) )
+    if ( const auto hit = vaus.collidesWith( ball ) )
     {
         c.center = hit->point + hit->normal * c.radius;
         // Reflect the velocity of the ball about the hit normal.

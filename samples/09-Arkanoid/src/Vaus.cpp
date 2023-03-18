@@ -1,9 +1,27 @@
-#include "Ball.hpp"
-
+#include <Ball.hpp>
 #include <Vaus.hpp>
+
+#include <Graphics/Font.hpp>
+#include <Graphics/Input.hpp>
+
+#include <map>
+#include <string>
 
 using namespace Graphics;
 using namespace Math;
+
+static std::map<Vaus::State, std::string> stateToString = {
+    { Vaus::State::Wait, "Wait" },
+    { Vaus::State::Appear, "Appear" },
+    { Vaus::State::Default, "Default" },
+    { Vaus::State::ToLaser, "To Laser" },
+    { Vaus::State::Laser, "Laser" },
+    { Vaus::State::Enlarge, "Enlarge" },
+    { Vaus::State::ExplodeStage1, "Explode 1" },
+    { Vaus::State::ExplodeStage2, "Explode 2" },
+    { Vaus::State::Dead, "Dead" },
+
+};
 
 inline Circle operator*( const Camera2D& camera, const Circle& c )
 {
@@ -15,47 +33,158 @@ AABB operator*( const Camera2D& camera, const AABB& aabb )
     return { camera * aabb.min, camera * aabb.max };
 }
 
-Vaus::Vaus() {}
+Vaus::Vaus() = default;
 
 Vaus::Vaus( const std::shared_ptr<Graphics::SpriteSheet>& spriteSheet, const glm::vec2& pos )
-: aabb { { 30, 0, 0 }, { 210, 64, 0 } }
-, leftCircle { { 0, 0 }, 32 }
-, rightCircle( { 0, 0 }, 32 )
+: aabb { { 4, 0, 0 }, { 28, 8, 0 } }
+, enlargeAABB { { 4, 0, 0 }, { 44, 8, 0 } }
+, leftCircle { { 0, 0 }, 4 }
+, rightCircle( { 0, 0 }, 4 )
 , transform { pos }
 {
-    // The animation frames in the sprite sheet for the various states of the paddle.
-    constexpr int defaultAnimFrames[] { 49, 50, 51 };
-    constexpr int gunsAnimFrames[] { 52, 53, 54 };
+    // The animation frames in the sprite sheet for the various modes.
+    {
+        constexpr int frames[] { 0, 1, 2, 3, 4 };
+        appearMode = SpriteAnim { spriteSheet, FPS, frames };
+    }
+    {
+        constexpr int frames[] { 6, 7, 8, 9, 10, 11, 11 };
+        defaultMode = SpriteAnim { spriteSheet, FPS, frames };
+    }
+    {
+        constexpr int frames[] { 12, 13, 14, 15, 16, 17, 17 };
+        enlargeMode = SpriteAnim { spriteSheet, FPS, frames };
+    }
+    {
+        constexpr int frames[] { 18, 19, 20, 21, 22, 23, 24, 25, 26 };
+        toLaserMode = SpriteAnim { spriteSheet, FPS, frames };
+    }
+    {
+        constexpr int frames[] { 27, 28, 29, 30, 31, 32 };
+        laserMode = SpriteAnim { spriteSheet, FPS, frames };
+    }
+    {
+        constexpr int frames[] { 36, 37, 38 };
+        explode1 = SpriteAnim { spriteSheet, FPS, frames };
+    }
+    {
+        constexpr int frames[] { 39, 40, 41, 42 };
+        explode2 = SpriteAnim { spriteSheet, FPS, frames };
+    }
 
-    defaultSpriteAnim = SpriteAnim { spriteSheet, 15, defaultAnimFrames };
-    gunsSpriteAnim    = SpriteAnim { spriteSheet, 15, gunsAnimFrames };
-
-    // Set the anchor point to the center of the paddle.
-    transform.setAnchor( { 121.5, 32 } );
+    // Set the anchor point to the center of the paddle (depending on mode)
+    transform.setAnchor( { 16, 4 } );
+    enlargeTransform.setAnchor( { 24, 4 } );
+    explosionTransform.setAnchor( { 24, 12 } );
 }
 
 void Vaus::update( float deltaTime )
 {
-    defaultSpriteAnim.update( deltaTime );
-    gunsSpriteAnim.update( deltaTime );
+    switch ( state )
+    {
+    case State::Wait:
+        doWait( deltaTime );
+        break;
+    case State::Appear:
+        doAppear( deltaTime );
+        break;
+    case State::Default:
+        doDefault( deltaTime );
+        break;
+    case State::ToLaser:
+        doToLaser( deltaTime );
+        break;
+    case State::Laser:
+        doLaser( deltaTime );
+        break;
+    case State::Enlarge:
+        doEnlarge( deltaTime );
+        break;
+    case State::ExplodeStage1:
+    case State::ExplodeStage2:
+        doExplosion( deltaTime );
+        break;
+    case State::Dead:
+        doDead( deltaTime );
+        break;
+    }
+
+#if _DEBUG
+    if ( Input::getKeyDown( KeyCode::D1 ) )
+    {
+        setState( State::Appear );
+    }
+    else if ( Input::getKeyDown( KeyCode::D2 ))
+    {
+        setState( State::ToLaser );
+    }
+    else if (Input::getKeyDown( KeyCode::D3 ))
+    {
+        setState( State::Enlarge );
+    }
+    else if (Input::getKeyDown( KeyCode::D4 ))
+    {
+        setState( State::ExplodeStage1 );
+    }
+#endif
 }
 
 void Vaus::draw( Graphics::Image& image, const Math::Camera2D& camera )
 {
-    image.drawSprite( defaultSpriteAnim, camera * transform );
+    const SpriteAnim*  sprite = nullptr;
+    const Transform2D* t      = &transform;
+
+    switch ( state )
+    {
+    case State::Wait:
+        // When waiting, no sprite is rendered.
+        break;
+    case State::Appear:
+        sprite = &appearMode;
+        break;
+    case State::Default:
+        sprite = &defaultMode;
+        break;
+    case State::ToLaser:
+        sprite = &toLaserMode;
+        break;
+    case State::Laser:
+        sprite = &laserMode;
+        break;
+    case State::Enlarge:
+        sprite = &enlargeMode;
+        t      = &enlargeTransform;
+        break;
+    case State::ExplodeStage1:
+        sprite = &explode1;
+        break;
+    case State::ExplodeStage2:
+        sprite = &explode2;
+        t      = &explosionTransform;
+        break;
+    }
+
+    if ( sprite )
+        image.drawSprite( *sprite, *t );
 
 #if _DEBUG
-    image.drawAABB( camera * getAABB(), Color::Yellow, {}, FillMode::WireFrame );
-    image.drawCircle( camera * leftCircle, Color::Yellow, {}, FillMode::WireFrame );
-    image.drawCircle( camera * rightCircle, Color::Yellow, {}, FillMode::WireFrame );
+    //image.drawAABB( getAABB(), Color::Yellow, {}, FillMode::WireFrame );
+    //image.drawCircle( leftCircle, Color::Yellow, {}, FillMode::WireFrame );
+    //image.drawCircle( rightCircle, Color::Yellow, {}, FillMode::WireFrame );
+
+    // Draw vaus's current state.
+    auto pos = transform.getPosition() - glm::vec2 { 20, 20 };
+    image.drawText( Font::Default, pos.x, pos.y, stateToString[state], Color::White );
 #endif
 }
 
 void Vaus::setPosition( const glm::vec2& pos )
 {
     transform.setPosition( pos );
+    enlargeTransform.setPosition( pos );
+    explosionTransform.setPosition( pos );
 
-    constexpr glm::vec2 paddleWidth { 90, 0 };
+    const glm::vec2 paddleWidth { ( state == State::Enlarge ? 20 : 12 ), 0 };
 
     leftCircle.center  = pos - paddleWidth;
     rightCircle.center = pos + paddleWidth;
@@ -68,7 +197,14 @@ const glm::vec2& Vaus::getPosition() const
 
 Math::AABB Vaus::getAABB() const
 {
-    return transform * aabb;
+    // Get the AABB depending on the current state of Vaus.
+    switch ( state )
+    {
+    case State::Enlarge:
+        return enlargeTransform * enlargeAABB;
+    default:
+        return transform * aabb;
+    }
 }
 
 std::optional<Physics::HitInfo> Vaus::collidesWith( const Ball& ball ) const
@@ -89,4 +225,145 @@ std::optional<Physics::HitInfo> Vaus::collidesWith( const Ball& ball ) const
     }
 
     return {};
+}
+
+void Vaus::setState( State newState )
+{
+    if ( state != newState )
+    {
+        beginState( newState );
+
+        const State oldState = state;
+        state                = newState;
+
+        endState( oldState );
+    }
+}
+
+void Vaus::beginState( State newState )
+{
+    switch ( newState )
+    {
+    case State::Wait:
+        break;
+    case State::Appear:
+        appearMode.reset();
+        break;
+    case State::Default:
+        defaultMode.reset();
+        break;
+    case State::ToLaser:
+        toLaserMode.reset();
+        break;
+    case State::Laser:
+        laserMode.reset();
+        break;
+    case State::Enlarge:
+        enlargeMode.reset();
+        break;
+    case State::ExplodeStage1:
+        explode1.reset();
+        break;
+    case State::ExplodeStage2:
+        explode2.reset();
+        break;
+    case State::Dead:
+        break;
+    }
+}
+
+void Vaus::endState( State oldState )
+{
+    switch ( oldState )
+    {
+    case State::Wait:
+        break;
+    case State::Appear:
+        break;
+    case State::Default:
+        break;
+    case State::ToLaser:
+        break;
+    case State::Laser:
+        break;
+    case State::Enlarge:
+        break;
+    case State::ExplodeStage1:
+        break;
+    case State::ExplodeStage2:
+        break;
+    case State::Dead:
+        break;
+    }
+}
+
+void Vaus::doWait( float deltaTime )
+{
+    // Do nothing until Vaus is transitioned to the appear state.
+}
+void Vaus::doAppear( float deltaTime )
+{
+    // Update the appear animation.
+    appearMode.update( deltaTime );
+    if ( appearMode.isDone() )
+    {
+        // If the appear animation is finished playing,
+        // transition to the default state.
+        setState( State::Default );
+    }
+}
+
+void Vaus::doDefault( float deltaTime )
+{
+    // Update the default animation.
+    defaultMode.update( deltaTime );
+}
+
+void Vaus::doToLaser( float deltaTime )
+{
+    // Update the laser animation.
+    toLaserMode.update( deltaTime );
+    if ( toLaserMode.isDone() )
+    {
+        // Transition to the laser state.
+        setState( State::Laser );
+    }
+}
+
+void Vaus::doLaser( float deltaTime )
+{
+    // Update the laser animation.
+    laserMode.update( deltaTime );
+}
+
+void Vaus::doEnlarge( float deltaTime )
+{
+    // Update the enlarge animation.
+    enlargeMode.update( deltaTime );
+}
+
+void Vaus::doExplosion( float deltaTime )
+{
+    switch ( state )
+    {
+    case State::ExplodeStage1:
+        explode1.update( deltaTime );
+        if (explode1.isDone())
+        {
+            setState( State::ExplodeStage2 );
+        }
+        break;
+    case State::ExplodeStage2:
+        explode2.update( deltaTime );
+        if ( explode2.isDone() )
+        {
+            setState( State::Dead );
+        }
+        break;
+    }
+}
+
+void Vaus::doDead( float deltaTime )
+{
+    // Do nothing until the level is reset.
 }

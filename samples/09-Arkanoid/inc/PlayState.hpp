@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Ball.hpp"
-#include "Vaus.hpp"
 #include "State.hpp"
+#include "Vaus.hpp"
 
 #include <Math/Camera2D.hpp>
 
@@ -24,8 +24,8 @@ public:
     void draw( Graphics::Image& image ) override;
 
     void setState( State newState );
-    void startState(State newState );
-    void endState(State oldState );
+    void startState( State newState );
+    void endState( State oldState );
 
 private:
     void doStart( float deltaTime );
@@ -48,13 +48,13 @@ private:
     Math::Camera2D camera;
 
     Graphics::Image backgroundImage;
-    Ball      ball;
-    Vaus    paddle;
+    Ball            ball;
+    Vaus            vaus;
 
     // Size of the play area.
     int screenWidth;
     int screenHeight;
 
     const float paddleSpeed = 200.0f;  // pixels per second
-    const float ballSpeed = 100.0f;    // pixels per second
+    const float ballSpeed   = 100.0f;  // pixels per second
 };

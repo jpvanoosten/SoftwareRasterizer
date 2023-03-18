@@ -1,0 +1,45 @@
+<TextureAtlas imagePath="Breakout_Tile_Free.png">
+	<SubTexture name="0" x="0" y="0" width="32" height="8"/>
+	<SubTexture name="1" x="0" y="8" width="32" height="8"/>
+	<SubTexture name="1" x="0" y="16" width="32" height="8"/>
+	<SubTexture name="3" x="0" y="24" width="32" height="8"/>
+	<SubTexture name="4" x="0" y="32" width="32" height="8"/>
+	<SubTexture name="5" x="0" y="40" width="16" height="8"/>
+	<SubTexture name="6" x="32" y="0" width="32" height="8"/>
+	<SubTexture name="7" x="32" y="8" width="32" height="8"/>
+	<SubTexture name="8" x="32" y="16" width="32" height="8"/>
+	<SubTexture name="9" x="32" y="24" width="32" height="8"/>
+	<SubTexture name="10" x="32" y="32" width="32" height="8"/>
+	<SubTexture name="11" x="32" y="40" width="32" height="8 "/>
+	<SubTexture name="12" x="64" y="0" width="48" height="8"/>
+	<SubTexture name="13" x="64" y="8" width="48" height="8"/>
+	<SubTexture name="14" x="64" y="16" width="48" height="8"/>
+	<SubTexture name="15" x="64" y="24" width="48" height="8"/>
+	<SubTexture name="16" x="64" y="32" width="48" height="8"/>
+	<SubTexture name="17" x="64" y="40" width="48" height="8"/>
+	<SubTexture name="18" x="112" y="0" width="32" height="8"/>
+	<SubTexture name="19" x="112" y="8" width="32" height="8"/>
+	<SubTexture name="20" x="112" y="16" width="32" height="8"/>
+	<SubTexture name="21" x="112" y="24" width="32" height="8"/>
+	<SubTexture name="22" x="112" y="32" width="32" height="8"/>
+	<SubTexture name="23" x="112" y="40" width="32" height="8"/>
+	<SubTexture name="24" x="112" y="48" width="32" height="8"/>
+	<SubTexture name="25" x="112" y="56" width="32" height="8"/>
+	<SubTexture name="26" x="112" y="64 " width="32" height="8"/>
+	<SubTexture name="27" x="144" y="0" width="32" height="8"/>
+	<SubTexture name="28" x="144" y="8" width="32" height="8"/>
+	<SubTexture name="29" x="144" y="16" width="32" height="8"/>
+	<SubTexture name="30" x="144" y="24" width="32" height="8"/>
+	<SubTexture name="31" x="144" y="32" width="32" height="8"/>
+	<SubTexture name="32" x="144" y="40" width="32" height="8"/>
+	<SubTexture name="33" x="152" y="48" width="16" height="8"/>
+	<SubTexture name="34" x="152" y="56" width="16" height="8"/>
+	<SubTexture name="35" x="152" y="64" width="16" height="8"/>
+	<SubTexture name="36" x="176" y="0" width="32" height="8"/>
+	<SubTexture name="37" x="176" y="8" width="32" height="8"/>
+	<SubTexture name="38" x="176" y="16" width="32" height="8"/>
+	<SubTexture name="39" x="16" y="76" width="48" height="24"/>
+	<SubTexture name="40" x="64" y="76" width="48" height="24"/>
+	<SubTexture name="41" x="112" y="76" width="48" height="24"/>
+	<SubTexture name="42" x="160" y="76" width="48" height="24"/>
+</TextureAtlas>
