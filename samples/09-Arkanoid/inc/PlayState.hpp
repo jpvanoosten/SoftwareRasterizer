@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Ball.hpp"
-#include "Paddle.hpp"
+#include "Vaus.hpp"
 #include "State.hpp"
 
 #include <Math/Camera2D.hpp>
@@ -49,7 +49,7 @@ private:
 
     Graphics::Image backgroundImage;
     Ball      ball;
-    Paddle    paddle;
+    Vaus    paddle;
 
     // Size of the play area.
     int screenWidth;

@@ -12,12 +12,12 @@
 
 class Ball;
 
-class Paddle
+class Vaus
 {
 public:
-    Paddle();
+    Vaus();
 
-    Paddle( const std::shared_ptr<Graphics::SpriteSheet>& spriteSheet, const glm::vec2& pos );
+    Vaus( const std::shared_ptr<Graphics::SpriteSheet>& spriteSheet, const glm::vec2& pos );
 
     void update( float deltaTime );
 

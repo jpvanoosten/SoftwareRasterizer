@@ -1,55 +1,67 @@
 #include "Game.hpp"
+#include "Graphics/Input.hpp"
 
-#include <MainMenuState.hpp>
+#include <TitleState.hpp>
 #include <iostream>
 
 #include <Graphics/ResourceManager.hpp>
 
 using namespace Graphics;
 
-MainMenuState::MainMenuState( Game& game )
+TitleState::TitleState( Game& game )
 : game { game }
 , screenWidth( static_cast<int>( game.getImage().getWidth() ) )
 , screenHeight( static_cast<int>( game.getImage().getHeight() ) )
 , arcadeN { "assets/fonts/ARCADE_N.TTF", 8, 32, 138 }
-, coprgtb { "assets/fonts/COPRGTB.TTF", 24 }
 {
-    auto shipImage = ResourceManager::loadImage( "assets/Arkanoid/ship.png" );
+    auto shipImage  = ResourceManager::loadImage( "assets/Arkanoid/ship.png" );
+    auto taitoImage = ResourceManager::loadImage( "assets/Arkanoid/taito.png" );
+
     arkanoidSprite = Sprite( shipImage, { 0, 0, 193, 42 }, BlendMode::AlphaBlend );
+    taitoSprite    = Sprite( taitoImage );
 }
 
-void MainMenuState::update( float deltaTime )
+void TitleState::update( float deltaTime )
 {
-    // TODO: Use input controller to select/press buttons.
+    if ( game.getCoins() > 0 && Input::getButtonDown( "Start 1" ) )
+    {
+        game.setNumPlayers( 1 );
+        game.setState( Game::GameState::Playing );
+    }
+    else if ( game.getCoins() > 1 && Input::getButtonDown( "Start 2" ) )
+    {
+        game.setNumPlayers( 2 );
+        game.setState( Game::GameState::Playing );
+    }
 }
 
-void MainMenuState::draw( Graphics::Image& image )
+void TitleState::draw( Graphics::Image& image )
 {
     image.clear( Color::Black );
 
-    image.drawSprite( arkanoidSprite, 16, 63 );
+    image.drawSprite( arkanoidSprite, 16, 51 );
 
     int coins = game.getCoins();
-    if (coins > 0)
+    if ( coins > 0 )
     {
-        image.drawText( arcadeN, 97, 140, "PUSH", Color::White );
+        image.drawText( arcadeN, 97, 120, "PUSH", Color::White );
         if ( coins < 2 )
         {
-            image.drawText( arcadeN, 33, 168, "ONLY 1 PLAYER BUTTON", Color::White );
+            image.drawText( arcadeN, 33, 144, "ONLY 1 PLAYER BUTTON", Color::White );
         }
         else
         {
-            image.drawText( arcadeN, 34, 168, "1 OR 2 PLAYER BUTTON", Color::White );
+            image.drawText( arcadeN, 34, 144, "1 OR 2 PLAYER BUTTON", Color::White );
         }
     }
 
-    image.drawText( coprgtb, 73, 225, "TAITO", Color::Red );
-    image.drawText( arcadeN, 16, 243, L"© 1986 TAITO CORP JAPAN", Color::White );
-    image.drawText( arcadeN, 33, 261, "ALL RIGHTS RESERVED", Color::White );
-    image.drawText( arcadeN, 145, 298, std::format( "CREDIT{:3d}", coins ), Color::White );
+    image.drawSprite( taitoSprite, 64, 179 );
+    image.drawText( arcadeN, 16, 208 , L"© 1986 TAITO CORP JAPAN", Color::White );
+    image.drawText( arcadeN, 33, 222, "ALL RIGHTS RESERVED", Color::White );
+    image.drawText( arcadeN, 145, 255, std::format( "CREDIT{:3d}", coins ), Color::White );
 }
 
-void MainMenuState::processEvent( const Graphics::Event& _event )
+void TitleState::processEvent( const Graphics::Event& _event )
 {
 
     // Copy the event so we can modify it.
@@ -88,7 +100,7 @@ void MainMenuState::processEvent( const Graphics::Event& _event )
     }
 }
 
-void MainMenuState::onMouseMoved( Graphics::MouseMovedEventArgs& args )
+void TitleState::onMouseMoved( Graphics::MouseMovedEventArgs& args )
 {
     // Compute the mouse position relative to the menu screen (which can be scaled if the window is resized).
     const glm::vec2 scale {
@@ -103,7 +115,7 @@ void MainMenuState::onMouseMoved( Graphics::MouseMovedEventArgs& args )
     mousePos = { args.x, args.y };
 }
 
-void MainMenuState::onResized( const Graphics::ResizeEventArgs& args )
+void TitleState::onResized( const Graphics::ResizeEventArgs& args )
 {
     const float aspectRatio = static_cast<float>( screenWidth ) / static_cast<float>( screenHeight );
     const float scaleWidth  = static_cast<float>( args.width ) / static_cast<float>( screenWidth );

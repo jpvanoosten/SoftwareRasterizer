@@ -33,14 +33,29 @@ public:
 
     Graphics::Image& getImage() noexcept;
 
+    void setState( GameState newState );
+
+    GameState getState() const noexcept
+    {
+        return currentState;
+    }
+
     int getCoins() const noexcept
     {
         return coins;
     }
 
-private:
-    void setState( GameState newState );
+    void setNumPlayers( int _numPlayers ) noexcept
+    {
+        numPlayers = _numPlayers;
+    }
 
+    int getNumPlayers() const noexcept
+    {
+        return numPlayers;
+    }
+
+private:
     GameState              currentState = GameState::None;
     std::unique_ptr<State> state;
 
@@ -48,7 +63,7 @@ private:
     // Fonts.
     Graphics::Font arcadeN;
 
-    int numPlayers = 2;
+    int numPlayers = 1;
     int coins      = 0;
     // Player 1 score.
     int score1 = 0;
@@ -56,5 +71,4 @@ private:
     int score2 = 0;
     // Current high score.
     int highScore = 50000;
-    
 };

@@ -5,10 +5,10 @@
 
 class Game;
 
-class MainMenuState : public State
+class TitleState : public State
 {
 public:
-    MainMenuState( Game& game );
+    TitleState( Game& game );
 
     void update( float deltaTime ) override;
     void draw( Graphics::Image& image ) override;
@@ -24,8 +24,8 @@ private:
     int screenHeight;
 
     Graphics::Sprite arkanoidSprite;
+    Graphics::Sprite taitoSprite;
     Graphics::Font   arcadeN;
-    Graphics::Font   coprgtb;
 
     // The game rectangle in the Window's coordinate frame.
     // Used for translating mouse coordinates.

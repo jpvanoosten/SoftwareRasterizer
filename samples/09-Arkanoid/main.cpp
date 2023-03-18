@@ -24,7 +24,7 @@ int main( int argc, char* argv[] )
     }
 
     constexpr int WINDOW_WIDTH  = 224;
-    constexpr int WINDOW_HEIGHT = 300;
+    constexpr int WINDOW_HEIGHT = 256;
 
     Game game { WINDOW_WIDTH, WINDOW_HEIGHT };
 

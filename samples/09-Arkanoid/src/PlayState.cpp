@@ -45,7 +45,7 @@ PlayState::PlayState( Game& game )
     camera.setZoom( 0.5f );
 
     // Set the paddle to the middle of the play area.
-    paddle = Paddle { spriteSheet, glm::vec2 { static_cast<float>( screenWidth ) / 2.0f, static_cast<float>( screenHeight ) - 200.0f } };
+    paddle = Vaus { spriteSheet, glm::vec2 { static_cast<float>( screenWidth ) / 2.0f, static_cast<float>( screenHeight ) - 200.0f } };
 }
 
 void PlayState::update( float deltaTime )

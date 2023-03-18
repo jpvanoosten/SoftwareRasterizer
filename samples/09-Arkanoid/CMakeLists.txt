@@ -6,8 +6,8 @@ set( INC_FILES
     inc/Ball.hpp
     inc/Button.hpp
     inc/Game.hpp
-    inc/MainMenuState.hpp
-    inc/Paddle.hpp
+    inc/TitleState.hpp
+    inc/Vaus.hpp
     inc/Physics.hpp
     inc/PlayState.hpp
     inc/State.hpp
@@ -19,15 +19,15 @@ set( SRC_FILES
     src/Ball.cpp
     src/Button.cpp
     src/Game.cpp
-    src/MainMenuState.cpp
-    src/Paddle.cpp
+    src/TitleState.cpp
+    src/Vaus.cpp
     src/Physics.cpp
     src/PlayState.cpp
     src/tinyxml2.cpp
 )
 
 
-set( ALL_FILES ${SRC_FILES} ${INC_FILES} ../glm.natvis )
+set( ALL_FILES ${SRC_FILES} ${INC_FILES} ../glm.natvis README.md )
 
 add_executable( ${TARGET_NAME} ${ALL_FILES})
 

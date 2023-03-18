@@ -1,6 +1,6 @@
 #include "Ball.hpp"
 
-#include <Paddle.hpp>
+#include <Vaus.hpp>
 
 using namespace Graphics;
 using namespace Math;
@@ -15,9 +15,9 @@ AABB operator*( const Camera2D& camera, const AABB& aabb )
     return { camera * aabb.min, camera * aabb.max };
 }
 
-Paddle::Paddle() {}
+Vaus::Vaus() {}
 
-Paddle::Paddle( const std::shared_ptr<Graphics::SpriteSheet>& spriteSheet, const glm::vec2& pos )
+Vaus::Vaus( const std::shared_ptr<Graphics::SpriteSheet>& spriteSheet, const glm::vec2& pos )
 : aabb { { 30, 0, 0 }, { 210, 64, 0 } }
 , leftCircle { { 0, 0 }, 32 }
 , rightCircle( { 0, 0 }, 32 )
@@ -34,13 +34,13 @@ Paddle::Paddle( const std::shared_ptr<Graphics::SpriteSheet>& spriteSheet, const
     transform.setAnchor( { 121.5, 32 } );
 }
 
-void Paddle::update( float deltaTime )
+void Vaus::update( float deltaTime )
 {
     defaultSpriteAnim.update( deltaTime );
     gunsSpriteAnim.update( deltaTime );
 }
 
-void Paddle::draw( Graphics::Image& image, const Math::Camera2D& camera )
+void Vaus::draw( Graphics::Image& image, const Math::Camera2D& camera )
 {
     image.drawSprite( defaultSpriteAnim, camera * transform );
 
@@ -51,7 +51,7 @@ void Paddle::draw( Graphics::Image& image, const Math::Camera2D& camera )
 #endif
 }
 
-void Paddle::setPosition( const glm::vec2& pos )
+void Vaus::setPosition( const glm::vec2& pos )
 {
     transform.setPosition( pos );
 
@@ -61,17 +61,17 @@ void Paddle::setPosition( const glm::vec2& pos )
     rightCircle.center = pos + paddleWidth;
 }
 
-const glm::vec2& Paddle::getPosition() const
+const glm::vec2& Vaus::getPosition() const
 {
     return transform.getPosition();
 }
 
-Math::AABB Paddle::getAABB() const
+Math::AABB Vaus::getAABB() const
 {
     return transform * aabb;
 }
 
-std::optional<Physics::HitInfo> Paddle::collidesWith( const Ball& ball ) const
+std::optional<Physics::HitInfo> Vaus::collidesWith( const Ball& ball ) const
 {
     const auto& c = ball.getCircle();
 

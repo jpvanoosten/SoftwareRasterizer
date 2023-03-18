@@ -1,5 +1,5 @@
 #include <Game.hpp>
-#include <MainMenuState.hpp>
+#include <TitleState.hpp>
 #include <PlayState.hpp>
 
 #include <Graphics/Input.hpp>
@@ -10,7 +10,7 @@ using namespace Math;
 
 Game::Game( uint32_t screenWidth, uint32_t screenHeight )
 : image { screenWidth, screenHeight }
-, arcadeN { "assets/fonts/ARCADE_N.ttf", 9 }
+, arcadeN { "assets/fonts/ARCADE_N.ttf", 7 }
 {
     // Input that controls the horizontal movement of the paddle.
     Input::mapAxis( "Horizontal", []( std::span<const GamePadStateTracker> gamePadStates, const KeyboardStateTracker& keyboardState, const MouseStateTracker& mouseState ) {
@@ -100,24 +100,24 @@ void Game::update( float deltaTime )
     // Draw the score board.
     {
         // Player 1
-        image.drawText( arcadeN, 26, 8, "1UP", Color::Red );
+        image.drawText( arcadeN, 26, 7, "1UP", Color::Red );
         // Draw P1 score right-aligned.
         const auto score = std::format( "{:6d}", score1 );
-        image.drawText( arcadeN, 8, 17, score, Color::White );
+        image.drawText( arcadeN, 15, 15, score, Color::White );
     }
     {
         // High score
-        image.drawText( arcadeN, 73, 8, "HIGH SCORE", Color::Red );
+        image.drawText( arcadeN, 73, 7, "HIGH SCORE", Color::Red );
         const auto score = std::format( "{:6d}", highScore );
-        image .drawText( arcadeN, 88, 17, score, Color::White );
+        image .drawText( arcadeN, 87, 15, score, Color::White );
     }
     if ( numPlayers > 1 )
     {
         // Player 2
-        image.drawText( arcadeN, 177, 8, "2UP", Color::Red );
+        image.drawText( arcadeN, 177, 7, "2UP", Color::Red );
         // Draw P2 score right-aligned.
         const auto score = std::format( "{:6d}", score2 );
-        image.drawText( arcadeN, 160, 17, score, Color::White );
+        image.drawText( arcadeN, 164, 15, score, Color::White );
     }
 }
 
@@ -130,10 +130,12 @@ void Game::setState( GameState newState )
 {
     if ( currentState != newState )
     {
+        currentState = newState;
+
         switch ( newState )
         {
         case GameState::MainMenu:
-            state = std::make_unique<MainMenuState>( *this );
+            state = std::make_unique<TitleState>( *this );
             break;
         case GameState::Playing:
             state = std::make_unique<PlayState>( *this );
