@@ -11,18 +11,18 @@ inline Circle operator*( const Camera2D& camera, const Circle& c )
 }
 
 Ball::Ball()
-: circle { {0, 0}, 32.0f }
-, sprite { ResourceManager::loadImage( "assets/Breakout/Sprite Sheet/Breakout_Tile_Free.png" ), { 1403, 652, 64, 64 }, BlendMode::AlphaBlend }
+: circle { {0, 0}, 2.5f }
+, sprite { ResourceManager::loadImage( "assets/Arkanoid/vaus.png" ), { 0, 40, 16, 8 }, BlendMode::AlphaBlend }
 {
-    transform.setAnchor( { 32, 32 } );
+    transform.setAnchor( { 2.5f, 2.5f } );
 }
 
 Ball::Ball( const glm::vec2& position )
 : transform { position }
-, circle { position, 32.0f }
-, sprite { ResourceManager::loadImage( "assets/Breakout/Sprite Sheet/Breakout_Tile_Free.png" ), { 1403, 652, 64, 64 }, BlendMode::AlphaBlend }
+, circle { position, 2.5f }
+, sprite { ResourceManager::loadImage( "assets/Arkanoid/vaus.png" ), { 0, 40, 16, 8 }, BlendMode::AlphaBlend }
 {
-    transform.setAnchor( { 32, 32 } );
+    transform.setAnchor( { 2.5f, 2.5f } );
 }
 
 void Ball::update( float deltaTime )
@@ -37,10 +37,13 @@ void Ball::update( float deltaTime )
 
 void Ball::draw( Graphics::Image& image )
 {
-    image.drawSprite( sprite, transform );
+    const int x =  static_cast<int>( std::round( transform.getPosition().x - circle.radius ) );
+    const int y = static_cast<int>( std::round( transform.getPosition().y - circle.radius ) );
+
+    image.drawSprite( sprite, x, y );
 
 #if _DEBUG
-    image.drawCircle( circle, Color::Yellow, {}, FillMode::WireFrame );
+    //image.drawCircle( circle, Color::Yellow, {}, FillMode::WireFrame );
 #endif
 }
 

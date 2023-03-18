@@ -114,15 +114,15 @@ void Vaus::update( float deltaTime )
     {
         setState( State::Appear );
     }
-    else if ( Input::getKeyDown( KeyCode::D2 ))
+    else if ( Input::getKeyDown( KeyCode::D2 ) )
     {
         setState( State::ToLaser );
     }
-    else if (Input::getKeyDown( KeyCode::D3 ))
+    else if ( Input::getKeyDown( KeyCode::D3 ) )
     {
         setState( State::Enlarge );
     }
-    else if (Input::getKeyDown( KeyCode::D4 ))
+    else if ( Input::getKeyDown( KeyCode::D4 ) )
     {
         setState( State::ExplodeStage1 );
     }
@@ -165,12 +165,25 @@ void Vaus::draw( Graphics::Image& image )
     }
 
     if ( sprite )
-        image.drawSprite( *sprite, *t );
+    {
+        Sprite normalSprite = *sprite;
+        Sprite blackSprite  = *sprite;
+
+        blackSprite.setColor( Color::Black );
+
+        int x = t->getPosition().x - t->getAnchor().x;
+        int y = t->getPosition().y - t->getAnchor().y;
+
+        // Draw the shadow.
+        image.drawSprite( blackSprite, x + 4, y + 4 );
+        // Draw the regular sprite.
+        image.drawSprite( normalSprite, x, y );
+    }
 
 #if _DEBUG
-    //image.drawAABB( getAABB(), Color::Yellow, {}, FillMode::WireFrame );
-    //image.drawCircle( leftCircle, Color::Yellow, {}, FillMode::WireFrame );
-    //image.drawCircle( rightCircle, Color::Yellow, {}, FillMode::WireFrame );
+    image.drawAABB( getAABB(), Color::Yellow, {}, FillMode::WireFrame );
+    image.drawCircle( leftCircle, Color::Yellow, {}, FillMode::WireFrame );
+    image.drawCircle( rightCircle, Color::Yellow, {}, FillMode::WireFrame );
 
     // Draw vaus's current state.
     auto pos = transform.getPosition() - glm::vec2 { 20, 20 };
@@ -348,7 +361,7 @@ void Vaus::doExplosion( float deltaTime )
     {
     case State::ExplodeStage1:
         explode1.update( deltaTime );
-        if (explode1.isDone())
+        if ( explode1.isDone() )
         {
             setState( State::ExplodeStage2 );
         }

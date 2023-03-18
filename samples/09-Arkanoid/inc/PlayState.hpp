@@ -50,5 +50,5 @@ private:
     int screenHeight;
 
     const float paddleSpeed = 200.0f;  // pixels per second
-    const float ballSpeed   = 100.0f;  // pixels per second
+    const float ballSpeed   = 200.0f;  // pixels per second
 };

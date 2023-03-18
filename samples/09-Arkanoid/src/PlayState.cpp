@@ -124,7 +124,15 @@ void PlayState::doStart( float deltaTime )
 
     if ( Input::getButtonDown( "Fire" ) )
     {
-        ball.setVelocity( glm::vec2 { 0.0f, 1.0f } * ballSpeed );
+        // Initially, fire the ball up and to the left.
+        glm::vec2 vel { 1.0f, 1.0f };
+        if ( vaus.getPosition().x < screenWidth / 2.0f )
+        {
+            // Or to the right when vaus is on the left side of the screen.
+            vel.x = -1.0f;
+        }
+
+        ball.setVelocity( normalize(vel) * ballSpeed );
         setState( State::Playing );
     }
 }
@@ -160,28 +168,30 @@ void PlayState::checkCollisions( Ball& ball )
     auto c = ball.getCircle();
     auto v = ball.getVelocity();
 
-    const auto w = static_cast<float>( screenWidth );
-    const auto h = static_cast<float>( screenHeight );
+    constexpr float top    = 24.0f;
+    constexpr float bottom = 256.0f;
+    constexpr float left   = 8.0f;
+    constexpr float right  = 216.0f;
 
-    if ( c.center.x - c.radius <= 0 )
+    if ( c.center.x - c.radius <= left )
     {
-        c.center.x = c.radius;
+        c.center.x = left + c.radius;
         v.x *= -1;
     }
-    else if ( c.center.x + c.radius > w )
+    else if ( c.center.x + c.radius > right )
     {
-        c.center.x = w - c.radius;
+        c.center.x = right - c.radius;
         v.x *= -1;
     }
 
-    if ( c.center.y - c.radius <= 0 )
+    if ( c.center.y - c.radius <= top )
     {
-        c.center.y = c.radius;
+        c.center.y = top + c.radius;
         v.y *= -1;
     }
-    else if ( c.center.y + c.radius >= h )
+    else if ( c.center.y + c.radius >= bottom )
     {
-        c.center.y = h - c.radius;
+        c.center.y = bottom - c.radius;
         v.y *= -1;
     }
 
