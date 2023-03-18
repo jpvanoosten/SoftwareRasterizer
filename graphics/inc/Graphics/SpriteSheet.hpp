@@ -138,6 +138,13 @@ public:
     /// </summary>
     /// <param name="index">The 1D index of the sprite in the sprite sheet.</param>
     /// <returns>The sprite at the given index, or a default "empty" sprite if index is out of range.</returns>
+    const Sprite& getSprite( size_t index ) const noexcept;
+
+    /// <summary>
+    /// Retrieve a sprite from the sprite sheet.
+    /// </summary>
+    /// <param name="index">The 1D index of the sprite in the sprite sheet.</param>
+    /// <returns>The sprite at the given index, or a default "empty" sprite if index is out of range.</returns>
     const Sprite& operator[]( size_t index ) const noexcept;
 
     /// <summary>

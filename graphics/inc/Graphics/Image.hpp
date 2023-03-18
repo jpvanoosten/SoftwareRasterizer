@@ -198,6 +198,18 @@ struct SR_API Image final
     /// <param name="fillMode">The fill mode to use when rendering.</param>
     void drawTriangle( const glm::vec2& p0, const glm::vec2& p1, const glm::vec2& p2, const Color& color, const BlendMode& blendMode = {}, FillMode fillMode = FillMode::Solid ) noexcept;
 
+
+    /// <summary>
+    /// Draw a rectangle to the screen.
+    /// </summary>
+    /// <typeparam name="T">The rectangle type.</typeparam>
+    /// <param name="rect">The rectangle to draw.</param>
+    /// <param name="color">The color to draw the rectangle with.</param>
+    /// <param name="blendMode">(optional) The blend mode to use when drawing. Default: No blending.</param>
+    /// <param name="fillMode">(optional) The fill mode to use. Default: Solid fill.</param>
+    template<typename T>
+    void drawRectangle( const Math::Rect<T>& rect, const Color& color, const BlendMode& blendMode = {}, FillMode fillMode = FillMode::Solid ) noexcept;
+
     /// <summary>
     /// Draw a solid or wireframe 2D quad on the screen.
     /// </summary>
@@ -206,8 +218,8 @@ struct SR_API Image final
     /// <param name="p2">The third quad point.</param>
     /// <param name="p3">The fourth quad point.</param>
     /// <param name="color">The color of the quad.</param>
-    /// <param name="blendMode">The blending mode to apply when rendering.</param>
-    /// <param name="fillMode">The fill mode to use.</param>
+    /// <param name="blendMode">(optional) The blending mode to apply when rendering. Default: No blending.</param>
+    /// <param name="fillMode">(optional) The fill mode to use. Default: Solid.</param>
     void drawQuad( const glm::vec2& p0, const glm::vec2& p1, const glm::vec2& p2, const glm::vec2& p3, const Color& color, const BlendMode& blendMode = {}, FillMode fillMode = FillMode::Solid ) noexcept;
 
     /// <summary>
@@ -219,7 +231,7 @@ struct SR_API Image final
     /// <param name="v3">The fourth vertex.</param>
     /// <param name="image">The texture to use to render the quad.</param>
     /// <param name="addressMode">(optional) The address mode to use when sampling the image. Default: AddressMode::Wrap</param>
-    /// <param name="blendMode">The blending mode to apply.</param>
+    /// <param name="blendMode">(optional) The blending mode to apply. Default: No blending.</param>
     void drawQuad( const Vertex& v0, const Vertex& v1, const Vertex& v2, const Vertex& v3, const Image& image, AddressMode addressMode = AddressMode::Wrap, const BlendMode& blendMode = {} ) noexcept;
 
     /// <summary>
@@ -437,4 +449,11 @@ private:
     Math::AABB                  m_AABB;
     aligned_unique_ptr<Color[]> m_data;
 };
+
+template<typename T>
+void Image::drawRectangle( const Math::Rect<T>& rect, const Color& color, const BlendMode& blendMode, FillMode fillMode ) noexcept
+{
+    drawAABB( Math::AABB::fromRect( rect ), color, blendMode, fillMode );
+}
+
 }  // namespace Graphics

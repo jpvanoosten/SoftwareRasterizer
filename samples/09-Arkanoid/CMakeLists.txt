@@ -6,12 +6,13 @@ set( INC_FILES
     inc/Ball.hpp
     inc/Button.hpp
     inc/Game.hpp
-    inc/TitleState.hpp
-    inc/Vaus.hpp
+    inc/Field.hpp
     inc/Physics.hpp
     inc/PlayState.hpp
     inc/State.hpp
     inc/tinyxml2.h
+    inc/TitleState.hpp
+    inc/Vaus.hpp
 )
 
 set( SRC_FILES
@@ -19,11 +20,12 @@ set( SRC_FILES
     src/Ball.cpp
     src/Button.cpp
     src/Game.cpp
-    src/TitleState.cpp
-    src/Vaus.cpp
+    src/Field.cpp
     src/Physics.cpp
     src/PlayState.cpp
     src/tinyxml2.cpp
+    src/TitleState.cpp
+    src/Vaus.cpp
 )
 
 

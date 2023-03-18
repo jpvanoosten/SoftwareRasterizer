@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Ball.hpp"
+#include "Field.hpp"
 #include "State.hpp"
 #include "Vaus.hpp"
 
@@ -40,16 +41,9 @@ private:
 
     State state = State::Start;
 
-    // This sprite sheet contains all of the sprites for the game
-    // and is shared between all of the game objects.
-    std::shared_ptr<Graphics::SpriteSheet> spriteSheet;
-
-    // Camera for scaling the objects on the screen.
-    Math::Camera2D camera;
-
-    Graphics::Image backgroundImage;
-    Ball            ball;
-    Vaus            vaus;
+    Field field;
+    Ball  ball;
+    Vaus  vaus;
 
     // Size of the play area.
     int screenWidth;

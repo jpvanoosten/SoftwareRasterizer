@@ -1,0 +1,21 @@
+<TextureAtlas imagePath="fields.png">
+	<SubTexture name="0" x="0" y="0" width="224" height="240"/>
+	<SubTexture name="1" x="0" y="256" width="224" height="240"/>
+	<SubTexture name="2" x="232" y="0" width="224" height="240"/>
+	<SubTexture name="3" x="232" y="256" width="224" height="240"/>
+	<SubTexture name="4" x="696" y="0" width="224" height="240"/>
+	<SubTexture name="5" x="696" y="256 " width="224" height="240"/>
+	<SubTexture name="6" x="696" y="0" width="224" height="240"/>
+	<SubTexture name="7" x="696" y="256" width="224" height="240"/>
+	<SubTexture name="8" x="928"  y="0" width="224" height="240"/>
+	<SubTexture name="9" x="928"  y="256" width="8" height="40"/>
+	<SubTexture name="10" x="936"  y="256" width="8" height="40"/>
+	<SubTexture name="11" x="944"  y="256" width="8" height="40"/>
+	<SubTexture name="12" x="952"  y="256" width="8" height="40"/>
+	<SubTexture name="13" x="976"  y="256" width="32" height="8"/>
+	<SubTexture name="14" x="976"  y="264" width="32" height="8"/>
+	<SubTexture name="15" x="976"  y="272" width="32" height="8"/>
+	<SubTexture name="16" x="976"  y="280" width="32" height="8"/>
+	<SubTexture name="17" x="976"  y="288" width="32" height="8"/>
+	<SubTexture name="18" x="976"  y="296" width="32" height="8"/>
+</TextureAtlas>

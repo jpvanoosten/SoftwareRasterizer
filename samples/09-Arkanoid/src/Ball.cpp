@@ -35,12 +35,12 @@ void Ball::update( float deltaTime )
     transform.setPosition( position );
 }
 
-void Ball::draw( Graphics::Image& image, const Math::Camera2D& camera )
+void Ball::draw( Graphics::Image& image )
 {
-    image.drawSprite( sprite, camera * transform );
+    image.drawSprite( sprite, transform );
 
 #if _DEBUG
-    image.drawCircle( camera * circle, Color::Yellow, {}, FillMode::WireFrame );
+    image.drawCircle( circle, Color::Yellow, {}, FillMode::WireFrame );
 #endif
 }
 

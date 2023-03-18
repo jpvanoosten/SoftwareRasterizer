@@ -78,7 +78,7 @@ Game::Game( uint32_t screenWidth, uint32_t screenHeight )
         return start || _2;
     } );
 
-    setState( GameState::MainMenu );
+    setState( GameState::Playing );
 }
 
 void Game::processEvent( const Graphics::Event& event )

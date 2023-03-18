@@ -34,18 +34,20 @@ std::vector<RectI> parseSpriteRects( const std::filesystem::path& xmlFile )
 
 PlayState::PlayState( Game& game )
 : game { game }
-, backgroundImage { "assets/textures/space_background.jpg" }
-, screenWidth{ static_cast<int>( game.getImage().getWidth() ) }
-, screenHeight{ static_cast<int>( game.getImage().getHeight() ) }
+, screenWidth { static_cast<int>( game.getImage().getWidth() ) }
+, screenHeight { static_cast<int>( game.getImage().getHeight() ) }
 {
-    // Load the game sprites.
-    spriteSheet = std::make_shared<SpriteSheet>( "assets/Arkanoid/vaus.png", parseSpriteRects( "assets/Arkanoid/vaus.xml" ), BlendMode::AlphaBlend );
-
-    // Setup the camera.
-    camera.setZoom( 0.5f );
-
-    // Set the paddle to the middle of the play area.
-    vaus = Vaus { spriteSheet, glm::vec2 { static_cast<float>( screenWidth ) / 2.0f, static_cast<float>( screenHeight ) - 17.0f } };
+    {
+        // Load the vaus sprites.
+        const auto spriteSheet = std::make_shared<SpriteSheet>( "assets/Arkanoid/vaus.png", parseSpriteRects( "assets/Arkanoid/vaus.xml" ), BlendMode::AlphaBlend );
+        // Set the paddle to the middle of the play area.
+        vaus = Vaus { spriteSheet, glm::vec2 { static_cast<float>( screenWidth ) / 2.0f, static_cast<float>( screenHeight ) - 17.0f } };
+    }
+    {
+        // Load the field sprites.
+        const auto spriteSheet = std::make_shared<SpriteSheet>( "assets/Arkanoid/fields.png", parseSpriteRects( "assets/Arkanoid/fields.xml" ), BlendMode::Disable );
+        field                  = Field { spriteSheet };
+    }
 }
 
 void PlayState::update( float deltaTime )
@@ -65,10 +67,12 @@ void PlayState::update( float deltaTime )
 
 void PlayState::draw( Graphics::Image& image )
 {
-    image.copy( backgroundImage, 0, 0 );
+    // Clear the area above the game field.
+    image.drawRectangle( RectUI { 0u, 0u, image.getWidth(), 16u }, Color::Black );
 
-    vaus.draw( image, camera );
-    ball.draw( image, camera );
+    field.draw( image );
+    ball.draw( image );
+    vaus.draw( image );
 }
 
 void PlayState::setState( State newState )
@@ -130,6 +134,7 @@ void PlayState::doPlaying( float deltaTime )
     updatePaddle( deltaTime );
 
     ball.update( deltaTime );
+    field.update( deltaTime );
 
     checkCollisions( ball );
 }

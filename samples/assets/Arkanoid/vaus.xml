@@ -1,4 +1,4 @@
-<TextureAtlas imagePath="Breakout_Tile_Free.png">
+<TextureAtlas imagePath="vaus.png">
 	<SubTexture name="0" x="0" y="0" width="32" height="8"/>
 	<SubTexture name="1" x="0" y="8" width="32" height="8"/>
 	<SubTexture name="1" x="0" y="16" width="32" height="8"/>

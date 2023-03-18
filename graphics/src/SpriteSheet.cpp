@@ -153,7 +153,7 @@ SpriteSheet& SpriteSheet::operator=( SpriteSheet&& other ) noexcept
     return *this;
 }
 
-const Sprite& SpriteSheet::operator[]( size_t index ) const noexcept
+const Sprite& SpriteSheet::getSprite( size_t index ) const noexcept
 {
     if ( index < sprites.size() )
         return sprites[index];
@@ -162,9 +162,14 @@ const Sprite& SpriteSheet::operator[]( size_t index ) const noexcept
     return emptySprite;
 }
 
+const Sprite& SpriteSheet::operator[]( size_t index ) const noexcept
+{
+    return getSprite( index );
+}
+
 const Sprite& SpriteSheet::operator()( size_t i, size_t j ) const noexcept
 {
-    return operator[]( i* columns + j );
+    return getSprite( i * columns + j );
 }
 
 std::shared_ptr<SpriteSheet> SpriteSheet::fromGrid( const std::filesystem::path& fileName, uint32_t columns, uint32_t rows, uint32_t padding, uint32_t margin, const BlendMode& blendMode )

@@ -502,10 +502,10 @@ void Image::drawSprite( const Sprite& sprite, const glm::mat3& matrix ) noexcept
     const glm::ivec2& size      = sprite.getSize();
 
     Vertex verts[] = {
-        Vertex { { 0, 0 }, { uv.x, uv.y }, color },                              // Top-left
-        Vertex { { size.x - 1, 0 }, { uv.x + size.x - 1, uv.y }, color },                // Top-right
+        Vertex { { 0, 0 }, { uv.x, uv.y }, color },                                              // Top-left
+        Vertex { { size.x - 1, 0 }, { uv.x + size.x - 1, uv.y }, color },                        // Top-right
         Vertex { { size.x - 1, size.y - 1 }, { uv.x + size.x - 1, uv.y + size.y - 1 }, color },  // Bottom-right
-        Vertex { { 0, size.y - 1 }, { uv.x, uv.y + size.y - 1 }, color }                 // Bottom-left
+        Vertex { { 0, size.y - 1 }, { uv.x, uv.y + size.y - 1 }, color }                         // Bottom-left
     };
 
     // Transform verts.
@@ -535,7 +535,7 @@ void Image::drawSprite( const Sprite& sprite, const glm::mat3& matrix ) noexcept
         1, 2, 3
     };
 
- #pragma omp parallel for schedule( dynamic ) firstprivate( aabb, indicies, verts, color, blendMode )
+#pragma omp parallel for schedule( dynamic ) firstprivate( aabb, indicies, verts, color, blendMode )
     for ( int y = static_cast<int>( aabb.min.y ); y <= static_cast<int>( aabb.max.y ); ++y )
     {
         for ( int x = static_cast<int>( aabb.min.x ); x <= static_cast<int>( aabb.max.x ); ++x )

@@ -129,7 +129,7 @@ void Vaus::update( float deltaTime )
 #endif
 }
 
-void Vaus::draw( Graphics::Image& image, const Math::Camera2D& camera )
+void Vaus::draw( Graphics::Image& image )
 {
     const SpriteAnim*  sprite = nullptr;
     const Transform2D* t      = &transform;
