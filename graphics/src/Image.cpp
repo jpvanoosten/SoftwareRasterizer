@@ -621,12 +621,12 @@ void Image::drawSprite( const Sprite& sprite, int x, int y ) noexcept
     }
 }
 
-void Image::drawText( const Font& font, int x, int y, std::string_view text, const Color& color ) noexcept
+void Image::drawText( const Font& font, std::string_view text, int x, int y, const Color& color ) noexcept
 {
     font.drawText( *this, text, x, y, color );
 }
 
-void Image::drawText( const Font& font, int x, int y, std::wstring_view text, const Color& color ) noexcept
+void Image::drawText( const Font& font, std::wstring_view text, int x, int y, const Color& color ) noexcept
 {
     font.drawText( *this, text, x, y, color );
 }

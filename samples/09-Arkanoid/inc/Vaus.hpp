@@ -23,16 +23,17 @@ public:
         ToLaser,  // Transition to laser mode.
         Laser,
         Enlarge,
+        Dead,           // Vaus is dead.
         ExplodeStage1,  // First stage explosion.
         ExplodeStage2,  // Second stage explosion.
-        Dead,           // Vaus is dead.
     };
 
     Vaus();
 
-    Vaus( const std::shared_ptr<Graphics::SpriteSheet>& spriteSheet, const glm::vec2& pos );
+    Vaus( const std::shared_ptr<Graphics::SpriteSheet>& spriteSheet );
 
-    void setState( State newState );
+    void  setState( State newState );
+    State getState() const noexcept;
 
     void update( float deltaTime );
 
@@ -40,6 +41,10 @@ public:
 
     void             setPosition( const glm::vec2& pos );
     const glm::vec2& getPosition() const;
+
+    // The extent is 1/2 the width.
+    // The width of vaus is dependent on state.
+    float getExtent() const noexcept;
 
     Math::AABB getAABB() const;
 
@@ -54,11 +59,13 @@ private:
     // Framerate for all sprite animations.
     static inline const float FPS = 6.0f;
 
+    void updateControls( float deltaTime );
+
     void beginState( State newState );
     void endState( State oldState );
 
     // Update functions for each state/mode.
-    void doWait(float deltaTime);
+    void doWait( float deltaTime );
     void doAppear( float deltaTime );
     void doDefault( float deltaTime );
     void doToLaser( float deltaTime );
@@ -67,7 +74,7 @@ private:
     void doExplosion( float deltaTime );
     void doDead( float deltaTime );
 
-    State state = State::Appear;
+    State state = State::Wait;
 
     Math::AABB   aabb;
     Math::AABB   enlargeAABB;
@@ -85,4 +92,7 @@ private:
     Graphics::SpriteAnim laserMode;
     Graphics::SpriteAnim explode1;
     Graphics::SpriteAnim explode2;
+
+    // Pixels per second.
+    static inline const float speed = 200.0f;
 };

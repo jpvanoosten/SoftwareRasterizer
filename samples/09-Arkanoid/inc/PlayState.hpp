@@ -14,6 +14,8 @@ class PlayState : public State
 public:
     enum class State
     {
+        Ready,
+        Appear,
         Start,
         Playing,
         Dead,
@@ -25,21 +27,27 @@ public:
     void draw( Graphics::Image& image ) override;
 
     void setState( State newState );
+    State getState() const noexcept;
+
+private:
     void startState( State newState );
     void endState( State oldState );
 
-private:
+    void doReady( float deltaTime );
+    void doAppear( float deltaTime );
     void doStart( float deltaTime );
     void doPlaying( float deltaTime );
-
-    void updatePaddle( float deltaTime );
+    void doDead( float deltaTime );
 
     // Check collisions with the ball.
     void checkCollisions( Ball& ball );
 
-    Game& game;
+    void drawText( Graphics::Image& image, std::string_view text, int x, int y );
 
-    State state = State::Start;
+    Game& game;
+    Graphics::Font arcadeN;
+
+    State state = State::Dead;
 
     Field field;
     Ball  ball;
@@ -49,6 +57,12 @@ private:
     int screenWidth;
     int screenHeight;
 
-    const float paddleSpeed = 200.0f;  // pixels per second
-    const float ballSpeed   = 200.0f;  // pixels per second
+    // Number of lives.
+    int numLives = 2;
+    // The current level.
+    int level = 0;
+
+    float time = 0.0f;
+
+    static inline const float ballSpeed   = 200.0f;  // pixels per second
 };

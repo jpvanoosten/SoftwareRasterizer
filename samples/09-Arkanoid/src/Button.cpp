@@ -73,7 +73,7 @@ void Button::draw( Graphics::Image& image )
         // Center the text on the button.
         const auto size = buttonFont->getSize( buttonText );
         const auto pos  = glm::vec2 { getAABB().center() } - glm::vec2 { size.x, -size.y } / 2.0f;
-        image.drawText( *buttonFont, static_cast<int>( pos.x ), static_cast<int>( pos.y + (state == State::Pressed ? 5.0f : 0.0f)), buttonText, textColor );
+        image.drawText( *buttonFont, buttonText, static_cast<int>( pos.x ), static_cast<int>( pos.y + ( state == State::Pressed ? 5.0f : 0.0f ) ), textColor );
     }
 
 #if _DEBUG

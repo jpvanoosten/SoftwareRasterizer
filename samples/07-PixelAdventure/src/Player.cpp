@@ -162,7 +162,7 @@ void Player::draw( Graphics::Image& image ) const noexcept
 #if _DEBUG
     // Draw the current state of the player.
     auto pos = transform.getPosition() - glm::vec2 { 12, 50 };
-    image.drawText( Font::Default, static_cast<int>( pos.x ), static_cast<int>( pos.y ), stateToString[state], Color::White );
+    image.drawText( Font::Default, stateToString[state], static_cast<int>( pos.x ), static_cast<int>( pos.y ), Color::White );
 
     // Draw the AABB of the player
     image.drawAABB( getAABB(), Color::Red, BlendMode::Disable, FillMode::WireFrame );

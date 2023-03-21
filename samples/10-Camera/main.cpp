@@ -161,17 +161,17 @@ int main( int argc, char* argv[] )
         image.drawLine( WINDOW_CENTER - glm::vec2 { 10, 0 }, WINDOW_CENTER + glm::vec2 { 10, 0 }, Color::Red );
         image.drawLine( WINDOW_CENTER - glm::vec2 { 0, 10 }, WINDOW_CENTER + glm::vec2 { 0, 10 }, Color::Green );
 
-        image.drawText( Font::Default, 10, 10, fps, Color::White );
+        image.drawText( Font::Default, fps, 10, 10, Color::White );
 
         float zoom     = camera.getZoom();
         float rotation = camera.getRotation();
         auto  position = camera.getPosition();
         auto  origin   = camera.getOrigin();
 
-        image.drawText( Font::Default, 10, 30, std::format( "Zoom    : {}", zoom ), Color::White );
-        image.drawText( Font::Default, 10, 45, std::format( "Rotation: {}", rotation ), Color::White );
-        image.drawText( Font::Default, 10, 60, std::format( "Position: {}, {}", position.x, position.y ), Color::White );
-        image.drawText( Font::Default, 10, 75, std::format( "Origin  : {}, {}", origin.x, origin.y ), Color::White );
+        image.drawText( Font::Default, std::format( "Zoom    : {}", zoom ), 10, 30, Color::White );
+        image.drawText( Font::Default, std::format( "Rotation: {}", rotation ), 10, 45, Color::White );
+        image.drawText( Font::Default, std::format( "Position: {}, {}", position.x, position.y ), 10, 60, Color::White );
+        image.drawText( Font::Default, std::format( "Origin  : {}, {}", origin.x, origin.y ), 10, 75, Color::White );
 
         window.present( image );
 
@@ -188,6 +188,9 @@ int main( int argc, char* argv[] )
                 {
                 case KeyCode::R:
                     camera.reset();
+                    break;
+            case KeyCode::V:
+                    window.toggleVSync();
                     break;
                 case KeyCode::Escape:
                     window.destroy();

@@ -100,24 +100,24 @@ void Game::update( float deltaTime )
     // Draw the score board.
     {
         // Player 1
-        image.drawText( arcadeN, 26, 7, "1UP", Color::Red );
+        image.drawText( arcadeN, "1UP", 26, 7, Color::Red );
         // Draw P1 score right-aligned.
         const auto score = std::format( "{:6d}", score1 );
-        image.drawText( arcadeN, 15, 15, score, Color::White );
+        image.drawText( arcadeN, score, 15, 15, Color::White );
     }
     {
         // High score
-        image.drawText( arcadeN, 73, 7, "HIGH SCORE", Color::Red );
+        image.drawText( arcadeN, "HIGH SCORE", 73, 7, Color::Red );
         const auto score = std::format( "{:6d}", highScore );
-        image .drawText( arcadeN, 87, 15, score, Color::White );
+        image.drawText( arcadeN, score, 87, 15, Color::White );
     }
     if ( numPlayers > 1 )
     {
         // Player 2
-        image.drawText( arcadeN, 177, 7, "2UP", Color::Red );
+        image.drawText( arcadeN, "2UP", 177, 7, Color::Red );
         // Draw P2 score right-aligned.
         const auto score = std::format( "{:6d}", score2 );
-        image.drawText( arcadeN, 164, 15, score, Color::White );
+        image.drawText( arcadeN, score, 164, 15, Color::White );
     }
 }
 

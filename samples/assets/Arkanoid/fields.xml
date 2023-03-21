@@ -18,4 +18,9 @@
 	<SubTexture name="16" x="976"  y="280" width="32" height="8"/>
 	<SubTexture name="17" x="976"  y="288" width="32" height="8"/>
 	<SubTexture name="18" x="976"  y="296" width="32" height="8"/>
+	<SubTexture name="19" x="8" y="240" width="16" height="8" />
+	<SubTexture name="20" x="240" y="240" width="16" height="8" />
+	<SubTexture name="21" x="472" y="240" width="16" height="8" />
+	<SubTexture name="22" x="704" y="240" width="16" height="8" />
+	<SubTexture name="23" x="936" y="240" width="16" height="8" />
 </TextureAtlas>

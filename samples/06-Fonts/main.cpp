@@ -47,7 +47,7 @@ int main( int argc, char* argv[] )
         image.resize( window.getWidth(), window.getHeight() );
         image.clear( Color::Black );
 
-        image.drawText( font24, 10, 24, fps, Color::White );
+        image.drawText( font24, fps, 10, 24, Color::White );
 
         // Draw some text centered on the screen.
         {
@@ -55,7 +55,7 @@ int main( int argc, char* argv[] )
             const auto        size = font56.getSize( text );
             int               x    = ( static_cast<int>( image.getWidth() ) - size.x ) / 2;
             int               y    = ( static_cast<int>( image.getHeight() ) - size.y ) / 2;
-            image.drawText( font56, x, y, text, Color::White );
+            image.drawText( font56, text, x, y, Color::White );
         }
 
         window.present( image );

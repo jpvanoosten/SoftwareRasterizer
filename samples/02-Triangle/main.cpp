@@ -47,7 +47,7 @@ int main( int argc, char* argv[] )
         // Draw a blue outline for the triangle.
         image.drawTriangle( { WINDOW_WIDTH * 0.5f + dx, WINDOW_HEIGHT * 0.25 }, { WINDOW_WIDTH * 0.25f + dx, WINDOW_HEIGHT * 0.75f }, { WINDOW_WIDTH * 0.75f + dx, WINDOW_HEIGHT * 0.75f }, Color::Blue, {}, FillMode::WireFrame );
 
-        image.drawText( Font::Default, 10, 10, fps, Color::Black );
+        image.drawText( Font::Default, fps, 10, 10, Color::Black );
 
         window.present( image );
 

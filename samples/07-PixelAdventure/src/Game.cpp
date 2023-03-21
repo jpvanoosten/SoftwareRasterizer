@@ -221,12 +221,12 @@ void Game::Update()
     }
 
     // Draw an FPS counter in the corner of the screen.
-    image.drawText( arial20, 6, 20, fps, Color::Black );
-    image.drawText( arial20, 4, 18, fps, Color::White );
+    image.drawText( arial20, fps, 6, 20, Color::Black );
+    image.drawText( arial20, fps, 4, 18, Color::White );
 
 #if _DEBUG
     // Draw some text at the mouse position.
-    image.drawText( arial20, mousePos.x, mousePos.y, std::format( "({}, {})", mousePos.x, mousePos.y ), Color::White );
+    image.drawText( arial20, std::format( "({}, {})", mousePos.x, mousePos.y ), mousePos.x, mousePos.y, Color::White );
 #endif
 
     // Simulate low frame rates.

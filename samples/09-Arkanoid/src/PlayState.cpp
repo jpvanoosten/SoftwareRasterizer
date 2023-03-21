@@ -34,6 +34,7 @@ std::vector<RectI> parseSpriteRects( const std::filesystem::path& xmlFile )
 
 PlayState::PlayState( Game& game )
 : game { game }
+, arcadeN { "assets/fonts/ARCADE_N.ttf", 7 }
 , screenWidth { static_cast<int>( game.getImage().getWidth() ) }
 , screenHeight { static_cast<int>( game.getImage().getHeight() ) }
 {
@@ -41,19 +42,30 @@ PlayState::PlayState( Game& game )
         // Load the vaus sprites.
         const auto spriteSheet = std::make_shared<SpriteSheet>( "assets/Arkanoid/vaus.png", parseSpriteRects( "assets/Arkanoid/vaus.xml" ), BlendMode::AlphaBlend );
         // Set the paddle to the middle of the play area.
-        vaus = Vaus { spriteSheet, glm::vec2 { static_cast<float>( screenWidth ) / 2.0f, static_cast<float>( screenHeight ) - 17.0f } };
+        vaus = Vaus { spriteSheet };
     }
     {
         // Load the field sprites.
         const auto spriteSheet = std::make_shared<SpriteSheet>( "assets/Arkanoid/fields.png", parseSpriteRects( "assets/Arkanoid/fields.xml" ), BlendMode::Disable );
         field                  = Field { spriteSheet };
+        field.setLives( numLives );
     }
+
+    setState( State::Ready );
 }
 
 void PlayState::update( float deltaTime )
 {
+    field.setLives( numLives );
+
     switch ( state )
     {
+    case State::Ready:
+        doReady( deltaTime );
+        break;
+    case State::Appear:
+        doAppear( deltaTime );
+        break;
     case State::Start:
         doStart( deltaTime );
         break;
@@ -61,17 +73,37 @@ void PlayState::update( float deltaTime )
         doPlaying( deltaTime );
         break;
     case State::Dead:
+        doDead( deltaTime );
         break;
     }
+}
+void PlayState::drawText( Graphics::Image& image, std::string_view text, int x, int y )
+{
+    image.drawText( arcadeN, text, x + 1, y + 1, Color::Black );
+    image.drawText( arcadeN, text, x, y, Color::White );
 }
 
 void PlayState::draw( Graphics::Image& image )
 {
-    // Clear the area above the game field.
+    // Clear the 16 pixels area above the game field.
     image.drawRectangle( RectUI { 0u, 0u, image.getWidth(), 16u }, Color::Black );
 
+    // Draw the field.
     field.draw( image );
-    ball.draw( image );
+
+    switch ( state )
+    {
+    case State::Ready:
+        drawText( image, std::format( "ROUND {:2}", level + 1 ), 81, 180 );
+        if ( time > 1.0f )
+            drawText( image, "READY", 93, 200 );
+        break;
+    case State::Start:
+    case State::Playing:
+        ball.draw( image );
+        break;
+    }
+
     vaus.draw( image );
 }
 
@@ -85,15 +117,29 @@ void PlayState::setState( State newState )
     }
 }
 
+PlayState::State PlayState::getState() const noexcept
+{
+    return state;
+}
+
 void PlayState::startState( State newState )
 {
     switch ( newState )
     {
+    case State::Ready:
+        time = 0.0f;
+        vaus.setPosition( glm::vec2 { static_cast<float>( screenWidth ) / 2.0f, static_cast<float>( screenHeight ) - 17.0f } );
+        break;
+    case State::Appear:
+        vaus.setState( Vaus::State::Appear );
+        break;
     case State::Start:
+        time = 0.0f;
         break;
     case State::Playing:
         break;
     case State::Dead:
+        vaus.setState( Vaus::State::Dead );
         break;
     }
 }
@@ -102,7 +148,9 @@ void PlayState::endState( State oldState )
 {
     switch ( oldState )
     {
-    case State::Start:
+    case State::Ready:
+        break;
+    case State::Appear:
         break;
     case State::Playing:
         break;
@@ -111,9 +159,29 @@ void PlayState::endState( State oldState )
     }
 }
 
+void PlayState::doReady( float deltaTime )
+{
+    time += deltaTime;
+
+    if ( time > 2.0f )
+    {
+        setState( State::Appear );
+    }
+}
+
+void PlayState::doAppear( float deltaTime )
+{
+    vaus.update( deltaTime );
+    if ( vaus.getState() != Vaus::State::Appear )
+    {
+        setState( State::Start );
+    }
+}
+
 void PlayState::doStart( float deltaTime )
 {
-    updatePaddle( deltaTime );
+    vaus.update( deltaTime );
+
     auto p    = vaus.getPosition();
     auto aabb = vaus.getAABB();
 
@@ -122,45 +190,30 @@ void PlayState::doStart( float deltaTime )
     c.center = { p.x, aabb.min.y - c.radius };
     ball.setCircle( c );
 
-    if ( Input::getButtonDown( "Fire" ) )
+    time += deltaTime;
+
+    if ( time > 3.0f || Input::getButtonDown( "Fire" ) )
     {
-        // Initially, fire the ball up and to the left.
+        // Initially, fire the ball up and to the right.
         glm::vec2 vel { 1.0f, 1.0f };
-        if ( vaus.getPosition().x < screenWidth / 2.0f )
+        if ( p.x < screenWidth / 2.0f )
         {
-            // Or to the right when vaus is on the left side of the screen.
+            // Or to the right when Vaus is on the left side of the screen.
             vel.x = -1.0f;
         }
 
-        ball.setVelocity( normalize(vel) * ballSpeed );
+        ball.setVelocity( normalize( vel ) * ballSpeed );
         setState( State::Playing );
     }
 }
 
 void PlayState::doPlaying( float deltaTime )
 {
-    updatePaddle( deltaTime );
-
+    vaus.update( deltaTime );
     ball.update( deltaTime );
     field.update( deltaTime );
 
     checkCollisions( ball );
-}
-
-void PlayState::updatePaddle( float deltaTime )
-{
-    const auto w = static_cast<float>( screenWidth );
-
-    auto pos = vaus.getPosition();
-    pos.x += Input::getAxis( "Horizontal" ) * paddleSpeed * deltaTime;
-
-    if ( pos.x < 0.0f )
-        pos.x = 0.0f;
-    else if ( pos.x >= w )
-        pos.x = w;
-
-    vaus.setPosition( pos );
-    vaus.update( deltaTime );
 }
 
 void PlayState::checkCollisions( Ball& ball )
@@ -191,8 +244,9 @@ void PlayState::checkCollisions( Ball& ball )
     }
     else if ( c.center.y + c.radius >= bottom )
     {
-        c.center.y = bottom - c.radius;
-        v.y *= -1;
+        //c.center.y = bottom - c.radius;
+        //v.y *= -1;
+        setState( State::Dead );
     }
 
     if ( const auto hit = vaus.collidesWith( ball ) )
@@ -204,4 +258,14 @@ void PlayState::checkCollisions( Ball& ball )
 
     ball.setCircle( c );
     ball.setVelocity( v );
+}
+
+void PlayState::doDead( float deltaTime )
+{
+    vaus.update( deltaTime );
+    if ( vaus.getState() == Vaus::State::Wait )
+    {
+        --numLives;
+        setState( State::Ready );
+    }
 }

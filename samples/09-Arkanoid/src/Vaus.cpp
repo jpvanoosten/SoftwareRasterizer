@@ -35,12 +35,11 @@ AABB operator*( const Camera2D& camera, const AABB& aabb )
 
 Vaus::Vaus() = default;
 
-Vaus::Vaus( const std::shared_ptr<Graphics::SpriteSheet>& spriteSheet, const glm::vec2& pos )
+Vaus::Vaus( const std::shared_ptr<Graphics::SpriteSheet>& spriteSheet )
 : aabb { { 4, 0, 0 }, { 28, 8, 0 } }
 , enlargeAABB { { 4, 0, 0 }, { 44, 8, 0 } }
 , leftCircle { { 0, 0 }, 4 }
 , rightCircle( { 0, 0 }, 4 )
-, transform { pos }
 {
     // The animation frames in the sprite sheet for the various modes.
     {
@@ -100,12 +99,12 @@ void Vaus::update( float deltaTime )
     case State::Enlarge:
         doEnlarge( deltaTime );
         break;
+    case State::Dead:
+        doDead( deltaTime );
+        break;
     case State::ExplodeStage1:
     case State::ExplodeStage2:
         doExplosion( deltaTime );
-        break;
-    case State::Dead:
-        doDead( deltaTime );
         break;
     }
 
@@ -187,7 +186,7 @@ void Vaus::draw( Graphics::Image& image )
 
     // Draw vaus's current state.
     auto pos = transform.getPosition() - glm::vec2 { 20, 20 };
-    image.drawText( Font::Default, pos.x, pos.y, stateToString[state], Color::White );
+    image.drawText( Font::Default, stateToString[state], pos.x, pos.y, Color::White );
 #endif
 }
 
@@ -197,7 +196,7 @@ void Vaus::setPosition( const glm::vec2& pos )
     enlargeTransform.setPosition( pos );
     explosionTransform.setPosition( pos );
 
-    const glm::vec2 paddleWidth { ( state == State::Enlarge ? 20 : 12 ), 0 };
+    const glm::vec2 paddleWidth { getExtent(), 0 };
 
     leftCircle.center  = pos - paddleWidth;
     rightCircle.center = pos + paddleWidth;
@@ -206,6 +205,20 @@ void Vaus::setPosition( const glm::vec2& pos )
 const glm::vec2& Vaus::getPosition() const
 {
     return transform.getPosition();
+}
+
+float Vaus::getExtent() const noexcept
+{
+    float width = 12.0f;
+
+    switch ( state )
+    {
+    case State::Enlarge:
+        width = 20.0f;
+        break;
+    }
+
+    return width;
 }
 
 Math::AABB Vaus::getAABB() const
@@ -253,6 +266,25 @@ void Vaus::setState( State newState )
     }
 }
 
+Vaus::State Vaus::getState() const noexcept
+{
+    return state;
+}
+
+void Vaus::updateControls( float deltaTime )
+{
+    auto pos = getPosition();
+
+    pos.x += Input::getAxis( "Horizontal" ) * speed * deltaTime;
+
+    if ( pos.x - getExtent() < 8.0f )
+        pos.x = getExtent() + 8.0f;
+    else if ( pos.x >= 216 )
+        pos.x = 216 - getExtent();
+
+    setPosition( pos );
+}
+
 void Vaus::beginState( State newState )
 {
     switch ( newState )
@@ -274,13 +306,13 @@ void Vaus::beginState( State newState )
     case State::Enlarge:
         enlargeMode.reset();
         break;
+    case State::Dead:
+        break;
     case State::ExplodeStage1:
         explode1.reset();
         break;
     case State::ExplodeStage2:
         explode2.reset();
-        break;
-    case State::Dead:
         break;
     }
 }
@@ -314,6 +346,7 @@ void Vaus::doWait( float deltaTime )
 {
     // Do nothing until Vaus is transitioned to the appear state.
 }
+
 void Vaus::doAppear( float deltaTime )
 {
     // Update the appear animation.
@@ -328,12 +361,15 @@ void Vaus::doAppear( float deltaTime )
 
 void Vaus::doDefault( float deltaTime )
 {
+    updateControls( deltaTime );
     // Update the default animation.
     defaultMode.update( deltaTime );
 }
 
 void Vaus::doToLaser( float deltaTime )
 {
+    updateControls( deltaTime );
+
     // Update the laser animation.
     toLaserMode.update( deltaTime );
     if ( toLaserMode.isDone() )
@@ -345,12 +381,14 @@ void Vaus::doToLaser( float deltaTime )
 
 void Vaus::doLaser( float deltaTime )
 {
+    updateControls( deltaTime );
     // Update the laser animation.
     laserMode.update( deltaTime );
 }
 
 void Vaus::doEnlarge( float deltaTime )
 {
+    updateControls( deltaTime );
     // Update the enlarge animation.
     enlargeMode.update( deltaTime );
 }
@@ -370,7 +408,7 @@ void Vaus::doExplosion( float deltaTime )
         explode2.update( deltaTime );
         if ( explode2.isDone() )
         {
-            setState( State::Dead );
+            setState( State::Wait );
         }
         break;
     }
@@ -378,5 +416,6 @@ void Vaus::doExplosion( float deltaTime )
 
 void Vaus::doDead( float deltaTime )
 {
-    // Do nothing until the level is reset.
+    // Go directly to explosion state.
+    setState( State::ExplodeStage1 );
 }

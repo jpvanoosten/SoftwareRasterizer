@@ -65,7 +65,7 @@ int main( int argc, char* argv[] )
         // Draw an outline.
         image.drawAABB( aabb, Color::Blue.withAlpha( alpha ), BlendMode::AlphaBlend, FillMode::WireFrame );
 
-        image.drawText( Font::Default, 10, 10, fps, Color::White );
+        image.drawText( Font::Default, fps, 10, 10, Color::White );
 
         window.present( image );
 

@@ -60,7 +60,7 @@ int main( int argc, char* argv[] )
         int y = ( window.getHeight() - sprite.getSize().y ) / 2;
         // image.drawSprite( sprite, x, y );
 
-        image.drawText( Font::Default, 10, 10, fps, Color::White );
+        image.drawText( Font::Default, fps, 10, 10, Color::White );
 
         window.present( image );
 
