@@ -279,7 +279,7 @@ void Vaus::updateControls( float deltaTime )
 
     if ( pos.x - getExtent() < 8.0f )
         pos.x = getExtent() + 8.0f;
-    else if ( pos.x >= 216 )
+    else if ( pos.x + getExtent() >= 216 )
         pos.x = 216 - getExtent();
 
     setPosition( pos );

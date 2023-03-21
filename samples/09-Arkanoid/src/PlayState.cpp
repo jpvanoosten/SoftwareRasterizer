@@ -265,7 +265,14 @@ void PlayState::doDead( float deltaTime )
     vaus.update( deltaTime );
     if ( vaus.getState() == Vaus::State::Wait )
     {
-        --numLives;
-        setState( State::Ready );
+        if (numLives > 0)
+        {
+            --numLives;
+            setState( State::Ready );
+        }
+        else
+        {
+            setState( State::GameOver );
+        }
     }
 }

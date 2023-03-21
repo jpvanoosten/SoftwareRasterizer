@@ -3,5 +3,6 @@
   <!-- Local Debugger Settings (Command Arguments and Environment Variables) for All Configurations -->
   <PropertyGroup>
     <LocalDebuggerCommandArguments>@COMMAND_ARGUMENTS@</LocalDebuggerCommandArguments>
+	<LocalDebuggerEnvironment>OMP_WAIT_POLICY=PASSIVE</LocalDebuggerEnvironment>
   </PropertyGroup>
 </Project>

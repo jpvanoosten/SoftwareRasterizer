@@ -19,6 +19,7 @@ public:
         Start,
         Playing,
         Dead,
+        GameOver,
     };
 
     PlayState( Game& game );
@@ -58,7 +59,7 @@ private:
     int screenHeight;
 
     // Number of lives.
-    int numLives = 2;
+    int numLives = 3;
     // The current level.
     int level = 0;
 

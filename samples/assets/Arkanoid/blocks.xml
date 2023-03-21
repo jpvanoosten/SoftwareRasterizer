@@ -1,0 +1,3 @@
+<TextureAtlas imagePath="blocks.png">
+	<SubTexture name="0" x="0" y="0" width="224" height="240"/>
+</TextureAtlas>

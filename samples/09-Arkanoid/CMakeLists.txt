@@ -4,6 +4,7 @@ set( TARGET_NAME 09-Arkanoid )
 
 set( INC_FILES
     inc/Ball.hpp
+    inc/Brick.hpp
     inc/Button.hpp
     inc/Game.hpp
     inc/Field.hpp
@@ -18,6 +19,7 @@ set( INC_FILES
 set( SRC_FILES
     main.cpp
     src/Ball.cpp
+    src/Brick.cpp
     src/Button.cpp
     src/Game.cpp
     src/Field.cpp
@@ -27,7 +29,6 @@ set( SRC_FILES
     src/TitleState.cpp
     src/Vaus.cpp
 )
-
 
 set( ALL_FILES ${SRC_FILES} ${INC_FILES} ../glm.natvis README.md )
 
