@@ -5,7 +5,7 @@ using namespace Graphics;
 TileMap::TileMap( std::shared_ptr<SpriteSheet> spriteSheet, uint32_t columns, uint32_t rows )
 : columns { columns }
 , rows { rows }
-, spriteSheet { std::move(spriteSheet) }
+, spriteSheet { std::move( spriteSheet ) }
 , spriteGrid( static_cast<size_t>( columns ) * rows, -1 )
 {}
 
@@ -54,7 +54,7 @@ void TileMap::draw( Image& image ) const
             const int spriteId = spriteGrid[i * columns + j];
             if ( spriteId >= 0 && spriteId < numSprites )
             {
-                image.drawSprite( (*spriteSheet)[spriteId], x, y );
+                image.drawSprite( spriteSheet->getSprite( spriteId ), x, y );
             }
             x += spriteWidth;
         }

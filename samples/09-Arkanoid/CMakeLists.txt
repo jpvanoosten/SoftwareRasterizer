@@ -8,6 +8,7 @@ set( INC_FILES
     inc/Button.hpp
     inc/Game.hpp
     inc/Field.hpp
+    inc/Level.hpp
     inc/Physics.hpp
     inc/PlayState.hpp
     inc/State.hpp
@@ -23,6 +24,7 @@ set( SRC_FILES
     src/Button.cpp
     src/Game.cpp
     src/Field.cpp
+    src/Level.cpp
     src/Physics.cpp
     src/PlayState.cpp
     src/tinyxml2.cpp
