@@ -23,7 +23,8 @@ void Brick::update( float deltaTime )
 
 void Brick::draw( Graphics::Image& image ) const
 {
-    image.drawSprite( spriteAnim, transform );
+    if (hitPoints > 0)
+        image.drawSprite( spriteAnim, transform );
 }
 
 int Brick::hit()
@@ -42,6 +43,7 @@ int Brick::hit()
 
 void Brick::animate()
 {
+    spriteAnim.reset();
     doAnimation = true;
 }
 

@@ -4,6 +4,7 @@
 #include "Field.hpp"
 #include "State.hpp"
 #include "Vaus.hpp"
+#include "Level.hpp"
 
 #include <Math/Camera2D.hpp>
 
@@ -53,6 +54,7 @@ private:
     Field field;
     Ball  ball;
     Vaus  vaus;
+    Level level;
 
     // Size of the play area.
     int screenWidth;
@@ -61,7 +63,7 @@ private:
     // Number of lives.
     int numLives = 3;
     // The current level.
-    int level = 0;
+    int levelId = 0;
 
     float time = 0.0f;
 

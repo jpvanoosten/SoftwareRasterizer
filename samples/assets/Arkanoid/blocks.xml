@@ -1,3 +1,22 @@
 <TextureAtlas imagePath="blocks.png">
-	<SubTexture name="0" x="0" y="0" width="224" height="240"/>
+	<SubTexture name="0" x="0" y="0" width="16" height="8"/>
+	<SubTexture name="1" x="16" y="0" width="16" height="8"/>
+	<SubTexture name="2" x="32" y="0" width="16" height="8"/>
+	<SubTexture name="3" x="48" y="0" width="16" height="8"/>
+	<SubTexture name="4" x="0" y="8" width="16" height="8"/>
+	<SubTexture name="5" x="16" y="8" width="16" height="8"/>
+	<SubTexture name="6" x="32" y="8" width="16" height="8"/>
+	<SubTexture name="7" x="48" y="8" width="16" height="8"/>
+	<SubTexture name="8" x="0" y="16" width="16" height="8"/>
+	<SubTexture name="9" x="16" y="16" width="16" height="8"/>
+	<SubTexture name="10" x="32" y="16" width="16" height="8"/>
+	<SubTexture name="11" x="48" y="16" width="16" height="8"/>
+	<SubTexture name="12" x="64" y="16" width="16" height="8"/>
+	<SubTexture name="13" x="80" y="16" width="16" height="8"/>
+	<SubTexture name="14" x="0" y="24" width="16" height="8"/>
+	<SubTexture name="15" x="16" y="24" width="16" height="8"/>
+	<SubTexture name="16" x="32" y="24" width="16" height="8"/>
+	<SubTexture name="17" x="48" y="24" width="16" height="8"/>
+	<SubTexture name="18" x="64" y="24" width="16" height="8"/>
+	<SubTexture name="19" x="80" y="24" width="16" height="8"/>
 </TextureAtlas>

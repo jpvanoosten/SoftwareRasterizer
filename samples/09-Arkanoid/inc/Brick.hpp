@@ -23,9 +23,18 @@ public:
     /// <param name="frames">The frames in the sprite sheet for this brick.</param>
     /// <param name="points">The number of points you get for breaking the brick.</param>
     /// <param name="hitPoints">The number of hits needed to break this brick.</param>
-    Brick( const std::shared_ptr<Graphics::SpriteSheet> spriteSheet, std::span<const int> frames, int points = 50, int hitPoints = 1 );
+    Brick( std::shared_ptr<Graphics::SpriteSheet> spriteSheet, std::span<const int> frames, int points = 50, int hitPoints = 1 );
 
+    /// <summary>
+    /// Update the brick's animation.
+    /// </summary>
+    /// <param name="deltaTime">The elapsed time (in seconds).</param>
     void update( float deltaTime );
+
+    /// <summary>
+    /// Draw brick sprite to the image.
+    /// </summary>
+    /// <param name="image">The image to draw the brick to.</param>
     void draw( Graphics::Image& image ) const;
 
     /// <summary>
@@ -78,7 +87,7 @@ public:
     Math::AABB getAABB() const noexcept;
 
 private:
-    static inline float  FPS = 6.0f;
+    static inline float  FPS = 12.0f;
 
     Graphics::SpriteAnim spriteAnim;
 

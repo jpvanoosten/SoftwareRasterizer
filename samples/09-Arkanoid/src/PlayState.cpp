@@ -1,36 +1,12 @@
 #include "Game.hpp"
 
+#include <ParseRects.hpp>
 #include <PlayState.hpp>
 
 #include <Graphics/Input.hpp>
 
-#include "tinyxml2.h"
-
 using namespace Graphics;
-using namespace tinyxml2;
 using namespace Math;
-
-// Parse the XML file and return a list of rects containing the sprites in the texture atlas.
-std::vector<RectI> parseSpriteRects( const std::filesystem::path& xmlFile )
-{
-    XMLDocument doc;
-    doc.LoadFile( xmlFile.string().c_str() );
-
-    XMLElement* root = doc.RootElement();
-
-    std::vector<RectI> rects;
-
-    for ( XMLElement* subTexture = root->FirstChildElement( "SubTexture" ); subTexture != nullptr; subTexture = subTexture->NextSiblingElement( "SubTexture" ) )
-    {
-        int x      = subTexture->IntAttribute( "x" );
-        int y      = subTexture->IntAttribute( "y" );
-        int width  = subTexture->IntAttribute( "width" );
-        int height = subTexture->IntAttribute( "height" );
-        rects.emplace_back( x, y, width, height );
-    }
-
-    return rects;
-}
 
 PlayState::PlayState( Game& game )
 : game { game }
@@ -40,16 +16,18 @@ PlayState::PlayState( Game& game )
 {
     {
         // Load the vaus sprites.
-        const auto spriteSheet = std::make_shared<SpriteSheet>( "assets/Arkanoid/vaus.png", parseSpriteRects( "assets/Arkanoid/vaus.xml" ), BlendMode::AlphaBlend );
+        const auto spriteSheet = std::make_shared<SpriteSheet>( "assets/Arkanoid/vaus.png", ParseRects( "assets/Arkanoid/vaus.xml" ), BlendMode::AlphaBlend );
         // Set the paddle to the middle of the play area.
         vaus = Vaus { spriteSheet };
     }
     {
         // Load the field sprites.
-        const auto spriteSheet = std::make_shared<SpriteSheet>( "assets/Arkanoid/fields.png", parseSpriteRects( "assets/Arkanoid/fields.xml" ), BlendMode::Disable );
+        const auto spriteSheet = std::make_shared<SpriteSheet>( "assets/Arkanoid/fields.png", ParseRects( "assets/Arkanoid/fields.xml" ), BlendMode::Disable );
         field                  = Field { spriteSheet };
         field.setLives( numLives );
     }
+
+    level = Level { 0 };
 
     setState( State::Ready );
 }
@@ -57,6 +35,7 @@ PlayState::PlayState( Game& game )
 void PlayState::update( float deltaTime )
 {
     field.setLives( numLives );
+    level.update( deltaTime );
 
     switch ( state )
     {
@@ -77,6 +56,7 @@ void PlayState::update( float deltaTime )
         break;
     }
 }
+
 void PlayState::drawText( Graphics::Image& image, std::string_view text, int x, int y )
 {
     image.drawText( arcadeN, text, x + 1, y + 1, Color::Black );
@@ -94,7 +74,7 @@ void PlayState::draw( Graphics::Image& image )
     switch ( state )
     {
     case State::Ready:
-        drawText( image, std::format( "ROUND {:2}", level + 1 ), 81, 180 );
+        drawText( image, std::format( "ROUND {:2}", levelId + 1 ), 81, 180 );
         if ( time > 1.0f )
             drawText( image, "READY", 93, 200 );
         break;
@@ -104,6 +84,7 @@ void PlayState::draw( Graphics::Image& image )
         break;
     }
 
+    level.draw( image );
     vaus.draw( image );
 }
 
@@ -131,6 +112,7 @@ void PlayState::startState( State newState )
         vaus.setPosition( glm::vec2 { static_cast<float>( screenWidth ) / 2.0f, static_cast<float>( screenHeight ) - 17.0f } );
         break;
     case State::Appear:
+        level.animateBricks();
         vaus.setState( Vaus::State::Appear );
         break;
     case State::Start:
@@ -244,12 +226,22 @@ void PlayState::checkCollisions( Ball& ball )
     }
     else if ( c.center.y + c.radius >= bottom )
     {
-        //c.center.y = bottom - c.radius;
-        //v.y *= -1;
+#if _DEBUG
+        c.center.y = bottom - c.radius;
+        v.y *= -1;
+#else
         setState( State::Dead );
+#endif
     }
 
     if ( const auto hit = vaus.collidesWith( ball ) )
+    {
+        c.center = hit->point + hit->normal * c.radius;
+        // Reflect the velocity of the ball about the hit normal.
+        v = glm::reflect( v, hit->normal );
+    }
+
+    if ( const auto hit = level.checkCollision( ball ) )
     {
         c.center = hit->point + hit->normal * c.radius;
         // Reflect the velocity of the ball about the hit normal.
@@ -265,7 +257,7 @@ void PlayState::doDead( float deltaTime )
     vaus.update( deltaTime );
     if ( vaus.getState() == Vaus::State::Wait )
     {
-        if (numLives > 0)
+        if ( numLives > 0 )
         {
             --numLives;
             setState( State::Ready );

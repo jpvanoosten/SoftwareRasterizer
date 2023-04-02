@@ -4,7 +4,7 @@
 #include "Physics.hpp"
 
 #include <Graphics/Image.hpp>
-#include <Math/Circle.hpp>
+#include "Ball.hpp"
 
 #include <optional>
 #include <vector>
@@ -12,21 +12,42 @@
 class Level
 {
 public:
+    /// <summary>
+    /// Default level constructor creates an empty level (no bricks).
+    /// </summary>
     Level() = default;
 
+    /// <summary>
+    /// Create the level given the specific level ID.
+    /// </summary>
+    /// <param name="levelId">The level to create.</param>
     explicit Level( int levelId );
 
+    /// <summary>
+    /// Updates the bricks animations.
+    /// </summary>
+    /// <param name="deltaTime">The elapsed time (in seconds).</param>
     void update( float deltaTime );
-    void draw( Graphics::Image& image );
 
     /// <summary>
-    /// 
+    /// Draw the bricks for this level.
     /// </summary>
-    /// <param name="c"></param>
-    /// <param name="v"></param>
-    /// <returns></returns>
-    std::optional<Physics::HitInfo> checkCollision( const Math::Circle& c, const glm::vec2& v ) const;
+    /// <param name="image">The image to draw the bricks to.</param>
+    void draw( Graphics::Image& image ) const;
+
+    /// <summary>
+    /// Play the "hit" animation on all of the bricks in the scene.
+    /// </summary>
+    void animateBricks();
+
+    /// <summary>
+    /// Check collision with the ball and the bricks.
+    /// </summary>
+    /// <param name="ball">The ball to check for collision with.</param>
+    /// <returns>An optional HitInfo structure that contains the collision information, otherwise a disengaged optional value if no collision occurred.</returns>
+    std::optional<Physics::HitInfo> checkCollision( const Ball& ball );
 
 private:
+    std::shared_ptr<Graphics::SpriteSheet> brickSprites;
     std::vector<Brick> bricks;
 };

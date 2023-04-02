@@ -9,10 +9,10 @@ set( INC_FILES
     inc/Game.hpp
     inc/Field.hpp
     inc/Level.hpp
+    inc/ParseRects.hpp
     inc/Physics.hpp
     inc/PlayState.hpp
     inc/State.hpp
-    inc/tinyxml2.h
     inc/TitleState.hpp
     inc/Vaus.hpp
 )
@@ -25,8 +25,11 @@ set( SRC_FILES
     src/Game.cpp
     src/Field.cpp
     src/Level.cpp
+    src/ParseRects.cpp
+    src/Stages.hpp
     src/Physics.cpp
     src/PlayState.cpp
+    src/tinyxml2.h
     src/tinyxml2.cpp
     src/TitleState.cpp
     src/Vaus.cpp
