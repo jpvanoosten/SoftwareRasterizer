@@ -40,6 +40,8 @@ std::optional<HitInfo> collidesWith( const Math::Line& line, const Math::Circle&
     // Circle is intersecting with the line.
     if ( d < c.radius * c.radius )
     {
+        // TODO: Compute the normal vector that is perpendicular to the line in the direction of the center of the circle.
+        // n = p - dot( p, line.p1 - line.p0 ); // Something like this...
         const glm::vec2 n = glm::normalize( glm::vec2 { dx, dy } );
         return HitInfo { n, p };
     }
@@ -92,8 +94,9 @@ std::optional<HitInfo> collidesWith( const AABB& aabb, const Circle& circle, con
         case Left:
         {
             Line leftEdge { { aabb.min.x, aabb.min.y, 0 }, { aabb.min.x, aabb.max.y, 0 } };
-            if ( const auto hit = collidesWith( leftEdge, circle ) )
+            if ( auto hit = collidesWith( leftEdge, circle ) )
             {
+                hit->normal = glm::vec2 { -1, 0 };
                 return hit;
             }
         }
@@ -101,8 +104,9 @@ std::optional<HitInfo> collidesWith( const AABB& aabb, const Circle& circle, con
         case Right:
         {
             Line rightEdge { { aabb.max.x, aabb.min.y, 0 }, { aabb.max.x, aabb.max.y, 0 } };
-            if ( const auto hit = collidesWith( rightEdge, circle ) )
+            if ( auto hit = collidesWith( rightEdge, circle ) )
             {
+                hit->normal = glm::vec2 { 1, 0 };
                 return hit;
             }
         }
@@ -110,8 +114,9 @@ std::optional<HitInfo> collidesWith( const AABB& aabb, const Circle& circle, con
         case Top:
         {
             Line topEdge { { aabb.min.x, aabb.min.y, 0 }, { aabb.max.x, aabb.min.y, 0 } };
-            if ( const auto hit = collidesWith( topEdge, circle ) )
+            if ( auto hit = collidesWith( topEdge, circle ) )
             {
+                hit->normal = glm::vec2 { 0, -1 };
                 return hit;
             }
         }
@@ -119,8 +124,9 @@ std::optional<HitInfo> collidesWith( const AABB& aabb, const Circle& circle, con
         case Bottom:
         {
             Line bottomEdge { { aabb.min.x, aabb.max.y, 0 }, { aabb.max.x, aabb.max.y, 0 } };
-            if ( const auto hit = collidesWith( bottomEdge, circle ) )
+            if ( auto hit = collidesWith( bottomEdge, circle ) )
             {
+                hit->normal = glm::vec2 { 0, 1 };
                 return hit;
             }
         }
