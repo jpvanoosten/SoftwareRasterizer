@@ -5,6 +5,7 @@ set( INC_FILES
     inc/Audio/Device.hpp
     inc/Audio/Listener.hpp
     inc/Audio/Sound.hpp
+    inc/Audio/Waveform.hpp
 )
 
 set( SRC_FILES
@@ -17,6 +18,9 @@ set( SRC_FILES
     src/Sound.cpp
     src/SoundImpl.hpp
     src/SoundImpl.cpp
+    src/Waveform.cpp
+    src/WaveformImpl.hpp
+    src/WaveformImpl.cpp
     src/stb_vorbis.c
 )
 

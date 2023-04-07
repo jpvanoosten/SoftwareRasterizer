@@ -27,7 +27,7 @@ PlayState::PlayState( Game& game )
         field.setLives( numLives );
     }
 
-    level = Level { 0 };
+    level = Level { game, 0 };
 
     setState( State::Ready );
 }

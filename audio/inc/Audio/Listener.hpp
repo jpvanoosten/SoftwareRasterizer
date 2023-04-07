@@ -79,6 +79,12 @@ public:
     Listener& operator=( Listener&& ) noexcept;
 
     /// <summary>
+    /// Reset the underlying pointer object.
+    /// If this is the last reference, the object is destroyed.
+    /// </summary>
+    void reset();
+
+    /// <summary>
     /// Allow nullptr assignment.
     /// </summary>
     /// <remarks>

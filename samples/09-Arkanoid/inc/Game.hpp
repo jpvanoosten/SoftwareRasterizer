@@ -55,6 +55,12 @@ public:
         return numPlayers;
     }
 
+    /// <summary>
+    /// Add the given points to the current player.
+    /// </summary>
+    /// <param name="points">The number of points to add to the current player.</param>
+    void addPoints( int points );
+
 private:
     GameState              currentState = GameState::None;
     std::unique_ptr<State> state;
@@ -69,6 +75,10 @@ private:
     int score1 = 0;
     // Player 2 score.
     int score2 = 0;
+
+    // Current player.
+    int currentPlayer = 0;
+
     // Current high score.
     int highScore = 50000;
 };

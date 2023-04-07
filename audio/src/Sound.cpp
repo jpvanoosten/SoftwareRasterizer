@@ -12,6 +12,11 @@ Sound::Sound( Sound&& ) noexcept            = default;
 Sound& Sound::operator=( const Sound& )     = default;
 Sound& Sound::operator=( Sound&& ) noexcept = default;
 
+void Sound::reset()
+{
+    impl.reset();
+}
+
 Sound& Sound::operator=( nullptr_t ) noexcept
 {
     impl = nullptr;

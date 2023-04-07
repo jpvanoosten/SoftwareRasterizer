@@ -3,11 +3,13 @@
 #include "Brick.hpp"
 #include "Physics.hpp"
 
-#include <Graphics/Image.hpp>
 #include "Ball.hpp"
+#include <Graphics/Image.hpp>
 
 #include <optional>
 #include <vector>
+
+class Game;
 
 class Level
 {
@@ -20,8 +22,9 @@ public:
     /// <summary>
     /// Create the level given the specific level ID.
     /// </summary>
+    /// <param name="game">A reference to the Game instance.</param>
     /// <param name="levelId">The level to create.</param>
-    explicit Level( int levelId );
+    explicit Level( Game& game, int levelId );
 
     /// <summary>
     /// Updates the bricks animations.
@@ -48,5 +51,8 @@ public:
     std::optional<Physics::HitInfo> checkCollision( const Ball& ball );
 
 private:
+    // Need a pointer to the game to update the points when a brick is destroyed.
+    Game* pGame = nullptr;
+
     std::vector<Brick> bricks;
 };

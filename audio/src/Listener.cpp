@@ -1,10 +1,10 @@
-#include <Audio/Listener.hpp>
 #include "ListenerImpl.hpp"
+#include <Audio/Listener.hpp>
 
 using namespace Audio;
 
 Listener::Listener( std::shared_ptr<ListenerImpl> impl )
-: impl { std::move(impl) }
+: impl { std::move( impl ) }
 {}
 
 Listener::Listener()                                 = default;
@@ -12,6 +12,12 @@ Listener::Listener( const Listener& )                = default;
 Listener::Listener( Listener&& ) noexcept            = default;
 Listener& Listener::operator=( const Listener& )     = default;
 Listener& Listener::operator=( Listener&& ) noexcept = default;
+
+void Listener::reset()
+{
+    impl.reset();
+}
+
 Listener& Listener::operator=( nullptr_t ) noexcept
 {
     impl = nullptr;

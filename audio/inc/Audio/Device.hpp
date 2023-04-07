@@ -3,6 +3,7 @@
 #include "Config.hpp"
 #include "Listener.hpp"
 #include "Sound.hpp"
+#include "Waveform.hpp"
 
 #include <filesystem>
 
@@ -44,6 +45,15 @@ public:
     /// <param name="filePath">The path to the music file to load.</param>
     /// <returns>A valid sound or empty sound if the file is not valid.</returns>
     static Sound loadMusic( const std::filesystem::path& filePath );
+
+    /// <summary>
+    /// Create a waveform.
+    /// </summary>
+    /// <param name="type">The function to use for the waveform.</param>
+    /// <param name="amplitude">The amplitude of the waveform.</param>
+    /// <param name="frequency">The frequency of the waveform.</param>
+    /// <returns>The waveform.</returns>
+    static Waveform createWaveform( Waveform::Type type, float amplitude, float frequency );
 
     // Singleton class.
     Device()                           = delete;

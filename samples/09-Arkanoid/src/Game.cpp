@@ -143,3 +143,18 @@ void Game::setState( GameState newState )
         }
     }
 }
+
+void Game::addPoints( int points )
+{
+    switch ( currentPlayer )
+    {
+    case 0:
+        score1 += points;
+        break;
+    case 1:
+        score2 += points;
+        break;
+    default: 
+        break;
+    }
+}

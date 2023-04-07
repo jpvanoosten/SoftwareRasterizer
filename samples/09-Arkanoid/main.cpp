@@ -100,5 +100,7 @@ int main( int argc, char* argv[] )
             frameCount = 0;
             totalTime  = 0.0f;
         }
+
+//        timer.limitFPS( 30 );
     }
 }

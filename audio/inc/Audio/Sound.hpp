@@ -27,7 +27,12 @@ public:
         Exponential,  ///< Exponential attenuation. Equivalent to OpenAL's AL_EXPONENT_DISTANCE_CLAMPED.
     };
 
-    explicit Sound( const std::filesystem::path& filePath, Type type );
+    /// <summary>
+    /// Load a sound effect from a file.
+    /// </summary>
+    /// <param name="filePath">The path to the sound file.</param>
+    /// <param name="type">The type of sound.</param>
+    explicit Sound( const std::filesystem::path& filePath, Type type = Type::Sound );
 
     /// <summary>
     /// Load a sound effect from a file.
@@ -350,6 +355,12 @@ public:
     Sound( Sound&& ) noexcept;
     Sound& operator=( const Sound& );
     Sound& operator=( Sound&& ) noexcept;
+
+    /// <summary>
+    /// Reset the underlying pointer object.
+    /// If this is the last reference, the object is destroyed.
+    /// </summary>
+    void reset();
 
     /// <summary>
     /// Allow nullptr assignment.

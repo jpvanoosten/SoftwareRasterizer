@@ -1,3 +1,4 @@
+#include <Game.hpp>
 #include <Level.hpp>
 
 #include "ParseRects.hpp"
@@ -34,7 +35,8 @@ const Brick& GetBrick( Stages::B b )
     return bricks[b];
 }
 
-Level::Level( int levelId )
+Level::Level( Game& game, int levelId )
+: pGame { &game }
 {
     Stages::Stage stage = Stages::stages[levelId];
 
@@ -84,7 +86,7 @@ void Level::draw( Graphics::Image& image ) const
 
 void Level::animateBricks()
 {
-    for (auto& b : bricks)
+    for ( auto& b: bricks )
     {
         b.animate();
     }
@@ -92,13 +94,16 @@ void Level::animateBricks()
 
 std::optional<Physics::HitInfo> Level::checkCollision( const Ball& ball )
 {
-    for (auto& brick : bricks )
+    for ( auto& brick: bricks )
     {
-        if (brick.getHitPoints() > 0 )
+        if ( brick.getHitPoints() > 0 )
         {
-            if (const auto hit = brick.checkCollision( ball.getCircle(), ball.getVelocity() ) )
+            if ( const auto hit = brick.checkCollision( ball.getCircle(), ball.getVelocity() ) )
             {
-                brick.hit();
+                if ( brick.hit() == 0 && pGame != nullptr) // Block is destroyed.
+                {
+                    pGame->addPoints( brick.getPoints() );
+                }
                 return hit;
             }
         }

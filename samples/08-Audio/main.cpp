@@ -50,6 +50,9 @@ int main( int argc, char* argv[] )
     bounceSounds.emplace_back( "assets/sounds/bounce-3.wav", Audio::Sound::Type::Sound );
     bounceSounds.emplace_back( "assets/sounds/bounce-4.wav", Audio::Sound::Type::Sound );
 
+    // Create a waveform
+    Audio::Waveform waveform { Audio::Waveform::Type::Sine, 0.2f, 500.0f };
+
     for ( auto& sound: bounceSounds )
     {
         // The default attenuation model is Inverse, but the linear attenuation model sounds better for this demo.
@@ -64,6 +67,7 @@ int main( int argc, char* argv[] )
     bgMusic.setVolume( 0.2f );  // It's too loud!
 
     bgMusic.play();
+    waveform.start();
 
     Timer       timer;
     double      totalTime  = 0.0;
@@ -104,6 +108,9 @@ int main( int argc, char* argv[] )
         }
         ball.setCircle( c );
         ball.setVelocity( vel );
+
+        // Set the waveform's frequency based on the ball's y-coordinate.
+        waveform.setFrequency( c.center.y / WINDOW_HEIGHT * 500.0f );
 
         // Update the sound positions.
         for ( auto& sound: bounceSounds )
