@@ -48,6 +48,5 @@ public:
     std::optional<Physics::HitInfo> checkCollision( const Ball& ball );
 
 private:
-    std::shared_ptr<Graphics::SpriteSheet> brickSprites;
     std::vector<Brick> bricks;
 };

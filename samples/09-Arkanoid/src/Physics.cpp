@@ -1,5 +1,7 @@
 #include <Physics.hpp>
 
+#include <glm/gtx/projection.hpp>
+
 #include <array>
 
 using namespace Math;
@@ -27,10 +29,10 @@ std::optional<HitInfo> collidesWith( const Math::Circle& c1, const Math::Circle&
     return {};
 }
 
-std::optional<HitInfo> collidesWith( const Math::Line& line, const Math::Circle& c )
+std::optional<HitInfo> collidesWith( const Math::Line& l, const Math::Circle& c )
 {
     // Get the closest point on the line to the circle's center.
-    const auto p = line.closestPoint( glm::vec3 { c.center, 0 } );
+    const auto p = l.closestPoint( glm::vec3 { c.center, 0 } );
     // Compute the distance between the circle's center and the closest point on the line.
     const float dx = c.center.x - p.x;
     const float dy = c.center.y - p.y;
@@ -40,9 +42,12 @@ std::optional<HitInfo> collidesWith( const Math::Line& line, const Math::Circle&
     // Circle is intersecting with the line.
     if ( d < c.radius * c.radius )
     {
-        // TODO: Compute the normal vector that is perpendicular to the line in the direction of the center of the circle.
-        // n = p - dot( p, line.p1 - line.p0 ); // Something like this...
-        const glm::vec2 n = glm::normalize( glm::vec2 { dx, dy } );
+        // The hit normal is the perpendicular vector component
+        // that is in the direction of the circle's center point.
+        const glm::vec2 v0 = l.p1 - l.p0;
+        const glm::vec2 v1 = c.center - glm::vec2 { l.p0 };
+
+        const glm::vec2 n = glm::normalize( v1 - glm::proj(v1, v0) );
         return HitInfo { n, p };
     }
 
@@ -94,9 +99,8 @@ std::optional<HitInfo> collidesWith( const AABB& aabb, const Circle& circle, con
         case Left:
         {
             Line leftEdge { { aabb.min.x, aabb.min.y, 0 }, { aabb.min.x, aabb.max.y, 0 } };
-            if ( auto hit = collidesWith( leftEdge, circle ) )
+            if ( const auto hit = collidesWith( leftEdge, circle ) )
             {
-                hit->normal = glm::vec2 { -1, 0 };
                 return hit;
             }
         }
@@ -104,9 +108,8 @@ std::optional<HitInfo> collidesWith( const AABB& aabb, const Circle& circle, con
         case Right:
         {
             Line rightEdge { { aabb.max.x, aabb.min.y, 0 }, { aabb.max.x, aabb.max.y, 0 } };
-            if ( auto hit = collidesWith( rightEdge, circle ) )
+            if ( const auto hit = collidesWith( rightEdge, circle ) )
             {
-                hit->normal = glm::vec2 { 1, 0 };
                 return hit;
             }
         }
@@ -114,9 +117,8 @@ std::optional<HitInfo> collidesWith( const AABB& aabb, const Circle& circle, con
         case Top:
         {
             Line topEdge { { aabb.min.x, aabb.min.y, 0 }, { aabb.max.x, aabb.min.y, 0 } };
-            if ( auto hit = collidesWith( topEdge, circle ) )
+            if ( const auto hit = collidesWith( topEdge, circle ) )
             {
-                hit->normal = glm::vec2 { 0, -1 };
                 return hit;
             }
         }
@@ -124,9 +126,8 @@ std::optional<HitInfo> collidesWith( const AABB& aabb, const Circle& circle, con
         case Bottom:
         {
             Line bottomEdge { { aabb.min.x, aabb.max.y, 0 }, { aabb.max.x, aabb.max.y, 0 } };
-            if ( auto hit = collidesWith( bottomEdge, circle ) )
+            if ( const auto hit = collidesWith( bottomEdge, circle ) )
             {
-                hit->normal = glm::vec2 { 0, 1 };
                 return hit;
             }
         }
