@@ -27,7 +27,7 @@ struct MakeSound : Sound
 struct MakeWaveform : Waveform
 {
     MakeWaveform( std::shared_ptr<WaveformImpl> impl )
-        : Waveform( std::move(impl) )
+    : Waveform( std::move( impl ) )
     {}
 };
 
