@@ -1,4 +1,5 @@
 #include "Ball.hpp"
+#include "MarioCoin.hpp"
 
 #include <Audio/Device.hpp>
 #include <Math/Transform2D.hpp>
@@ -52,6 +53,7 @@ int main( int argc, char* argv[] )
 
     // Create a waveform
     Audio::Waveform waveform { Audio::Waveform::Type::Sine, 0.2f, 500.0f };
+    MarioCoin       marioCoin;
 
     for ( auto& sound: bounceSounds )
     {
@@ -67,7 +69,7 @@ int main( int argc, char* argv[] )
     bgMusic.setVolume( 0.2f );  // It's too loud!
 
     bgMusic.play();
-    waveform.start();
+//    waveform.start();
 
     Timer       timer;
     double      totalTime  = 0.0;
@@ -77,6 +79,7 @@ int main( int argc, char* argv[] )
     while ( window )
     {
         ball.update( static_cast<float>( timer.elapsedSeconds() ) );
+        marioCoin.update( static_cast<float>( timer.elapsedSeconds() ) );
 
         // Check for collisions with the edges of the screen.
         Circle    c   = ball.getCircle();
@@ -86,25 +89,29 @@ int main( int argc, char* argv[] )
             c.center.x = c.radius;
             vel.x *= -1.0f;
             // Play a random bounce sound.
-            bounceSounds[dist( rng )].replay();
+            // bounceSounds[dist( rng )].replay();
+            marioCoin.play();
         }
         else if ( c.right() >= static_cast<float>( image.getWidth() ) )
         {
             c.center.x = static_cast<float>( image.getWidth() ) - c.radius;
             vel.x *= -1.0f;
-            bounceSounds[dist( rng )].replay();
+            //bounceSounds[dist( rng )].replay();
+            marioCoin.play();
         }
         if ( c.top() <= 0.0f )
         {
             c.center.y = c.radius;
             vel.y *= -1.0f;
-            bounceSounds[dist( rng )].replay();
+            //bounceSounds[dist( rng )].replay();
+            marioCoin.play();
         }
         else if ( c.bottom() >= static_cast<float>( image.getHeight() ) )
         {
             c.center.y = static_cast<float>( image.getHeight() ) - c.radius;
             vel.y *= -1.0f;
-            bounceSounds[dist( rng )].replay();
+            //bounceSounds[dist( rng )].replay();
+            marioCoin.play();
         }
         ball.setCircle( c );
         ball.setVelocity( vel );

@@ -4,11 +4,13 @@ set( TARGET_NAME 08-Audio )
 
 set( INC_FILES
     Ball.hpp
+    MarioCoin.hpp
 )
 
 set( SRC_FILES
     Ball.cpp
     main.cpp
+    MarioCoin.cpp
 )
 
 set( ALL_FILES ${SRC_FILES} ${INC_FILES} )
