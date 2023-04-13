@@ -5,6 +5,8 @@
 
 #include <Graphics/Input.hpp>
 
+#include <glm/gtc/random.hpp>  // For generating random vectors.
+
 using namespace Graphics;
 using namespace Math;
 
@@ -27,7 +29,8 @@ PlayState::PlayState( Game& game )
         field.setLives( numLives );
     }
 
-    level = Level { game, 0 };
+    level = Level { game, levelId };
+    field.setLevel( levelId );
 
     setState( State::Ready );
 }
@@ -109,6 +112,7 @@ void PlayState::startState( State newState )
     {
     case State::Ready:
         time = 0.0f;
+        vaus.setState( Vaus::State::Wait );
         vaus.setPosition( glm::vec2 { static_cast<float>( screenWidth ) / 2.0f, static_cast<float>( screenHeight ) - 17.0f } );
         break;
     case State::Appear:
@@ -195,7 +199,24 @@ void PlayState::doPlaying( float deltaTime )
     ball.update( deltaTime );
     field.update( deltaTime );
 
+#if _DEBUG
+    // In debug mode, put vaus under the ball...
+    auto x = ball.getPosition().x;
+    auto y = vaus.getPosition().y;
+//    vaus.setPosition( { x, y } );
+#endif
+
     checkCollisions( ball );
+
+    // No bricks left. Go to next level.
+    if ( level.getNumBricks() == 0 )
+    {
+        // Go to the next level.
+        ++levelId;
+        level = Level { game, levelId };
+        field.setLevel( levelId );
+        setState( State::Ready );
+    }
 }
 
 void PlayState::checkCollisions( Ball& ball )
@@ -203,11 +224,13 @@ void PlayState::checkCollisions( Ball& ball )
     auto c = ball.getCircle();
     auto v = ball.getVelocity();
 
+    // Level bounds.
     constexpr float top    = 24.0f;
     constexpr float bottom = 256.0f;
     constexpr float left   = 8.0f;
     constexpr float right  = 216.0f;
 
+    // Check collision with the sides of the level.
     if ( c.center.x - c.radius <= left )
     {
         c.center.x = left + c.radius;
@@ -236,14 +259,18 @@ void PlayState::checkCollisions( Ball& ball )
 
     if ( const auto hit = vaus.collidesWith( ball ) )
     {
-        c.center = hit->point + hit->normal * c.radius;
+        // Slightly perturb the hit normal to prevent the ball from getting stuck on gold bricks.
+        glm::vec2 n = glm::normalize( hit->normal + glm::diskRand( 0.2f ) );
+        c.center    = hit->point + n * c.radius;
         // Reflect the velocity of the ball about the hit normal.
         v = glm::reflect( v, hit->normal );
     }
 
     if ( const auto hit = level.checkCollision( ball ) )
     {
-        c.center = hit->point + hit->normal * c.radius;
+        // Slightly perturb the hit normal to prevent the ball from getting stuck on gold bricks.
+        glm::vec2 n = glm::normalize( hit->normal + glm::diskRand( 0.2f ) );
+        c.center    = hit->point + n * c.radius;
         // Reflect the velocity of the ball about the hit normal.
         v = glm::reflect( v, hit->normal );
     }

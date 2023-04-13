@@ -67,5 +67,5 @@ private:
 
     float time = 0.0f;
 
-    static inline const float ballSpeed   = 200.0f;  // pixels per second
+    static inline const float ballSpeed   = 1200.0f;  // pixels per second
 };

@@ -4,6 +4,15 @@
 
 #include <span>
 
+/// <summary>
+/// Defines a point along a curve.
+/// </summary>
+struct Point
+{
+    float t;  ///< The time (or x) value.
+    float v;  ///< The value at time (t).
+};
+
 using namespace Audio;
 
 // Piano frequencies.
@@ -21,9 +30,9 @@ static constexpr Point amplitude[] = {
 
 // Frequency curve.
 static constexpr Point frequency[] = {
-    { 0.0f, B5 },  // B4
+    { 0.0f, B5 },  // B5
     { 0.1f, B5 },  // Hold for 0.1 seconds.
-    { 0.1f, E6 },  // E5
+    { 0.1f, E6 },  // E6
     { 1.0f, E6 }   // Hold until end.
 };
 

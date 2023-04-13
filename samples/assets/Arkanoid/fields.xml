@@ -3,8 +3,8 @@
 	<SubTexture name="1" x="0" y="256" width="224" height="240"/>
 	<SubTexture name="2" x="232" y="0" width="224" height="240"/>
 	<SubTexture name="3" x="232" y="256" width="224" height="240"/>
-	<SubTexture name="4" x="696" y="0" width="224" height="240"/>
-	<SubTexture name="5" x="696" y="256 " width="224" height="240"/>
+	<SubTexture name="4" x="464" y="0" width="224" height="240"/>
+	<SubTexture name="5" x="464 " y="256 " width="224" height="240"/>
 	<SubTexture name="6" x="696" y="0" width="224" height="240"/>
 	<SubTexture name="7" x="696" y="256" width="224" height="240"/>
 	<SubTexture name="8" x="928"  y="0" width="224" height="240"/>

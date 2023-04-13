@@ -44,6 +44,13 @@ public:
     void animateBricks();
 
     /// <summary>
+    /// Get the number of bricks that are left over.
+    /// Note: Gold bricks cannot be destroyed at all. They are indestructible, and therefore not counted against you towards your attempt to clear an area of bricks.
+    /// </summary>
+    /// <returns></returns>
+    int getNumBricks() const noexcept;
+
+    /// <summary>
     /// Check collision with the ball and the bricks.
     /// </summary>
     /// <param name="ball">The ball to check for collision with.</param>

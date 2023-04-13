@@ -2,17 +2,6 @@
 
 #include <Audio/Waveform.hpp>
 
-#include <vector>
-
-/// <summary>
-/// Defines a point along a curve.
-/// </summary>
-struct Point
-{
-    float t;  ///< The time (or x) value.
-    float v;  ///< The value at time (t).
-};
-
 class MarioCoin
 {
 public:

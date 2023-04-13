@@ -29,7 +29,7 @@ const Brick& GetBrick( Stages::B b )
         { sprites, { { 6 } }, 110, 1 },                       // Magenta.
         { sprites, { { 7 } }, 120, 1 },                       // Yellow.
         { sprites, { { 8, 9, 10, 11, 12, 13 } }, 50, 2 },     // Sliver.
-        { sprites, { { 14, 15, 16, 17, 18, 19 } }, 0, 255 },  // Gold.
+        { sprites, { { 14, 15, 16, 17, 18, 19 } }, 0, std::numeric_limits<int>::max() },  // Gold.
     };
 
     return bricks[b];
@@ -90,6 +90,19 @@ void Level::animateBricks()
     {
         b.animate();
     }
+}
+
+int Level::getNumBricks() const noexcept
+{
+    int numBricks = 0;
+
+    for ( auto& b: bricks )
+    {
+        if ( b.getPoints() > 0 && b.getHitPoints() > 0 )
+            ++numBricks;
+    }
+
+    return numBricks;
 }
 
 std::optional<Physics::HitInfo> Level::checkCollision( const Ball& ball )
