@@ -203,7 +203,7 @@ void PlayState::doPlaying( float deltaTime )
     // In debug mode, put vaus under the ball...
     auto x = ball.getPosition().x;
     auto y = vaus.getPosition().y;
-//    vaus.setPosition( { x, y } );
+    vaus.setPosition( { x, y } );
 #endif
 
     checkCollisions( ball );

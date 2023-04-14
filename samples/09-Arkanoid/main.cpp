@@ -38,7 +38,7 @@ int main( int argc, char* argv[] )
     std::string fps        = "FPS: 0";
 
     // Maximum tick time for physics.
-    constexpr float physicsTick = 1.0f / 60.0f;
+    constexpr float physicsTick = 1.0f / 200.0f;
 
     while ( window )
     {
