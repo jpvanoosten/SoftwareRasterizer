@@ -195,10 +195,6 @@ void PlayState::doStart( float deltaTime )
 
 void PlayState::doPlaying( float deltaTime )
 {
-    vaus.update( deltaTime );
-    ball.update( deltaTime );
-    field.update( deltaTime );
-
 #if _DEBUG
     // In debug mode, put vaus under the ball...
     auto x = ball.getPosition().x;
@@ -206,6 +202,10 @@ void PlayState::doPlaying( float deltaTime )
     vaus.setPosition( { x, y } );
 #endif
 
+    vaus.update( deltaTime );
+    ball.update( deltaTime );
+    field.update( deltaTime );
+    
     checkCollisions( ball );
 
     // No bricks left. Go to next level.
