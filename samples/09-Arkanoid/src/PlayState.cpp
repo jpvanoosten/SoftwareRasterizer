@@ -12,7 +12,6 @@ using namespace Math;
 
 PlayState::PlayState( Game& game )
 : game { game }
-, arcadeN { "assets/fonts/ARCADE_N.ttf", 7 }
 , screenWidth { static_cast<int>( game.getImage().getWidth() ) }
 , screenHeight { static_cast<int>( game.getImage().getHeight() ) }
 {
@@ -62,8 +61,10 @@ void PlayState::update( float deltaTime )
 
 void PlayState::drawText( Graphics::Image& image, std::string_view text, int x, int y )
 {
-    image.drawText( arcadeN, text, x + 1, y + 1, Color::Black );
-    image.drawText( arcadeN, text, x, y, Color::White );
+    const auto& font = game.getFont();
+
+    image.drawText( font, text, x + 1, y + 1, Color::Black );
+    image.drawText( font, text, x, y, Color::White );
 }
 
 void PlayState::draw( Graphics::Image& image )

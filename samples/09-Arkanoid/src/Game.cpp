@@ -1,6 +1,7 @@
 #include <Game.hpp>
 #include <TitleState.hpp>
 #include <PlayState.hpp>
+#include <GameOverState.hpp>
 
 #include <Graphics/Input.hpp>
 #include <Graphics/KeyCodes.hpp>
@@ -78,10 +79,10 @@ Game::Game( uint32_t screenWidth, uint32_t screenHeight )
         return start || _2;
     } );
 
-    // Load highscores.
+    // Load high scores.
     highScores.load( "assets/Arkanoid/high_scores.txt" );
 
-    setState( GameState::Playing );
+    setState( GameState::GameOver );
 }
 
 void Game::processEvent( const Graphics::Event& event )
@@ -158,6 +159,9 @@ void Game::setState( GameState newState )
         case GameState::Playing:
             state = std::make_unique<PlayState>( *this );
             break;
+        case GameState::GameOver:
+            state = std::make_unique<GameOverState>( *this );
+            break;
         }
     }
 }
@@ -175,4 +179,9 @@ void Game::addPoints( int points )
     default: 
         break;
     }
+}
+
+const Graphics::Font& Game::getFont() const noexcept
+{
+    return arcadeN;
 }

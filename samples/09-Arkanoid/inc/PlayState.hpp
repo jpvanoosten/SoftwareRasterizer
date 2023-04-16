@@ -47,7 +47,6 @@ private:
     void drawText( Graphics::Image& image, std::string_view text, int x, int y );
 
     Game& game;
-    Graphics::Font arcadeN;
 
     State state = State::Dead;
 

@@ -12,7 +12,6 @@ TitleState::TitleState( Game& game )
 : game { game }
 , screenWidth( static_cast<int>( game.getImage().getWidth() ) )
 , screenHeight( static_cast<int>( game.getImage().getHeight() ) )
-, arcadeN { "assets/fonts/ARCADE_N.TTF", 8, 32, 138 }
 {
     auto shipImage  = ResourceManager::loadImage( "assets/Arkanoid/ship.png" );
     auto taitoImage = ResourceManager::loadImage( "assets/Arkanoid/taito.png" );
@@ -31,7 +30,7 @@ void TitleState::update( float deltaTime )
     else if ( game.getCoins() > 1 && Input::getButtonDown( "Start 2" ) )
     {
         game.setNumPlayers( 2 );
-        game.setNextState( Game::GameState::Playing ); 
+        game.setNextState( Game::GameState::Playing );
     }
 }
 
@@ -41,24 +40,26 @@ void TitleState::draw( Graphics::Image& image )
 
     image.drawSprite( arkanoidSprite, 16, 51 );
 
-    int coins = game.getCoins();
+    int         coins = game.getCoins();
+    const auto& font  = game.getFont();
+
     if ( coins > 0 )
     {
-        image.drawText( arcadeN, "PUSH", 97, 120, Color::White );
+        image.drawText( font, "PUSH", 97, 120, Color::White );
         if ( coins < 2 )
         {
-            image.drawText( arcadeN, "ONLY 1 PLAYER BUTTON", 33, 144, Color::White );
+            image.drawText( font, "ONLY 1 PLAYER BUTTON", 33, 144, Color::White );
         }
         else
         {
-            image.drawText( arcadeN, "1 OR 2 PLAYER BUTTON", 34, 144, Color::White );
+            image.drawText( font, "1 OR 2 PLAYER BUTTON", 34, 144, Color::White );
         }
     }
 
     image.drawSprite( taitoSprite, 64, 179 );
-    image.drawText( arcadeN, L"© 1986 TAITO CORP JAPAN", 16, 208, Color::White );
-    image.drawText( arcadeN, "ALL RIGHTS RESERVED", 33, 222, Color::White );
-    image.drawText( arcadeN, std::format( "CREDIT{:3d}", coins ), 145, 255, Color::White );
+    image.drawText( font, L"© 1986 TAITO CORP JAPAN", 16, 208, Color::White );
+    image.drawText( font, "ALL RIGHTS RESERVED", 33, 222, Color::White );
+    image.drawText( font, std::format( "CREDIT{:3d}", coins ), 145, 255, Color::White );
 }
 
 void TitleState::processEvent( const Graphics::Event& _event )

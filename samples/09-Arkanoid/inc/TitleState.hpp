@@ -25,7 +25,6 @@ private:
 
     Graphics::Sprite arkanoidSprite;
     Graphics::Sprite taitoSprite;
-    Graphics::Font   arcadeN;
 
     // The game rectangle in the Window's coordinate frame.
     // Used for translating mouse coordinates.

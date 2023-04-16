@@ -16,6 +16,7 @@ public:
         None,
         MainMenu,
         Playing,
+        HighScore,
         Pause,
         GameOver,
     };
@@ -67,6 +68,12 @@ public:
     /// </summary>
     /// <param name="points">The number of points to add to the current player.</param>
     void addPoints( int points );
+
+    /// <summary>
+    /// Get the one font used by the game.
+    /// </summary>
+    /// <returns></returns>
+    const Graphics::Font& getFont() const noexcept;
 
 private:
     GameState              currentState = GameState::None;

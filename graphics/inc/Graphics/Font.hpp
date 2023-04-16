@@ -35,7 +35,7 @@ public:
     /// Get the size of the area needed to render the given text using this font.
     /// </summary>
     /// <param name="text">The text to write.</param>
-    /// <returns>The size of the are needed to render this font.</returns>
+    /// <returns>The size of the rectangle needed to render this font.</returns>
     glm::vec2 getSize( std::string_view text ) const noexcept;
 
     float getFontSize() const noexcept
