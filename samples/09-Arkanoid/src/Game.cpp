@@ -78,6 +78,9 @@ Game::Game( uint32_t screenWidth, uint32_t screenHeight )
         return start || _2;
     } );
 
+    // Load highscores.
+    highScores.load( "assets/Arkanoid/high_scores.txt" );
+
     setState( GameState::Playing );
 }
 
@@ -107,6 +110,7 @@ void Game::update( float deltaTime )
     }
     {
         // High score
+        int highScore = std::max( highScores.getHighScore(), std::max( score1, score2 ) );
         image.drawText( arcadeN, "HIGH SCORE", 73, 7, Color::Red );
         const auto score = std::format( "{:6d}", highScore );
         image.drawText( arcadeN, score, 87, 15, Color::White );

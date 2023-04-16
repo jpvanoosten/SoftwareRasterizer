@@ -1,6 +1,7 @@
 #pragma once
 
 #include "State.hpp"
+#include "HighScores.hpp"
 
 #include <Graphics/Events.hpp>
 #include <Graphics/Font.hpp>
@@ -87,6 +88,5 @@ private:
     // Current player.
     int currentPlayer = 0;
 
-    // Current high score.
-    int highScore = 50000;
+    HighScores highScores;
 };
