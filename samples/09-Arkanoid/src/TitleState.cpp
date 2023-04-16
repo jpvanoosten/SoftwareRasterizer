@@ -26,12 +26,12 @@ void TitleState::update( float deltaTime )
     if ( game.getCoins() > 0 && Input::getButtonDown( "Start 1" ) )
     {
         game.setNumPlayers( 1 );
-        game.setState( Game::GameState::Playing );
+        game.setNextState( Game::GameState::Playing );
     }
     else if ( game.getCoins() > 1 && Input::getButtonDown( "Start 2" ) )
     {
         game.setNumPlayers( 2 );
-        game.setState( Game::GameState::Playing );
+        game.setNextState( Game::GameState::Playing ); 
     }
 }
 

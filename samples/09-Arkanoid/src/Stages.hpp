@@ -709,6 +709,27 @@ inline Stage stages[] = {
         { No, No, No, No, No, No, No, No, No, No, No, No, No },
         { No, No, No, No, No, No, No, No, No, No, No, No, No },
     } },
+    // Stage 33 (Daniel's stage)
+    { {
+        { Si, Si, Si, Si, Si, Si, Si, Si, Si, Si, Si, Si, Si },
+        { Si, Cy, Cy, Cy, Cy, Cy, Ye, Cy, Cy, Cy, Cy, Cy, Si },
+        { Si, Cy, Cy, Cy, Cy, Ye, Ye, Ye, Cy, Cy, Cy, Cy, Si },
+        { Si, Cy, Cy, Cy, Ye, Ye, Ye, Ye, Ye, Cy, Cy, Cy, Si },
+        { Si, Cy, Cy, Ye, Ye, Ye, Ye, Ye, Ye, Ye, Cy, Cy, Si },
+        { Si, Cy, Cy, Ye, Wh, Wh, Ye, Wh, Wh, Ye, Cy, Cy, Si },
+        { Si, Cy, Ye, Ye, Wh, Bl, Ye, Bl, Wh, Ye, Ye, Cy, Si },
+        { Si, Ye, Ye, Ye, Wh, Bl, Ye, Bl, Wh, Ye, Ye, Ye, Si },
+        { Si, Ye, Ye, Ye, Ye, Ye, Ye, Ye, Ye, Ye, Ye, Ye, Si },
+        { Si, Ye, Ye, Ye, Ye, Ye, Go, Ye, Ye, Ye, Ye, Ye, Si },
+        { Si, Ye, Ye, Ye, Ye, Ye, Ye, Ye, Ye, Ye, Ye, Ye, Si },
+        { Si, Cy, Ye, Ye, Ye, Ye, Ye, Ye, Ye, Ye, Ye, Cy, Si },
+        { Si, Cy, Cy, Ye, Re, Ye, Ye, Ye, Re, Ye, Cy, Cy, Si },
+        { Si, Cy, Cy, Ye, Ye, Re, Re, Re, Ye, Ye, Cy, Cy, Si },
+        { Si, Cy, Cy, Cy, Ye, Ye, Ye, Ye, Ye, Cy, Cy, Cy, Si },
+        { Si, Cy, Cy, Cy, Cy, Ye, Ye, Ye, Cy, Cy, Cy, Cy, Si },
+        { Si, Cy, Cy, Cy, Cy, Cy, Ye, Cy, Cy, Cy, Cy, Cy, Si },
+        { Si, Si, Si, Si, Si, Si, Si, Si, Si, Si, Si, Si, Si },
+    } },
 };
 
 }  // namespace Stages

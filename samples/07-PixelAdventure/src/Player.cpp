@@ -13,7 +13,7 @@ const float Player::accel = 5e3f;
 // The maximum speed of the player.
 const float Player::maxSpeed = 150.0f;
 // Maximum jump height in pixels.
-const float Player::jumpHeight = 60.0f;
+const float Player::jumpHeight = 55.0f;
 // Jump time is the time (in seconds) to the apex of the jump.
 const float Player::jumpTime = 0.25f;
 // Gravity and jump speed are computed to achieve the desired jump parabola.

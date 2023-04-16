@@ -33,6 +33,12 @@ public:
 
     Graphics::Image& getImage() noexcept;
 
+    /// <summary>
+    /// Set the state to transition.
+    /// </summary>
+    /// <param name="nextState">The next state to transition to.</param>
+    void setNextState( GameState nextState );
+
     void setState( GameState newState );
 
     GameState getState() const noexcept
@@ -63,6 +69,8 @@ public:
 
 private:
     GameState              currentState = GameState::None;
+    GameState              nextState    = GameState::None;
+
     std::unique_ptr<State> state;
 
     Graphics::Image image;

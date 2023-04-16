@@ -35,6 +35,11 @@ const Brick& GetBrick( Stages::B b )
     return bricks[b];
 }
 
+int Level::getNumStages()
+{
+    return static_cast<int>( std::size( Stages::stages ) );
+}
+
 Level::Level( Game& game, int levelId )
 : pGame { &game }
 {

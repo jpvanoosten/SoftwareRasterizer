@@ -229,8 +229,7 @@ void Game::Update()
     image.drawText( arial20, std::format( "({}, {})", mousePos.x, mousePos.y ), mousePos.x, mousePos.y, Color::White );
 #endif
 
-    // Simulate low frame rates.
-    // timer.limitFPS( 25 );
+//    timer.limitFPS( 30 );
 }
 
 void Game::processEvent( const Graphics::Event& _event )

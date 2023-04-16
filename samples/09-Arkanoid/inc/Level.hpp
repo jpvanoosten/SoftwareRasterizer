@@ -20,6 +20,13 @@ public:
     Level() = default;
 
     /// <summary>
+    /// Get the maximum number of stages.
+    /// </summary>
+    /// <see cref="Stages::stages"/>
+    /// <returns>The number of stages defined in the stages array.</returns>
+    static int getNumStages();
+
+    /// <summary>
     /// Create the level given the specific level ID.
     /// </summary>
     /// <param name="game">A reference to the Game instance.</param>

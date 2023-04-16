@@ -72,13 +72,12 @@ Level::Level( const ldtk::Project& project, const ldtk::World& world, const ldtk
         auto& s      = e.getSize();
         auto& oneWay = e.getField<ldtk::FieldType::Bool>( "OneWay" );
         auto& trap   = e.getField<ldtk::FieldType::Bool>( "Trap" );
-        bool isTrap = trap ? *trap : false;
+        bool  isTrap = trap ? *trap : false;
 
         // Add a few pixels padding if it is a spike trap.
         int padding = isTrap ? 2 : 0;
 
-        Collider collider
-        {
+        Collider collider {
             .type     = ColliderType::Default,
             .aabb     = AABB { { p.x + padding, p.y + padding, 0.0 }, { p.x + s.x - 1 - padding, p.y + s.y - 1 - padding, 0.0f } },
             .isOneWay = oneWay ? *oneWay : false,
@@ -167,14 +166,18 @@ Level::Level( const ldtk::Project& project, const ldtk::World& world, const ldtk
 
     // Load some sound effects.
     pickupSound.loadSound( "assets/sounds/8-bit-powerup.mp3" );
-    pickupSound.setVolume( 0.25f );
+    pickupSound.setVolume( 0.2f );
 
-    woodBreakSounds.emplace_back( "assets/sounds/wood_break_1.wav", Audio::Sound::Type::Sound );
-    woodBreakSounds.emplace_back( "assets/sounds/wood_break_2.wav", Audio::Sound::Type::Sound );
-    woodBreakSounds.emplace_back( "assets/sounds/wood_break_3.wav", Audio::Sound::Type::Sound );
-    woodBreakSounds.emplace_back( "assets/sounds/wood_break_4.wav", Audio::Sound::Type::Sound );
-    woodBreakSounds.emplace_back( "assets/sounds/wood_break_5.wav", Audio::Sound::Type::Sound );
-    woodBreakSounds.emplace_back( "assets/sounds/wood_break_6.wav", Audio::Sound::Type::Sound );
+    woodBreakSounds.emplace_back( "assets/sounds/wood_break_1.wav" );
+    woodBreakSounds.emplace_back( "assets/sounds/wood_break_2.wav" );
+    woodBreakSounds.emplace_back( "assets/sounds/wood_break_3.wav" );
+    woodBreakSounds.emplace_back( "assets/sounds/wood_break_4.wav" );
+    woodBreakSounds.emplace_back( "assets/sounds/wood_break_5.wav" );
+    woodBreakSounds.emplace_back( "assets/sounds/wood_break_6.wav" );
+
+    for ( auto& s: woodBreakSounds )
+        s.setVolume( 0.2f );
+
     // Setup the random number generator for playing the wood break sounds effects.
     rng.seed( std::random_device()() );
     dist.param( std::uniform_int_distribution<>::param_type( 0, static_cast<int>( woodBreakSounds.size() ) - 1 ) );
@@ -541,7 +544,7 @@ void Level::updateBoxes( float deltaTime )
                 box->hit();
 
                 // Play a random box hit sound.
-                woodBreakSounds[dist(rng)].replay();
+                woodBreakSounds[dist( rng )].replay();
 
                 continue;
             }
@@ -560,6 +563,7 @@ void Level::updateBoxes( float deltaTime )
 
                 // Hit the box.
                 box->hit();
+
                 // Play a random box hit sound.
                 woodBreakSounds[dist( rng )].replay();
 

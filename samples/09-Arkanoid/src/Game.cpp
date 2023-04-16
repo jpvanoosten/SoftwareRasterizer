@@ -119,6 +119,13 @@ void Game::update( float deltaTime )
         const auto score = std::format( "{:6d}", score2 );
         image.drawText( arcadeN, score, 164, 15, Color::White );
     }
+
+    // If one of the states requested a state change, then
+    // switch to the next state at the end of the update function.
+    // Switching states while a state is executing will crash
+    // since the states are objects and deleting an object while it
+    // is still running is bad.
+    setState( nextState );
 }
 
 Graphics::Image& Game::getImage() noexcept
@@ -126,11 +133,18 @@ Graphics::Image& Game::getImage() noexcept
     return image;
 }
 
+void Game::setNextState( GameState _nextState )
+{
+    nextState = _nextState;
+}
+
 void Game::setState( GameState newState )
 {
     if ( currentState != newState )
     {
         currentState = newState;
+        // Also make sure the next state is correct...
+        nextState    = currentState;
 
         switch ( newState )
         {

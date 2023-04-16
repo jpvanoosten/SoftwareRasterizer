@@ -235,23 +235,27 @@ Math::AABB Vaus::getAABB() const
 
 std::optional<Physics::HitInfo> Vaus::collidesWith( const Ball& ball ) const
 {
-    const auto& c = ball.getCircle();
+    // The ball can only collide with vaus if it's moving downwards.
+    if (ball.getVelocity().y > 0 )
+    {
+        const auto& c = ball.getCircle();
 
-    if ( auto hit = Physics::collidesWith( leftCircle, c ) )
-    {
-        // 45 degrees to the left.
-        hit->normal = glm::normalize( glm::vec2 { -1, -1 } );
-        return hit;
-    }
-    if ( auto hit = Physics::collidesWith( rightCircle, c ) )
-    {
-        // 45 degrees to the right.
-        hit->normal = glm::normalize( glm::vec2 { 1, -1 } );
-        return hit;
-    }
-    if ( const auto hit = Physics::collidesWith( getAABB(), ball.getCircle(), ball.getVelocity() ) )
-    {
-        return hit;
+        if ( auto hit = Physics::collidesWith( leftCircle, c ) )
+        {
+            // 45 degrees to the left.
+            hit->normal = glm::normalize( glm::vec2 { -1, -1 } );
+            return hit;
+        }
+        if ( auto hit = Physics::collidesWith( rightCircle, c ) )
+        {
+            // 45 degrees to the right.
+            hit->normal = glm::normalize( glm::vec2 { 1, -1 } );
+            return hit;
+        }
+        if ( const auto hit = Physics::collidesWith( getAABB(), ball.getCircle(), ball.getVelocity() ) )
+        {
+            return hit;
+        }
     }
 
     return {};

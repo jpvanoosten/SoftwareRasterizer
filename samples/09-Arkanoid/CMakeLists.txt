@@ -7,6 +7,7 @@ set( INC_FILES
     inc/Brick.hpp
     inc/Button.hpp
     inc/Game.hpp
+    inc/HighScores.hpp
     inc/Field.hpp
     inc/Level.hpp
     inc/ParseRects.hpp
@@ -23,6 +24,7 @@ set( SRC_FILES
     src/Brick.cpp
     src/Button.cpp
     src/Game.cpp
+    src/HighScores.cpp
     src/Field.cpp
     src/Level.cpp
     src/ParseRects.cpp

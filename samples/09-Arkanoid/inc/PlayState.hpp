@@ -63,9 +63,9 @@ private:
     // Number of lives.
     int numLives = 3;
     // The current level.
-    int levelId = 9;
+    int levelId = 32;
 
     float time = 0.0f;
 
-    static inline const float ballSpeed   = 1200.0f;  // pixels per second
+    static inline const float ballSpeed   = 50.0f;  // pixels per second
 };

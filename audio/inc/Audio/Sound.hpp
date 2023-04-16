@@ -31,7 +31,7 @@ public:
     /// Load a sound effect from a file.
     /// </summary>
     /// <param name="filePath">The path to the sound file.</param>
-    /// <param name="type">The type of sound.</param>
+    /// <param name="type">(optional) The type of sound. Default: Sound effect.</param>
     explicit Sound( const std::filesystem::path& filePath, Type type = Type::Sound );
 
     /// <summary>
