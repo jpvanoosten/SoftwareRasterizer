@@ -490,13 +490,13 @@ void Image::drawCircle( const Math::Circle& c, const Color& color, const BlendMo
     }
 }
 
-void Image::drawSprite( const Sprite& sprite, const glm::mat3& matrix ) noexcept
+void Image::drawSprite( const Sprite& sprite, const glm::mat3& matrix, std::optional<Graphics::Color> _color ) noexcept
 {
     std::shared_ptr<Image> image = sprite.getImage();
     if ( !image )
         return;
 
-    const Color       color     = sprite.getColor();
+    const Color       color     = _color ? *_color : sprite.getColor();
     const BlendMode   blendMode = sprite.getBlendMode();
     const glm::ivec2& uv        = sprite.getUV();
     const glm::ivec2& size      = sprite.getSize();
@@ -561,13 +561,13 @@ void Image::drawSprite( const Sprite& sprite, const glm::mat3& matrix ) noexcept
     }
 }
 
-void Image::drawSprite( const Sprite& sprite, int x, int y ) noexcept
+void Image::drawSprite( const Sprite& sprite, int x, int y, std::optional<Graphics::Color> _color ) noexcept
 {
     std::shared_ptr<Image> image = sprite.getImage();
     if ( !image )
         return;
 
-    const Color      color     = sprite.getColor();
+    const Color      color     = _color ? *_color : sprite.getColor();
     const BlendMode  blendMode = sprite.getBlendMode();
     const glm::ivec2 uv        = sprite.getUV();
     const glm::ivec2 size      = sprite.getSize();

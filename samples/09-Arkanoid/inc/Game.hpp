@@ -1,7 +1,7 @@
 #pragma once
 
-#include "State.hpp"
 #include "HighScores.hpp"
+#include "State.hpp"
 
 #include <Graphics/Events.hpp>
 #include <Graphics/Font.hpp>
@@ -70,14 +70,29 @@ public:
     void addPoints( int points );
 
     /// <summary>
+    /// Add a given high score to the high score list.
+    /// </summary>
+    /// <param name="score">The high score to add.</param>
+    void addHighScore( const HighScore& score );
+
+    /// <summary>
+    /// Get the current high score.
+    /// </summary>
+    /// <returns>The current highscore.</returns>
+    int getHighScore() const noexcept;
+
+    /// <summary>
     /// Get the one font used by the game.
     /// </summary>
     /// <returns></returns>
     const Graphics::Font& getFont() const noexcept;
 
 private:
-    GameState              currentState = GameState::None;
-    GameState              nextState    = GameState::None;
+    void endState( GameState state );
+    void startState( GameState state );
+
+    GameState currentState = GameState::None;
+    GameState nextState    = GameState::None;
 
     std::unique_ptr<State> state;
 
@@ -87,6 +102,8 @@ private:
 
     int numPlayers = 1;
     int coins      = 0;
+    // Current level.
+    int levelId    = 0;
     // Player 1 score.
     int score1 = 0;
     // Player 2 score.

@@ -6,8 +6,6 @@
 #include "Vaus.hpp"
 #include "Level.hpp"
 
-#include <Math/Camera2D.hpp>
-
 class Game;
 
 class PlayState : public State
@@ -30,6 +28,11 @@ public:
 
     void setState( State newState );
     State getState() const noexcept;
+
+    int getCurrentLevel() const noexcept
+    {
+        return levelId;
+    }
 
 private:
     void startState( State newState );

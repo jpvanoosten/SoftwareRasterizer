@@ -165,18 +165,13 @@ void Vaus::draw( Graphics::Image& image )
 
     if ( sprite )
     {
-        Sprite normalSprite = *sprite;
-        Sprite blackSprite  = *sprite;
-
-        blackSprite.setColor( Color::Black );
-
         int x = t->getPosition().x - t->getAnchor().x;
         int y = t->getPosition().y - t->getAnchor().y;
 
         // Draw the shadow.
-        image.drawSprite( blackSprite, x + 4, y + 4 );
+        image.drawSprite( *sprite, x + 4, y + 4, Color::Black );
         // Draw the regular sprite.
-        image.drawSprite( normalSprite, x, y );
+        image.drawSprite( *sprite, x, y );
     }
 
 #if _DEBUG

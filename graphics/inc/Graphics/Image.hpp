@@ -282,16 +282,18 @@ struct SR_API Image final
     /// </summary>
     /// <param name="sprite">The sprite the draw.</param>
     /// <param name="matrix">The matrix to apply to the sprite before drawing.</param>
-    void drawSprite( const Sprite& sprite, const glm::mat3& matrix ) noexcept;
+    /// <param name="color">(optional) Replace the sprite color by this color. Default: The sprite's color.</param>
+    void drawSprite( const Sprite& sprite, const glm::mat3& matrix, std::optional<Graphics::Color> color = {} ) noexcept;
 
     /// <summary>
     /// Draw a sprite on the screen using the given transform.
     /// </summary>
     /// <param name="sprite">The sprite to draw.</param>
     /// <param name="transform">The transform to apply to the sprite.</param>
-    void drawSprite( const Sprite& sprite, const Math::Transform2D& transform ) noexcept
+    /// <param name="color">(optional) Replace the sprite color by this color. Default: The sprite's color.</param>
+    void drawSprite( const Sprite& sprite, const Math::Transform2D& transform, std::optional<Graphics::Color> color = {} ) noexcept
     {
-        drawSprite( sprite, transform.getTransform() );
+        drawSprite( sprite, transform.getTransform(), color );
     }
 
     /// <summary>
@@ -300,7 +302,8 @@ struct SR_API Image final
     /// <param name="sprite">The sprite to draw.</param>
     /// <param name="x">The x-coordinate on the screen.</param>
     /// <param name="y">The y-coordinate on the screen.</param>
-    void drawSprite( const Sprite& sprite, int x, int y ) noexcept;
+    /// <param name="color">(optional) Replace the sprite color by this color. Default: The sprite's color.</param>
+    void drawSprite( const Sprite& sprite, int x, int y, std::optional<Graphics::Color> color = {} ) noexcept;
 
     /// <summary>
     /// Draw text to the image.

@@ -1,7 +1,8 @@
 #include <Game.hpp>
-#include <TitleState.hpp>
-#include <PlayState.hpp>
 #include <GameOverState.hpp>
+#include <HighScoreState.hpp>
+#include <PlayState.hpp>
+#include <TitleState.hpp>
 
 #include <Graphics/Input.hpp>
 #include <Graphics/KeyCodes.hpp>
@@ -82,7 +83,7 @@ Game::Game( uint32_t screenWidth, uint32_t screenHeight )
     // Load high scores.
     highScores.load( "assets/Arkanoid/high_scores.txt" );
 
-    setState( GameState::GameOver );
+    setState( GameState::HighScore );
 }
 
 void Game::processEvent( const Graphics::Event& event )
@@ -111,7 +112,7 @@ void Game::update( float deltaTime )
     }
     {
         // High score
-        int highScore = std::max( highScores.getHighScore(), std::max( score1, score2 ) );
+        int highScore = getHighScore();
         image.drawText( arcadeN, "HIGH SCORE", 73, 7, Color::Red );
         const auto score = std::format( "{:6d}", highScore );
         image.drawText( arcadeN, score, 87, 15, Color::White );
@@ -147,9 +148,12 @@ void Game::setState( GameState newState )
 {
     if ( currentState != newState )
     {
+        endState( currentState );
+        startState( newState );
+
         currentState = newState;
         // Also make sure the next state is correct...
-        nextState    = currentState;
+        nextState = currentState;
 
         switch ( newState )
         {
@@ -158,6 +162,9 @@ void Game::setState( GameState newState )
             break;
         case GameState::Playing:
             state = std::make_unique<PlayState>( *this );
+            break;
+        case GameState::HighScore:
+            state = std::make_unique<HighScoreState>( *this, std::max( score1, score2 ), levelId + 1 );
             break;
         case GameState::GameOver:
             state = std::make_unique<GameOverState>( *this );
@@ -176,12 +183,38 @@ void Game::addPoints( int points )
     case 1:
         score2 += points;
         break;
-    default: 
+    default:
         break;
     }
+}
+
+void Game::addHighScore( const HighScore& score )
+{
+    highScores.addScore( score );
+    highScores.save( "assets/Arkanoid/high_scores.txt" );
+}
+
+int Game::getHighScore() const noexcept
+{
+    return std::max( highScores.getHighScore(), std::max( score1, score2 ) );
 }
 
 const Graphics::Font& Game::getFont() const noexcept
 {
     return arcadeN;
 }
+
+void Game::endState( GameState _state )
+{
+    switch ( _state )
+    {
+    case GameState::Playing:
+    {
+        const PlayState* playState = dynamic_cast<PlayState*>( state.get() );
+        levelId                    = playState->getCurrentLevel();
+    }
+    break;
+    }
+}
+
+void Game::startState( GameState _state ) {}
