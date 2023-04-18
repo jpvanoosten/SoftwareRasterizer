@@ -2,7 +2,11 @@
 
 #include <Graphics/Input.hpp>
 
+#include <numbers>
+
 using namespace Graphics;
+
+constexpr float PI = std::numbers::pi_v<float>;
 
 static const std::string chars    = "ABCDEFGHIJKLMNOPQRSTUVWXYZ.! ";  // I don't know what the possible characters are...
 static const std::string palace[] = {
@@ -65,13 +69,26 @@ HighScoreState::HighScoreState( Game& _game, int score, int round )
 
         for ( auto& gamePadState: gamePadStates )
         {
-            right = right || gamePadState.dPadLeft == ButtonState::Pressed;
+            right = right || gamePadState.dPadRight == ButtonState::Pressed;
         }
 
-        right        = right || keyboardState.isKeyPressed( KeyCode::Left );
+        right        = right || keyboardState.isKeyPressed( KeyCode::Right );
         const bool d = keyboardState.isKeyPressed( KeyCode::D );
 
         return right || d;
+    } );
+
+    Input::mapButtonDown( "Back", []( std::span<const GamePadStateTracker> gamePadStates, const KeyboardStateTracker& keyboardState, const MouseStateTracker& mouseState ) {
+        bool b = false;
+
+        for ( auto& gamePadState: gamePadStates )
+        {
+            b = b || gamePadState.b == ButtonState::Pressed;
+        }
+
+        const bool backspace = keyboardState.isKeyPressed( KeyCode::Back );
+
+        return b || backspace;
     } );
 
     Input::mapButtonDown( "Enter", []( std::span<const GamePadStateTracker> gamePadStates, const KeyboardStateTracker& keyboardState, const MouseStateTracker& mouseState ) {
@@ -90,23 +107,25 @@ HighScoreState::HighScoreState( Game& _game, int score, int round )
 
 void HighScoreState::update( float deltaTime )
 {
+    timer += deltaTime;
+
     // The number of characters in the character array.
     const int numChars = static_cast<int>( std::size( chars ) );
 
     if ( Input::getButtonDown( "Up" ) )
     {
-        character = ( character + 1 ) % numChars;
+        character[initial] = ( character[initial] + 1 ) % numChars;
     }
     if ( Input::getButtonDown( "Down" ) )
     {
         // This is a trick to make sure it doesn't become negative, but still wraps around to the previous character.
-        character = ( character + numChars + 1 ) % numChars;
+        character[initial] = ( character[initial] - 1 + numChars ) % numChars;
     }
-    if ( Input::getButtonDown( "Left" ) )
+    if ( Input::getButtonDown( "Left" ) || Input::getButtonDown( "Back" ) )
     {
         initial = std::max( 0, initial - 1 );
     }
-    if ( Input::getButtonDown( "Right" ) )
+    if ( Input::getButtonDown( "Right" )  )
     {
         initial = std::min( 2, initial + 1 );
     }
@@ -123,7 +142,7 @@ void HighScoreState::update( float deltaTime )
         }
     }
 
-    highScore.name[initial] = chars[character];
+    highScore.name[initial] = chars[character[initial]];
 }
 
 void HighScoreState::draw( Graphics::Image& image )
@@ -134,12 +153,22 @@ void HighScoreState::draw( Graphics::Image& image )
 
     image.drawText( font, "ENTER YOUR INITIALS !", 31, 79, Color::Red );
     image.drawText( font, "SCORE ROUND   NAME", 40, 104, Color::Yellow );
-    image.drawText( font, std::format( "{}", highScore.score ), 24, 120, Color::White );
-    image.drawText( font, std::format( "{}", highScore.round ), 104, 120, Color::Yellow );
-    // TODO: Blink the current initial between red and white.
-    image.drawText( font, std::format( "{}", highScore.name[0] ), 150, 120, Color::Yellow );
-    image.drawText( font, std::format( "{}", highScore.name[1] ), 160, 120, Color::Yellow );
-    image.drawText( font, std::format( "{}", highScore.name[2] ), 170, 120, Color::Yellow );
+    image.drawText( font, std::format( "{:8d}", highScore.score), 20, 120, Color::White );
+    image.drawText( font, std::format( "{:>3}", highScore.round ), 95, 120, Color::Yellow );
+
+    for ( int i = 0; i < 3; ++i )
+    {
+
+        auto color = Color::Yellow;
+        if (i == initial)
+        {
+            color = std::sin( timer * PI * 12.0f ) > 0.0f ? Color::Red : Color::White;
+        }
+
+        image.drawText( font, std::format( "{}", highScore.name[i] ), 144 + i * 7, 120, color );
+    }
+
+
 }
 
 void HighScoreState::processEvent( const Graphics::Event& event )

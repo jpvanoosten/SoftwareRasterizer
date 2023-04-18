@@ -18,8 +18,10 @@ private:
 
     // The currently selected initial.
     int initial = 0;
-    // The currently selected character.
-    int character = 0;
+    // The current characters.
+    int character[3] = {};
+    // A timer used to blink the current initial.
+    float timer = 0.0f;
 
     HighScore highScore;
 };

@@ -202,6 +202,11 @@ constexpr Color Color::operator*( float rhs ) const noexcept
     return { red, green, blue, alpha };
 }
 
+constexpr Color operator*( float lhs, const Color& rhs )
+{
+    return rhs * lhs;
+}
+
 constexpr Color& Color::operator*=( float rhs ) noexcept
 {
     b = static_cast<uint8_t>( std::clamp( static_cast<float>( b ) * rhs, 0.0f, 255.0f ) );
