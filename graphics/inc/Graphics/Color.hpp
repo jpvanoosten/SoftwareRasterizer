@@ -7,6 +7,12 @@
 #include <compare>
 #include <cstdint>
 
+#if defined( __SSE4_1__ ) || defined( _M_X64 )
+    #define GRAPHICS_SSE 1
+    #include <emmintrin.h>
+    #include <immintrin.h>
+#endif
+
 namespace Graphics
 {
 struct SR_API alignas( 4 ) Color
@@ -28,11 +34,11 @@ struct SR_API alignas( 4 ) Color
     constexpr Color& operator+=( const Color& rhs ) noexcept;
     constexpr Color  operator-( const Color& rhs ) const noexcept;
     constexpr Color& operator-=( const Color& rhs ) noexcept;
-    constexpr Color  operator*( const Color& rhs ) const noexcept;
-    constexpr Color& operator*=( const Color& rhs ) noexcept;
-    constexpr Color  operator*( float rhs ) const noexcept;
+    inline Color     operator*( const Color& rhs ) const noexcept;
+    inline Color&    operator*=( const Color& rhs ) noexcept;
+    inline Color     operator*( float rhs ) const noexcept;
     constexpr Color& operator*=( float rhs ) noexcept;
-    constexpr Color  operator/( float rhs ) const noexcept;
+    inline Color     operator/( float rhs ) const noexcept;
     constexpr Color& operator/=( float rhs ) noexcept;
 
     /// <summary>
@@ -172,37 +178,80 @@ constexpr Color& Color::operator-=( const Color& rhs ) noexcept
     return *this;
 }
 
-constexpr Color Color::operator*( const Color& rhs ) const noexcept
+inline Color Color::operator*( const Color& _rhs ) const noexcept
 {
-    auto blue  = static_cast<uint8_t>( b * rhs.b / 255 );
-    auto green = static_cast<uint8_t>( g * rhs.g / 255 );
-    auto red   = static_cast<uint8_t>( r * rhs.r / 255 );
-    auto alpha = static_cast<uint8_t>( a * rhs.a / 255 );
+#if defined( GRAPHICS_SSE )
+    const __m128i lhs = _mm_set_epi32( a, r, g, b );
+    const __m128i rhs = _mm_set_epi32( _rhs.a, _rhs.r, _rhs.g, _rhs.b );
+
+    __m128i result = _mm_mullo_epi16( lhs, rhs );
+    result         = _mm_div_epi32( result, _mm_set1_epi32( 255 ) );
+
+    const uint32_t blue  = _mm_extract_epi32( result, 0 );
+    const uint32_t green = _mm_extract_epi32( result, 1 );
+    const uint32_t red   = _mm_extract_epi32( result, 2 );
+    const uint32_t alpha = _mm_extract_epi32( result, 3 );
+
+    return { static_cast<uint8_t>( red ), static_cast<uint8_t>( green ), static_cast<uint8_t>( blue ), static_cast<uint8_t>( alpha ) };
+#else
+    auto blue  = static_cast<uint8_t>( b * _rhs.b / 255 );
+    auto green = static_cast<uint8_t>( g * _rhs.g / 255 );
+    auto red   = static_cast<uint8_t>( r * _rhs.r / 255 );
+    auto alpha = static_cast<uint8_t>( a * _rhs.a / 255 );
 
     return { red, green, blue, alpha };
+#endif
 }
 
-constexpr Color& Color::operator*=( const Color& rhs ) noexcept
+inline Color& Color::operator*=( const Color& _rhs ) noexcept
 {
-    b = static_cast<uint8_t>( b * rhs.b / 255 );
-    g = static_cast<uint8_t>( g * rhs.g / 255 );
-    r = static_cast<uint8_t>( r * rhs.r / 255 );
-    a = static_cast<uint8_t>( a * rhs.a / 255 );
+#if defined( GRAPHICS_SSE )
+    const __m128i lhs = _mm_set_epi32( a, r, g, b );
+    const __m128i rhs = _mm_set_epi32( _rhs.a, _rhs.r, _rhs.g, _rhs.b );
+
+    __m128i result = _mm_mullo_epi16( lhs, rhs );
+    result         = _mm_div_epi32( result, _mm_set1_epi32( 255 ) );
+
+    b = static_cast<uint8_t>( _mm_extract_epi32( result, 0 ) );
+    g = static_cast<uint8_t>( _mm_extract_epi32( result, 1 ) );
+    r = static_cast<uint8_t>( _mm_extract_epi32( result, 2 ) );
+    a = static_cast<uint8_t>( _mm_extract_epi32( result, 3 ) );
+#else
+    b          = static_cast<uint8_t>( b * _rhs.b / 255 );
+    g          = static_cast<uint8_t>( g * _rhs.g / 255 );
+    r          = static_cast<uint8_t>( r * _rhs.r / 255 );
+    a          = static_cast<uint8_t>( a * _rhs.a / 255 );
+#endif
 
     return *this;
 }
 
-constexpr Color Color::operator*( float rhs ) const noexcept
+inline Color Color::operator*( float _rhs ) const noexcept
 {
-    auto blue  = static_cast<uint8_t>( std::clamp( static_cast<float>( b ) * rhs, 0.0f, 255.0f ) );
-    auto green = static_cast<uint8_t>( std::clamp( static_cast<float>( g ) * rhs, 0.0f, 255.0f ) );
-    auto red   = static_cast<uint8_t>( std::clamp( static_cast<float>( r ) * rhs, 0.0f, 255.0f ) );
-    auto alpha = static_cast<uint8_t>( std::clamp( static_cast<float>( a ) * rhs, 0.0f, 255.0f ) );
+#if defined( GRAPHICS_SSE )
+    const __m128 lhs = _mm_cvtepi32_ps( _mm_set_epi32( a, r, g, b ) );
+    const __m128 rhs = _mm_set1_ps( _rhs );
+
+    __m128i result = _mm_cvtps_epi32( _mm_min_ps( _mm_mul_ps( lhs, rhs ), _mm_set1_ps( 255.0f ) ) );
+    result         = _mm_packus_epi32( result, _mm_setzero_si128() );
+
+    const uint32_t blue  = _mm_extract_epi16( result, 0 );
+    const uint32_t green = _mm_extract_epi16( result, 1 );
+    const uint32_t red   = _mm_extract_epi16( result, 2 );
+    const uint32_t alpha = _mm_extract_epi16( result, 3 );
+
+    return { static_cast<uint8_t>( red ), static_cast<uint8_t>( green ), static_cast<uint8_t>( blue ), static_cast<uint8_t>( alpha ) };
+#else
+    auto blue  = static_cast<uint8_t>( std::clamp( static_cast<float>( b ) * _rhs, 0.0f, 255.0f ) );
+    auto green = static_cast<uint8_t>( std::clamp( static_cast<float>( g ) * _rhs, 0.0f, 255.0f ) );
+    auto red   = static_cast<uint8_t>( std::clamp( static_cast<float>( r ) * _rhs, 0.0f, 255.0f ) );
+    auto alpha = static_cast<uint8_t>( std::clamp( static_cast<float>( a ) * _rhs, 0.0f, 255.0f ) );
 
     return { red, green, blue, alpha };
+#endif
 }
 
-constexpr Color operator*( float lhs, const Color& rhs )
+inline Color operator*( float lhs, const Color& rhs )
 {
     return rhs * lhs;
 }
@@ -217,7 +266,7 @@ constexpr Color& Color::operator*=( float rhs ) noexcept
     return *this;
 }
 
-constexpr Color Color::operator/( float rhs ) const noexcept
+inline Color Color::operator/( float rhs ) const noexcept
 {
     assert( rhs != 0.0f );
 
@@ -257,10 +306,10 @@ constexpr Color Color::fromFloats( float _r, float _g, float _b, float _a ) noex
 
 constexpr Color Color::fromHex( uint32_t color ) noexcept
 {
-    const uint8_t a = static_cast<uint8_t>( (color & 0xFF000000) >> 24 );
-    const uint8_t r = static_cast<uint8_t>( (color & 0x00FF0000) >> 16 );
-    const uint8_t g = static_cast<uint8_t>( (color & 0x0000FF00) >> 8 );
-    const uint8_t b = static_cast<uint8_t>( (color & 0x000000FF) >> 0 );
+    const uint8_t a = static_cast<uint8_t>( ( color & 0xFF000000 ) >> 24 );
+    const uint8_t r = static_cast<uint8_t>( ( color & 0x00FF0000 ) >> 16 );
+    const uint8_t g = static_cast<uint8_t>( ( color & 0x0000FF00 ) >> 8 );
+    const uint8_t b = static_cast<uint8_t>( ( color & 0x000000FF ) >> 0 );
 
     return { r, g, b, a };
 }
