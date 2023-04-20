@@ -7,10 +7,10 @@
 #include <compare>
 #include <cstdint>
 
-#if defined( __SSE4_1__ ) || defined( _M_X64 )
-    #define GRAPHICS_SSE 1
+#if defined( __SSE__ )
     #include <emmintrin.h>
     #include <immintrin.h>
+    #include <smmintrin.h>
 #endif
 
 namespace Graphics
@@ -180,7 +180,7 @@ constexpr Color& Color::operator-=( const Color& rhs ) noexcept
 
 inline Color Color::operator*( const Color& _rhs ) const noexcept
 {
-#if defined( GRAPHICS_SSE )
+#if defined( __SSE__ )
     const __m128i lhs = _mm_set_epi32( a, r, g, b );
     const __m128i rhs = _mm_set_epi32( _rhs.a, _rhs.r, _rhs.g, _rhs.b );
 
@@ -205,17 +205,19 @@ inline Color Color::operator*( const Color& _rhs ) const noexcept
 
 inline Color& Color::operator*=( const Color& _rhs ) noexcept
 {
-#if defined( GRAPHICS_SSE )
+#if defined( __SSE__ )
     const __m128i lhs = _mm_set_epi32( a, r, g, b );
     const __m128i rhs = _mm_set_epi32( _rhs.a, _rhs.r, _rhs.g, _rhs.b );
 
     __m128i result = _mm_mullo_epi16( lhs, rhs );
-    result         = _mm_div_epi32( result, _mm_set1_epi32( 255 ) );
+    result         = _mm_srli_epi16( _mm_add_epi16( result, _mm_set1_epi16( 128 ) ), 8 );
 
-    b = static_cast<uint8_t>( _mm_extract_epi32( result, 0 ) );
-    g = static_cast<uint8_t>( _mm_extract_epi32( result, 1 ) );
-    r = static_cast<uint8_t>( _mm_extract_epi32( result, 2 ) );
-    a = static_cast<uint8_t>( _mm_extract_epi32( result, 3 ) );
+    uint32_t packed = _mm_cvtsi128_si32( result );
+
+    b = packed & 0xff;
+    g = ( packed >> 8 ) & 0xff;
+    r = ( packed >> 16 ) & 0xff;
+    a = ( packed >> 24 ) & 0xff;
 #else
     b          = static_cast<uint8_t>( b * _rhs.b / 255 );
     g          = static_cast<uint8_t>( g * _rhs.g / 255 );
@@ -228,12 +230,12 @@ inline Color& Color::operator*=( const Color& _rhs ) noexcept
 
 inline Color Color::operator*( float _rhs ) const noexcept
 {
-#if defined( GRAPHICS_SSE )
+#if defined( __SSE__ )
     const __m128 lhs = _mm_cvtepi32_ps( _mm_set_epi32( a, r, g, b ) );
     const __m128 rhs = _mm_set1_ps( _rhs );
 
     __m128i result = _mm_cvtps_epi32( _mm_min_ps( _mm_mul_ps( lhs, rhs ), _mm_set1_ps( 255.0f ) ) );
-    result         = _mm_packus_epi32( result, _mm_setzero_si128() );
+    result         = _mm_packus_epi16( result, _mm_setzero_si128() );
 
     const uint32_t blue  = _mm_extract_epi16( result, 0 );
     const uint32_t green = _mm_extract_epi16( result, 1 );
