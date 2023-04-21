@@ -15,12 +15,3 @@
     #define SR_API
     #define SR_EXTERN
 #endif
-
-#ifdef _MSC_VER
-    #if defined( _M_AMD64 ) || defined( _M_X64 ) || _M_IX86_FP == 2
-        #define __SSE__
-        #define __SSE2__
-    #elif _M_IX86_FP == 1
-        #define __SSE__
-    #endif
-#endif
