@@ -58,6 +58,7 @@ set( SRC_FILES
     src/VertexShader.glsl
     src/stb_image.cpp
     src/stb_image_write.cpp
+    src/stb_rect_pack.h
 	src/stb_truetype.cpp
     src/TileMap.cpp
     src/Timer.cpp

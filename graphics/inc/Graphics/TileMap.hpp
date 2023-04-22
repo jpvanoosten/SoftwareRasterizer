@@ -38,8 +38,8 @@ public:
     /// Get a reference to a sprite ID at the i^th row and the j^th column in the tile map.
     /// Note: The top-left tile is at (0, 0) and the bottom-right tile is at (rows - 1, columns - 1).
     /// </summary>
-    /// <param name="i">The x-coordinate of the tile in the tile map. Must be in the range [0 ... rows - 1]</param>
-    /// <param name="j">The y-coordinate of the tile in the tile map. Must be in the range [0 ... columns - 1]</param>
+    /// <param name="i">The row of the tile in the tile map. Must be in the range [0 ... rows - 1]</param>
+    /// <param name="j">The column of the tile in the tile map. Must be in the range [0 ... columns - 1]</param>
     /// <returns>The sprite ID of the sprite in the sprite sheet at the specified grid coordinate.</returns>
     int& operator()( size_t i, size_t j ) noexcept;
 
@@ -119,7 +119,9 @@ public:
     /// Draw this tile map to the image.
     /// </summary>
     /// <param name="image">The image to draw the tile map to.</param>
-    void draw( Image& image ) const;
+    /// <param name="xOffset">An offset (in pixels) to draw the map.</param>
+    /// <param name="yOffset">An offset (in pixels) to draw the map.</param>
+    void draw( Image& image, int xOffset = 0, int yOffset = 0 ) const;
 
 private:
     // The number of columns in the tile map.

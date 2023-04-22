@@ -34,22 +34,20 @@ Font::Font( const std::filesystem::path& fontFile, float size, uint32_t firstCha
 {
     if ( fs::exists( fontFile ) && fs::is_regular_file( fontFile ) )
     {
-        bakedChar = std::make_unique<stbtt_bakedchar[]>( numChars );
-        fontData  = File::readFile<unsigned char>( fontFile, std::ios::binary );
+        packedChar = std::make_unique<stbtt_packedchar[]>( numChars );
 
-        stbtt_InitFont( &fontInfo, fontData.data(), 0 );
-        // int x0, y0, x1, y1;
-        // stbtt_GetFontBoundingBox( &fontInfo, &x0, &y0, &x1, &y1 );
-        // float scale = stbtt_ScaleForPixelHeight( &fontInfo, size );
+        fontData = File::readFile<unsigned char>( fontFile, std::ios::binary );
 
         // I'm not sure how to calculate the exact size of the pixel buffer needed for the font.
         // This pixel width is very liberal, but better safe than sorry.
-        const int pw         = static_cast<int>( std::ceil( static_cast<float>( numChars ) * size ) );
-        const int ph         = static_cast<int>( std::ceil( 2.0f * size ) );
+        const int pw         = static_cast<int>( std::ceil( static_cast<float>( numChars ) * size * 8.0f ) );
+        const int ph         = static_cast<int>( std::ceil( size * 8.0f + 1.0f ) );
         auto      fontBitmap = std::make_unique<unsigned char[]>( static_cast<size_t>( pw ) * ph );
 
-        int numRows = stbtt_BakeFontBitmap( fontData.data(), 0, size, fontBitmap.get(), pw, ph,
-                                            static_cast<int>( firstChar ), static_cast<int>( numChars ), bakedChar.get() );
+        stbtt_PackBegin( &packContext, fontBitmap.get(), pw, ph, 0, 0, nullptr );
+        stbtt_PackSetOversampling( &packContext, 8, 8 );
+        stbtt_PackFontRange( &packContext, fontData.data(), 0, size, static_cast<int>( firstChar ), static_cast<int>( numChars ), packedChar.get() );
+        stbtt_PackEnd( &packContext );
 
         // Copy the alpha values of the font bitmap to the font image.
         fontImage = std::make_unique<Image>( pw, ph );
@@ -81,7 +79,7 @@ glm::vec2 Font::getSize( std::string_view text ) const noexcept
     float width  = 0.0f;
     float height = 0.0f;
 
-    if ( fontImage && bakedChar )
+    if ( fontImage && packedChar )
     {
         // TODO: There must be a better way of computing the size of the text using font metrics.
         // But using GetBakedQuad seems like the most obvious (but not optimal) approach.
@@ -94,7 +92,7 @@ glm::vec2 Font::getSize( std::string_view text ) const noexcept
             if ( *t >= firstChar && *t < ( firstChar + numChars ) )
             {
                 stbtt_aligned_quad q;
-                stbtt_GetBakedQuad( bakedChar.get(), static_cast<int>( fontImage->getWidth() ), static_cast<int>( fontImage->getHeight() ), *t - firstChar, &xPos, &yPos, &q, 1 );
+                stbtt_GetPackedQuad( packedChar.get(), static_cast<int>( fontImage->getWidth() ), static_cast<int>( fontImage->getHeight() ), *t - firstChar, &xPos, &yPos, &q, 0 );
                 aabb.expand( Math::AABB::fromMinMax( { q.x0, q.y0, 0 }, { q.x1, q.y1, 0 } ) );
             }
             else if ( *t == '\n' )
@@ -126,7 +124,7 @@ void Font::drawText( Image& image, std::string_view text, int x, int y, const Co
 
 void Font::drawText( Image& image, std::wstring_view text, int x, int y, const Color& color ) const
 {
-    if ( fontImage && bakedChar )
+    if ( fontImage && packedChar )
     {
         const wchar_t* t    = text.data();
         auto           xPos = static_cast<float>( x );
@@ -136,7 +134,7 @@ void Font::drawText( Image& image, std::wstring_view text, int x, int y, const C
             if ( *t >= firstChar && *t < ( firstChar + numChars ) )
             {
                 stbtt_aligned_quad q;
-                stbtt_GetBakedQuad( bakedChar.get(), static_cast<int>( fontImage->getWidth() ), static_cast<int>( fontImage->getHeight() ), static_cast<int>( *t - firstChar ), &xPos, &yPos, &q, 1 );
+                stbtt_GetPackedQuad( packedChar.get(), static_cast<int>( fontImage->getWidth() ), static_cast<int>( fontImage->getHeight() ), *t - firstChar, &xPos, &yPos, &q, 0 );
 
                 Vertex v0 { { q.x0, q.y0 }, { q.s0, q.t0 }, color };
                 Vertex v1 { { q.x1, q.y0 }, { q.s1, q.t0 }, color };

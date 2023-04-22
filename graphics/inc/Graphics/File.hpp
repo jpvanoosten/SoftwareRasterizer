@@ -42,10 +42,10 @@ public:
     template<typename T = char>
     static void writeFile( const std::filesystem::path& path, std::span<T> data, std::ios::openmode mode = std::ios::out );
 
-    File() = delete;
-    File( const File&) = delete;
-    File( File&& )      = delete;
-    ~File()            = delete;
+    File()                         = delete;
+    File( const File& )            = delete;
+    File( File&& )                 = delete;
+    ~File()                        = delete;
     File& operator=( const File& ) = delete;
     File& operator=( File&& )      = delete;
 };
