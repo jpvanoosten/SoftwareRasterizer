@@ -152,6 +152,7 @@ void Game::Update()
     }
 
     // Update and draw the background.
+    //image.clear( Color::Black );
     currentBackground->update( timer );
     currentBackground->draw( image );
 

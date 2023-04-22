@@ -14,6 +14,8 @@
 #include <numbers>
 #include <optional>
 
+#include <glm/gtx/matrix_query.hpp> // isIdentity.
+
 using namespace Graphics;
 using namespace Math;
 
@@ -243,7 +245,6 @@ void Image::copy( const Image& srcImage, int x, int y )
 // Source: https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
 void Image::drawLine( int x0, int y0, int x1, int y1, const Color& color, const BlendMode& blendMode ) noexcept
 {
-    // Shrink the image AABB by 1 pixel to prevent drawing the line outside of the image bounds.
     if ( !m_AABB.clip( x0, y0, x1, y1 ) )
         return;
 
@@ -495,6 +496,17 @@ void Image::drawSprite( const Sprite& sprite, const glm::mat3& matrix, std::opti
     std::shared_ptr<Image> image = sprite.getImage();
     if ( !image )
         return;
+
+    // If the top-left area of the matrix is identity, then there is no rotation or scale.
+    // In this case, use the fast-path to draw the sprite.
+    if (glm::isIdentity( glm::mat2{matrix}, 0.0001f ) )
+    {
+        const int x = static_cast<int>( matrix[2][0] );
+        const int y = static_cast<int>( matrix[2][1] );
+
+        drawSprite( sprite, x, y, _color );
+        return;
+    }
 
     const Color       color     = _color ? *_color : sprite.getColor();
     const BlendMode   blendMode = sprite.getBlendMode();
