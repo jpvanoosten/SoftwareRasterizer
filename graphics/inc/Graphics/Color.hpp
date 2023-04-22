@@ -2,6 +2,25 @@
 
 #include "Config.hpp"
 
+#if !defined( USE_SSE )
+    #define USE_SSE 0
+#endif
+#if !defined( USE_VCL )
+    #define USE_VCL 0
+#endif
+
+#if USE_SSE
+    #include <emmintrin.h>
+    #include <immintrin.h>
+    #include <smmintrin.h>
+    #define SR_INLINE inline
+#elif USE_VCL
+    #include <vcl/vectorclass.h>
+    #define SR_INLINE inline
+#else
+    #define SR_INLINE constexpr
+#endif
+
 #include <algorithm>
 #include <cassert>
 #include <compare>
@@ -24,15 +43,15 @@ struct SR_API alignas( 4 ) Color
     constexpr auto operator<=>( const Color& rhs ) const noexcept;
     constexpr bool operator==( const Color& rhs ) const noexcept;
 
-    constexpr Color  operator+( const Color& rhs ) const noexcept;
-    constexpr Color& operator+=( const Color& rhs ) noexcept;
-    constexpr Color  operator-( const Color& rhs ) const noexcept;
-    constexpr Color& operator-=( const Color& rhs ) noexcept;
-    constexpr Color  operator*( const Color& rhs ) const noexcept;
+    SR_INLINE Color  operator+( const Color& rhs ) const noexcept;
+    SR_INLINE Color& operator+=( const Color& rhs ) noexcept;
+    SR_INLINE Color  operator-( const Color& rhs ) const noexcept;
+    SR_INLINE Color& operator-=( const Color& rhs ) noexcept;
+    SR_INLINE Color  operator*( const Color& rhs ) const noexcept;
     constexpr Color& operator*=( const Color& rhs ) noexcept;
     constexpr Color  operator*( float rhs ) const noexcept;
     constexpr Color& operator*=( float rhs ) noexcept;
-    inline Color     operator/( float rhs ) const noexcept;
+    constexpr Color  operator/( float rhs ) const noexcept;
     constexpr Color& operator/=( float rhs ) noexcept;
 
     /// <summary>
@@ -132,62 +151,205 @@ constexpr auto Color::operator<=>( const Color& rhs ) const noexcept
     return a <=> rhs.a;
 }
 
-constexpr Color Color::operator+( const Color& rhs ) const noexcept
+SR_INLINE Color Color::operator+( const Color& _rhs ) const noexcept
 {
+#if USE_SSE
+    static const __m128i _255 = _mm_set1_epi32( 255 );
+
+    const __m128i lhs = _mm_set_epi32( a, r, g, b );
+    const __m128i rhs = _mm_set_epi32( _rhs.a, _rhs.r, _rhs.g, _rhs.b );
+
+    __m128i result = _mm_add_epi32( lhs, rhs );
+    result         = _mm_min_epi32( result, _255 );
+
+    const uint8_t blue  = static_cast<uint8_t>( _mm_extract_epi32( result, 0 ) );
+    const uint8_t green = static_cast<uint8_t>( _mm_extract_epi32( result, 1 ) );
+    const uint8_t red   = static_cast<uint8_t>( _mm_extract_epi32( result, 2 ) );
+    const uint8_t alpha = static_cast<uint8_t>( _mm_extract_epi32( result, 3 ) );
+
+    return { red, green, blue, alpha };
+#elif USE_VCL != 0
+    const Vec4i        lhs { b, g, r, a };
+    const Vec4i        rhs { _rhs.b, _rhs.g, _rhs.r, _rhs.a };
+    static const Vec4i _255 { 255 };
+
+    Vec4i result = min( lhs + rhs, _255 );
+
+    const uint8_t blue  = static_cast<uint8_t>( result[0] );
+    const uint8_t green = static_cast<uint8_t>( result[1] );
+    const uint8_t red   = static_cast<uint8_t>( result[2] );
+    const uint8_t alpha = static_cast<uint8_t>( result[3] );
+
+    return { red, green, blue, alpha };
+#else
     return {
-        static_cast<uint8_t>( std::min<uint32_t>( r + rhs.r, 255u ) ),
-        static_cast<uint8_t>( std::min<uint32_t>( g + rhs.g, 255u ) ),
-        static_cast<uint8_t>( std::min<uint32_t>( b + rhs.b, 255u ) ),
-        static_cast<uint8_t>( std::min<uint32_t>( a + rhs.a, 255u ) ),
+        static_cast<uint8_t>( std::min<uint32_t>( r + _rhs.r, 255u ) ),
+        static_cast<uint8_t>( std::min<uint32_t>( g + _rhs.g, 255u ) ),
+        static_cast<uint8_t>( std::min<uint32_t>( b + _rhs.b, 255u ) ),
+        static_cast<uint8_t>( std::min<uint32_t>( a + _rhs.a, 255u ) ),
     };
+#endif
 }
 
-constexpr Color& Color::operator+=( const Color& rhs ) noexcept
+SR_INLINE Color& Color::operator+=( const Color& _rhs ) noexcept
 {
-    b = static_cast<uint8_t>( std::min<uint32_t>( b + rhs.b, 255u ) );
-    g = static_cast<uint8_t>( std::min<uint32_t>( g + rhs.g, 255u ) );
-    r = static_cast<uint8_t>( std::min<uint32_t>( r + rhs.r, 255u ) );
-    a = static_cast<uint8_t>( std::min<uint32_t>( a + rhs.a, 255u ) );
+#if USE_SSE
+    static const __m128i _255 = _mm_set1_epi32( 255 );
+
+    const __m128i lhs = _mm_set_epi32( a, r, g, b );
+    const __m128i rhs = _mm_set_epi32( _rhs.a, _rhs.r, _rhs.g, _rhs.b );
+
+    __m128i result = _mm_add_epi32( lhs, rhs );
+    result         = _mm_min_epi32( result, _255 );
+
+    b = static_cast<uint8_t>( _mm_extract_epi32( result, 0 ) );
+    g = static_cast<uint8_t>( _mm_extract_epi32( result, 1 ) );
+    r = static_cast<uint8_t>( _mm_extract_epi32( result, 2 ) );
+    a = static_cast<uint8_t>( _mm_extract_epi32( result, 3 ) );
+#elif USE_VCL
+    static const Vec4i _255 { 255 };
+
+    const Vec4i lhs { b, g, r, a };
+    const Vec4i rhs { _rhs.b, _rhs.g, _rhs.r, _rhs.a };
+
+    Vec4i result = min( lhs + rhs, _255 );
+
+    b = static_cast<uint8_t>( result[0] );
+    g = static_cast<uint8_t>( result[1] );
+    r = static_cast<uint8_t>( result[2] );
+    a = static_cast<uint8_t>( result[3] );
+#else
+    b = static_cast<uint8_t>( std::min<uint32_t>( b + _rhs.b, 255u ) );
+    g = static_cast<uint8_t>( std::min<uint32_t>( g + _rhs.g, 255u ) );
+    r = static_cast<uint8_t>( std::min<uint32_t>( r + _rhs.r, 255u ) );
+    a = static_cast<uint8_t>( std::min<uint32_t>( a + _rhs.a, 255u ) );
+#endif
 
     return *this;
 }
 
-constexpr Color Color::operator-( const Color& rhs ) const noexcept
+SR_INLINE Color Color::operator-( const Color& _rhs ) const noexcept
 {
+#if USE_SSE
+    static const __m128i _0 = _mm_set1_epi32( 0 );
+
+    const __m128i lhs = _mm_set_epi32( a, r, g, b );
+    const __m128i rhs = _mm_set_epi32( _rhs.a, _rhs.r, _rhs.g, _rhs.b );
+
+    __m128i result = _mm_sub_epi32( lhs, rhs );
+    result         = _mm_max_epi32( result, _0 );
+
+    const uint8_t blue  = static_cast<uint8_t>( _mm_extract_epi32( result, 0 ) );
+    const uint8_t green = static_cast<uint8_t>( _mm_extract_epi32( result, 1 ) );
+    const uint8_t red   = static_cast<uint8_t>( _mm_extract_epi32( result, 2 ) );
+    const uint8_t alpha = static_cast<uint8_t>( _mm_extract_epi32( result, 3 ) );
+
+    return { red, green, blue, alpha };
+#elif USE_VCL
+    static const Vec4i _0 { 0 };
+
+    const Vec4i lhs { b, g, r, a };
+    const Vec4i rhs { _rhs.b, _rhs.g, _rhs.r, _rhs.a };
+
+    Vec4i result = max( lhs - rhs, _0 );
+
+    const uint8_t blue  = static_cast<uint8_t>( result[0] );
+    const uint8_t green = static_cast<uint8_t>( result[1] );
+    const uint8_t red   = static_cast<uint8_t>( result[2] );
+    const uint8_t alpha = static_cast<uint8_t>( result[3] );
+
+    return { red, green, blue, alpha };
+#else
     return {
-        static_cast<uint8_t>( std::max<int32_t>( r - rhs.r, 0 ) ),
-        static_cast<uint8_t>( std::max<int32_t>( g - rhs.g, 0 ) ),
-        static_cast<uint8_t>( std::max<int32_t>( b - rhs.b, 0 ) ),
-        static_cast<uint8_t>( std::max<int32_t>( a - rhs.a, 0 ) ),
+        static_cast<uint8_t>( std::max<int32_t>( r - _rhs.r, 0 ) ),
+        static_cast<uint8_t>( std::max<int32_t>( g - _rhs.g, 0 ) ),
+        static_cast<uint8_t>( std::max<int32_t>( b - _rhs.b, 0 ) ),
+        static_cast<uint8_t>( std::max<int32_t>( a - _rhs.a, 0 ) ),
     };
+#endif
 }
 
-constexpr Color& Color::operator-=( const Color& rhs ) noexcept
+SR_INLINE Color& Color::operator-=( const Color& _rhs ) noexcept
 {
-    b = static_cast<uint8_t>( std::max<int32_t>( b - rhs.b, 0 ) );
-    g = static_cast<uint8_t>( std::max<int32_t>( g - rhs.g, 0 ) );
-    r = static_cast<uint8_t>( std::max<int32_t>( r - rhs.r, 0 ) );
-    a = static_cast<uint8_t>( std::max<int32_t>( a - rhs.a, 0 ) );
+#if USE_SSE
+    static const __m128i _0 = _mm_set1_epi32( 0 );
 
+    const __m128i lhs = _mm_set_epi32( a, r, g, b );
+    const __m128i rhs = _mm_set_epi32( _rhs.a, _rhs.r, _rhs.g, _rhs.b );
+
+    __m128i result = _mm_sub_epi32( lhs, rhs );
+    result         = _mm_max_epi32( result, _0 );
+
+    b = static_cast<uint8_t>( _mm_extract_epi32( result, 0 ) );
+    g = static_cast<uint8_t>( _mm_extract_epi32( result, 1 ) );
+    r = static_cast<uint8_t>( _mm_extract_epi32( result, 2 ) );
+    a = static_cast<uint8_t>( _mm_extract_epi32( result, 3 ) );
+#elif USE_VCL
+    static const Vec4i _0 { 0 };
+
+    const Vec4i lhs { b, g, r, a };
+    const Vec4i rhs { _rhs.b, _rhs.g, _rhs.r, _rhs.a };
+
+    Vec4i result = max( lhs - rhs, _0 );
+
+    b = static_cast<uint8_t>( result[0] );
+    g = static_cast<uint8_t>( result[1] );
+    r = static_cast<uint8_t>( result[2] );
+    a = static_cast<uint8_t>( result[3] );
+#else
+    b          = static_cast<uint8_t>( std::max<int32_t>( b - _rhs.b, 0 ) );
+    g          = static_cast<uint8_t>( std::max<int32_t>( g - _rhs.g, 0 ) );
+    r          = static_cast<uint8_t>( std::max<int32_t>( r - _rhs.r, 0 ) );
+    a          = static_cast<uint8_t>( std::max<int32_t>( a - _rhs.a, 0 ) );
+#endif
     return *this;
 }
 
-constexpr Color Color::operator*( const Color& _rhs ) const noexcept
+SR_INLINE Color Color::operator*( const Color& _rhs ) const noexcept
 {
+#if USE_SSE
+    static const __m128i _255 = _mm_set1_epi32( 255 );
+
+    const __m128i lhs = _mm_set_epi32( a, r, g, b );
+    const __m128i rhs = _mm_set_epi32( _rhs.a, _rhs.r, _rhs.g, _rhs.b );
+
+    __m128i result = _mm_mullo_epi32( lhs, rhs );
+    result         = _mm_div_epi32( result, _255 );
+
+    const uint8_t blue  = static_cast<uint8_t>( _mm_extract_epi32( result, 0 ) );
+    const uint8_t green = static_cast<uint8_t>( _mm_extract_epi32( result, 1 ) );
+    const uint8_t red   = static_cast<uint8_t>( _mm_extract_epi32( result, 2 ) );
+    const uint8_t alpha = static_cast<uint8_t>( _mm_extract_epi32( result, 3 ) );
+
+    return { red, green, blue, alpha };
+#elif USE_VCL
+    const Vec4i lhs { b, g, r, a };
+    const Vec4i rhs { _rhs.b, _rhs.g, _rhs.r, _rhs.a };
+
+    Vec4i result = ( lhs * rhs ) >> 8;
+
+    const uint8_t blue = static_cast<uint8_t>( result[0] );
+    const uint8_t green = static_cast<uint8_t>( result[1] );
+    const uint8_t red = static_cast<uint8_t>( result[2] );
+    const uint8_t alpha = static_cast<uint8_t>( result[3] );
+
+    return { red, green, blue, alpha };
+#else
     auto blue  = static_cast<uint8_t>( b * _rhs.b / 255 );
     auto green = static_cast<uint8_t>( g * _rhs.g / 255 );
     auto red   = static_cast<uint8_t>( r * _rhs.r / 255 );
     auto alpha = static_cast<uint8_t>( a * _rhs.a / 255 );
 
     return { red, green, blue, alpha };
+#endif
 }
 
 constexpr Color& Color::operator*=( const Color& _rhs ) noexcept
 {
-    b          = static_cast<uint8_t>( b * _rhs.b / 255 );
-    g          = static_cast<uint8_t>( g * _rhs.g / 255 );
-    r          = static_cast<uint8_t>( r * _rhs.r / 255 );
-    a          = static_cast<uint8_t>( a * _rhs.a / 255 );
+    b = static_cast<uint8_t>( b * _rhs.b / 255 );
+    g = static_cast<uint8_t>( g * _rhs.g / 255 );
+    r = static_cast<uint8_t>( r * _rhs.r / 255 );
+    a = static_cast<uint8_t>( a * _rhs.a / 255 );
 
     return *this;
 }
@@ -207,32 +369,32 @@ inline Color operator*( float lhs, const Color& rhs )
     return rhs * lhs;
 }
 
-constexpr Color& Color::operator*=( float rhs ) noexcept
+constexpr Color& Color::operator*=( float _rhs ) noexcept
 {
-    b = static_cast<uint8_t>( std::clamp( static_cast<float>( b ) * rhs, 0.0f, 255.0f ) );
-    g = static_cast<uint8_t>( std::clamp( static_cast<float>( g ) * rhs, 0.0f, 255.0f ) );
-    r = static_cast<uint8_t>( std::clamp( static_cast<float>( r ) * rhs, 0.0f, 255.0f ) );
-    a = static_cast<uint8_t>( std::clamp( static_cast<float>( a ) * rhs, 0.0f, 255.0f ) );
+    b = static_cast<uint8_t>( std::clamp( static_cast<float>( b ) * _rhs, 0.0f, 255.0f ) );
+    g = static_cast<uint8_t>( std::clamp( static_cast<float>( g ) * _rhs, 0.0f, 255.0f ) );
+    r = static_cast<uint8_t>( std::clamp( static_cast<float>( r ) * _rhs, 0.0f, 255.0f ) );
+    a = static_cast<uint8_t>( std::clamp( static_cast<float>( a ) * _rhs, 0.0f, 255.0f ) );
 
     return *this;
 }
 
-inline Color Color::operator/( float rhs ) const noexcept
+constexpr Color Color::operator/( float _rhs ) const noexcept
 {
-    assert( rhs != 0.0f );
+    assert( _rhs != 0.0f );
 
-    rhs = 1.0f / rhs;
+    _rhs = 1.0f / _rhs;
 
-    return operator*( rhs );
+    return operator*( _rhs );
 }
 
-constexpr Color& Color::operator/=( float rhs ) noexcept
+constexpr Color& Color::operator/=( float _rhs ) noexcept
 {
-    assert( rhs != 0.0f );
+    assert( _rhs != 0.0f );
 
-    rhs = 1.0f / rhs;
+    _rhs = 1.0f / _rhs;
 
-    return operator*=( rhs );
+    return operator*=( _rhs );
 }
 
 constexpr Color Color::withAlpha( float alpha ) const noexcept
@@ -247,9 +409,9 @@ constexpr Color Color::withAlpha( uint8_t alpha ) const noexcept
 
 constexpr Color Color::fromFloats( float _r, float _g, float _b, float _a ) noexcept
 {
-    const uint8_t r = static_cast<uint8_t>( _r * 255.0f );
-    const uint8_t g = static_cast<uint8_t>( _g * 255.0f );
     const uint8_t b = static_cast<uint8_t>( _b * 255.0f );
+    const uint8_t g = static_cast<uint8_t>( _g * 255.0f );
+    const uint8_t r = static_cast<uint8_t>( _r * 255.0f );
     const uint8_t a = static_cast<uint8_t>( _a * 255.0f );
 
     return { r, g, b, a };
@@ -257,10 +419,10 @@ constexpr Color Color::fromFloats( float _r, float _g, float _b, float _a ) noex
 
 constexpr Color Color::fromHex( uint32_t color ) noexcept
 {
-    const uint8_t a = static_cast<uint8_t>( ( color & 0xFF000000 ) >> 24 );
-    const uint8_t r = static_cast<uint8_t>( ( color & 0x00FF0000 ) >> 16 );
-    const uint8_t g = static_cast<uint8_t>( ( color & 0x0000FF00 ) >> 8 );
     const uint8_t b = static_cast<uint8_t>( ( color & 0x000000FF ) >> 0 );
+    const uint8_t g = static_cast<uint8_t>( ( color & 0x0000FF00 ) >> 8 );
+    const uint8_t r = static_cast<uint8_t>( ( color & 0x00FF0000 ) >> 16 );
+    const uint8_t a = static_cast<uint8_t>( ( color & 0xFF000000 ) >> 24 );
 
     return { r, g, b, a };
 }

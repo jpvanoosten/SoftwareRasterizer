@@ -1,5 +1,7 @@
 cmake_minimum_required( VERSION 3.23.0 )
 
+option(SR_USE_OPENMP "Use OpenMP for parallel loops." OFF)
+
 set( INC_FILES
     inc/Graphics/BlendMode.hpp
     inc/Graphics/Config.hpp
@@ -94,6 +96,16 @@ if(BUILD_SHARED_LIBS)
     )
 endif(BUILD_SHARED_LIBS)
 
+if(SR_USE_SSE)
+    target_compile_definitions( Graphics
+        PRIVATE USE_SSE
+    )
+elseif(SR_USE_VCL)
+    target_compile_definitions( Graphics
+        PRIVATE USE_VCL
+    )
+endif(SR_USE_SSE)
+
 target_include_directories( Graphics
     PUBLIC inc
 )
@@ -103,16 +115,18 @@ target_link_libraries( Graphics
     PRIVATE glew
 )
 
-find_package(OpenMP)
-if(OpenMP_CXX_FOUND)
-    target_include_directories( Graphics
-        PRIVATE ${OpenMP_CXX_INCLUDE_DIRS}
-    )
+if(SR_USE_OPENMP)
+    find_package(OpenMP)
+    if(OpenMP_CXX_FOUND)
+        target_include_directories( Graphics
+            PRIVATE ${OpenMP_CXX_INCLUDE_DIRS}
+        )
 
-    target_link_libraries( Graphics
-        PUBLIC OpenMP::OpenMP_CXX
-    )
-endif(OpenMP_CXX_FOUND)
+        target_link_libraries( Graphics
+            PUBLIC OpenMP::OpenMP_CXX
+        )
+    endif(OpenMP_CXX_FOUND)
+endif(SR_USE_OPENMP)
 
 install(TARGETS Graphics)
 install( DIRECTORY inc/Graphics DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} )

@@ -2,6 +2,8 @@ cmake_minimum_required( VERSION 3.23.0 )
 
 option( BUILD_SHARED_LIBS "Global flag to cause add_library to create shared libraries." ON )
 option( SR_BUILD_SAMPLES "Build samples." ON )
+option( SR_USE_SSE "Use SSE intrinsics for SIMD optimizations" OFF )
+option( SR_USE_VCL "Use Vector Class Library for SIMD optimizations" OFF )
 
 # Make sure DLL and EXE targets go to the same directory.
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
