@@ -96,16 +96,6 @@ if(BUILD_SHARED_LIBS)
     )
 endif(BUILD_SHARED_LIBS)
 
-if(SR_USE_SSE)
-    target_compile_definitions( Graphics
-        PRIVATE USE_SSE
-    )
-elseif(SR_USE_VCL)
-    target_compile_definitions( Graphics
-        PRIVATE USE_VCL
-    )
-endif(SR_USE_SSE)
-
 target_include_directories( Graphics
     PUBLIC inc
 )
