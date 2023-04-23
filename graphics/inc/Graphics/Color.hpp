@@ -2,6 +2,8 @@
 
 #include "Config.hpp"
 
+#include <Math/Math.hpp>
+
 #include <algorithm>
 #include <cassert>
 #include <compare>
@@ -135,19 +137,19 @@ constexpr auto Color::operator<=>( const Color& rhs ) const noexcept
 constexpr Color Color::operator+( const Color& _rhs ) const noexcept
 {
     return {
-        static_cast<uint8_t>( std::min<uint32_t>( r + _rhs.r, 255u ) ),
-        static_cast<uint8_t>( std::min<uint32_t>( g + _rhs.g, 255u ) ),
-        static_cast<uint8_t>( std::min<uint32_t>( b + _rhs.b, 255u ) ),
-        static_cast<uint8_t>( std::min<uint32_t>( a + _rhs.a, 255u ) ),
+        static_cast<uint8_t>( Math::min<uint32_t>( r + _rhs.r, 255u ) ),
+        static_cast<uint8_t>( Math::min<uint32_t>( g + _rhs.g, 255u ) ),
+        static_cast<uint8_t>( Math::min<uint32_t>( b + _rhs.b, 255u ) ),
+        static_cast<uint8_t>( Math::min<uint32_t>( a + _rhs.a, 255u ) ),
     };
 }
 
 constexpr Color& Color::operator+=( const Color& _rhs ) noexcept
 {
-    b = static_cast<uint8_t>( std::min<uint32_t>( b + _rhs.b, 255u ) );
-    g = static_cast<uint8_t>( std::min<uint32_t>( g + _rhs.g, 255u ) );
-    r = static_cast<uint8_t>( std::min<uint32_t>( r + _rhs.r, 255u ) );
-    a = static_cast<uint8_t>( std::min<uint32_t>( a + _rhs.a, 255u ) );
+    b = static_cast<uint8_t>( Math::min<uint32_t>( b + _rhs.b, 255u ) );
+    g = static_cast<uint8_t>( Math::min<uint32_t>( g + _rhs.g, 255u ) );
+    r = static_cast<uint8_t>( Math::min<uint32_t>( r + _rhs.r, 255u ) );
+    a = static_cast<uint8_t>( Math::min<uint32_t>( a + _rhs.a, 255u ) );
 
     return *this;
 }
@@ -155,19 +157,19 @@ constexpr Color& Color::operator+=( const Color& _rhs ) noexcept
 constexpr Color Color::operator-( const Color& _rhs ) const noexcept
 {
     return {
-        static_cast<uint8_t>( std::max<int32_t>( r - _rhs.r, 0 ) ),
-        static_cast<uint8_t>( std::max<int32_t>( g - _rhs.g, 0 ) ),
-        static_cast<uint8_t>( std::max<int32_t>( b - _rhs.b, 0 ) ),
-        static_cast<uint8_t>( std::max<int32_t>( a - _rhs.a, 0 ) ),
+        static_cast<uint8_t>( Math::max<int32_t>( r - _rhs.r, 0 ) ),
+        static_cast<uint8_t>( Math::max<int32_t>( g - _rhs.g, 0 ) ),
+        static_cast<uint8_t>( Math::max<int32_t>( b - _rhs.b, 0 ) ),
+        static_cast<uint8_t>( Math::max<int32_t>( a - _rhs.a, 0 ) ),
     };
 }
 
 constexpr Color& Color::operator-=( const Color& _rhs ) noexcept
 {
-    b          = static_cast<uint8_t>( std::max<int32_t>( b - _rhs.b, 0 ) );
-    g          = static_cast<uint8_t>( std::max<int32_t>( g - _rhs.g, 0 ) );
-    r          = static_cast<uint8_t>( std::max<int32_t>( r - _rhs.r, 0 ) );
-    a          = static_cast<uint8_t>( std::max<int32_t>( a - _rhs.a, 0 ) );
+    b          = static_cast<uint8_t>( Math::max<int32_t>( b - _rhs.b, 0 ) );
+    g          = static_cast<uint8_t>( Math::max<int32_t>( g - _rhs.g, 0 ) );
+    r          = static_cast<uint8_t>( Math::max<int32_t>( r - _rhs.r, 0 ) );
+    a          = static_cast<uint8_t>( Math::max<int32_t>( a - _rhs.a, 0 ) );
 
     return *this;
 }
@@ -194,10 +196,10 @@ constexpr Color& Color::operator*=( const Color& _rhs ) noexcept
 
 constexpr Color Color::operator*( float _rhs ) const noexcept
 {
-    auto blue  = static_cast<uint8_t>( std::clamp( static_cast<float>( b ) * _rhs, 0.0f, 255.0f ) );
-    auto green = static_cast<uint8_t>( std::clamp( static_cast<float>( g ) * _rhs, 0.0f, 255.0f ) );
-    auto red   = static_cast<uint8_t>( std::clamp( static_cast<float>( r ) * _rhs, 0.0f, 255.0f ) );
-    auto alpha = static_cast<uint8_t>( std::clamp( static_cast<float>( a ) * _rhs, 0.0f, 255.0f ) );
+    auto blue  = static_cast<uint8_t>( Math::clamp( static_cast<float>( b ) * _rhs, 0.0f, 255.0f ) );
+    auto green = static_cast<uint8_t>( Math::clamp( static_cast<float>( g ) * _rhs, 0.0f, 255.0f ) );
+    auto red   = static_cast<uint8_t>( Math::clamp( static_cast<float>( r ) * _rhs, 0.0f, 255.0f ) );
+    auto alpha = static_cast<uint8_t>( Math::clamp( static_cast<float>( a ) * _rhs, 0.0f, 255.0f ) );
 
     return { red, green, blue, alpha };
 }
@@ -209,10 +211,10 @@ inline Color operator*( float lhs, const Color& rhs )
 
 constexpr Color& Color::operator*=( float _rhs ) noexcept
 {
-    b = static_cast<uint8_t>( std::clamp( static_cast<float>( b ) * _rhs, 0.0f, 255.0f ) );
-    g = static_cast<uint8_t>( std::clamp( static_cast<float>( g ) * _rhs, 0.0f, 255.0f ) );
-    r = static_cast<uint8_t>( std::clamp( static_cast<float>( r ) * _rhs, 0.0f, 255.0f ) );
-    a = static_cast<uint8_t>( std::clamp( static_cast<float>( a ) * _rhs, 0.0f, 255.0f ) );
+    b = static_cast<uint8_t>( Math::clamp( static_cast<float>( b ) * _rhs, 0.0f, 255.0f ) );
+    g = static_cast<uint8_t>( Math::clamp( static_cast<float>( g ) * _rhs, 0.0f, 255.0f ) );
+    r = static_cast<uint8_t>( Math::clamp( static_cast<float>( r ) * _rhs, 0.0f, 255.0f ) );
+    a = static_cast<uint8_t>( Math::clamp( static_cast<float>( a ) * _rhs, 0.0f, 255.0f ) );
 
     return *this;
 }

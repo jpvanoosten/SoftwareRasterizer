@@ -6,6 +6,48 @@
 
 namespace Math
 {
+/// <summary>
+/// Returns either a, or b, whichever is less.
+/// A faster implementation of min than what is provided by STL.
+/// </summary>
+/// <typeparam name="T">The value type.</typeparam>
+/// <param name="a">The first value.</param>
+/// <param name="b">The second value.</param>
+/// <returns>Either a, or b, whichever is less.</returns>
+template<typename T>
+constexpr T min( T a, T b) noexcept
+{
+    return a < b ? a : b;
+}
+
+/// <summary>
+/// Returns either a or b, whichever is greater.
+/// This should be a faster implementation than what is provided by STL.
+/// </summary>
+/// <typeparam name="T">The value type.</typeparam>
+/// <param name="a">The first value.</param>
+/// <param name="b">The second value.</param>
+/// <returns>Either a, or b, whichever is greater.</returns>
+template<typename T>
+constexpr T max( T a, T b) noexcept
+{
+    return a > b ? a : b;
+}
+
+/// <summary>
+/// Clamp the value `v` between `minVal` and `maxVal`.
+/// This should be a faster implementation of clamp than what is provided by STL.
+/// </summary>
+/// <typeparam name="T">The value type to clamp</typeparam>
+/// <param name="v">The value to clamp.</param>
+/// <param name="minVal">The minimum allowed value.</param>
+/// <param name="maxVal">The maximum allowed value.</param>
+/// <returns>The result of clamping `v` between `min`, and `max`.</returns>
+template<typename T>
+constexpr T clamp( T v, T minVal, T maxVal ) noexcept
+{
+    return min( max( v, minVal ), maxVal );
+}
 
 /// <summary>
 /// Compute the area of a triangle in 2D.
@@ -97,7 +139,7 @@ inline glm::vec3 barycentric( const glm::vec3& a, const glm::vec3& b, const glm:
 /// <returns>The barycentric coordinates for triangle (`a`, `b`, `c`) at point `p`.</returns>
 inline glm::vec3 barycentric( const glm::vec2& a, const glm::vec2& b, const glm::vec2& c, const glm::vec2& p )
 {
-    glm::vec3 u = cross( glm::vec3{ c.x - a.x, b.x - a.x, a.x - p.x }, glm::vec3{ c.y - a.y, b.y - a.y, a.y - p.y } );
+    glm::vec3 u = cross( glm::vec3 { c.x - a.x, b.x - a.x, a.x - p.x }, glm::vec3 { c.y - a.y, b.y - a.y, a.y - p.y } );
 
     if ( glm::abs( u.z ) < 1.0f )
         return { -1, -1, -1 };
@@ -126,9 +168,8 @@ inline bool barycentricInside( const glm::vec3& barycentric )
 inline bool pointInsideTriangle( const glm::vec3& p, const glm::vec3& a, const glm::vec3& b, const glm::vec3& c ) noexcept
 {
     const glm::vec3 bc = barycentric( a, b, c, p );
-    return barycentricInside(bc);
+    return barycentricInside( bc );
 }
-
 
 /// <summary>
 /// Test to see if a point p is contained in a triangle (a, b, c).

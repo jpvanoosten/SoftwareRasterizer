@@ -674,8 +674,8 @@ const Color& Image::sample( int u, int v, AddressMode addressMode ) const noexce
     break;
     case AddressMode::Clamp:
     {
-        u = std::clamp( u, 0, w - 1 );
-        v = std::clamp( v, 0, h - 1 );
+        u = Math::clamp( u, 0, w - 1 );
+        v = Math::clamp( v, 0, h - 1 );
     }
     break;
     }

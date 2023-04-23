@@ -107,7 +107,7 @@ struct SR_API BlendMode
     /// <param name="srcColor">The source color.</param>
     /// <param name="dstColor">The destination color.</param>
     /// <returns></returns>
-    constexpr Color Blend( const Color& srcColor, const Color& dstColor ) const noexcept;
+    constexpr Color Blend( Color srcColor, Color dstColor ) const noexcept;
 
     static const BlendMode Disable;
     static const BlendMode AlphaBlend;
@@ -222,7 +222,7 @@ constexpr uint8_t ComputeBlendOp( uint8_t sA, uint8_t dA, BlendOperation op ) no
     return sA;
 }
 
-constexpr Color BlendMode::Blend( const Color& srcColor, const Color& dstColor ) const noexcept
+constexpr Color BlendMode::Blend( const Color srcColor, const Color dstColor ) const noexcept
 {
     if ( !blendEnable )
         return srcColor;

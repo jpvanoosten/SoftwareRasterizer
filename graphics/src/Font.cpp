@@ -82,7 +82,6 @@ glm::vec2 Font::getSize( std::string_view text ) const noexcept
     if ( fontImage && packedChar )
     {
         // TODO: There must be a better way of computing the size of the text using font metrics.
-        // But using GetBakedQuad seems like the most obvious (but not optimal) approach.
         Math::AABB  aabb;
         const char* t    = text.data();
         float       xPos = 0.0f;

@@ -198,7 +198,6 @@ struct SR_API Image final
     /// <param name="fillMode">The fill mode to use when rendering.</param>
     void drawTriangle( const glm::vec2& p0, const glm::vec2& p1, const glm::vec2& p2, const Color& color, const BlendMode& blendMode = {}, FillMode fillMode = FillMode::Solid ) noexcept;
 
-
     /// <summary>
     /// Draw a rectangle to the screen.
     /// </summary>
@@ -378,7 +377,9 @@ struct SR_API Image final
     /// <returns>The color of the texel at the given UV texture coordinates.</returns>
     const Color& sample( float u, float v, AddressMode addressMode = AddressMode::Wrap ) const noexcept
     {
-        return sample( static_cast<int>( std::round( u * static_cast<float>( m_width ) ) ), static_cast<int>( std::round( v * static_cast<float>( m_height ) ) ), addressMode );
+        // return sample( static_cast<int>( std::round( u * static_cast<float>( m_width ) ) ), static_cast<int>( std::round( v * static_cast<float>( m_height ) ) ), addressMode );
+        // return sample( static_cast<int>( lround( u * static_cast<float>( m_width ) ) ), static_cast<int>( lround( v * static_cast<float>( m_height ) ) ), addressMode );
+        return sample( static_cast<int>( u * static_cast<float>( m_width ) + 0.5f ), static_cast<int>( v * static_cast<float>( m_height ) + 0.5f ), addressMode );  // NOLINT(bugprone-incorrect-roundings)
     }
 
     /// <summary>
