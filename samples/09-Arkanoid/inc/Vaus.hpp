@@ -44,7 +44,7 @@ public:
 
     // The extent is 1/2 the width.
     // The width of vaus is dependent on state.
-    float getExtent() const noexcept;
+    const glm::vec2& getAnchor() const noexcept;
 
     Math::AABB getAABB() const;
 
@@ -78,8 +78,6 @@ private:
 
     Math::AABB   aabb;
     Math::AABB   enlargeAABB;
-    Math::Circle leftCircle;
-    Math::Circle rightCircle;
 
     Math::Transform2D transform;
     Math::Transform2D enlargeTransform;

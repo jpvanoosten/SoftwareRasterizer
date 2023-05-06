@@ -83,7 +83,7 @@ Game::Game( uint32_t screenWidth, uint32_t screenHeight )
     // Load high scores.
     highScores.load( "assets/Arkanoid/high_scores.txt" );
 
-    setState( GameState::MainMenu );
+    setState( GameState::Playing );
 }
 
 void Game::processEvent( const Graphics::Event& event )

@@ -1,8 +1,11 @@
 #include <Ball.hpp>
+#include <iostream>
 #include <Vaus.hpp>
 
 #include <Graphics/Font.hpp>
 #include <Graphics/Input.hpp>
+
+#include <glm/glm.hpp>
 
 #include <map>
 #include <string>
@@ -36,10 +39,8 @@ AABB operator*( const Camera2D& camera, const AABB& aabb )
 Vaus::Vaus() = default;
 
 Vaus::Vaus( const std::shared_ptr<Graphics::SpriteSheet>& spriteSheet )
-: aabb { { 4, 0, 0 }, { 28, 8, 0 } }
-, enlargeAABB { { 4, 0, 0 }, { 44, 8, 0 } }
-, leftCircle { { 0, 0 }, 4 }
-, rightCircle( { 0, 0 }, 4 )
+: aabb { { 0, 0, 0 }, { 32, 8, 0 } }
+, enlargeAABB { { 0, 0, 0 }, { 48, 8, 0 } }
 {
     // The animation frames in the sprite sheet for the various modes.
     {
@@ -130,8 +131,7 @@ void Vaus::update( float deltaTime )
 
 void Vaus::draw( Graphics::Image& image )
 {
-    const SpriteAnim*  sprite = nullptr;
-    const Transform2D* t      = &transform;
+    const SpriteAnim* sprite = nullptr;
 
     switch ( state )
     {
@@ -152,34 +152,28 @@ void Vaus::draw( Graphics::Image& image )
         break;
     case State::Enlarge:
         sprite = &enlargeMode;
-        t      = &enlargeTransform;
         break;
     case State::ExplodeStage1:
         sprite = &explode1;
         break;
     case State::ExplodeStage2:
         sprite = &explode2;
-        t      = &explosionTransform;
         break;
     }
 
     if ( sprite )
     {
-        int x = t->getPosition().x - t->getAnchor().x;
-        int y = t->getPosition().y - t->getAnchor().y;
-
+        const glm::vec2 pos = getPosition() - getAnchor();
         // Draw the shadow.
-        image.drawSprite( *sprite, x + 4, y + 4, Color::Black );
+        image.drawSprite( *sprite, pos.x + 4, pos.y + 4, Color::Black );
         // Draw the regular sprite.
-        image.drawSprite( *sprite, x, y );
+        image.drawSprite( *sprite, pos.x, pos.y );
     }
 
 #if _DEBUG
     image.drawAABB( getAABB(), Color::Yellow, {}, FillMode::WireFrame );
-    image.drawCircle( leftCircle, Color::Yellow, {}, FillMode::WireFrame );
-    image.drawCircle( rightCircle, Color::Yellow, {}, FillMode::WireFrame );
 
-    // Draw vaus's current state.
+    // Draw Vaus's current state.
     auto pos = transform.getPosition() - glm::vec2 { 20, 20 };
     image.drawText( Font::Default, stateToString[state], pos.x, pos.y, Color::White );
 #endif
@@ -190,11 +184,6 @@ void Vaus::setPosition( const glm::vec2& pos )
     transform.setPosition( pos );
     enlargeTransform.setPosition( pos );
     explosionTransform.setPosition( pos );
-
-    const glm::vec2 paddleWidth { getExtent(), 0 };
-
-    leftCircle.center  = pos - paddleWidth;
-    rightCircle.center = pos + paddleWidth;
 }
 
 const glm::vec2& Vaus::getPosition() const
@@ -202,18 +191,17 @@ const glm::vec2& Vaus::getPosition() const
     return transform.getPosition();
 }
 
-float Vaus::getExtent() const noexcept
+const glm::vec2& Vaus::getAnchor() const noexcept
 {
-    float width = 12.0f;
-
     switch ( state )
     {
     case State::Enlarge:
-        width = 20.0f;
-        break;
+        return enlargeTransform.getAnchor();
+    case State::ExplodeStage2:
+        return explosionTransform.getAnchor();
     }
 
-    return width;
+    return transform.getAnchor();
 }
 
 Math::AABB Vaus::getAABB() const
@@ -230,25 +218,57 @@ Math::AABB Vaus::getAABB() const
 
 std::optional<Physics::HitInfo> Vaus::collidesWith( const Ball& ball ) const
 {
-    // The ball can only collide with vaus if it's moving downwards.
-    if (ball.getVelocity().y > 0 )
+    // The ball can only collide with Vaus if it's moving downwards.
+    if ( ball.getVelocity().y > 0 )
     {
         const auto& c = ball.getCircle();
 
-        if ( auto hit = Physics::collidesWith( leftCircle, c ) )
+        if ( auto hit = Physics::collidesWith( getAABB(), ball.getCircle(), ball.getVelocity() ) )
         {
-            // 45 degrees to the left.
-            hit->normal = glm::normalize( glm::vec2 { -1, -1 } );
-            return hit;
-        }
-        if ( auto hit = Physics::collidesWith( rightCircle, c ) )
-        {
-            // 45 degrees to the right.
-            hit->normal = glm::normalize( glm::vec2 { 1, -1 } );
-            return hit;
-        }
-        if ( const auto hit = Physics::collidesWith( getAABB(), ball.getCircle(), ball.getVelocity() ) )
-        {
+            // Adjust the hit normal according to where the ball hits the paddle.
+            // x position of the hit point
+            const float bx = hit->point.x;
+            // x position of Vaus
+            const float x = getPosition().x;
+
+            // Reflection angle at the edges of Vaus.
+            const float cosA = glm::cos( glm::radians( 40.0f ) );
+            const float sinA = glm::sin( glm::radians( 40.0f ) );
+            // Reflection angle in the middle of Vaus.
+            const float cosB = glm::cos( glm::radians( 60.0f ) );
+            const float sinB = glm::sin( glm::radians( 60.0f ) );
+            
+            if ( bx < x )  // ball is left of center point.
+            {
+                // Left most x pos.
+                const float lx = x - getAnchor().x;
+                if ( bx - lx < 8.0f )  // 8px from left edge.
+                {
+                    std::cout << "-40 deg left" << std::endl;
+                    hit->normal = { -cosA, -sinA };
+                }
+                else
+                {
+                    std::cout << "-60 deg left" << std::endl;
+                    hit->normal = { -cosB, -sinB };
+                }
+            }
+            else  // ball is right of center point.
+            {
+                // Right most x pos
+                const float rx = x + getAnchor().x;
+                if (rx - bx < 8.0f ) // 8px from right edge.
+                {
+                    std::cout << "40 deg right" << std::endl;
+                    hit->normal = { cosA, -sinA };
+                }
+                else
+                {
+                    std::cout << "60 deg right" << std::endl;
+                    hit->normal = { cosB, -sinB };
+                }
+            }
+
             return hit;
         }
     }
@@ -280,10 +300,10 @@ void Vaus::updateControls( float deltaTime )
 
     pos.x += Input::getAxis( "Horizontal" ) * speed * deltaTime;
 
-    if ( pos.x - getExtent() < 8.0f )
-        pos.x = getExtent() + 8.0f;
-    else if ( pos.x + getExtent() >= 216 )
-        pos.x = 216 - getExtent();
+    if ( pos.x - getAnchor().x < 8.0f )
+        pos.x = getAnchor().x + 8.0f;
+    else if ( pos.x + getAnchor().x >= 216 )
+        pos.x = 216 - getAnchor().x;
 
     setPosition( pos );
 }
@@ -345,7 +365,7 @@ void Vaus::endState( State oldState )
     }
 }
 
-void Vaus::doWait( float deltaTime )
+void Vaus::doWait( float )
 {
     // Do nothing until Vaus is transitioned to the appear state.
 }

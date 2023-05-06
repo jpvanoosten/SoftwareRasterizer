@@ -11,18 +11,18 @@ inline Circle operator*( const Camera2D& camera, const Circle& c )
 }
 
 Ball::Ball()
-: circle { {0, 0}, 2.5f }
+: circle { {0, 0}, radius }
 , sprite { ResourceManager::loadImage( "assets/Arkanoid/vaus.png" ), { 0, 40, 16, 8 }, BlendMode::AlphaBlend }
 {
-    transform.setAnchor( { 2.5f, 2.5f } );
+    transform.setAnchor( { radius, radius } );
 }
 
 Ball::Ball( const glm::vec2& position )
 : transform { position }
-, circle { position, 2.5f }
+, circle { position, radius }
 , sprite { ResourceManager::loadImage( "assets/Arkanoid/vaus.png" ), { 0, 40, 16, 8 }, BlendMode::AlphaBlend }
 {
-    transform.setAnchor( { 2.5f, 2.5f } );
+    transform.setAnchor( { radius, radius } );
 }
 
 void Ball::update( float deltaTime )

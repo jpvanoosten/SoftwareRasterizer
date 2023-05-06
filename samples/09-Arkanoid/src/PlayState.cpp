@@ -198,9 +198,9 @@ void PlayState::doPlaying( float deltaTime )
 {
 #if _DEBUG
     // In debug mode, put vaus under the ball...
-    auto x = ball.getPosition().x;
-    auto y = vaus.getPosition().y;
-    vaus.setPosition( { x, y } );
+    //auto x = ball.getPosition().x;
+    //auto y = vaus.getPosition().y;
+    //vaus.setPosition( { x, y } );
 #endif
 
     vaus.update( deltaTime );
@@ -260,11 +260,8 @@ void PlayState::checkCollisions( Ball& ball )
 
     if ( const auto hit = vaus.collidesWith( ball ) )
     {
-        // Slightly perturb the hit normal to prevent the ball from getting stuck on gold bricks.
-        glm::vec2 n = glm::normalize( hit->normal + glm::diskRand( 0.2f ) );
-        c.center    = hit->point + n * c.radius;
         // Reflect the velocity of the ball about the hit normal.
-        v = glm::reflect( v, hit->normal );
+        v = hit->normal * ballSpeed;
     }
 
     if ( const auto hit = level.checkCollision( ball ) )

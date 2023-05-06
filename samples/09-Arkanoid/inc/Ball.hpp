@@ -34,4 +34,6 @@ private:
     glm::vec2         velocity { 0 };
 
     Graphics::Sprite sprite;
+
+    static inline float radius = 2.0f;
 };

@@ -25,3 +25,8 @@ set_target_properties(
 	PROPERTIES
 		FOLDER samples
 )
+
+# Set the startup project.
+set_directory_properties( PROPERTIES
+	VS_STARTUP_PROJECT 07-PixelAdventure
+)

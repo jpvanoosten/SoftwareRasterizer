@@ -65,7 +65,7 @@ private:
     // Number of lives.
     int numLives = 3;
     // The current level.
-    int levelId = 32;
+    int levelId = 0;
 
     float time = 0.0f;
 

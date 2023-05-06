@@ -30,8 +30,4 @@ add_subdirectory(graphics)
 
 if(SR_BUILD_SAMPLES)
     add_subdirectory(samples)
-    # Set the startup project.
-    set_directory_properties( PROPERTIES
-        VS_STARTUP_PROJECT 02-Triangle
-    )
 endif(SR_BUILD_SAMPLES)
