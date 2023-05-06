@@ -123,7 +123,8 @@ int main( int argc, char* argv[] )
         for ( auto& sound: bounceSounds )
         {
             // Update the position of the sound to enable 3D spatialization of the sound effect.
-            sound.setPosition( glm::vec3 { ball.getPosition(), 0 } );
+            glm::vec3 p = glm::vec3 { ball.getPosition(), 0 };
+            sound.setPosition( {p.x, p.y, p.z} );
         }
 
         image.clear( Color::Black );
