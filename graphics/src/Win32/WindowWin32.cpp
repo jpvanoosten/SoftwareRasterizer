@@ -36,7 +36,6 @@ const char* g_FragmentShader = {
 extern void Keyboard_ProcessMessage( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam );
 extern void Mouse_ProcessMessage( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam );
 
-
 void ReportError()
 {
     // Retrieve the system error message for the last-error code
@@ -307,7 +306,7 @@ void WindowWin32::clear( const Color& color )
 
     // Bind the default framebuffer.
     glBindFramebuffer( GL_FRONT_AND_BACK, 0 );
-    glClearColor( color.r / 255.0f, color.g / 255.0f, color.b / 255.0f, color.a / 255.0f );
+    glClearColor( static_cast<float>( color.r ) / 255.0f, static_cast<float>( color.g ) / 255.0f, static_cast<float>( color.b ) / 255.0f, static_cast<float>( color.a ) / 255.0f );
     glClear( GL_COLOR_BUFFER_BIT );
 }
 
@@ -316,7 +315,6 @@ void WindowWin32::present( const Image& image )
     makeCurrent();
 
     // Copy the image data to the texture
-    // glInvalidateTexImage( m_Texture, 0 );
     glBindTexture( GL_TEXTURE_2D, m_Texture );
     glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, static_cast<GLsizei>( image.getWidth() ), static_cast<GLsizei>( image.getHeight() ), 0, GL_RGBA, GL_UNSIGNED_BYTE, image.data() );
     glTextureParameteri( m_Texture, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
@@ -553,7 +551,7 @@ glm::ivec2 WindowWin32::getSize() const noexcept
 
 void WindowWin32::setFullscreen( bool _fullscreen )
 {
-    if (m_hWnd && fullscreen != _fullscreen )
+    if ( m_hWnd && fullscreen != _fullscreen )
     {
         fullscreen = _fullscreen;
 
@@ -591,7 +589,6 @@ void WindowWin32::setFullscreen( bool _fullscreen )
 
             ShowWindow( m_hWnd, SW_NORMAL );
         }
-
     }
 }
 

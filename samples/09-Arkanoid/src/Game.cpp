@@ -14,43 +14,6 @@ Game::Game( uint32_t screenWidth, uint32_t screenHeight )
 : image { screenWidth, screenHeight }
 , arcadeN { "assets/fonts/ARCADE_N.ttf", 7 }
 {
-    // Input that controls the horizontal movement of the paddle.
-    Input::mapAxis( "Horizontal", []( std::span<const GamePadStateTracker> gamePadStates, const KeyboardStateTracker& keyboardState, const MouseStateTracker& mouseState ) {
-        float leftX = 0.0f;
-
-        for ( auto& gamePadState: gamePadStates )
-        {
-            const auto state = gamePadState.getLastState();
-
-            leftX += state.thumbSticks.leftX;
-        }
-
-        const auto keyState = keyboardState.getLastState();
-
-        const float a     = keyState.A ? 1.0f : 0.0f;
-        const float d     = keyState.D ? 1.0f : 0.0f;
-        const float left  = keyState.Left ? 1.0f : 0.0f;
-        const float right = keyState.Right ? 1.0f : 0.0f;
-
-        return std::clamp( leftX - a + d - left + right, -1.0f, 1.0f );
-    } );
-
-    // Input that controls shooting.
-    Input::mapButtonDown( "Fire", []( std::span<const GamePadStateTracker> gamePadStates, const KeyboardStateTracker& keyboardState, const MouseStateTracker& mouseState ) {
-        bool a = false;
-
-        for ( auto& gamePadState: gamePadStates )
-        {
-            a = a || gamePadState.a == ButtonState::Pressed;
-        }
-
-        const bool space = keyboardState.isKeyPressed( KeyCode::Space );
-        const bool up    = keyboardState.isKeyPressed( KeyCode::Up );
-        const bool w     = keyboardState.isKeyPressed( Graphics::KeyCode::W );
-
-        return a || space || up || w;
-    } );
-
     // Input that controls adding coins.
     Input::mapButtonDown( "Coin", []( std::span<const GamePadStateTracker> gamePadStates, const KeyboardStateTracker& keyboardState, const MouseStateTracker& mouseState ) {
         bool back = false;

@@ -8,7 +8,6 @@
 #include <Math/AABB.hpp>
 #include <Math/Transform2D.hpp>
 
-
 #include <memory>
 
 class Brick
@@ -79,6 +78,13 @@ public:
     /// <param name="v">The velocity of the circle.</param>
     /// <returns>An optional HitInfo structure that contains the point of collision and the collision normal.</returns>
     std::optional<Physics::HitInfo> checkCollision( const Math::Circle& c, const glm::vec2& v ) const;
+
+    /// <summary>
+    /// Check collision with this brick and an other AABB.
+    /// </summary>
+    /// <param name="aabb">The AABB to check for collisions with.</param>
+    /// <returns>`true` if they are colliding, `false` otherwise.</returns>
+    bool checkCollision( const Math::AABB& aabb ) const;
 
     /// <summary>
     /// Get the brick's AABB.

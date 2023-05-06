@@ -8,6 +8,5 @@ out vec4 color;
 void main()
 {
     color = textureLod(tex, uv, 0).bgra;
-    // color = vec4(uv, 0, 0);
 }
 )"

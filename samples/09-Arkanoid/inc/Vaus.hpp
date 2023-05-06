@@ -92,5 +92,5 @@ private:
     Graphics::SpriteAnim explode2;
 
     // Pixels per second.
-    static inline const float speed = 200.0f;
+    static inline const float speed = 300.0f;
 };

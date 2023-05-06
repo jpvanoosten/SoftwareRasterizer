@@ -1,10 +1,13 @@
 #pragma once
 
 #include "Ball.hpp"
+#include "Bullet.hpp"
 #include "Field.hpp"
 #include "State.hpp"
 #include "Vaus.hpp"
 #include "Level.hpp"
+
+#include <array>
 
 class Game;
 
@@ -46,6 +49,7 @@ private:
 
     // Check collisions with the ball.
     void checkCollisions( Ball& ball );
+    void checkCollisions( Bullet& bullet );
 
     void drawText( Graphics::Image& image, std::string_view text, int x, int y );
 
@@ -57,6 +61,9 @@ private:
     Ball  ball;
     Vaus  vaus;
     Level level;
+    std::array<Bullet, 2> bullets;
+    // Timer for firing bullets.
+    float                 bulletTimeout = 0.0f;
 
     // Size of the play area.
     int screenWidth;

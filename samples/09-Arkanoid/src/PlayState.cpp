@@ -15,11 +15,50 @@ PlayState::PlayState( Game& game )
 , screenWidth { static_cast<int>( game.getImage().getWidth() ) }
 , screenHeight { static_cast<int>( game.getImage().getHeight() ) }
 {
+    // Input that controls the horizontal movement of the paddle.
+    Input::mapAxis( "Horizontal", []( std::span<const GamePadStateTracker> gamePadStates, const KeyboardStateTracker& keyboardState, const MouseStateTracker& mouseState ) {
+        float leftX = 0.0f;
+
+        for ( auto& gamePadState: gamePadStates )
+        {
+            const auto state = gamePadState.getLastState();
+
+            leftX += state.thumbSticks.leftX;
+        }
+
+        const auto keyState = keyboardState.getLastState();
+
+        const float a     = keyState.A ? 1.0f : 0.0f;
+        const float d     = keyState.D ? 1.0f : 0.0f;
+        const float left  = keyState.Left ? 1.0f : 0.0f;
+        const float right = keyState.Right ? 1.0f : 0.0f;
+
+        return std::clamp( leftX - a + d - left + right, -1.0f, 1.0f );
+    } );
+
+    // Input that controls shooting.
+    Input::mapButtonDown( "Fire", []( std::span<const GamePadStateTracker> gamePadStates, const KeyboardStateTracker& keyboardState, const MouseStateTracker& mouseState ) {
+        bool a = false;
+
+        for ( auto& gamePadState: gamePadStates )
+        {
+            a = a || gamePadState.a == ButtonState::Pressed;
+        }
+
+        const bool space = keyboardState.isKeyPressed( KeyCode::Space );
+        const bool up    = keyboardState.isKeyPressed( KeyCode::Up );
+        const bool w     = keyboardState.isKeyPressed( Graphics::KeyCode::W );
+
+        return a || space || up || w;
+    } );
+
     {
         // Load the vaus sprites.
         const auto spriteSheet = std::make_shared<SpriteSheet>( "assets/Arkanoid/vaus.png", ParseRects( "assets/Arkanoid/vaus.xml" ), BlendMode::AlphaBlend );
         // Set the paddle to the middle of the play area.
         vaus = Vaus { spriteSheet };
+        // Initialize the bullets.
+        bullets[0] = bullets[1] = Bullet { spriteSheet, { { 33, 34, 35 } } };
     }
     {
         // Load the field sprites.
@@ -90,6 +129,12 @@ void PlayState::draw( Graphics::Image& image )
 
     level.draw( image );
     vaus.draw( image );
+
+    // draw bullets
+    for ( auto& bullet: bullets )
+    {
+        bullet.draw( image );
+    }
 }
 
 void PlayState::setState( State newState )
@@ -140,6 +185,10 @@ void PlayState::endState( State oldState )
     case State::Appear:
         break;
     case State::Playing:
+        for (auto& bullet : bullets)
+        {
+            bullet.setState( Bullet::State::None );
+        }
         break;
     case State::Dead:
         break;
@@ -198,15 +247,38 @@ void PlayState::doPlaying( float deltaTime )
 {
 #if _DEBUG
     // In debug mode, put vaus under the ball...
-    //auto x = ball.getPosition().x;
-    //auto y = vaus.getPosition().y;
-    //vaus.setPosition( { x, y } );
+     auto x = ball.getPosition().x;
+     auto y = vaus.getPosition().y;
+     vaus.setPosition( { x, y } );
 #endif
 
     vaus.update( deltaTime );
     ball.update( deltaTime );
     field.update( deltaTime );
-    
+
+    if ( vaus.getState() == Vaus::State::Laser )
+    {
+        bulletTimeout -= deltaTime;
+        if ( Input::getButtonDown( "Fire" ) && bulletTimeout < 0.0f )
+        {
+            bulletTimeout = 0.1f;  // Don't fire a bullet again for x seconds.
+            for ( auto& bullet: bullets )
+            {
+                if ( bullet.getState() == Bullet::State::None )
+                {
+                    bullet.fire( vaus.getPosition() );
+                    break;
+                }
+            }
+        }
+    }
+
+    for ( auto& bullet: bullets )
+    {
+        bullet.update( deltaTime );
+        checkCollisions( bullet );
+    }
+
     checkCollisions( ball );
 
     // No bricks left. Go to next level.
@@ -260,7 +332,7 @@ void PlayState::checkCollisions( Ball& ball )
 
     if ( const auto hit = vaus.collidesWith( ball ) )
     {
-        // Reflect the velocity of the ball about the hit normal.
+        // Use the hit normal to determine the direction of the ball.
         v = hit->normal * ballSpeed;
     }
 
@@ -275,6 +347,30 @@ void PlayState::checkCollisions( Ball& ball )
 
     ball.setCircle( c );
     ball.setVelocity( v );
+}
+
+void PlayState::checkCollisions( Bullet& bullet )
+{
+    // Only check collision with fired bullets.
+    if ( bullet.getState() != Bullet::State::Fired )
+        return;
+
+    // Level bounds.
+    constexpr float top = 24.0f;
+
+    Math::AABB aabb = bullet.getAABB();
+
+    // Check for collision with the bricks.
+    if ( level.checkCollision( bullet ) )
+    {
+        bullet.hit();
+    }
+
+    // Check for collision with the top of the screen.
+    if ( aabb.min.y <= top )
+    {
+        bullet.hit();
+    }
 }
 
 void PlayState::doDead( float deltaTime )

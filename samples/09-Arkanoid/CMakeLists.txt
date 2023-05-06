@@ -6,6 +6,7 @@ set( INC_FILES
     inc/Ball.hpp
     inc/Brick.hpp
     inc/Button.hpp
+    inc/Bullet.hpp
     inc/Game.hpp
     inc/GameOverState.hpp
     inc/HighScores.hpp
@@ -25,6 +26,7 @@ set( SRC_FILES
     src/Ball.cpp
     src/Brick.cpp
     src/Button.cpp
+    src/Bullet.cpp
     src/Game.cpp
     src/GameOverState.cpp
     src/HighScores.cpp

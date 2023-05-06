@@ -27,6 +27,7 @@ void Brick::draw( Graphics::Image& image ) const
     {
         const int x = static_cast<int>( transform.getPosition().x );
         const int y = static_cast<int>( transform.getPosition().y );
+        image.drawSprite( spriteAnim, x + 8, y + 8, Graphics::Color::Black.withAlpha( 0.3f ) );
         image.drawSprite( spriteAnim, x, y );
     }
 }
@@ -64,6 +65,11 @@ const glm::vec2& Brick::getPosition() const noexcept
 std::optional<Physics::HitInfo> Brick::checkCollision( const Math::Circle& c, const glm::vec2& v ) const
 {
     return Physics::collidesWith( getAABB(), c, v );
+}
+
+bool Brick::checkCollision( const Math::AABB& _aabb ) const
+{
+    return getAABB().intersect( _aabb );
 }
 
 Math::AABB Brick::getAABB() const noexcept

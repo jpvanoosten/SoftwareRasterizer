@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Brick.hpp"
+#include "Bullet.hpp"
 #include "Physics.hpp"
 
 #include "Ball.hpp"
@@ -63,6 +64,7 @@ public:
     /// <param name="ball">The ball to check for collision with.</param>
     /// <returns>An optional HitInfo structure that contains the collision information, otherwise a disengaged optional value if no collision occurred.</returns>
     std::optional<Physics::HitInfo> checkCollision( const Ball& ball );
+    bool checkCollision( const Bullet& ball );
 
 private:
     // Need a pointer to the game to update the points when a brick is destroyed.

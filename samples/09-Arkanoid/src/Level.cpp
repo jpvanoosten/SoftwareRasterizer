@@ -10,7 +10,7 @@ using namespace Graphics;
 std::shared_ptr<SpriteSheet> GetBrickSprites()
 {
     // Lazy initialize static brick sprites (avoid loading more than once).
-    static std::shared_ptr<SpriteSheet> sprites = std::make_shared<SpriteSheet>( "assets/Arkanoid/blocks.png", ParseRects( "assets/Arkanoid/blocks.xml" ) );
+    static std::shared_ptr<SpriteSheet> sprites = std::make_shared<SpriteSheet>( "assets/Arkanoid/blocks.png", ParseRects( "assets/Arkanoid/blocks.xml" ), BlendMode::AlphaBlend );
     return sprites;
 }
 
@@ -128,4 +128,27 @@ std::optional<Physics::HitInfo> Level::checkCollision( const Ball& ball )
     }
 
     return {};
+}
+
+bool Level::checkCollision( const Bullet& ball )
+{
+    Math::AABB aabb = ball.getAABB();
+    bool       collided = false;
+
+    for ( auto& brick: bricks )
+    {
+        if ( brick.getHitPoints() > 0 )
+        {
+            if ( brick.checkCollision( aabb ) )
+            {
+                collided = true;
+                if ( brick.hit() == 0 && pGame != nullptr )  // Block is destroyed.
+                {
+                    pGame->addPoints( brick.getPoints() );
+                }
+            }
+        }
+    }
+
+    return collided;
 }

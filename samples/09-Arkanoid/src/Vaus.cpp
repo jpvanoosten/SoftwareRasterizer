@@ -1,6 +1,6 @@
 #include <Ball.hpp>
-#include <iostream>
 #include <Vaus.hpp>
+#include <iostream>
 
 #include <Graphics/Font.hpp>
 #include <Graphics/Input.hpp>
@@ -42,35 +42,14 @@ Vaus::Vaus( const std::shared_ptr<Graphics::SpriteSheet>& spriteSheet )
 : aabb { { 0, 0, 0 }, { 32, 8, 0 } }
 , enlargeAABB { { 0, 0, 0 }, { 48, 8, 0 } }
 {
-    // The animation frames in the sprite sheet for the various modes.
-    {
-        constexpr int frames[] { 0, 1, 2, 3, 4 };
-        appearMode = SpriteAnim { spriteSheet, FPS, frames };
-    }
-    {
-        constexpr int frames[] { 6, 7, 8, 9, 10, 11, 11 };
-        defaultMode = SpriteAnim { spriteSheet, FPS, frames };
-    }
-    {
-        constexpr int frames[] { 12, 13, 14, 15, 16, 17, 17 };
-        enlargeMode = SpriteAnim { spriteSheet, FPS, frames };
-    }
-    {
-        constexpr int frames[] { 18, 19, 20, 21, 22, 23, 24, 25, 26 };
-        toLaserMode = SpriteAnim { spriteSheet, FPS, frames };
-    }
-    {
-        constexpr int frames[] { 27, 28, 29, 30, 31, 32 };
-        laserMode = SpriteAnim { spriteSheet, FPS, frames };
-    }
-    {
-        constexpr int frames[] { 36, 37, 38 };
-        explode1 = SpriteAnim { spriteSheet, FPS, frames };
-    }
-    {
-        constexpr int frames[] { 39, 40, 41, 42 };
-        explode2 = SpriteAnim { spriteSheet, FPS, frames };
-    }
+    // Setup the animations.
+    appearMode  = SpriteAnim { spriteSheet, FPS, { { 0, 1, 2, 3, 4 } } };
+    defaultMode = SpriteAnim { spriteSheet, FPS, { { 6, 7, 8, 9, 10, 11, 11 } } };
+    enlargeMode = SpriteAnim { spriteSheet, FPS, { { 12, 13, 14, 15, 16, 17, 17 } } };
+    toLaserMode = SpriteAnim { spriteSheet, FPS, { { 18, 19, 20, 21, 22, 23, 24, 25, 26 } } };
+    laserMode   = SpriteAnim { spriteSheet, FPS, { { 27, 28, 29, 30, 31, 32 } } };
+    explode1    = SpriteAnim { spriteSheet, FPS, { { 36, 37, 38 } } };
+    explode2    = SpriteAnim { spriteSheet, FPS, { { 39, 40, 41, 42 } } };
 
     // Set the anchor point to the center of the paddle (depending on mode)
     transform.setAnchor( { 16, 4 } );
@@ -237,19 +216,17 @@ std::optional<Physics::HitInfo> Vaus::collidesWith( const Ball& ball ) const
             // Reflection angle in the middle of Vaus.
             const float cosB = glm::cos( glm::radians( 60.0f ) );
             const float sinB = glm::sin( glm::radians( 60.0f ) );
-            
+
             if ( bx < x )  // ball is left of center point.
             {
                 // Left most x pos.
                 const float lx = x - getAnchor().x;
                 if ( bx - lx < 8.0f )  // 8px from left edge.
                 {
-                    std::cout << "-40 deg left" << std::endl;
                     hit->normal = { -cosA, -sinA };
                 }
                 else
                 {
-                    std::cout << "-60 deg left" << std::endl;
                     hit->normal = { -cosB, -sinB };
                 }
             }
@@ -257,14 +234,12 @@ std::optional<Physics::HitInfo> Vaus::collidesWith( const Ball& ball ) const
             {
                 // Right most x pos
                 const float rx = x + getAnchor().x;
-                if (rx - bx < 8.0f ) // 8px from right edge.
+                if ( rx - bx < 8.0f )  // 8px from right edge.
                 {
-                    std::cout << "40 deg right" << std::endl;
                     hit->normal = { cosA, -sinA };
                 }
                 else
                 {
-                    std::cout << "60 deg right" << std::endl;
                     hit->normal = { cosB, -sinB };
                 }
             }
