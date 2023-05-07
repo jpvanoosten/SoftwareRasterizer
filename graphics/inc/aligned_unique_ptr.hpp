@@ -2,13 +2,21 @@
 
 #include <memory>
 
+#if defined(_MSC_VER)
+    #define aligned_malloc(size, alignment) _aligned_malloc((size), (alignment))
+    #define aligned_free _aligned_free
+#else
+    #define aligned_malloc(size, alignment) aligned_alloc((alignment), (size))
+    #define aligned_free free
+#endif
+
 struct aligned_deleter
 {
     void operator()( void* ptr ) const
     {
         // Note: this doesn't destruct array elements.
         // TODO: specialize aligned_deleter for array types?
-        _aligned_free( ptr );
+        aligned_free( ptr );
     }
 };
 
@@ -34,7 +42,7 @@ template<typename T, std::size_t Align, typename... Args>
 std::enable_if_t<!std::is_array_v<T>, aligned_unique_ptr<T>>
     make_aligned_unique( Args&&... args )
 {
-    aligned_unique_ptr<T> ptr = aligned_unique_ptr<T>( static_cast<T*>( _aligned_malloc( sizeof( T ), Align ) ), aligned_deleter() );
+    aligned_unique_ptr<T> ptr = aligned_unique_ptr<T>( static_cast<T*>( aligned_malloc( sizeof( T ), Align ) ), aligned_deleter() );
     new ( ptr.get() ) T( std::forward<Args>( args )... );
     return ptr;
 }
@@ -44,7 +52,7 @@ std::enable_if_t<detail::is_unbounded_array_v<T> && std::is_default_constructibl
     make_aligned_unique( std::size_t n )
 {
     using T2                  = std::remove_extent_t<T>;
-    aligned_unique_ptr<T> ptr = aligned_unique_ptr<T>( static_cast<T2*>( _aligned_malloc( sizeof( T2 ) * n, Align ) ), aligned_deleter() );
+    aligned_unique_ptr<T> ptr = aligned_unique_ptr<T>( static_cast<T2*>( aligned_malloc( sizeof( T2 ) * n, Align ) ), aligned_deleter() );
 
     // Default construct the elements.
     T2* p = ptr.get();

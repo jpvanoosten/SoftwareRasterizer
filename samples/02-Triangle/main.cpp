@@ -4,6 +4,7 @@
 #include <Graphics/Window.hpp>
 
 #include <iostream>
+#include <cmath>
 
 using namespace Graphics;
 

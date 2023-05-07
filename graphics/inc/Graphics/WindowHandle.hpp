@@ -8,5 +8,7 @@ namespace Graphics
 {
 #if defined( _WIN32 )
 using WindowHandle = HWND__*;
+#else
+using WindowHandle = void*;
 #endif
 }  // namespace Graphics

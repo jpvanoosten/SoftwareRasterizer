@@ -13,6 +13,7 @@
 #include <iostream>
 #include <numbers>
 #include <optional>
+#include <cstring>
 
 #include <glm/gtx/matrix_query.hpp> // isIdentity.
 
@@ -43,7 +44,7 @@ Image::Image( const std::filesystem::path& fileName )
 
     resize( static_cast<uint32_t>( x ), static_cast<uint32_t>( y ) );
 
-    memcpy_s( m_data.get(), static_cast<rsize_t>( m_width ) * m_height * sizeof( Color ), data, static_cast<rsize_t>( m_width ) * m_height * sizeof( Color ) );
+    std::memcpy( m_data.get(), data, static_cast<std::size_t>( m_width ) * m_height * sizeof( Color ) );
 
     stbi_image_free( data );
 }
@@ -51,7 +52,7 @@ Image::Image( const std::filesystem::path& fileName )
 Image::Image( const Image& copy )
 {
     resize( copy.m_width, copy.m_height );
-    memcpy_s( data(), static_cast<rsize_t>( m_width ) * m_height * sizeof( Color ), copy.data(), static_cast<rsize_t>( copy.m_width ) * copy.m_height * sizeof( Color ) );
+    std::memcpy( data(), copy.data(), static_cast<std::size_t>( m_width ) * m_height * sizeof( Color ) );
 }
 
 Image::Image( Image&& move ) noexcept
@@ -72,7 +73,7 @@ Image::Image( uint32_t width, uint32_t height )
 Image& Image::operator=( const Image& image )
 {
     resize( image.m_width, image.m_height );
-    memcpy_s( data(), static_cast<rsize_t>( m_width ) * m_height * sizeof( Color ), image.data(), static_cast<rsize_t>( image.m_width ) * image.m_height * sizeof( Color ) );
+    std::memcpy( data(), image.data(), static_cast<std::size_t>( image.m_width ) * image.m_height * sizeof( Color ) );
 
     return *this;
 }
@@ -239,7 +240,7 @@ void Image::copy( const Image& srcImage, int x, int y )
 
 #pragma omp parallel for firstprivate( w, h, sX, sY, dX, dY )
     for ( int i = 0; i < h; ++i )
-        memcpy_s( dst + ( i + dY ) * m_width + dX, w * sizeof( Color ), src + ( i + sY ) * srcWidth + sX, w * sizeof( Color ) );
+        std::memcpy( dst + ( i + dY ) * m_width + dX, src + ( i + sY ) * srcWidth + sX, w * sizeof( Color ) );
 }
 
 // Source: https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm

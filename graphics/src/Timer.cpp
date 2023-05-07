@@ -1,5 +1,7 @@
 #include <Graphics/Timer.hpp>
 
+#include <algorithm>
+
 using namespace Graphics;
 using std::chrono::high_resolution_clock;
 using std::chrono::duration;

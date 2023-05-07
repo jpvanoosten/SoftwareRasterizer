@@ -13,6 +13,7 @@
 #include <cassert>
 #include <filesystem>
 #include <memory>
+#include <optional>
 
 #include <glm/vec2.hpp>
 

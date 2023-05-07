@@ -1,6 +1,7 @@
 #include <Graphics/GamePad.hpp>
 
 #include <algorithm>
+#include <cmath>
 
 namespace Graphics
 {
@@ -38,7 +39,7 @@ void ApplyStickDeadZone( float x, float y, DeadZone deadZoneMode, float maxValue
         break;
     case DeadZone::Circular:
     {
-        const float dist   = sqrtf( x * x + y * y );
+        const float dist   = std::sqrt( x * x + y * y );
         const float wanted = ApplyLinearDeadZone( dist, maxValue, deadZoneSize );
 
         const float scale = ( wanted > 0.f ) ? ( wanted / dist ) : 0.f;
