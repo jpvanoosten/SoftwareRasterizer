@@ -41,7 +41,7 @@ int main( int argc, char* argv[] )
     {
         image.clear( Color::White );
 
-        float dx = std::sinf( timer.totalSeconds() * 0.5 ) * static_cast<float>( WINDOW_WIDTH / 2 );
+        float dx = std::sin( timer.totalSeconds() * 0.5 ) * static_cast<float>( WINDOW_WIDTH / 2 );
         //float dx = WINDOW_WIDTH / 2.0f;  
 
         // Draw a red triangle in the middle of the screen.

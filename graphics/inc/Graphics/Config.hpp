@@ -5,7 +5,7 @@
     #define SR_EXPORT __declspec( dllexport )
 #elif defined(__GNUC__) && __GNUC__ >= 4
     #define SR_IMPORT __attribute__ ((visibility ("default")))
-    #define SR_EXPROT __attribute__ ((visibility ("default")))
+    #define SR_EXPORT __attribute__( ( visibility( "default" ) ) )
 #else
     #define SR_IMPORT
     #define SR_EXPORT
