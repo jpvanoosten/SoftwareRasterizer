@@ -1,4 +1,4 @@
-cmake_minimum_required( VERSION 3.23.0 )
+cmake_minimum_required( VERSION 3.22.1 )
 
 option( BUILD_SHARED_LIBS "Global flag to cause add_library to create shared libraries." ON )
 option( SR_BUILD_SAMPLES "Build samples." ON )
@@ -16,7 +16,7 @@ set( SR_VERSION ${SR_VERSION_MAJOR}.${SR_VERSION_MINOR}.${SR_VERSION_PATCH})
 # Use solution folders.
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-project( SoftwareRasterizer VERSION ${SR_VERSION} LANGUAGES CXX )
+project( SoftwareRasterizer VERSION ${SR_VERSION} LANGUAGES C CXX )
 
 # Enable multi-processor builds in MSVC.
 if(MSVC)

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.23.0) # The version of CMake used when creating this project.
+cmake_minimum_required(VERSION 3.22.1) # The version of CMake used when creating this project.
 
 include(FetchContent)
 

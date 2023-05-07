@@ -1,4 +1,4 @@
-cmake_minimum_required( VERSION 3.23.0 )
+cmake_minimum_required( VERSION 3.22.1 )
 
 set( TARGET_NAME 02-Triangle )
 
