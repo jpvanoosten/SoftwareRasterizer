@@ -1,7 +1,7 @@
 <TextureAtlas imagePath="vaus.png">
 	<SubTexture name="0" x="0" y="0" width="32" height="8"/>
 	<SubTexture name="1" x="0" y="8" width="32" height="8"/>
-	<SubTexture name="1" x="0" y="16" width="32" height="8"/>
+	<SubTexture name="2" x="0" y="16" width="32" height="8"/>
 	<SubTexture name="3" x="0" y="24" width="32" height="8"/>
 	<SubTexture name="4" x="0" y="32" width="32" height="8"/>
 	<SubTexture name="5" x="0" y="40" width="16" height="8"/>

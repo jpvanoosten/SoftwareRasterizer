@@ -4,6 +4,7 @@
 #include <Graphics/Timer.hpp>
 #include <Graphics/Window.hpp>
 
+#include <fmt/core.h>
 #include <iostream>
 
 using namespace Graphics;
@@ -103,7 +104,7 @@ int main( int argc, char* argv[] )
         totalTime += timer.elapsedSeconds();
         if ( totalTime > 1.0 )
         {
-            fps = std::format( "FPS: {:.3f}", static_cast<double>(frameCount) / totalTime );
+            fps = fmt::format( "FPS: {:.3f}", static_cast<double>(frameCount) / totalTime );
 
             std::cout << fps << std::endl;
 

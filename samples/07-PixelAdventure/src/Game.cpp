@@ -3,6 +3,7 @@
 #include <Graphics/Color.hpp>
 #include <Graphics/Input.hpp>
 
+#include <fmt/core.h>
 #include <string>
 
 using namespace Graphics;
@@ -146,7 +147,7 @@ void Game::Update()
     totalTime += timer.elapsedSeconds();
     if ( totalTime > 1.0 )
     {
-        fps       = std::format( "FPS: {:.3f}", static_cast<double>( frames ) / totalTime );
+        fps       = fmt::format( "FPS: {:.3f}", static_cast<double>( frames ) / totalTime );
         frames    = 0;
         totalTime = 0.0;
     }
@@ -227,7 +228,7 @@ void Game::Update()
 
 #if _DEBUG
     // Draw some text at the mouse position.
-    image.drawText( arial20, std::format( "({}, {})", mousePos.x, mousePos.y ), mousePos.x, mousePos.y, Color::White );
+    image.drawText( arial20, fmt::format( "({}, {})", mousePos.x, mousePos.y ), mousePos.x, mousePos.y, Color::White );
 #endif
 
 //    timer.limitFPS( 30 );

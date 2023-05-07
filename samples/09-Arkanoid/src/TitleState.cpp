@@ -1,10 +1,10 @@
-#include "Game.hpp"
-#include "Graphics/Input.hpp"
-
+#include <Game.hpp>
 #include <TitleState.hpp>
-#include <iostream>
 
+#include <Graphics/Input.hpp>
 #include <Graphics/ResourceManager.hpp>
+
+#include <fmt/core.h>
 
 using namespace Graphics;
 
@@ -59,7 +59,7 @@ void TitleState::draw( Graphics::Image& image )
     image.drawSprite( taitoSprite, 64, 179 );
     image.drawText( font, L"© 1986 TAITO CORP JAPAN", 16, 208, Color::White );
     image.drawText( font, "ALL RIGHTS RESERVED", 33, 222, Color::White );
-    image.drawText( font, std::format( "CREDIT{:3d}", coins ), 145, 255, Color::White );
+    image.drawText( font, fmt::format( "CREDIT{:3d}", coins ), 145, 255, Color::White );
 }
 
 void TitleState::processEvent( const Graphics::Event& _event )

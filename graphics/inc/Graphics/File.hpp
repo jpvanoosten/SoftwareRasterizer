@@ -1,7 +1,7 @@
 #pragma once
 
 #include <filesystem>
-#include <format>
+#include <fmt/core.h>
 #include <fstream>
 #include <span>
 #include <vector>
@@ -62,10 +62,10 @@ std::vector<T> File::readFile( const std::filesystem::path& path, std::ios::open
             return data;
         }
 
-        throw std::invalid_argument( std::format( "File is empty: {}", path.string() ) );
+        throw std::invalid_argument( fmt::format( "File is empty: {}", path.string() ) );
     }
 
-    throw std::invalid_argument( std::format( "Failed to open file: {}", path.string() ) );
+    throw std::invalid_argument( fmt::format( "Failed to open file: {}", path.string() ) );
 }
 
 template<typename T>

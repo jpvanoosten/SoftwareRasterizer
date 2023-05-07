@@ -9,6 +9,7 @@
 #include <Graphics/Timer.hpp>
 #include <Graphics/Window.hpp>
 
+#include <fmt/core.h>
 #include <iostream>
 #include <random>
 
@@ -156,7 +157,7 @@ int main( int argc, char* argv[] )
                 }
                 break;
                 // case Event::Resize:
-                //     std::cout << std::format( "Resize: {},{}\n", e.resize.width, e.resize.height );
+                //     std::cout << fmt::format( "Resize: {},{}\n", e.resize.width, e.resize.height );
                 //     image.resize( e.resize.width, e.resize.height );
                 //     image.clear( Color::Black );
                 //     break;
@@ -169,7 +170,7 @@ int main( int argc, char* argv[] )
         totalTime += timer.elapsedSeconds();
         if ( totalTime > 1.0 )
         {
-            fps = std::format( "FPS: {:.3f}", static_cast<double>( frameCount ) / totalTime );
+            fps = fmt::format( "FPS: {:.3f}", static_cast<double>( frameCount ) / totalTime );
 
             std::cout << fps << std::endl;
 

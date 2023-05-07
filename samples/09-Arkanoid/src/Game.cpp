@@ -7,6 +7,8 @@
 #include <Graphics/Input.hpp>
 #include <Graphics/KeyCodes.hpp>
 
+#include <fmt/core.h>
+
 using namespace Graphics;
 using namespace Math;
 
@@ -70,14 +72,14 @@ void Game::update( float deltaTime )
         // Player 1
         image.drawText( arcadeN, "1UP", 26, 7, Color::Red );
         // Draw P1 score right-aligned.
-        const auto score = std::format( "{:6d}", score1 );
+        const auto score = fmt::format( "{:6d}", score1 );
         image.drawText( arcadeN, score, 15, 15, Color::White );
     }
     {
         // High score
         int highScore = getHighScore();
         image.drawText( arcadeN, "HIGH SCORE", 73, 7, Color::Red );
-        const auto score = std::format( "{:6d}", highScore );
+        const auto score = fmt::format( "{:6d}", highScore );
         image.drawText( arcadeN, score, 87, 15, Color::White );
     }
     if ( numPlayers > 1 )
@@ -85,7 +87,7 @@ void Game::update( float deltaTime )
         // Player 2
         image.drawText( arcadeN, "2UP", 177, 7, Color::Red );
         // Draw P2 score right-aligned.
-        const auto score = std::format( "{:6d}", score2 );
+        const auto score = fmt::format( "{:6d}", score2 );
         image.drawText( arcadeN, score, 164, 15, Color::White );
     }
 

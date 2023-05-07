@@ -2,6 +2,7 @@
 
 #include <Graphics/Input.hpp>
 
+#include <fmt/core.h>
 #include <numbers>
 
 using namespace Graphics;
@@ -153,8 +154,8 @@ void HighScoreState::draw( Graphics::Image& image )
 
     image.drawText( font, "ENTER YOUR INITIALS !", 31, 79, Color::Red );
     image.drawText( font, "SCORE ROUND   NAME", 40, 104, Color::Yellow );
-    image.drawText( font, std::format( "{:8d}", highScore.score), 20, 120, Color::White );
-    image.drawText( font, std::format( "{:>3}", highScore.round ), 95, 120, Color::Yellow );
+    image.drawText( font, fmt::format( "{:8d}", highScore.score), 20, 120, Color::White );
+    image.drawText( font, fmt::format( "{:>3}", highScore.round ), 95, 120, Color::Yellow );
 
     for ( int i = 0; i < 3; ++i )
     {
@@ -165,7 +166,7 @@ void HighScoreState::draw( Graphics::Image& image )
             color = std::sin( timer * PI * 12.0f ) > 0.0f ? Color::Red : Color::White;
         }
 
-        image.drawText( font, std::format( "{}", highScore.name[i] ), 144 + i * 7, 120, color );
+        image.drawText( font, fmt::format( "{}", highScore.name[i] ), 144 + i * 7, 120, color );
     }
 
 

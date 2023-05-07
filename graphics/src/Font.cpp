@@ -65,8 +65,8 @@ Font::Font( const std::filesystem::path& fontFile, float size, uint32_t firstCha
 
         // Uncomment the next lines to save the font image to disk.
         // This is mostly used for testing the font baking.
-        // auto fontTga = std::format( "{}/{}_{}.tga", fontFile.parent_path().string(), fontFile.stem().string(), size );
-        // fontImage->save( fontTga );
+        //auto fontTga = fmt::format( "{}/{}_{}.tga", fontFile.parent_path().string(), fontFile.stem().string(), size );
+        //fontImage->save( fontTga );
     }
     else
     {

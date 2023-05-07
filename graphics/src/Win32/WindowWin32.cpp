@@ -4,6 +4,7 @@
 #include <objbase.h>
 
 #include <iostream>
+#include <fmt/core.h>
 
 #include <GL/wglew.h>
 
@@ -265,7 +266,7 @@ void WindowWin32::init()
     }
     else
     {
-        std::cout << std::format( "Using GLEW: {}\n", reinterpret_cast<const char*>( glewGetString( GLEW_VERSION ) ) );
+        std::cout << fmt::format( "Using GLEW: {}\n", reinterpret_cast<const char*>( glewGetString( GLEW_VERSION ) ) );
     }
 }
 

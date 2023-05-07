@@ -102,7 +102,7 @@ target_include_directories( Graphics
 )
 
 target_link_libraries( Graphics
-    PUBLIC Math 
+    PUBLIC Math fmt
     PRIVATE glew
 )
 

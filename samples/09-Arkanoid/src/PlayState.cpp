@@ -5,6 +5,7 @@
 
 #include <Graphics/Input.hpp>
 
+#include <fmt/core.h>
 #include <glm/gtc/random.hpp>  // For generating random vectors.
 
 using namespace Graphics;
@@ -117,7 +118,7 @@ void PlayState::draw( Graphics::Image& image )
     switch ( state )
     {
     case State::Ready:
-        drawText( image, std::format( "ROUND {:2}", levelId + 1 ), 81, 180 );
+        drawText( image, fmt::format( "ROUND {:2}", levelId + 1 ), 81, 180 );
         if ( time > 1.0f )
             drawText( image, "READY", 93, 200 );
         break;
@@ -185,7 +186,7 @@ void PlayState::endState( State oldState )
     case State::Appear:
         break;
     case State::Playing:
-        for (auto& bullet : bullets)
+        for ( auto& bullet: bullets )
         {
             bullet.setState( Bullet::State::None );
         }
@@ -247,9 +248,9 @@ void PlayState::doPlaying( float deltaTime )
 {
 #if _DEBUG
     // In debug mode, put vaus under the ball...
-     auto x = ball.getPosition().x;
-     auto y = vaus.getPosition().y;
-     vaus.setPosition( { x, y } );
+    auto x = ball.getPosition().x;
+    auto y = vaus.getPosition().y;
+    vaus.setPosition( { x, y } );
 #endif
 
     vaus.update( deltaTime );

@@ -6,6 +6,7 @@
 
 #include <Math/Camera2D.hpp>
 
+#include <fmt/core.h>
 #include <iostream>
 
 using namespace Graphics;
@@ -168,10 +169,10 @@ int main( int argc, char* argv[] )
         auto  position = camera.getPosition();
         auto  origin   = camera.getOrigin();
 
-        image.drawText( Font::Default, std::format( "Zoom    : {}", zoom ), 10, 30, Color::White );
-        image.drawText( Font::Default, std::format( "Rotation: {}", rotation ), 10, 45, Color::White );
-        image.drawText( Font::Default, std::format( "Position: {}, {}", position.x, position.y ), 10, 60, Color::White );
-        image.drawText( Font::Default, std::format( "Origin  : {}, {}", origin.x, origin.y ), 10, 75, Color::White );
+        image.drawText( Font::Default, fmt::format( "Zoom    : {}", zoom ), 10, 30, Color::White );
+        image.drawText( Font::Default, fmt::format( "Rotation: {}", rotation ), 10, 45, Color::White );
+        image.drawText( Font::Default, fmt::format( "Position: {}, {}", position.x, position.y ), 10, 60, Color::White );
+        image.drawText( Font::Default, fmt::format( "Origin  : {}, {}", origin.x, origin.y ), 10, 75, Color::White );
 
         window.present( image );
 
@@ -205,7 +206,7 @@ int main( int argc, char* argv[] )
         totalTime += timer.elapsedSeconds();
         if ( totalTime > 1.0 )
         {
-            fps = std::format( "FPS: {:.3f}", static_cast<double>( frameCount ) / totalTime );
+            fps = fmt::format( "FPS: {:.3f}", static_cast<double>( frameCount ) / totalTime );
 
             std::cout << fps << std::endl;
 
