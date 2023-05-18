@@ -1,4 +1,5 @@
 #include "Game.hpp"
+#include "PowerUp.hpp"
 
 #include <ParseRects.hpp>
 #include <PlayState.hpp>
@@ -11,10 +12,35 @@
 using namespace Graphics;
 using namespace Math;
 
+// Get the spritesheet for the powerups.
+std::shared_ptr<SpriteSheet> GetPowerUpSprites()
+{
+    static std::shared_ptr<SpriteSheet> sprites = std::make_shared<SpriteSheet>( "assets/Arkanoid/powerups.png", ParseRects( "assets/Arkanoid/powerups.xml" ), BlendMode::AlphaBlend );
+    return sprites;
+}
+
+const PowerUp& GetPowerup( PowerUp::Type type )
+{
+    static auto    sprites    = GetPowerUpSprites();
+    static PowerUp powerUps[] = {
+        { nullptr, {}, PowerUp::None },
+        { sprites, { { 0, 1, 2, 3, 4, 5, 6, 7 } }, PowerUp::Slow },
+        { sprites, { { 8, 9, 10, 11, 12, 13, 14, 15 } }, PowerUp::Catch },
+        { sprites, { { 16, 17, 18, 19, 20, 21, 22, 23 } }, PowerUp::Laser },
+        { sprites, { { 24, 25, 26, 27, 28, 29, 30, 31 } }, PowerUp::Enlarge },
+        { sprites, { { 32, 33, 34, 35, 36, 37, 38, 39 } }, PowerUp::Disruption },
+        { sprites, { { 40, 41, 42, 43, 44, 45, 46, 47 } }, PowerUp::Break },
+        { sprites, { { 48, 49, 50, 51, 52, 53, 54, 55 } }, PowerUp::Player }
+    };
+
+    return powerUps[type];
+}
+
 PlayState::PlayState( Game& game )
 : game { game }
 , screenWidth { static_cast<int>( game.getImage().getWidth() ) }
 , screenHeight { static_cast<int>( game.getImage().getHeight() ) }
+, rng { std::random_device {}() }  // Seed the random number generator with a random device.
 {
     // Input that controls the horizontal movement of the paddle.
     Input::mapAxis( "Horizontal", []( std::span<const GamePadStateTracker> gamePadStates, const KeyboardStateTracker& keyboardState, const MouseStateTracker& mouseState ) {
@@ -65,18 +91,19 @@ PlayState::PlayState( Game& game )
         // Load the field sprites.
         const auto spriteSheet = std::make_shared<SpriteSheet>( "assets/Arkanoid/fields.png", ParseRects( "assets/Arkanoid/fields.xml" ), BlendMode::Disable );
         field                  = Field { spriteSheet };
-        field.setLives( numLives );
+        field.setLives( numLives[currentPlayer] );
     }
 
     level = Level { game, levelId };
     field.setLevel( levelId );
+    balls.emplace_back();
 
     setState( State::Ready );
 }
 
 void PlayState::update( float deltaTime )
 {
-    field.setLives( numLives );
+    field.setLives( numLives[currentPlayer] );
     level.update( deltaTime );
 
     switch ( state )
@@ -124,7 +151,8 @@ void PlayState::draw( Graphics::Image& image )
         break;
     case State::Start:
     case State::Playing:
-        ball.draw( image );
+        for ( auto& ball: balls )
+            ball.draw( image );
         break;
     }
 
@@ -135,6 +163,12 @@ void PlayState::draw( Graphics::Image& image )
     for ( auto& bullet: bullets )
     {
         bullet.draw( image );
+    }
+
+    // Draw power-ups
+    for ( auto& powerUp: powerUps )
+    {
+        powerUp.draw( image );
     }
 }
 
@@ -190,6 +224,7 @@ void PlayState::endState( State oldState )
         {
             bullet.setState( Bullet::State::None );
         }
+        powerUps.clear();
         break;
     case State::Dead:
         break;
@@ -223,9 +258,9 @@ void PlayState::doStart( float deltaTime )
     auto aabb = vaus.getAABB();
 
     // In the start state, the ball is attached to the paddle until the user presses the fire button.
-    auto c   = ball.getCircle();
+    auto c   = balls[0].getCircle();
     c.center = { p.x, aabb.min.y - c.radius };
-    ball.setCircle( c );
+    balls[0].setCircle( c );
 
     time += deltaTime;
 
@@ -239,7 +274,8 @@ void PlayState::doStart( float deltaTime )
             vel.x = -1.0f;
         }
 
-        ball.setVelocity( normalize( vel ) * ballSpeed );
+        balls[0].setVelocity( normalize( vel ) * ballSpeed );
+
         setState( State::Playing );
     }
 }
@@ -248,13 +284,19 @@ void PlayState::doPlaying( float deltaTime )
 {
 #if _DEBUG
     // In debug mode, put vaus under the ball...
-    auto x = ball.getPosition().x;
+    auto x = balls[0].getPosition().x;
     auto y = vaus.getPosition().y;
     vaus.setPosition( { x, y } );
 #endif
 
     vaus.update( deltaTime );
-    ball.update( deltaTime );
+
+    for ( auto& ball: balls )
+        ball.update( deltaTime );
+
+    for ( auto& powerUp: powerUps )
+        powerUp.update( deltaTime );
+
     field.update( deltaTime );
 
     if ( vaus.getState() == Vaus::State::Laser )
@@ -280,7 +322,22 @@ void PlayState::doPlaying( float deltaTime )
         checkCollisions( bullet );
     }
 
-    checkCollisions( ball );
+    for ( auto& ball: balls )
+        checkCollisions( ball );
+
+    // Handle power-ups.
+    for ( auto iter = powerUps.begin(); iter != powerUps.end(); )
+    {
+        auto& powerUp = *iter;
+        if ( checkCollisions( powerUp ) )
+        {
+            iter = powerUps.erase( iter );
+        }
+        else
+        {
+            ++iter;
+        }
+    }
 
     // No bricks left. Go to next level.
     if ( level.getNumBricks() == 0 )
@@ -337,7 +394,7 @@ void PlayState::checkCollisions( Ball& ball )
         v = hit->normal * ballSpeed;
     }
 
-    if ( const auto hit = level.checkCollision( ball ) )
+    if ( const auto hit = level.checkCollision( ball, *this ) )
     {
         // Slightly perturb the hit normal to prevent the ball from getting stuck on gold bricks.
         glm::vec2 n = glm::normalize( hit->normal + glm::diskRand( 0.2f ) );
@@ -362,7 +419,7 @@ void PlayState::checkCollisions( Bullet& bullet )
     Math::AABB aabb = bullet.getAABB();
 
     // Check for collision with the bricks.
-    if ( level.checkCollision( bullet ) )
+    if ( level.checkCollision( bullet, *this ) )
     {
         bullet.hit();
     }
@@ -374,14 +431,65 @@ void PlayState::checkCollisions( Bullet& bullet )
     }
 }
 
+bool PlayState::checkCollisions( const PowerUp& powerUp )
+{
+    // Destroy power-ups that reach the bottom of the screen.
+    if ( powerUp.getPosition().y > 250.0f )
+        return true;
+
+    if ( powerUp.checkCollision( vaus.getAABB() ) )
+    {
+        switch ( powerUp.getType() )
+        {
+        case PowerUp::Slow:
+            break;
+        case PowerUp::Catch:
+            break;
+        case PowerUp::Laser:
+            if ( vaus.getState() != Vaus::State::Laser )
+                vaus.setState( Vaus::State::ToLaser );
+            break;
+        case PowerUp::Enlarge:
+            if ( vaus.getState() != Vaus::State::Enlarge )
+                vaus.setState( Vaus::State::Enlarge );
+            break;
+        case PowerUp::Disruption:
+            break;
+        case PowerUp::Break:
+            break;
+        case PowerUp::Player:
+            // Max 13 lives...
+            numLives[currentPlayer] = std::min( 13, numLives[currentPlayer] + 1 );
+            break;
+        }
+
+        return true;
+    }
+
+    return false;
+}
+
+void PlayState::spawnPowerUp( const glm::vec2& pos )
+{
+    if ( powerUpChance( rng ) )
+    {
+        const auto type = static_cast<PowerUp::Type>( powerUpTypeDist( rng ) );
+        assert( type != PowerUp::None );
+        auto powerUp = GetPowerup( type );
+        powerUp.setPosition( pos );
+
+        powerUps.push_back( powerUp );
+    }
+}
+
 void PlayState::doDead( float deltaTime )
 {
     vaus.update( deltaTime );
     if ( vaus.getState() == Vaus::State::Wait )
     {
-        if ( numLives > 0 )
+        if ( numLives[currentPlayer] > 0 )
         {
-            --numLives;
+            --numLives[currentPlayer];
             setState( State::Ready );
         }
         else

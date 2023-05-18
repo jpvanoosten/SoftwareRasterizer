@@ -69,7 +69,7 @@ void Field::draw( Graphics::Image& image )
     image.drawSprite( rightEnemyGate, 152, 16 );
 
     // Draw a ship sprite for each life.
-    for ( int i = 0; i < lives - 1; ++i )
+    for ( int i = 0; i < lives; ++i )
     {
         image.drawSprite( shipSprite, i * shipSprite.getWidth() + 8, 248 );
     }

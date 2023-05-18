@@ -14,6 +14,7 @@ set( INC_FILES
     inc/Field.hpp
     inc/Level.hpp
     inc/ParseRects.hpp
+    inc/PowerUp.hpp
     inc/Physics.hpp
     inc/PlayState.hpp
     inc/State.hpp
@@ -34,6 +35,7 @@ set( SRC_FILES
     src/Field.cpp
     src/Level.cpp
     src/ParseRects.cpp
+    src/PowerUp.cpp
     src/Stages.hpp
     src/Physics.cpp
     src/PlayState.cpp

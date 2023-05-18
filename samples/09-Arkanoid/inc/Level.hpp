@@ -11,6 +11,7 @@
 #include <vector>
 
 class Game;
+class PlayState;
 
 class Level
 {
@@ -62,9 +63,10 @@ public:
     /// Check collision with the ball and the bricks.
     /// </summary>
     /// <param name="ball">The ball to check for collision with.</param>
+    /// <param name="playState">Spawn a powerup if a brick is destroyed.</param>
     /// <returns>An optional HitInfo structure that contains the collision information, otherwise a disengaged optional value if no collision occurred.</returns>
-    std::optional<Physics::HitInfo> checkCollision( const Ball& ball );
-    bool checkCollision( const Bullet& ball );
+    std::optional<Physics::HitInfo> checkCollision( const Ball& ball, PlayState& playState );
+    bool checkCollision( const Bullet& ball, PlayState& playState );
 
 private:
     // Need a pointer to the game to update the points when a brick is destroyed.

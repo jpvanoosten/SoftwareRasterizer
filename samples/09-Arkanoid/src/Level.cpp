@@ -2,6 +2,7 @@
 #include <Level.hpp>
 
 #include "ParseRects.hpp"
+#include "PlayState.hpp"
 #include "Stages.hpp"
 
 using namespace Graphics;
@@ -110,7 +111,7 @@ int Level::getNumBricks() const noexcept
     return numBricks;
 }
 
-std::optional<Physics::HitInfo> Level::checkCollision( const Ball& ball )
+std::optional<Physics::HitInfo> Level::checkCollision( const Ball& ball, PlayState& playState )
 {
     for ( auto& brick: bricks )
     {
@@ -121,6 +122,7 @@ std::optional<Physics::HitInfo> Level::checkCollision( const Ball& ball )
                 if ( brick.hit() == 0 && pGame != nullptr) // Block is destroyed.
                 {
                     pGame->addPoints( brick.getPoints() );
+                    playState.spawnPowerUp( brick.getPosition() );
                 }
                 return hit;
             }
@@ -130,9 +132,9 @@ std::optional<Physics::HitInfo> Level::checkCollision( const Ball& ball )
     return {};
 }
 
-bool Level::checkCollision( const Bullet& ball )
+bool Level::checkCollision( const Bullet& bullet, PlayState& playState )
 {
-    Math::AABB aabb = ball.getAABB();
+    Math::AABB aabb = bullet.getAABB();
     bool       collided = false;
 
     for ( auto& brick: bricks )
@@ -145,6 +147,7 @@ bool Level::checkCollision( const Bullet& ball )
                 if ( brick.hit() == 0 && pGame != nullptr )  // Block is destroyed.
                 {
                     pGame->addPoints( brick.getPoints() );
+                    playState.spawnPowerUp( brick.getPosition() );
                 }
             }
         }
