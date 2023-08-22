@@ -6,7 +6,7 @@
 #include <Graphics/Events.hpp>
 #include <Graphics/WindowImpl.hpp>
 
-#include <GL/glew.h>
+#include <glad/gl.h>
 
 #include <queue>
 

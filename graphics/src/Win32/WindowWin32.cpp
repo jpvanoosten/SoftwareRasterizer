@@ -6,7 +6,7 @@
 #include <iostream>
 #include <fmt/core.h>
 
-#include <GL/wglew.h>
+#include <glad/wgl.h>
 
 #pragma comment( lib, "OpenGL32.lib" )
 
@@ -259,14 +259,18 @@ void WindowWin32::init()
     g_hTempContext = wglCreateContext( hDC );
     wglMakeCurrent( hDC, g_hTempContext );
 
-    GLenum err = glewInit();
-    if ( err != GLEW_OK )
+    // Load WGL extensions.
+    gladLoaderLoadWGL( hDC );
+
+    // Load OpenGL extensions.
+    int version = gladLoaderLoadGL();
+    if ( version == 0 )
     {
-        ::MessageBoxA( nullptr, "Failed to initialize GLEW.", "Error", MB_OK | MB_ICONERROR );
+        ::MessageBoxA( nullptr, "Failed to initialize OpenGL.", "Error", MB_OK | MB_ICONERROR );
     }
     else
     {
-        std::cout << fmt::format( "Using GLEW: {}\n", reinterpret_cast<const char*>( glewGetString( GLEW_VERSION ) ) );
+        std::cout << fmt::format( "Loaded OpenGL: {}.{}\n", GLAD_VERSION_MAJOR( version ), GLAD_VERSION_MINOR( version ) );
     }
 }
 
@@ -284,7 +288,7 @@ void WindowWin32::setVSync( bool enabled )
 {
     makeCurrent();
 
-    if ( WGLEW_EXT_swap_control )
+    if ( GLAD_WGL_EXT_swap_control )
     {
         wglSwapIntervalEXT( enabled ? 1 : 0 );
         vSync = enabled;
