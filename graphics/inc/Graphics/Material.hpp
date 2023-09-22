@@ -5,7 +5,7 @@
 
 namespace Graphics
 {
-struct SR_EXPORT Material final
+struct SR_API Material final
 {
     explicit Material(
         const Color& diffuseColor  = Color::White,
