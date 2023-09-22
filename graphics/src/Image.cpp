@@ -374,7 +374,7 @@ void Image::drawQuad( const glm::vec2& p0, const glm::vec2& p1, const glm::vec2&
     }
 }
 
-void Image::drawQuad( const Vertex& v0, const Vertex& v1, const Vertex& v2, const Vertex& v3, const Image& image, AddressMode addressMode, const BlendMode& _blendMode ) noexcept
+void Image::drawQuad( const Vertex2D& v0, const Vertex2D& v1, const Vertex2D& v2, const Vertex2D& v3, const Image& image, AddressMode addressMode, const BlendMode& _blendMode ) noexcept
 {
     // Compute an AABB over the sprite quad.
     AABB aabb {
@@ -391,7 +391,7 @@ void Image::drawQuad( const Vertex& v0, const Vertex& v1, const Vertex& v2, cons
     // Clamp to the size of the screen.
     aabb.clamp( m_AABB );
 
-    Vertex verts[] = {
+    Vertex2D verts[] = {
         v0, v1, v2, v3
     };
 
@@ -514,15 +514,15 @@ void Image::drawSprite( const Sprite& sprite, const glm::mat3& matrix, std::opti
     const glm::ivec2& uv        = sprite.getUV();
     const glm::ivec2& size      = sprite.getSize();
 
-    Vertex verts[] = {
-        Vertex { { 0, 0 }, { uv.x, uv.y }, color },                                              // Top-left
-        Vertex { { size.x - 1, 0 }, { uv.x + size.x - 1, uv.y }, color },                        // Top-right
-        Vertex { { size.x - 1, size.y - 1 }, { uv.x + size.x - 1, uv.y + size.y - 1 }, color },  // Bottom-right
-        Vertex { { 0, size.y - 1 }, { uv.x, uv.y + size.y - 1 }, color }                         // Bottom-left
+    Vertex2D verts[] = {
+        Vertex2D { { 0, 0 }, { uv.x, uv.y }, color },                                              // Top-left
+        Vertex2D { { size.x - 1, 0 }, { uv.x + size.x - 1, uv.y }, color },                        // Top-right
+        Vertex2D { { size.x - 1, size.y - 1 }, { uv.x + size.x - 1, uv.y + size.y - 1 }, color },  // Bottom-right
+        Vertex2D { { 0, size.y - 1 }, { uv.x, uv.y + size.y - 1 }, color }                         // Bottom-left
     };
 
     // Transform verts.
-    for ( Vertex& v: verts )
+    for ( Vertex2D& v: verts )
     {
         v.position = matrix * glm::vec3 { v.position, 1.0f };
     }

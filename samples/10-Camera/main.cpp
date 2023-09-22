@@ -12,10 +12,10 @@
 using namespace Graphics;
 using namespace Math;
 
-std::vector<Vertex> transformVerts( const Camera2D& camera, std::span<const Vertex> verts )
+std::vector<Vertex2D> transformVerts( const Camera2D& camera, std::span<const Vertex2D> verts )
 {
-    std::vector<Vertex> transformedVerts { verts.begin(), verts.end() };
-    std::ranges::for_each( transformedVerts, [&camera]( Vertex& v ) { v.position = camera * v.position; } );
+    std::vector<Vertex2D> transformedVerts { verts.begin(), verts.end() };
+    std::ranges::for_each( transformedVerts, [&camera]( Vertex2D& v ) { v.position = camera * v.position; } );
     return transformedVerts;
 }
 
@@ -126,7 +126,7 @@ int main( int argc, char* argv[] )
     uint64_t    frameCount = 0ull;
     std::string fps        = "FPS: 0";
 
-    const Vertex verts[] = {
+    const Vertex2D verts[] = {
         { { 0, 0 }, { -4, -3 } },                       // Top-left.
         { { WINDOW_WIDTH, 0 }, { 4, -3 } },             // Top-right.
         { { WINDOW_WIDTH, WINDOW_HEIGHT }, { 4, 3 } },  // Bottom-right.

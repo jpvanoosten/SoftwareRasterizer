@@ -20,6 +20,7 @@ set( INC_FILES
     inc/Graphics/KeyboardStateTracker.hpp
     inc/Graphics/KeyCodes.hpp
     inc/Graphics/Material.hpp
+    inc/Graphics/Mesh.hpp
     inc/Graphics/Mouse.hpp
     inc/Graphics/MouseState.hpp
     inc/Graphics/MouseStateTracker.hpp
@@ -53,6 +54,7 @@ set( SRC_FILES
     src/KeyboardState.cpp
     src/KeyboardStateTracker.cpp
     src/Material.cpp
+    src/Mesh.cpp
     src/Mouse.cpp
     src/ResourceManager.cpp
     src/SpriteAnim.cpp

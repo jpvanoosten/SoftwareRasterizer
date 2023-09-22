@@ -232,7 +232,7 @@ struct SR_API Image final
     /// <param name="image">The texture to use to render the quad.</param>
     /// <param name="addressMode">(optional) The address mode to use when sampling the image. Default: AddressMode::Wrap</param>
     /// <param name="blendMode">(optional) The blending mode to apply. Default: No blending.</param>
-    void drawQuad( const Vertex& v0, const Vertex& v1, const Vertex& v2, const Vertex& v3, const Image& image, AddressMode addressMode = AddressMode::Wrap, const BlendMode& blendMode = {} ) noexcept;
+    void drawQuad( const Vertex2D& v0, const Vertex2D& v1, const Vertex2D& v2, const Vertex2D& v3, const Image& image, AddressMode addressMode = AddressMode::Wrap, const BlendMode& blendMode = {} ) noexcept;
 
     /// <summary>
     /// Draw an axis-aligned bounding box to the image.

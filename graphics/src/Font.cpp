@@ -135,10 +135,10 @@ void Font::drawText( Image& image, std::wstring_view text, int x, int y, const C
                 stbtt_aligned_quad q;
                 stbtt_GetPackedQuad( packedChar.get(), static_cast<int>( fontImage->getWidth() ), static_cast<int>( fontImage->getHeight() ), *t - firstChar, &xPos, &yPos, &q, 0 );
 
-                Vertex v0 { { q.x0, q.y0 }, { q.s0, q.t0 }, color };
-                Vertex v1 { { q.x1, q.y0 }, { q.s1, q.t0 }, color };
-                Vertex v2 { { q.x1, q.y1 }, { q.s1, q.t1 }, color };
-                Vertex v3 { { q.x0, q.y1 }, { q.s0, q.t1 }, color };
+                Vertex2D v0 { { q.x0, q.y0 }, { q.s0, q.t0 }, color };
+                Vertex2D v1 { { q.x1, q.y0 }, { q.s1, q.t0 }, color };
+                Vertex2D v2 { { q.x1, q.y1 }, { q.s1, q.t1 }, color };
+                Vertex2D v3 { { q.x0, q.y1 }, { q.s0, q.t1 }, color };
 
                 image.drawQuad( v0, v1, v2, v3, *fontImage, AddressMode::Clamp, BlendMode::AlphaBlend );
                 // image.drawQuad( { q.x0, q.y0 }, { q.x1, q.y0 }, { q.x1, q.y1 }, { q.x0, q.y1 }, Color::Red, {}, FillMode::WireFrame ); // For debugging glyph quads.

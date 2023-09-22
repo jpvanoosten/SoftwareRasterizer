@@ -24,11 +24,3 @@ Material::Material(
 , ambientTexture { std::move( ambientTexture ) }
 , emissiveTexture { std::move( emissiveTexture ) }
 {}
-
-Material::Material( const Material& )            = default;
-Material::Material( Material&& ) noexcept        = default;
-Material::~Material()                            = default;
-Material& Material::operator=( const Material& ) = default;
-Material& Material::operator=( Material&& ) noexcept = default;
-
-

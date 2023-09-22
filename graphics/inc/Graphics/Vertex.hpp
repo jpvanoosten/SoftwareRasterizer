@@ -2,12 +2,13 @@
 
 #include "Color.hpp"
 #include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
 
 namespace Graphics
 {
-struct Vertex
+struct Vertex2D
 {
-    constexpr Vertex( const glm::vec2& position = glm::vec2 { 0 }, const glm::vec2& texCoord = glm::vec2 { 0 }, const Color& color = Color::White )
+    constexpr Vertex2D( const glm::vec2& position = glm::vec2 { 0 }, const glm::vec2& texCoord = glm::vec2 { 0 }, const Color& color = Color::White )
     : position { position }
     , texCoord { texCoord }
     , color { color }
@@ -17,4 +18,20 @@ struct Vertex
     glm::vec2 texCoord { 0 };
     Color     color { Color::White };
 };
+
+struct Vertex3D
+{
+    constexpr Vertex3D( const glm::vec3& position = glm::vec3 { 0 }, const glm::vec3& normal = glm::vec3 { 0 }, const glm::vec2& texCoord = glm::vec2 { 0 }, const Color& color = Color::White )
+    : position { position }
+    , normal { normal }
+    , texCoord { texCoord }
+    , color { color }
+    {}
+
+    glm::vec3 position { 0 };
+    glm::vec3 normal { 0 };
+    glm::vec2 texCoord { 0 };
+    Color     color { Color::White };
+};
+
 }  // namespace Graphics
