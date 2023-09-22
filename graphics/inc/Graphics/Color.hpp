@@ -16,6 +16,7 @@ struct SR_API alignas( 4 ) Color
     constexpr Color() noexcept;
     constexpr explicit Color( uint32_t argb ) noexcept;
     constexpr Color( uint8_t r, uint8_t g, uint8_t b, uint8_t a = 255u ) noexcept;
+    constexpr explicit Color( float d ) noexcept;
     constexpr ~Color() noexcept              = default;
     constexpr Color( const Color& ) noexcept = default;
     constexpr Color( Color&& ) noexcept      = default;
@@ -87,6 +88,7 @@ struct SR_API alignas( 4 ) Color
             uint8_t r;
             uint8_t a;
         };
+        float depth;  // Yes, I know this breaks strict aliasing rules.
     };
 
     static const Color Black;
@@ -99,22 +101,26 @@ struct SR_API alignas( 4 ) Color
     static const Color Cyan;
 };
 
-constexpr Color::Color() noexcept
+constexpr Color::Color() noexcept  // NOLINT(cppcoreguidelines-pro-type-member-init)
 : b { 0 }
 , g { 0 }
 , r { 0 }
 , a { 255 }
 {}
 
-constexpr Color::Color( uint32_t argb ) noexcept
+constexpr Color::Color( uint32_t argb ) noexcept  // NOLINT(cppcoreguidelines-pro-type-member-init)
 : argb { argb }
 {}
 
-constexpr Color::Color( uint8_t r, uint8_t g, uint8_t b, uint8_t a ) noexcept
+constexpr Color::Color( uint8_t r, uint8_t g, uint8_t b, uint8_t a ) noexcept  // NOLINT(cppcoreguidelines-pro-type-member-init)
 : b { b }
 , g { g }
 , r { r }
 , a { a }
+{}
+
+constexpr Color::Color( float d ) noexcept  // NOLINT(cppcoreguidelines-pro-type-member-init)
+: depth { d }
 {}
 
 constexpr bool Color::operator==( const Color& rhs ) const noexcept
@@ -166,10 +172,10 @@ constexpr Color Color::operator-( const Color& _rhs ) const noexcept
 
 constexpr Color& Color::operator-=( const Color& _rhs ) noexcept
 {
-    b          = static_cast<uint8_t>( Math::max<int32_t>( b - _rhs.b, 0 ) );
-    g          = static_cast<uint8_t>( Math::max<int32_t>( g - _rhs.g, 0 ) );
-    r          = static_cast<uint8_t>( Math::max<int32_t>( r - _rhs.r, 0 ) );
-    a          = static_cast<uint8_t>( Math::max<int32_t>( a - _rhs.a, 0 ) );
+    b = static_cast<uint8_t>( Math::max<int32_t>( b - _rhs.b, 0 ) );
+    g = static_cast<uint8_t>( Math::max<int32_t>( g - _rhs.g, 0 ) );
+    r = static_cast<uint8_t>( Math::max<int32_t>( r - _rhs.r, 0 ) );
+    a = static_cast<uint8_t>( Math::max<int32_t>( a - _rhs.a, 0 ) );
 
     return *this;
 }

@@ -103,7 +103,7 @@ target_include_directories( Graphics
 
 target_link_libraries( Graphics
     PUBLIC Math fmt::fmt
-    PRIVATE glad
+    PRIVATE glad tinyobjloader
 )
 
 if(SR_USE_OPENMP)

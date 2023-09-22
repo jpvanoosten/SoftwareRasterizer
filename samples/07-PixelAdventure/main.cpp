@@ -35,7 +35,7 @@ int main( int argc, char* argv[] )
 
     while ( window )
     {
-        window.clear( Color { 0x211f30 } );
+        window.clear( Color { 0x211f30u } );
 
         // Update the game.
         game.Update();
