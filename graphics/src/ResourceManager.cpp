@@ -91,6 +91,9 @@ struct std::hash<FontKey>
 // Image store.
 static std::unordered_map<std::filesystem::path, std::shared_ptr<Image>> g_ImageMap;
 
+// Model store.
+static std::unordered_map<std::filesystem::path, std::shared_ptr<Model>> g_ModelMap;
+
 // Font store.
 static std::unordered_map<FontKey, std::shared_ptr<Font>> g_FontMap;
 
@@ -116,6 +119,20 @@ std::shared_ptr<SpriteSheet> ResourceManager::loadSpriteSheet( const std::filesy
     return std::make_shared<SpriteSheet>( image, spriteWidth, spriteHeight, padding, margin, blendMode );
 }
 
+std::shared_ptr<Model> ResourceManager::loadModel( const std::filesystem::path& filePath )
+{
+    const auto iter = g_ModelMap.find( filePath );
+
+    if (iter == g_ModelMap.end())
+    {
+        auto model = std::make_shared<Model>( filePath );
+        g_ModelMap[filePath] = model;
+        return model;
+    }
+
+    return iter->second;
+}
+
 std::shared_ptr<Font> ResourceManager::loadFont( const std::filesystem::path& fontFile, float size, uint32_t firstChar, uint32_t numChars )
 {
     FontKey    key { fontFile, size, firstChar, numChars };
@@ -133,8 +150,10 @@ std::shared_ptr<Font> ResourceManager::loadFont( const std::filesystem::path& fo
     return iter->second;
 }
 
+
 void ResourceManager::clear()
 {
     g_ImageMap.clear();
+    g_ModelMap.clear();
     g_FontMap.clear();
 }

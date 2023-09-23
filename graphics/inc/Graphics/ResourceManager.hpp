@@ -3,6 +3,8 @@
 #include "Config.hpp"
 #include "Font.hpp"
 #include "Image.hpp"
+#include "Material.hpp"
+#include "Model.hpp"
 #include "SpriteSheet.hpp"
 
 #include <filesystem>
@@ -31,6 +33,14 @@ public:
     /// <param name="blendMode">(optional) The blend mode to use when rendering the sprites in this sprite sheet. Default: No blending.</param>
     /// <returns>The loaded SpriteSheet.</returns>
     static std::shared_ptr<SpriteSheet> loadSpriteSheet( const std::filesystem::path& filePath, std::optional<uint32_t> spriteWidth = {}, std::optional<uint32_t> spriteHeight = {}, uint32_t padding = 0u, uint32_t margin = 0u, const BlendMode& blendMode = {} );
+
+    /// <summary>
+    /// Load a model from a model file.
+    /// Note: Currently only supports .obj files.
+    /// </summary>
+    /// <param name="filePath">The path to the model file to load.</param>
+    /// <returns>A shared pointer to the loaded model, or nullptr if the model failed to load.</returns>
+    static std::shared_ptr<Model> loadModel( const std::filesystem::path& filePath );
 
     /// <summary>
     /// Load a font from a file.
