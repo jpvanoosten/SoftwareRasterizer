@@ -4,6 +4,8 @@
 
 #include <Math/Math.hpp>
 
+#include <glm/vec3.hpp>
+
 #include <algorithm>
 #include <cassert>
 #include <compare>
@@ -78,6 +80,16 @@ struct SR_API alignas( 4 ) Color
     /// <param name="color"></param>
     /// <returns></returns>
     static constexpr Color fromHex( uint32_t color ) noexcept;
+
+    /// <summary>
+    /// Construct a color from Hue, Saturation, and Brightness values.
+    /// See: https://en.wikipedia.org/wiki/HSL_and_HSV#HSV_to_RGB
+    /// </summary>
+    /// <param name="H"></param>
+    /// <param name="S"></param>
+    /// <param name="V"></param>
+    /// <returns></returns>
+    static inline Color fromHSV( float H, float S, float V ) noexcept;
 
     // Yes, I know this union breaks strict aliasing rules.
     union
@@ -288,6 +300,42 @@ constexpr Color Color::fromHex( uint32_t color ) noexcept
     const uint8_t a = static_cast<uint8_t>( ( color & 0xFF000000 ) >> 24 );
 
     return { r, g, b, a };
+}
+
+inline Color Color::fromHSV( float H, float S, float V ) noexcept
+{
+    float C  = V * S;
+    float m  = V - C;
+    float H2 = H / 60.0f;
+    float X  = C * ( 1.0f - fabsf( fmodf( H2, 2.0f ) - 1.0f ) );
+
+    glm::vec3 RGB;
+
+    switch ( static_cast<int>( H2 ) )
+    {
+    case 0:
+        RGB = { C, X, 0 };
+        break;
+    case 1:
+        RGB = { X, C, 0 };
+        break;
+    case 2:
+        RGB = { 0, C, X };
+        break;
+    case 3:
+        RGB = { 0, X, C };
+        break;
+    case 4:
+        RGB = { X, 0, C };
+        break;
+    case 5:
+        RGB = { C, 0, X };
+        break;
+    }
+
+    RGB = RGB + m;
+
+    return fromFloats( RGB.r, RGB.g, RGB.b );
 }
 
 /// <summary>

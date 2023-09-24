@@ -394,6 +394,17 @@ struct SR_API Image final
         return sample( uv.x, uv.y, addressMode );
     }
 
+    const Color& operator[]( size_t i ) const
+    {
+        assert( i < static_cast<size_t>( m_width ) * m_height );
+        return m_data[i];
+    }
+
+    Color& operator[](size_t i) {
+        assert( i < static_cast<size_t>( m_width ) * m_height );
+        return m_data[i];
+    }
+
     const Color& operator()( uint32_t x, uint32_t y ) const
     {
         assert( x < m_width );
