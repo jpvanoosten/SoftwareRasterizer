@@ -90,8 +90,8 @@ int main( int argc, char* argv[] )
 
     // Setup matrices.
     glm::vec4 viewport { 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT };
-    glm::mat4 projectionMatrix = glm::perspectiveFov( glm::radians( 60.0f ), static_cast<float>( WINDOW_WIDTH ), static_cast<float>( WINDOW_HEIGHT ), 0.1f, 10.0f );
-    glm::mat4 viewMatrix       = glm::lookAt( glm::vec3 { 0, 0, 5 }, glm::vec3 { 0, 0, 0 }, glm::vec3 { 0, 1, 0 } );
+    glm::mat4 projectionMatrix = glm::perspectiveFov( glm::radians( 60.0f ), static_cast<float>( WINDOW_WIDTH ), static_cast<float>( WINDOW_HEIGHT ), 1.0f, 100.0f );
+    glm::mat4 viewMatrix       = glm::lookAt( glm::vec3 { 0, 50, 25 }, glm::vec3 { 0, 0, 0 }, glm::vec3 { 0, -1, 0 } );
 
     // Setup vertex shader.
     VertexShader vertexShader {};
@@ -109,7 +109,7 @@ int main( int argc, char* argv[] )
     Image  colorBuffer { WINDOW_WIDTH, WINDOW_HEIGHT };
     Image  depthBuffer { WINDOW_WIDTH, WINDOW_HEIGHT };
     Image  visibilityBuffer { WINDOW_WIDTH, WINDOW_HEIGHT };
-    Model  cube { "assets/models/cube.obj" };
+    Model  cube { "assets/models/sponza.obj" };
 
     window.show();
 
@@ -132,8 +132,8 @@ int main( int argc, char* argv[] )
         transformedVerts.clear();
 
         // Draw the cube.
-         angle += static_cast<float>( timer.elapsedSeconds() * 90.0 );  // Rotate the cube.
-        vertexShader.modelMatrix = glm::rotate( glm::radians( angle ), glm::vec3 { 1, 1, 0 } );
+        angle += static_cast<float>( timer.elapsedSeconds() * 30.0 );  // Rotate the cube.
+        vertexShader.modelMatrix = glm::scale( glm::vec3 { 0.01f } ) * glm::rotate( glm::radians( angle ), glm::vec3 { 0, 1, 0 } );
         vertexShader.instanceId  = 0;
         for ( const auto& mesh: cube.getMeshes() )
         {
@@ -183,8 +183,8 @@ int main( int argc, char* argv[] )
         {
             if ( auto c = visibilityBuffer[i]; c.primitiveId < 0xffff )
             {
-                colorBuffer[i] = instanceBuffer[c.instanceId].mesh->getMaterial()->diffuseColor;
-                //colorBuffer[i] = randomColors[c.instanceId];
+                //colorBuffer[i] = instanceBuffer[c.instanceId].mesh->getMaterial()->diffuseColor;
+                 colorBuffer[i] = randomColors[c.instanceId + c.primitiveId];
             }
         }
 

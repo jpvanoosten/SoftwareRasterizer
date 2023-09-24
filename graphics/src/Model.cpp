@@ -19,7 +19,7 @@ constexpr Color ParseColor( const tinyobj::real_t color[3] ) noexcept
     };
 }
 
-inline std::shared_ptr<Material> ParseMaterial( const tinyobj::material_t& material ) noexcept
+inline std::shared_ptr<Material> ParseMaterial( const std::filesystem::path& basePath, const tinyobj::material_t& material ) noexcept
 {
     Color diffuseColor  = ParseColor( material.diffuse );
     Color specularColor = ParseColor( material.specular );
@@ -28,11 +28,11 @@ inline std::shared_ptr<Material> ParseMaterial( const tinyobj::material_t& mater
     float specularPower = material.shininess;
 
     // TODO: Check if we need to prefix with path to model file.
-    auto diffuseTexture  = material.diffuse_texname.empty() ? nullptr : ResourceManager::loadImage( material.diffuse_texname );
-    auto specularTexture = material.specular_texname.empty() ? nullptr : ResourceManager::loadImage( material.specular_texname );
-    auto normalTexture   = material.bump_texname.empty() ? nullptr : ResourceManager::loadImage( material.bump_texname );
-    auto ambientTexture  = material.ambient_texname.empty() ? nullptr : ResourceManager::loadImage( material.ambient_texname );
-    auto emissiveTexture = material.emissive_texname.empty() ? nullptr : ResourceManager::loadImage( material.emissive_texname );
+    auto diffuseTexture  = material.diffuse_texname.empty() ? nullptr : ResourceManager::loadImage( basePath / material.diffuse_texname );
+    auto specularTexture = material.specular_texname.empty() ? nullptr : ResourceManager::loadImage( basePath / material.specular_texname );
+    auto normalTexture   = material.bump_texname.empty() ? nullptr : ResourceManager::loadImage( basePath / material.bump_texname );
+    auto ambientTexture  = material.ambient_texname.empty() ? nullptr : ResourceManager::loadImage( basePath / material.ambient_texname );
+    auto emissiveTexture = material.emissive_texname.empty() ? nullptr : ResourceManager::loadImage( basePath / material.emissive_texname );
 
     return std::make_shared<Material>( diffuseColor, specularColor, ambientColor, emissiveColor, specularPower, diffuseTexture, specularTexture, normalTexture, ambientTexture, emissiveTexture );
 }
@@ -40,10 +40,14 @@ inline std::shared_ptr<Material> ParseMaterial( const tinyobj::material_t& mater
 inline std::shared_ptr<Mesh> ParseMesh( const tinyobj::mesh_t& mesh, const tinyobj::attrib_t& attrib ) noexcept
 {
     std::vector<Vertex3D> vertices;
+    std::vector<int>      indices;
+
     // Reserve 3 vertices per face (we assume the mesh is triangulated).
     vertices.reserve( mesh.num_face_vertices.size() * 3 );
+    indices.reserve( mesh.num_face_vertices.size() * 3 );
 
     size_t indexOffset = 0;
+    int    i           = 0;
     // Loop over the faces of the mesh
     for ( size_t numVerts: mesh.num_face_vertices )
     {
@@ -79,12 +83,13 @@ inline std::shared_ptr<Mesh> ParseMesh( const tinyobj::mesh_t& mesh, const tinyo
             vert.color.b = static_cast<uint8_t>( attrib.colors[idx.vertex_index * 3 + 2] * 255u );
 
             vertices.emplace_back( vert );
+            indices.push_back( i++ );
         }
 
         indexOffset += numVerts;
     }
 
-    return std::make_shared<Mesh>( vertices );
+    return std::make_shared<Mesh>( vertices, indices );
 }
 
 Model::Model()                              = default;
@@ -129,9 +134,10 @@ Model::Model( const std::filesystem::path& modelFile )
     // Parse materials
     materials.reserve( reader.GetMaterials().size() );
 
+    const auto basePath = modelFile.parent_path();
     for ( const auto& m: reader.GetMaterials() )
     {
-        const auto material = ParseMaterial( m );
+        const auto material = ParseMaterial( basePath, m );
         materials.emplace_back( material );
     }
 
