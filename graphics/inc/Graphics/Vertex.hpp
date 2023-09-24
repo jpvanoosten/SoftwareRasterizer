@@ -19,9 +19,9 @@ struct Vertex2D
     Color     color { Color::White };
 };
 
-struct Vertex3D
+struct Vertex3D final
 {
-    constexpr Vertex3D(
+    constexpr explicit Vertex3D(
         const glm::vec3& position  = glm::vec3 { 0 },
         const glm::vec3& normal    = glm::vec3 { 0 },
         const glm::vec3& tangent   = glm::vec3 { 0 },
@@ -35,6 +35,12 @@ struct Vertex3D
     , texCoord { texCoord }
     , color { color }
     {}
+
+    Vertex3D( const Vertex3D& )            = default;
+    Vertex3D( Vertex3D&& )                 = default;
+    ~Vertex3D()                            = default;
+    Vertex3D& operator=( const Vertex3D& ) = default;
+    Vertex3D& operator=( Vertex3D&& )      = default;
 
     glm::vec3 position { 0 };
     glm::vec3 normal { 0 };

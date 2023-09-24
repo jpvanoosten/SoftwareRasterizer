@@ -28,11 +28,11 @@ inline std::shared_ptr<Material> ParseMaterial( const tinyobj::material_t& mater
     float specularPower = material.shininess;
 
     // TODO: Check if we need to prefix with path to model file.
-    auto diffuseTexture  = ResourceManager::loadImage( material.diffuse_texname );
-    auto specularTexture = ResourceManager::loadImage( material.specular_texname );
-    auto normalTexture   = ResourceManager::loadImage( material.bump_texname );
-    auto ambientTexture  = ResourceManager::loadImage( material.ambient_texname );
-    auto emissiveTexture = ResourceManager::loadImage( material.emissive_texname );
+    auto diffuseTexture  = material.diffuse_texname.empty() ? nullptr : ResourceManager::loadImage( material.diffuse_texname );
+    auto specularTexture = material.specular_texname.empty() ? nullptr : ResourceManager::loadImage( material.specular_texname );
+    auto normalTexture   = material.bump_texname.empty() ? nullptr : ResourceManager::loadImage( material.bump_texname );
+    auto ambientTexture  = material.ambient_texname.empty() ? nullptr : ResourceManager::loadImage( material.ambient_texname );
+    auto emissiveTexture = material.emissive_texname.empty() ? nullptr : ResourceManager::loadImage( material.emissive_texname );
 
     return std::make_shared<Material>( diffuseColor, specularColor, ambientColor, emissiveColor, specularPower, diffuseTexture, specularTexture, normalTexture, ambientTexture, emissiveTexture );
 }
@@ -87,6 +87,13 @@ inline std::shared_ptr<Mesh> ParseMesh( const tinyobj::mesh_t& mesh, const tinyo
     return std::make_shared<Mesh>( vertices );
 }
 
+Model::Model()                              = default;
+Model::Model( const Model& )                = default;
+Model::Model( Model&& ) noexcept            = default;
+Model::~Model()                             = default;
+Model& Model::operator=( const Model& )     = default;
+Model& Model::operator=( Model&& ) noexcept = default;
+
 Model::Model( const std::filesystem::path& modelFile )
 {
     if ( !std::filesystem::exists( modelFile ) || !std::filesystem::is_regular_file( modelFile ) )
@@ -138,13 +145,21 @@ Model::Model( const std::filesystem::path& modelFile )
 
         // Each mesh only has a single material associated with it.
         // Per-face materials are not supported.
-        const auto materialId = s.mesh.material_ids[0];
-        if ( materialId >= 0 && materialId < static_cast<int>( materials.size() ) )
+        if ( !s.mesh.material_ids.empty() )
         {
-            mesh->setMaterial( materials[materialId] );
+            const auto materialId = s.mesh.material_ids[0];
+            if ( materialId >= 0 && materialId < static_cast<int>( materials.size() ) )
+            {
+                mesh->setMaterial( materials[materialId] );
+            }
         }
 
         // Add the mesh to the model's meshes array.
         meshes.emplace_back( mesh );
     }
+}
+
+const std::vector<std::shared_ptr<Mesh>>& Model::getMeshes() const
+{
+    return meshes;
 }

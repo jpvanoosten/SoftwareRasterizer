@@ -16,7 +16,8 @@ struct SR_API alignas( 4 ) Color
     constexpr Color() noexcept;
     constexpr explicit Color( uint32_t argb ) noexcept;
     constexpr Color( uint8_t r, uint8_t g, uint8_t b, uint8_t a = 255u ) noexcept;
-    constexpr explicit Color( float d ) noexcept;
+    constexpr explicit Color( float depth ) noexcept;
+    constexpr Color( uint16_t instanceId, uint16_t primitiveId ) noexcept;
     constexpr ~Color() noexcept              = default;
     constexpr Color( const Color& ) noexcept = default;
     constexpr Color( Color&& ) noexcept      = default;
@@ -78,17 +79,26 @@ struct SR_API alignas( 4 ) Color
     /// <returns></returns>
     static constexpr Color fromHex( uint32_t color ) noexcept;
 
+    // Yes, I know this union breaks strict aliasing rules.
     union
     {
         uint32_t argb;
-        struct
+        // Color components.
+        struct  // NOLINT(clang-diagnostic-nested-anon-types)
         {
             uint8_t b;
             uint8_t g;
             uint8_t r;
             uint8_t a;
         };
-        float depth;  // Yes, I know this breaks strict aliasing rules.
+        // Visibility buffer.
+        struct  // NOLINT(clang-diagnostic-nested-anon-types)
+        {
+            uint16_t instanceId;
+            uint16_t primitiveId;
+        };
+        // Depth buffer.
+        float depth;
     };
 
     static const Color Black;
@@ -100,6 +110,8 @@ struct SR_API alignas( 4 ) Color
     static const Color Yellow;
     static const Color Cyan;
 };
+
+static_assert( sizeof( Color ) == 4 );
 
 constexpr Color::Color() noexcept  // NOLINT(cppcoreguidelines-pro-type-member-init)
 : b { 0 }
@@ -121,6 +133,11 @@ constexpr Color::Color( uint8_t r, uint8_t g, uint8_t b, uint8_t a ) noexcept  /
 
 constexpr Color::Color( float d ) noexcept  // NOLINT(cppcoreguidelines-pro-type-member-init)
 : depth { d }
+{}
+
+constexpr Color::Color( uint16_t instanceId, uint16_t primitiveId ) noexcept  // NOLINT(cppcoreguidelines-pro-type-member-init)
+: instanceId { instanceId }
+, primitiveId { primitiveId }
 {}
 
 constexpr bool Color::operator==( const Color& rhs ) const noexcept

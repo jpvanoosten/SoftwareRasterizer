@@ -421,6 +421,15 @@ struct SR_API Image final
     }
 
     /// <summary>
+    /// Get the AABB that covers the entire screen.
+    /// </summary>
+    /// <returns>The AABB of the screen.</returns>
+    const Math::AABB& getAABB() const noexcept
+    {
+        return m_AABB;
+    }
+
+    /// <summary>
     /// Get a rectangle that covers the entire image.
     /// </summary>
     /// <returns></returns>
