@@ -73,7 +73,7 @@ struct SR_API alignas( 4 ) Color
     /// And (transparent) Blue is:
     /// 0xFF
     /// </summary>
-    /// <param name="color"></param>
+    /// <param name="color">The color as a 32-bit integer.</param>
     /// <returns></returns>
     static constexpr Color fromHex( uint32_t color ) noexcept;
 
@@ -204,7 +204,7 @@ constexpr Color Color::operator*( float _rhs ) const noexcept
     return { red, green, blue, alpha };
 }
 
-inline Color operator*( float lhs, const Color& rhs )
+constexpr Color operator*( float lhs, const Color& rhs )
 {
     return rhs * lhs;
 }
