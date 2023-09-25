@@ -4,17 +4,20 @@ set( INC_FILES
     inc/Math/AABB.hpp
     inc/Math/bitmask_operators.hpp
     inc/Math/Camera2D.hpp
+    inc/Math/Camera3D.hpp
     inc/Math/Circle.hpp
     inc/Math/Line.hpp
     inc/Math/Math.hpp
     inc/Math/OutCodes.hpp
     inc/Math/Rect.hpp
+    inc/Math/Space.hpp
     inc/Math/Sphere.hpp
     inc/Math/Transform2D.hpp
 )
 
 set( SRC_FILES
     src/Camera2D.cpp
+    src/Camera3D.cpp
     src/Math.cpp
     src/Transform2D.cpp
 )

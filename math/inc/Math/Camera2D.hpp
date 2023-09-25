@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Transform2D.hpp"
+#include "Space.hpp"
 
 #include <glm/mat3x3.hpp>
 #include <glm/vec2.hpp>
@@ -10,12 +11,6 @@ namespace Math
 class Camera2D
 {
 public:
-    enum class Space
-    {
-        Local,   ///< Translation is applied in the camera's local space.
-        World,   ///< Translation is applied in screen world coordinates.
-    };
-
     /// <summary>
     /// Initialize a 2D Camera.
     /// </summary>
