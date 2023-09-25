@@ -103,7 +103,7 @@ int main( int argc, char* argv[] )
     FragmentShader fragmentShader {};
 
     // Setup some random colors for debugging.
-    auto randomColors = GenerateColors( 1024 );
+    auto randomColors = GenerateColors( 0xffff );
 
     Window window { L"11 - Cube", WINDOW_WIDTH, WINDOW_HEIGHT };
     Image  colorBuffer { WINDOW_WIDTH, WINDOW_HEIGHT };
@@ -183,8 +183,8 @@ int main( int argc, char* argv[] )
         {
             if ( auto c = visibilityBuffer[i]; c.primitiveId < 0xffff )
             {
-                //colorBuffer[i] = instanceBuffer[c.instanceId].mesh->getMaterial()->diffuseColor;
-                 colorBuffer[i] = randomColors[c.instanceId + c.primitiveId];
+                colorBuffer[i] = instanceBuffer[c.instanceId].mesh->getMaterial()->diffuseColor;
+                 //colorBuffer[i] = randomColors[c.instanceId + c.primitiveId];
             }
         }
 
