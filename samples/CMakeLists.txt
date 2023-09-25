@@ -10,6 +10,7 @@ add_subdirectory(07-PixelAdventure)
 add_subdirectory(08-Audio)
 add_subdirectory(09-Arkanoid)
 add_subdirectory(10-Camera)
+add_subdirectory(11-Cube)
 
 set_target_properties( 
 	01-ClearScreen 
@@ -22,6 +23,7 @@ set_target_properties(
 	08-Audio
 	09-Arkanoid
 	10-Camera
+	11-Cube
 	PROPERTIES
 		FOLDER samples
 )

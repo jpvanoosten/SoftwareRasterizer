@@ -19,6 +19,9 @@ set( INC_FILES
     inc/Graphics/KeyboardState.hpp
     inc/Graphics/KeyboardStateTracker.hpp
     inc/Graphics/KeyCodes.hpp
+    inc/Graphics/Material.hpp
+    inc/Graphics/Mesh.hpp
+    inc/Graphics/Model.hpp
     inc/Graphics/Mouse.hpp
     inc/Graphics/MouseState.hpp
     inc/Graphics/MouseStateTracker.hpp
@@ -51,6 +54,9 @@ set( SRC_FILES
     src/Keyboard.cpp
     src/KeyboardState.cpp
     src/KeyboardStateTracker.cpp
+    src/Material.cpp
+    src/Mesh.cpp
+    src/Model.cpp
     src/Mouse.cpp
     src/ResourceManager.cpp
     src/SpriteAnim.cpp
@@ -103,7 +109,7 @@ target_include_directories( Graphics
 
 target_link_libraries( Graphics
     PUBLIC Math fmt::fmt
-    PRIVATE glad
+    PRIVATE glad tinyobjloader
 )
 
 if(SR_USE_OPENMP)

@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.22.1) # The version of CMake used when creating
 include(FetchContent)
 
 add_subdirectory(glad)
+add_subdirectory(tinyobjloader)
 
 FetchContent_Declare(
   glm
@@ -13,7 +14,7 @@ FetchContent_Declare(
 FetchContent_Declare (
 	fmt
 	GIT_REPOSITORY https://github.com/fmtlib/fmt.git
-	GIT_TAG 9.1.0
+	GIT_TAG        9.1.0
 )
 
 message( STATUS "Fetching glm..." )
@@ -23,7 +24,7 @@ message( STATUS "Fetching fmt..." )
 FetchContent_MakeAvailable(fmt)
 
 set_target_properties(
-	fmt glad
+	fmt glad tinyobjloader
     PROPERTIES FOLDER externals
 )
 

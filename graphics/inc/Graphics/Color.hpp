@@ -4,6 +4,8 @@
 
 #include <Math/Math.hpp>
 
+#include <glm/vec3.hpp>
+
 #include <algorithm>
 #include <cassert>
 #include <compare>
@@ -16,6 +18,8 @@ struct SR_API alignas( 4 ) Color
     constexpr Color() noexcept;
     constexpr explicit Color( uint32_t argb ) noexcept;
     constexpr Color( uint8_t r, uint8_t g, uint8_t b, uint8_t a = 255u ) noexcept;
+    constexpr explicit Color( float depth ) noexcept;
+    constexpr Color( uint16_t instanceId, uint16_t primitiveId ) noexcept;
     constexpr ~Color() noexcept              = default;
     constexpr Color( const Color& ) noexcept = default;
     constexpr Color( Color&& ) noexcept      = default;
@@ -77,16 +81,36 @@ struct SR_API alignas( 4 ) Color
     /// <returns></returns>
     static constexpr Color fromHex( uint32_t color ) noexcept;
 
+    /// <summary>
+    /// Construct a color from Hue, Saturation, and Brightness values.
+    /// See: https://en.wikipedia.org/wiki/HSL_and_HSV#HSV_to_RGB
+    /// </summary>
+    /// <param name="H"></param>
+    /// <param name="S"></param>
+    /// <param name="V"></param>
+    /// <returns></returns>
+    static inline Color fromHSV( float H, float S, float V ) noexcept;
+
+    // Yes, I know this union breaks strict aliasing rules.
     union
     {
         uint32_t argb;
-        struct
+        // Color components.
+        struct  // NOLINT(clang-diagnostic-nested-anon-types)
         {
             uint8_t b;
             uint8_t g;
             uint8_t r;
             uint8_t a;
         };
+        // Visibility buffer.
+        struct  // NOLINT(clang-diagnostic-nested-anon-types)
+        {
+            uint16_t instanceId;
+            uint16_t primitiveId;
+        };
+        // Depth buffer.
+        float depth;
     };
 
     static const Color Black;
@@ -99,22 +123,33 @@ struct SR_API alignas( 4 ) Color
     static const Color Cyan;
 };
 
-constexpr Color::Color() noexcept
+static_assert( sizeof( Color ) == 4 );
+
+constexpr Color::Color() noexcept  // NOLINT(cppcoreguidelines-pro-type-member-init)
 : b { 0 }
 , g { 0 }
 , r { 0 }
 , a { 255 }
 {}
 
-constexpr Color::Color( uint32_t argb ) noexcept
+constexpr Color::Color( uint32_t argb ) noexcept  // NOLINT(cppcoreguidelines-pro-type-member-init)
 : argb { argb }
 {}
 
-constexpr Color::Color( uint8_t r, uint8_t g, uint8_t b, uint8_t a ) noexcept
+constexpr Color::Color( uint8_t r, uint8_t g, uint8_t b, uint8_t a ) noexcept  // NOLINT(cppcoreguidelines-pro-type-member-init)
 : b { b }
 , g { g }
 , r { r }
 , a { a }
+{}
+
+constexpr Color::Color( float d ) noexcept  // NOLINT(cppcoreguidelines-pro-type-member-init)
+: depth { d }
+{}
+
+constexpr Color::Color( uint16_t instanceId, uint16_t primitiveId ) noexcept  // NOLINT(cppcoreguidelines-pro-type-member-init)
+: instanceId { instanceId }
+, primitiveId { primitiveId }
 {}
 
 constexpr bool Color::operator==( const Color& rhs ) const noexcept
@@ -166,10 +201,10 @@ constexpr Color Color::operator-( const Color& _rhs ) const noexcept
 
 constexpr Color& Color::operator-=( const Color& _rhs ) noexcept
 {
-    b          = static_cast<uint8_t>( Math::max<int32_t>( b - _rhs.b, 0 ) );
-    g          = static_cast<uint8_t>( Math::max<int32_t>( g - _rhs.g, 0 ) );
-    r          = static_cast<uint8_t>( Math::max<int32_t>( r - _rhs.r, 0 ) );
-    a          = static_cast<uint8_t>( Math::max<int32_t>( a - _rhs.a, 0 ) );
+    b = static_cast<uint8_t>( Math::max<int32_t>( b - _rhs.b, 0 ) );
+    g = static_cast<uint8_t>( Math::max<int32_t>( g - _rhs.g, 0 ) );
+    r = static_cast<uint8_t>( Math::max<int32_t>( r - _rhs.r, 0 ) );
+    a = static_cast<uint8_t>( Math::max<int32_t>( a - _rhs.a, 0 ) );
 
     return *this;
 }
@@ -265,6 +300,42 @@ constexpr Color Color::fromHex( uint32_t color ) noexcept
     const uint8_t a = static_cast<uint8_t>( ( color & 0xFF000000 ) >> 24 );
 
     return { r, g, b, a };
+}
+
+inline Color Color::fromHSV( float H, float S, float V ) noexcept
+{
+    float C  = V * S;
+    float m  = V - C;
+    float H2 = H / 60.0f;
+    float X  = C * ( 1.0f - fabsf( fmodf( H2, 2.0f ) - 1.0f ) );
+
+    glm::vec3 RGB;
+
+    switch ( static_cast<int>( H2 ) )
+    {
+    case 0:
+        RGB = { C, X, 0 };
+        break;
+    case 1:
+        RGB = { X, C, 0 };
+        break;
+    case 2:
+        RGB = { 0, C, X };
+        break;
+    case 3:
+        RGB = { 0, X, C };
+        break;
+    case 4:
+        RGB = { X, 0, C };
+        break;
+    case 5:
+        RGB = { C, 0, X };
+        break;
+    }
+
+    RGB = RGB + m;
+
+    return fromFloats( RGB.r, RGB.g, RGB.b );
 }
 
 /// <summary>
