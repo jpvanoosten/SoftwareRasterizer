@@ -4,7 +4,6 @@
 #include <Graphics/Timer.hpp>
 #include <Graphics/Window.hpp>
 
-#include <glm/ext/matrix_projection.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/random.hpp>
 #include <glm/gtx/transform.hpp>
@@ -24,9 +23,7 @@ struct VertexOut
 
 struct VertexShader
 {
-    glm::mat4 modelMatrix;
-    glm::mat4 viewMatrix;
-    glm::mat4 projectionMatrix;
+    glm::mat4 modelViewProjectionMatrix;
     glm::vec4 viewport;
 
     uint16_t instanceId;
@@ -35,7 +32,14 @@ struct VertexShader
     {
         VertexOut out {};
 
-        out.position    = glm::project( in.position, viewMatrix * modelMatrix, projectionMatrix, viewport );
+         glm::vec4 pos = modelViewProjectionMatrix * glm::vec4 { in.position, 1 };
+         pos           = pos / pos.w; // Perspective divide.
+        // NDC -> screen space
+         pos           = pos * 0.5f + 0.5f;
+         pos.x         = pos.x * viewport.z + viewport.x;
+         pos.y         = pos.y * viewport.w + viewport.y;
+
+        out.position    = pos;
         out.instanceId  = instanceId;
         out.primitiveId = vertexId / 3;
 
@@ -95,8 +99,6 @@ int main( int argc, char* argv[] )
 
     // Setup vertex shader.
     VertexShader vertexShader {};
-    vertexShader.viewMatrix       = viewMatrix;
-    vertexShader.projectionMatrix = projectionMatrix;
     vertexShader.viewport         = viewport;
 
     // Setup fragment shader.
@@ -133,11 +135,12 @@ int main( int argc, char* argv[] )
 
         // Draw the cube.
         angle += static_cast<float>( timer.elapsedSeconds() * 30.0 );  // Rotate the cube.
-        vertexShader.modelMatrix = glm::scale( glm::vec3 { 0.01f } ) * glm::rotate( glm::radians( angle ), glm::vec3 { 0, 1, 0 } );
-        vertexShader.instanceId  = 0;
+        const glm::mat4 modelMatrix            = glm::scale( glm::vec3 { 0.01f } ) * glm::rotate( glm::radians( angle ), glm::vec3 { 0, 1, 0 } );
+        vertexShader.modelViewProjectionMatrix = projectionMatrix * viewMatrix * modelMatrix;
+        vertexShader.instanceId                = 0;
         for ( const auto& mesh: cube.getMeshes() )
         {
-            instanceBuffer.emplace_back( mesh, vertexShader.modelMatrix );
+            instanceBuffer.emplace_back( mesh, modelMatrix );
             for ( uint16_t vertexId = 0; const auto& v: mesh->getVertices() )
             {
                 auto vout = vertexShader( v, vertexId );
@@ -183,8 +186,8 @@ int main( int argc, char* argv[] )
         {
             if ( auto c = visibilityBuffer[i]; c.primitiveId < 0xffff )
             {
-                colorBuffer[i] = instanceBuffer[c.instanceId].mesh->getMaterial()->diffuseColor;
-                 //colorBuffer[i] = randomColors[c.instanceId + c.primitiveId];
+                // colorBuffer[i] = instanceBuffer[c.instanceId].mesh->getMaterial()->diffuseColor;
+                colorBuffer[i] = randomColors[c.instanceId + c.primitiveId];
             }
         }
 
