@@ -117,7 +117,7 @@ int main( int argc, char* argv[] )
 
     Window   window { L"10 - Camera", WINDOW_WIDTH, WINDOW_HEIGHT };
     Image    image { WINDOW_WIDTH, WINDOW_HEIGHT };
-    Camera2D camera;
+    Camera2D camera{image.getRect()};
 
     window.show();
 
@@ -144,8 +144,6 @@ int main( int argc, char* argv[] )
         const float elapsedTime = static_cast<float>( timer.elapsedSeconds() );
 
         camera.translate( glm::vec2 { Input::getAxis( "Horizontal" ), Input::getAxis( "Vertical" ) } * elapsedTime * 100.0f );
-        // Keep the origin in the center of the screen (relative to the position of the camera).
-        camera.setOrigin( camera.getPosition() + WINDOW_CENTER );
         camera.rotate( Input::getAxis( "Rotate" ) * elapsedTime );
         camera.zoom( Input::getAxis( "Zoom" ) * elapsedTime );
 
@@ -164,15 +162,13 @@ int main( int argc, char* argv[] )
 
         image.drawText( Font::Default, fps, 10, 10, Color::White );
 
-        float zoom     = camera.getZoom();
+        auto size = camera.getSize();
         float rotation = camera.getRotation();
         auto  position = camera.getPosition();
-        auto  origin   = camera.getOrigin();
 
-        image.drawText( Font::Default, fmt::format( "Zoom    : {}", zoom ), 10, 30, Color::White );
+        image.drawText( Font::Default, fmt::format( "Size    : {}, {}", size.x, size.y), 10, 30, Color::White );
         image.drawText( Font::Default, fmt::format( "Rotation: {}", rotation ), 10, 45, Color::White );
         image.drawText( Font::Default, fmt::format( "Position: {}, {}", position.x, position.y ), 10, 60, Color::White );
-        image.drawText( Font::Default, fmt::format( "Origin  : {}, {}", origin.x, origin.y ), 10, 75, Color::White );
 
         window.present( image );
 
@@ -188,7 +184,7 @@ int main( int argc, char* argv[] )
                 switch ( e.key.code )
                 {
                 case KeyCode::R:
-                    camera.reset();
+                    camera.reset(image.getRect());
                     break;
             case KeyCode::V:
                     window.toggleVSync();

@@ -1,7 +1,8 @@
 #pragma once
 
-#include "Transform2D.hpp"
+#include "Rect.hpp"
 #include "Space.hpp"
+#include "Transform2D.hpp"
 
 #include <glm/mat3x3.hpp>
 #include <glm/vec2.hpp>
@@ -11,35 +12,63 @@ namespace Math
 class Camera2D
 {
 public:
+    Camera2D() = default;
+
     /// <summary>
     /// Initialize a 2D Camera.
     /// </summary>
-    /// <param name="position">The position of the camera (in screen space pixels).</param>
-    /// <param name="origin">The origin of the camera's rotation and scaling.</param>
-    /// <param name="rotation">The rotation (in radians) of the camera.</param>
-    /// <param name="zoom">The zoom of the camera.</param>
-    explicit Camera2D( const glm::vec2& position = glm::vec2 { 0 }, const glm::vec2& origin = glm::vec2 { 0 }, float rotation = 0.0f, float zoom = 1.0f ) noexcept;
+    /// <param name="position">The center position of the camera (in screen space pixels).</param>
+    /// <param name="size">The size of the view to display.</param>
+    explicit Camera2D( const glm::vec2& position, const glm::vec2& size ) noexcept;
 
     /// <summary>
-    /// Reset the camera to its default state.
+    /// Initialize a 2D camera from a visible area to display.
     /// </summary>
-    void reset() noexcept
+    /// <param name="rectangle"></param>
+    template<typename T>
+    explicit Camera2D( const Rect<T>& rectangle ) noexcept
     {
-        m_Position       = glm::vec2 { 0 };
-        m_Origin         = glm::vec2 { 0 };
-        m_Rotation       = 0.0f;
-        m_Zoom           = 1.0f;
-        m_TransformDirty = true;
+        reset( rectangle );
     }
 
     /// <summary>
-    /// Set the position of the camera in screen space.
+    /// Reset the camera to fit the rectangle view.
     /// </summary>
-    /// <param name="pos">The position of the camera in 2D screen space.</param>
+    template<typename T>
+    void reset( const Rect<T>& rectangle ) noexcept
+    {
+        m_Position.x      = static_cast<float>( rectangle.left ) + static_cast<float>( rectangle.width ) / 2.0f;
+        m_Position.y      = static_cast<float>( rectangle.top ) + static_cast<float>( rectangle.height ) / 2.0f;
+        m_Size.x          = static_cast<float>( rectangle.width );
+        m_Size.y          = static_cast<float>( rectangle.height );
+        m_Rotation        = 0.0f;
+        m_Zoom            = 1.0f;
+        m_ViewMatrixDirty = true;
+    }
+
+    /// <summary>
+    /// Set the size of the viewable area.
+    /// </summary>
+    /// <param name="size">The width, and height of the viewable area.</param>
+    void setSize( const glm::vec2& size ) noexcept
+    {
+        m_Size            = size;
+        m_ViewMatrixDirty = true;
+    }
+
+    const glm::vec2& getSize() const noexcept
+    {
+        return m_Size;
+    }
+
+    /// <summary>
+    /// Set the center position of the camera.
+    /// </summary>
+    /// <param name="pos">The center position of the camera in 2D screen space.</param>
     void setPosition( const glm::vec2& pos ) noexcept
     {
-        m_Position       = pos;
-        m_TransformDirty = true;
+        m_Position        = pos;
+        m_ViewMatrixDirty = true;
     }
 
     /// <summary>
@@ -59,42 +88,13 @@ public:
     void translate( const glm::vec2& translation, Space space = Space::Local ) noexcept;
 
     /// <summary>
-    /// Set the origin of the camera.
-    /// This is the origin of zooming/rotating of the camera.
-    /// </summary>
-    /// <param name="origin">The origin of zooming/rotating.</param>
-    void setOrigin( const glm::vec2& origin ) noexcept
-    {
-        m_Origin         = origin;
-        m_TransformDirty = true;
-    }
-
-    /// <summary>
-    /// Get the current origin of the camera.
-    /// </summary>
-    /// <returns>The current origin of rotation.</returns>
-    const glm::vec2& getOrigin() const noexcept
-    {
-        return m_Origin;
-    }
-
-    /// <summary>
-    /// Move the origin of the camera.
-    /// </summary>
-    /// <param name="offset">The offset of the camera origin.</param>
-    void moveOrigin( const glm::vec2& offset ) noexcept
-    {
-        setOrigin( m_Origin + offset );
-    }
-
-    /// <summary>
     /// Set the current rotation of the camera (in radians).
     /// </summary>
     /// <param name="rot">The current rotation of the camera (in radians).</param>
     void setRotation( float rot ) noexcept
     {
-        m_Rotation       = rot;
-        m_TransformDirty = true;
+        m_Rotation        = rot;
+        m_ViewMatrixDirty = true;
     }
 
     /// <summary>
@@ -121,8 +121,8 @@ public:
     /// <param name="zoom">The zoom of the camera.</param>
     void setZoom( float zoom ) noexcept
     {
-        m_Zoom           = zoom;
-        m_TransformDirty = true;
+        m_Zoom            = zoom;
+        m_ViewMatrixDirty = true;
     }
 
     /// <summary>
@@ -170,13 +170,13 @@ public:
     }
 
 private:
-    glm::vec2 m_Position { 0 };
-    glm::vec2 m_Origin { 0 };
+    glm::vec2 m_Position { 0, 0 };
+    glm::vec2 m_Size { 100, 100 };
     float     m_Rotation { 0.0f };
     float     m_Zoom { 1.0f };
 
-    mutable glm::mat3 m_Transform { 1 };
-    mutable bool      m_TransformDirty = true;
+    mutable glm::mat3 m_ViewMatrix { 1 };
+    mutable bool      m_ViewMatrixDirty = true;
 };
 
 inline glm::vec2 operator*( const Camera2D& camera, const glm::vec2& point ) noexcept

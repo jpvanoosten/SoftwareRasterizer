@@ -1,22 +1,19 @@
 #include <Math/Camera2D.hpp>
 
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/trigonometric.hpp>
+#include <glm/gtx/transform.hpp>
 
 using namespace Math;
 
-Camera2D::Camera2D( const glm::vec2& position, const glm::vec2& origin, float rotation, float zoom ) noexcept
+Camera2D::Camera2D( const glm::vec2& position, const glm::vec2& size ) noexcept
 : m_Position { position }
-, m_Origin { origin }
-, m_Rotation { rotation }
-, m_Zoom { zoom }
+, m_Size { size }
 {}
 
 void Camera2D::translate( const glm::vec2& translation, Space space ) noexcept
 {
     switch ( space )
     {
-    case Space::Local: // Translation is applied in the camera's local (rotated) space.
+    case Space::Local:  // Translation is applied in the camera's local (rotated) space.
     {
         // Build a rotation matrix to rotate the translation vector.
         const float c = glm::cos( m_Rotation );
@@ -36,7 +33,7 @@ void Camera2D::translate( const glm::vec2& translation, Space space ) noexcept
         setPosition( m_Position + t );
     }
     break;
-    case Space::World: // Translation is in the world coordinate system (not rotated into the camera's local space).
+    case Space::World:  // Translation is in the world coordinate system (not rotated into the camera's local space).
         setPosition( m_Position + translation );
         break;
     }
@@ -44,18 +41,23 @@ void Camera2D::translate( const glm::vec2& translation, Space space ) noexcept
 
 const glm::mat3& Camera2D::getTransform() const noexcept
 {
-    if ( m_TransformDirty )
+    if ( m_ViewMatrixDirty )
     {
-        auto transform = glm::translate( glm::rotate( glm::scale( glm::translate( glm::mat4 { 1.0f }, glm::vec3 { -m_Position + m_Origin, 0 } ), glm::vec3 { m_Zoom, m_Zoom, 1 } ), -m_Rotation, glm::vec3 { 0, 0, 1 } ), glm::vec3 { -m_Origin, 0 } );
+        const auto translate1 = glm::translate( glm::vec3{ -m_Position, 1.0f } );
+        const auto translate2 = glm::translate( glm::vec3 { m_Size / 2.0f, 1.0f } );
+        const auto rotate    = glm::rotate( -m_Rotation, glm::vec3 { 0, 0, 1 } );
+        const auto scale      = glm::scale( glm::vec3 { m_Zoom, m_Zoom, 1 } );
 
-        m_Transform = {
+        const auto transform = translate2 * rotate * scale * translate1;
+
+        m_ViewMatrix = {
             transform[0][0], transform[0][1], transform[0][3],
             transform[1][0], transform[1][1], transform[1][3],
             transform[3][0], transform[3][1], transform[3][3]
         };
 
-        m_TransformDirty = false;
+        m_ViewMatrixDirty = false;
     }
 
-    return m_Transform;
+    return m_ViewMatrix;
 }
