@@ -32,6 +32,14 @@ public:
     }
 
     /// <summary>
+    /// Allow implicit conversion to mat3.
+    /// </summary>
+    operator const glm::mat3&() const
+    {
+        return getTransform();
+    }
+
+    /// <summary>
     /// Reset the camera to fit the rectangle view.
     /// </summary>
     template<typename T>
@@ -192,6 +200,16 @@ inline glm::vec3 operator*( const Camera2D& camera, const glm::vec3& v ) noexcep
 inline glm::mat3 operator*( const Camera2D& camera, const Transform2D& transform ) noexcept
 {
     return camera.getTransform() * transform.getTransform();
+}
+
+inline AABB operator*( const Camera2D& camera, const AABB& aabb ) noexcept
+{
+    const auto& mat = camera.getTransform();
+
+    const auto min = mat * glm::vec3 { aabb.min.x, aabb.min.y, 1.0f };
+    const auto max = mat * glm::vec3 { aabb.max.x, aabb.max.y, 1.0f };
+
+    return { glm::vec3 { min.x, min.y, aabb.min.z }, glm::vec3 { max.x, max.y, aabb.max.z } };
 }
 
 }  // namespace Math

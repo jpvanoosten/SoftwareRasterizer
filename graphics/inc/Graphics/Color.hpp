@@ -109,6 +109,13 @@ struct SR_API alignas( 4 ) Color
             uint16_t instanceId;
             uint16_t primitiveId;
         };
+        // Barycentric coordinates (32-bit packed)
+        struct // NOLINT(clang-diagnostic-nested-anon-types)
+        {
+            uint16_t u;
+            uint16_t v;
+            // w = 1 - u - v;
+        };
         // Depth buffer.
         float depth;
     };

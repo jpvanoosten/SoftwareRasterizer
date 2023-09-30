@@ -32,12 +32,12 @@ struct VertexShader
     {
         VertexOut out {};
 
-         glm::vec4 pos = modelViewProjectionMatrix * glm::vec4 { in.position, 1 };
-         pos           = pos / pos.w; // Perspective divide.
-        // NDC -> screen space
-         pos           = pos * 0.5f + 0.5f;
-         pos.x         = pos.x * viewport.z + viewport.x;
-         pos.y         = pos.y * viewport.w + viewport.y;
+        glm::vec4 pos = modelViewProjectionMatrix * glm::vec4 { in.position, 1 };
+        pos           = pos / pos.w;  // Perspective divide.
+                                      // NDC -> screen space
+        pos   = pos * 0.5f + 0.5f;
+        pos.x = pos.x * viewport.z + viewport.x;
+        pos.y = pos.y * viewport.w + viewport.y;
 
         out.position    = pos;
         out.instanceId  = instanceId;
@@ -99,7 +99,7 @@ int main( int argc, char* argv[] )
 
     // Setup vertex shader.
     VertexShader vertexShader {};
-    vertexShader.viewport         = viewport;
+    vertexShader.viewport = viewport;
 
     // Setup fragment shader.
     FragmentShader fragmentShader {};
@@ -111,7 +111,9 @@ int main( int argc, char* argv[] )
     Image  colorBuffer { WINDOW_WIDTH, WINDOW_HEIGHT };
     Image  depthBuffer { WINDOW_WIDTH, WINDOW_HEIGHT };
     Image  visibilityBuffer { WINDOW_WIDTH, WINDOW_HEIGHT };
-    Model  cube { "assets/models/sponza.obj" };
+    Image  barycentricCoords { WINDOW_WIDTH, WINDOW_HEIGHT };
+
+    Model cube { "assets/models/sponza.obj" };
 
     window.show();
 
@@ -151,7 +153,8 @@ int main( int argc, char* argv[] )
         }
 
         assert( transformedVerts.size() % 3 == 0 );  // Must be triangles.
-        for ( size_t i = 0; i < transformedVerts.size(); i += 3 )
+
+        for ( int i = 0; i < transformedVerts.size(); i += 3 )
         {
             auto v0 = transformedVerts[i + 0];
             auto v1 = transformedVerts[i + 1];
@@ -169,13 +172,13 @@ int main( int argc, char* argv[] )
                     if ( barycentricInside( b ) )
                     {
                         // Compute depth
-                        float z     = v0.position.z * b.x + v1.position.z * b.y + v2.position.z * b.z;
-                        float depth = depthBuffer( x, y ).depth;
-                        if ( z > 0.0f && z < 1.0f && z < depth )
+                        float  z = v0.position.z * b.x + v1.position.z * b.y + v2.position.z * b.z;
+                        Color& d = depthBuffer( x, y );
+                        if ( z > 0.0f && z < 1.0f && z < d.depth )
                         {
-                            // TODO: Interpolate vertex attributes.
-                            visibilityBuffer( x, y ) = Color { v2.instanceId, v2.primitiveId };
-                            depthBuffer( x, y )      = Color { z };
+                            visibilityBuffer( x, y )  = Color { v2.instanceId, v2.primitiveId };
+                            barycentricCoords( x, y ) = Color { static_cast<uint16_t>( b.x * 65535.0f ), static_cast<uint16_t>( b.y * 65535.0f ) };
+                            d.depth                   = z;
                         }
                     }
                 }
@@ -186,8 +189,24 @@ int main( int argc, char* argv[] )
         {
             if ( auto c = visibilityBuffer[i]; c.primitiveId < 0xffff )
             {
-                // colorBuffer[i] = instanceBuffer[c.instanceId].mesh->getMaterial()->diffuseColor;
-                colorBuffer[i] = randomColors[c.instanceId + c.primitiveId];
+                auto mesh           = instanceBuffer[c.instanceId].mesh;
+                auto mat            = mesh->getMaterial();
+                auto diffuseTexture = mat->diffuseTexture;
+
+                auto verts = mesh->getVertices().data();
+                auto v0    = verts[c.primitiveId * 3 + 0];
+                auto v1    = verts[c.primitiveId * 3 + 1];
+                auto v2    = verts[c.primitiveId * 3 + 2];
+
+                // Unpack barycentric coords.
+                Color       bc = barycentricCoords[i];
+                const float u  = static_cast<float>( bc.u ) / 65535.0f;
+                const float v  = static_cast<float>( bc.v ) / 65535.0f;
+                const float w  = 1.0f - u - v;
+                // Compute UV
+                const glm::vec2 uv = v0.texCoord * u + v1.texCoord * v + v2.texCoord * w;
+                // Sample diffuse texture.
+                colorBuffer[i] = mat->diffuseTexture->sample( uv );
             }
         }
 
