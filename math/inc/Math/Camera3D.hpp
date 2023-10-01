@@ -40,6 +40,14 @@ public:
     void setRotation( const glm::quat& rot );
 
     /// <summary>
+    /// Update the rotation to face the target.
+    /// </summary>
+    /// <param name="eye">The eye position.</param>
+    /// <param name="target">The target point to look at.</param>
+    /// <param name="up">(optional) The global "up" vector. Default: (0, 1, 0).</param>
+    void lookAt( const glm::vec3& eye, const glm::vec3& target, const glm::vec3& up = {0, 1, 0} );
+
+    /// <summary>
     /// Add translation to the camera.
     /// </summary>
     /// <param name="translation">The amount to add to the camera's position.</param>
@@ -89,14 +97,17 @@ public:
     const glm::mat4& getViewProjectionMatrix() const noexcept;
 
 private:
+    void updateViewMatrix();
+    void updateViewProjectionMatrix();
+
     glm::vec3 translation { 0 };  // World-space position.
     glm::quat rotation {};        // Rotation quaternion.
 
-    mutable glm::mat4 viewMatrix;
-    mutable glm::mat4 projectionMatrix;
-    mutable glm::mat4 viewProjectionMatrix;
+    glm::mat4 viewMatrix;
+    glm::mat4 projectionMatrix;
+    glm::mat4 viewProjectionMatrix;
 
-    mutable bool viewDirty           = true;
-    mutable bool viewProjectionDirty = true;
+    bool viewDirty           = true;
+    bool viewProjectionDirty = true;
 };
 }  // namespace Math

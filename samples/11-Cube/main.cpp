@@ -1,10 +1,11 @@
 #include <Graphics/Font.hpp>
 #include <Graphics/Image.hpp>
+#include <Graphics/Input.hpp>
 #include <Graphics/Model.hpp>
 #include <Graphics/Timer.hpp>
 #include <Graphics/Window.hpp>
+#include <Math/Camera3D.hpp>
 
-#include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/random.hpp>
 #include <glm/gtx/transform.hpp>
 
@@ -95,8 +96,10 @@ int main( int argc, char* argv[] )
 
     // Setup matrices.
     glm::vec4 viewport { 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT };
-    glm::mat4 projectionMatrix = glm::perspectiveFov( glm::radians( 60.0f ), static_cast<float>( WINDOW_WIDTH ), static_cast<float>( WINDOW_HEIGHT ), 1.0f, 100.0f );
-    glm::mat4 viewMatrix       = glm::lookAt( glm::vec3 { 0, 50, 25 }, glm::vec3 { 0, 0, 0 }, glm::vec3 { 0, -1, 0 } );
+
+    Camera camera;
+    camera.setProjection( glm::radians( 60.0f ), static_cast<float>( WINDOW_WIDTH ) / WINDOW_HEIGHT, 1.0f, 100.0f );
+    camera.lookAt( { 0, 50, 25 }, { 0, 0, 0 }, { 0, -1, 0 } );
 
     // Setup vertex shader.
     VertexShader vertexShader {};
@@ -130,16 +133,28 @@ int main( int argc, char* argv[] )
 
     while ( window )
     {
+        timer.tick();
+        Input::update();
+
+        camera.translate( glm::vec3 { Input::getAxis( "Horizontal" ), 0, -Input::getAxis( "Vertical" ) } * static_cast<float>( timer.elapsedSeconds() ) * 5.0f );
+        if ( Input::getMouseButton( MouseButton::Right ) )
+        {
+            camera.rotateX( glm::radians( -Input::getAxis( "Mouse Y" ) * timer.elapsedSeconds() ) );
+            camera.rotateY( glm::radians( Input::getAxis( "Mouse X" ) * timer.elapsedSeconds() ) );
+        }
+        float roll = Input::getKey( "q" ) ? -1.0f : 0.0f;
+        roll += Input::getKey( "e" ) ? 1.0f : 0.0f;
+
+        camera.rotateZ( glm::radians( roll ) * timer.elapsedSeconds() * 15.0f );
+
         colorBuffer.clear( Color::Black );
         visibilityBuffer.clear( { 0xffffu, 0xffffu } );
         instanceBuffer.clear();
         depthBuffer.clear( Color { 1.0f } );
         transformedVerts.clear();
 
-        // Draw the cube.
-        angle += static_cast<float>( timer.elapsedSeconds() * 30.0 );  // Rotate the cube.
-        const glm::mat4 modelMatrix            = glm::scale( glm::vec3 { 0.01f } ) * glm::rotate( glm::radians( angle ), glm::vec3 { 0, 1, 0 } );
-        vertexShader.modelViewProjectionMatrix = projectionMatrix * viewMatrix * modelMatrix;
+        const glm::mat4 modelMatrix            = glm::scale( glm::vec3 { 0.01f } );
+        vertexShader.modelViewProjectionMatrix = camera.getViewProjectionMatrix() * modelMatrix;
         vertexShader.instanceId                = 0;
         for ( const auto& mesh: cube.getMeshes() )
         {
@@ -164,6 +179,8 @@ int main( int argc, char* argv[] )
             auto aabb = AABB::fromTriangle( v0.position, v1.position, v2.position );
             // Clamp the triangle AABB to the AABB of the visibility buffer.
             aabb.clamp( visibilityBuffer.getAABB() );
+            if ( aabb.min.x > aabb.max.x || aabb.min.y > aabb.max.y || aabb.min.z > 1.0f || aabb.max.z < 0.0f )
+                continue;
 
             for ( int y = static_cast<int>( aabb.min.y ); y <= static_cast<int>( aabb.max.y ); ++y )
             {
@@ -228,6 +245,9 @@ int main( int argc, char* argv[] )
             case Event::KeyPressed:
                 switch ( e.key.code )
                 {
+                case KeyCode::R:
+                    camera.lookAt( { 0, 50, 25 }, { 0, 0, 0 }, { 0, -1, 0 } );
+                    break;
                 case KeyCode::Escape:
                     window.destroy();
                     break;
@@ -239,7 +259,6 @@ int main( int argc, char* argv[] )
             }
         }
 
-        timer.tick();
         ++frameCount;
 
         totalTime += timer.elapsedSeconds();
