@@ -28,13 +28,14 @@ struct VertexShader
 
     uint16_t instanceId;
 
-    VertexOut operator()( const Vertex3D& in, uint16_t vertexId ) const
+    VertexOut operator()( const glm::vec3& position, uint16_t vertexId ) const
     {
         VertexOut out {};
 
-        glm::vec4 pos = modelViewProjectionMatrix * glm::vec4 { in.position, 1 };
+        glm::vec4 pos = modelViewProjectionMatrix * glm::vec4 { position, 1 };
         pos           = pos / pos.w;  // Perspective divide.
-                                      // NDC -> screen space
+
+        // NDC -> screen space
         pos   = pos * 0.5f + 0.5f;
         pos.x = pos.x * viewport.z + viewport.x;
         pos.y = pos.y * viewport.w + viewport.y;
@@ -143,9 +144,9 @@ int main( int argc, char* argv[] )
         for ( const auto& mesh: cube.getMeshes() )
         {
             instanceBuffer.emplace_back( mesh, modelMatrix );
-            for ( uint16_t vertexId = 0; const auto& v: mesh->getVertices() )
+            for ( uint16_t vertexId = 0; const auto& p: mesh->getPositions() )
             {
-                auto vout = vertexShader( v, vertexId );
+                auto vout = vertexShader( p, vertexId );
                 transformedVerts.emplace_back( vout );
                 ++vertexId;
             }
@@ -185,6 +186,7 @@ int main( int argc, char* argv[] )
             }
         }
 
+        // TODO: Cluster by instance ID/sort by primitive ID.
         for ( int i = 0; i < WINDOW_WIDTH * WINDOW_HEIGHT; ++i )
         {
             if ( auto c = visibilityBuffer[i]; c.primitiveId < 0xffff )
@@ -193,10 +195,11 @@ int main( int argc, char* argv[] )
                 auto mat            = mesh->getMaterial();
                 auto diffuseTexture = mat->diffuseTexture;
 
-                auto verts = mesh->getVertices().data();
-                auto v0    = verts[c.primitiveId * 3 + 0];
-                auto v1    = verts[c.primitiveId * 3 + 1];
-                auto v2    = verts[c.primitiveId * 3 + 2];
+                auto textureCoords = mesh->getTexCoords().data();
+
+                auto t0 = textureCoords[c.primitiveId * 3 + 0];
+                auto t1 = textureCoords[c.primitiveId * 3 + 1];
+                auto t2 = textureCoords[c.primitiveId * 3 + 2];
 
                 // Unpack barycentric coords.
                 Color       bc = barycentricCoords[i];
@@ -204,7 +207,7 @@ int main( int argc, char* argv[] )
                 const float v  = static_cast<float>( bc.v ) / 65535.0f;
                 const float w  = 1.0f - u - v;
                 // Compute UV
-                const glm::vec2 uv = v0.texCoord * u + v1.texCoord * v + v2.texCoord * w;
+                const glm::vec2 uv = t0 * u + t1 * v + t2 * w;
                 // Sample diffuse texture.
                 colorBuffer[i] = mat->diffuseTexture->sample( uv );
             }

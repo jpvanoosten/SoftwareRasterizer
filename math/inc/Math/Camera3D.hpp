@@ -28,14 +28,6 @@ public:
     void setProjection( float fov, float aspect, float near, float far );
 
     /// <summary>
-    /// Set the view matrix of the camera.
-    /// </summary>
-    /// <param name="eye">The eye position (in world space).</param>
-    /// <param name="target">The target position (in world space).</param>
-    /// <param name="up">The camera's up vector (should be perpendicular to (target - eye))</param>
-    void setView( const glm::vec3& eye, const glm::vec3& target, const glm::vec3& up = glm::vec3 { 0, 1, 0 } );
-
-    /// <summary>
     /// Set the translation of the camera.
     /// </summary>
     /// <param name="pos"></param>
@@ -52,30 +44,59 @@ public:
     /// </summary>
     /// <param name="translation">The amount to add to the camera's position.</param>
     /// <param name="space">(optional) The space to apply the translation (Default: Local)</param>
-    void addTranslation( const glm::vec3& translation, Space space = Space::Local );
+    void translate( const glm::vec3& translation, Space space = Space::Local );
 
     /// <summary>
     /// Add rotation to the camera.
     /// </summary>
     /// <param name="rot">The rotation quaternion to add.</param>
-    void addRotation( const glm::quat& rot );
+    void rotate( const glm::quat& rot );
+
+    /// <summary>
+    /// Rotate about the X-axis (pitch).
+    /// </summary>
+    /// <param name="pitch">The pitch (in radians).</param>
+    void rotateX( float pitch );
+
+    /// <summary>
+    /// Rotate about the Y-axis (yaw).
+    /// </summary>
+    /// <param name="yaw">The yaw (in radians).</param>
+    void rotateY( float yaw );
+
+    /// <summary>
+    /// Rotate about the Z-axis (roll).
+    /// </summary>
+    /// <param name="roll">The roll (in radians).</param>
+    void rotateZ( float roll );
+
+    /// <summary>
+    /// Get the camera's view matrix.
+    /// </summary>
+    /// <returns>The view matrix of the camera.</returns>
+    const glm::mat4& getViewMatrix() const noexcept;
+
+    /// <summary>
+    /// Get the camera's projection matrix.
+    /// </summary>
+    /// <returns>The camera's projection matrix.</returns>
+    const glm::mat4& getProjectionMatrix() const noexcept;
+
+    /// <summary>
+    /// Get the concatenation of the view and projection matrices.
+    /// </summary>
+    /// <returns></returns>
+    const glm::mat4& getViewProjectionMatrix() const noexcept;
 
 private:
-    float fov;     // Vertical field of view.
-    float aspect;  // Aspect ratio.
-    float near;    // Near clipping plane.
-    float far;     // far clipping plane.
-
     glm::vec3 translation { 0 };  // World-space position.
     glm::quat rotation {};        // Rotation quaternion.
 
-    glm::mat4 viewMatrix;
-    glm::mat4 inverseViewMatrix;
-    glm::mat4 projectionMatrix;
-    glm::mat4 inverseProjectionMatrix;
+    mutable glm::mat4 viewMatrix;
+    mutable glm::mat4 projectionMatrix;
+    mutable glm::mat4 viewProjectionMatrix;
 
-    bool viewDirty                    = true;
-    bool inverseViewMatrixDirty       = true;
-    bool inverseProjectionMatrixDirty = true;
+    mutable bool viewDirty           = true;
+    mutable bool viewProjectionDirty = true;
 };
 }  // namespace Math

@@ -4,9 +4,9 @@
 #include "Material.hpp"
 #include "Vertex.hpp"
 
+#include <filesystem>
 #include <span>
 #include <vector>
-#include <filesystem>
 
 namespace Graphics
 {
@@ -29,10 +29,17 @@ public:
     Mesh& operator=( const Mesh& );
     Mesh& operator=( Mesh&& ) noexcept;
 
-    const std::vector<Vertex3D>& getVertices() const noexcept;
-    const std::vector<int>&      getIndices() const noexcept;
-    std::shared_ptr<Material>    getMaterial() const noexcept;
-    void                         setMaterial( std::shared_ptr<Material> material );
+    // const std::vector<Vertex3D>& getVertices() const noexcept;
+    const std::vector<glm::vec3>& getPositions() const noexcept;
+    const std::vector<glm::vec3>& getNormals() const noexcept;
+    const std::vector<glm::vec3>& getTangents() const noexcept;
+    const std::vector<glm::vec3>& getBitangents() const noexcept;
+    const std::vector<glm::vec3>& getTexCoords() const noexcept;
+    const std::vector<Color>&     getColors() const noexcept;
+
+    const std::vector<int>&          getIndices() const noexcept;
+    const std::shared_ptr<Material>& getMaterial() const noexcept;
+    void                             setMaterial( std::shared_ptr<Material> material );
 
     /// <summary>
     /// Check to see if this mesh has an index buffer.
@@ -44,8 +51,15 @@ public:
     }
 
 private:
-    std::vector<Vertex3D> vertexBuffer;
-    std::vector<int>      indexBuffer;
+    // std::vector<Vertex3D> vertexBuffer;
+    std::vector<glm::vec3> positions;
+    std::vector<glm::vec3> normals;
+    std::vector<glm::vec3> tangents;
+    std::vector<glm::vec3> bitangents;
+    std::vector<glm::vec3> texCoords;
+    std::vector<Color>     colors;
+
+    std::vector<int>          indexBuffer;
     std::shared_ptr<Material> material;
 };
 }  // namespace Graphics
