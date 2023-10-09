@@ -160,6 +160,9 @@ Model::Model( const std::filesystem::path& modelFile )
             }
         }
 
+        // Expend the AABB by the mesh's AABB.
+        aabb.expand( mesh->getAABB() );
+
         // Add the mesh to the model's meshes array.
         meshes.emplace_back( mesh );
     }
@@ -168,4 +171,9 @@ Model::Model( const std::filesystem::path& modelFile )
 const std::vector<std::shared_ptr<Mesh>>& Model::getMeshes() const
 {
     return meshes;
+}
+
+const Math::AABB& Model::getAABB() const noexcept
+{
+    return aabb;
 }

@@ -41,6 +41,8 @@ public:
     const std::shared_ptr<Material>& getMaterial() const noexcept;
     void                             setMaterial( std::shared_ptr<Material> material );
 
+    const Math::AABB& getAABB() const noexcept;
+
     /// <summary>
     /// Check to see if this mesh has an index buffer.
     /// </summary>
@@ -61,5 +63,6 @@ private:
 
     std::vector<int>          indexBuffer;
     std::shared_ptr<Material> material;
+    Math::AABB                aabb;
 };
 }  // namespace Graphics

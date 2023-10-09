@@ -16,6 +16,8 @@ Mesh::Mesh( std::span<const Vertex3D> vertices, std::span<int> indices, std::sha
 
     for ( const auto& vert : vertices )
     {
+        aabb.expand( vert.position );
+
         positions.emplace_back( vert.position );
         normals.emplace_back( vert.normal );
         tangents.emplace_back( vert.tangent );
@@ -80,4 +82,9 @@ const std::shared_ptr<Material>& Mesh::getMaterial() const noexcept
 void Mesh::setMaterial( std::shared_ptr<Material> _material )
 {
     material = std::move( _material );
+}
+
+const Math::AABB& Mesh::getAABB() const noexcept
+{
+    return aabb;
 }

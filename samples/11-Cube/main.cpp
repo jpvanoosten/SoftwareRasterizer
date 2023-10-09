@@ -5,6 +5,7 @@
 #include <Graphics/Timer.hpp>
 #include <Graphics/Window.hpp>
 #include <Math/Camera3D.hpp>
+#include <Math/Plane.hpp>
 
 #include <glm/gtc/random.hpp>
 #include <glm/gtx/transform.hpp>
@@ -17,7 +18,7 @@ using namespace Math;
 
 struct VertexOut
 {
-    glm::vec3 position;     // Vertex position in screen space.
+    glm::vec4 position;     // Vertex position in screen space.
     uint16_t  instanceId;   // Object instance ID.
     uint16_t  primitiveId;  // Triangle primitive ID.
 };
@@ -33,15 +34,7 @@ struct VertexShader
     {
         VertexOut out {};
 
-        glm::vec4 pos = modelViewProjectionMatrix * glm::vec4 { position, 1 };
-        pos           = pos / pos.w;  // Perspective divide.
-
-        // NDC -> screen space
-        pos   = pos * 0.5f + 0.5f;
-        pos.x = pos.x * viewport.z + viewport.x;
-        pos.y = pos.y * viewport.w + viewport.y;
-
-        out.position    = pos;
+        out.position    = modelViewProjectionMatrix * glm::vec4 { position, 1 };
         out.instanceId  = instanceId;
         out.primitiveId = vertexId / 3;
 
@@ -99,7 +92,7 @@ int main( int argc, char* argv[] )
 
     Camera camera;
     camera.setProjection( glm::radians( 60.0f ), static_cast<float>( WINDOW_WIDTH ) / WINDOW_HEIGHT, 1.0f, 100.0f );
-    camera.lookAt( { 0, 50, 25 }, { 0, 0, 0 }, { 0, -1, 0 } );
+    camera.lookAt( { 0, 50, 25 }, { 0, 0, 0 }, { 0, 1, 0 } );
 
     // Setup vertex shader.
     VertexShader vertexShader {};
@@ -176,6 +169,45 @@ int main( int argc, char* argv[] )
             auto v1 = transformedVerts[i + 1];
             auto v2 = transformedVerts[i + 2];
 
+            // Backface culling
+            auto e01 = v1.position - v0.position;
+            auto e02 = v2.position - v0.position;
+
+            auto z = e01.x * e02.y - e02.x * e01.y;
+            if ( z < 0.0f )
+                continue;
+
+            // Clip triangle.
+            // Clip against the near clipping plane.
+            // TODO: Do proper clipping.
+            const Plane near { { 0, 0, 1 }, 0 };
+            const Plane far { { 0, 0, -1 }, 1 };
+
+            const float d0 = near.distance( v0.position );
+            const float d1 = near.distance( v1.position );
+            const float d2 = near.distance( v2.position );
+
+            // All vertices are outside the plane.
+            if ( d0 < 0.0f && d1 < 0.0f && d2 < 0.0f )
+                continue;
+
+            if ( d0 < 0.0f || d1 < 0.0f || d2 < 0.0f )
+            {
+                // TODO: test all cases or figure out what cases I need to check.
+                continue;
+            }
+
+            for ( auto v: { std::ref( v0 ), std::ref( v1 ), std::ref( v2 ) } )
+            {
+                auto& pos = v.get().position;
+                pos       = pos / pos.w;  // Perspective divide.
+
+                // NDC -> screen space
+                pos   = pos * 0.5f + 0.5f;
+                pos.x = pos.x * viewport.z + viewport.x;
+                pos.y = ( 1.0f - pos.y ) * viewport.w + viewport.y;  // Flip Y
+            }
+
             auto aabb = AABB::fromTriangle( v0.position, v1.position, v2.position );
             // Clamp the triangle AABB to the AABB of the visibility buffer.
             aabb.clamp( visibilityBuffer.getAABB() );
@@ -189,7 +221,8 @@ int main( int argc, char* argv[] )
                     auto b = barycentric( v0.position, v1.position, v2.position, { x, y } );
                     if ( barycentricInside( b ) )
                     {
-                        // Compute depth
+                        // Compute depth.
+                        // TODO: Perspective correct projection.
                         float  z = v0.position.z * b.x + v1.position.z * b.y + v2.position.z * b.z;
                         Color& d = depthBuffer( x, y );
                         if ( z > 0.0f && z < 1.0f && z < d.depth )
@@ -212,6 +245,9 @@ int main( int argc, char* argv[] )
                 auto mat            = mesh->getMaterial();
                 auto diffuseTexture = mat->diffuseTexture;
 
+                if ( !diffuseTexture )
+                    continue;
+
                 auto textureCoords = mesh->getTexCoords().data();
 
                 auto t0 = textureCoords[c.primitiveId * 3 + 0];
@@ -223,10 +259,11 @@ int main( int argc, char* argv[] )
                 const float u  = static_cast<float>( bc.u ) / 65535.0f;
                 const float v  = static_cast<float>( bc.v ) / 65535.0f;
                 const float w  = 1.0f - u - v;
-                // Compute UV
+                // Compute UV:
+                // TODO: Perspective correct projection.
                 const glm::vec2 uv = t0 * u + t1 * v + t2 * w;
                 // Sample diffuse texture.
-                colorBuffer[i] = mat->diffuseTexture->sample( uv );
+                colorBuffer[i] = mat->diffuseTexture->sample( glm::vec2 { uv.x, 1.0f - uv.y } );
             }
         }
 
@@ -246,7 +283,7 @@ int main( int argc, char* argv[] )
                 switch ( e.key.code )
                 {
                 case KeyCode::R:
-                    camera.lookAt( { 0, 50, 25 }, { 0, 0, 0 }, { 0, -1, 0 } );
+                    camera.lookAt( { 0, 50, 25 }, { 0, 0, 0 }, { 0, 1, 0 } );
                     break;
                 case KeyCode::Escape:
                     window.destroy();

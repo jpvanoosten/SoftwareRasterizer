@@ -9,6 +9,7 @@ set( INC_FILES
     inc/Math/Line.hpp
     inc/Math/Math.hpp
     inc/Math/OutCodes.hpp
+    inc/Math/Plane.hpp
     inc/Math/Rect.hpp
     inc/Math/Space.hpp
     inc/Math/Sphere.hpp
