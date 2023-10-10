@@ -52,6 +52,11 @@ public:
         return !indexBuffer.empty();
     }
 
+    size_t getNumIndices() const noexcept
+    {
+        return indexBuffer.size();
+    }
+
 private:
     // std::vector<Vertex3D> vertexBuffer;
     std::vector<glm::vec3> positions;

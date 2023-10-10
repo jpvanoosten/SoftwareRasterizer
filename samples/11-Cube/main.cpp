@@ -19,6 +19,7 @@ using namespace Math;
 struct VertexOut
 {
     glm::vec4 position;     // Vertex position in screen space.
+    glm::vec2 uv;           // Vertex texture coordinates.
     uint16_t  instanceId;   // Object instance ID.
     uint16_t  primitiveId;  // Triangle primitive ID.
 };
@@ -30,11 +31,12 @@ struct VertexShader
 
     uint16_t instanceId;
 
-    VertexOut operator()( const glm::vec3& position, uint16_t vertexId ) const
+    VertexOut operator()( const glm::vec3& position, const glm::vec2& uv, uint16_t vertexId ) const
     {
         VertexOut out {};
 
         out.position    = modelViewProjectionMatrix * glm::vec4 { position, 1 };
+        out.uv          = uv;
         out.instanceId  = instanceId;
         out.primitiveId = vertexId / 3;
 
@@ -92,7 +94,7 @@ int main( int argc, char* argv[] )
 
     Camera camera;
     camera.setProjection( glm::radians( 60.0f ), static_cast<float>( WINDOW_WIDTH ) / WINDOW_HEIGHT, 1.0f, 100.0f );
-    camera.lookAt( { 0, 50, 25 }, { 0, 0, 0 }, { 0, 1, 0 } );
+    camera.lookAt( { 0, 5, 0 }, { -1, 5, 0 }, { 0, 1, 0 } );
 
     // Setup vertex shader.
     VertexShader vertexShader {};
@@ -108,11 +110,12 @@ int main( int argc, char* argv[] )
     Image  colorBuffer { WINDOW_WIDTH, WINDOW_HEIGHT };
     Image  depthBuffer { WINDOW_WIDTH, WINDOW_HEIGHT };
     Image  visibilityBuffer { WINDOW_WIDTH, WINDOW_HEIGHT };
-    Image  barycentricCoords { WINDOW_WIDTH, WINDOW_HEIGHT };
+    Image  textureCoordinates { WINDOW_WIDTH, WINDOW_HEIGHT };
 
     Model cube { "assets/models/sponza.obj" };
 
     window.show();
+    window.setFullscreen( true );
 
     Timer       timer;
     double      totalTime  = 0.0;
@@ -132,13 +135,12 @@ int main( int argc, char* argv[] )
         camera.translate( glm::vec3 { Input::getAxis( "Horizontal" ), 0, -Input::getAxis( "Vertical" ) } * static_cast<float>( timer.elapsedSeconds() ) * 5.0f );
         if ( Input::getMouseButton( MouseButton::Right ) )
         {
-            camera.rotateX( glm::radians( -Input::getAxis( "Mouse Y" ) * timer.elapsedSeconds() ) );
+            camera.rotateX( glm::radians( Input::getAxis( "Mouse Y" ) * timer.elapsedSeconds() ) );
             camera.rotateY( glm::radians( Input::getAxis( "Mouse X" ) * timer.elapsedSeconds() ) );
         }
-        float roll = Input::getKey( "q" ) ? -1.0f : 0.0f;
-        roll += Input::getKey( "e" ) ? 1.0f : 0.0f;
-
-        camera.rotateZ( glm::radians( roll ) * timer.elapsedSeconds() * 15.0f );
+        float y = Input::getKey( "q" ) ? -1.0f : 0.0f;
+        y += Input::getKey( "e" ) ? 1.0f : 0.0f;
+        camera.translate( glm::vec3 { 0, y, 0 } * static_cast<float>( timer.elapsedSeconds() ) * 5.0f );
 
         colorBuffer.clear( Color::Black );
         visibilityBuffer.clear( { 0xffffu, 0xffffu } );
@@ -152,11 +154,18 @@ int main( int argc, char* argv[] )
         for ( const auto& mesh: cube.getMeshes() )
         {
             instanceBuffer.emplace_back( mesh, modelMatrix );
-            for ( uint16_t vertexId = 0; const auto& p: mesh->getPositions() )
+            auto indices   = mesh->getIndices().data();
+            auto positions = mesh->getPositions().data();
+            auto texCoords = mesh->getTexCoords().data();
+
+            for ( size_t i = 0; i < mesh->getNumIndices(); ++i )
             {
-                auto vout = vertexShader( p, vertexId );
+                auto vertexId = static_cast<uint16_t>( indices[i] );
+                auto p        = positions[vertexId];
+                auto uv       = texCoords[vertexId];
+
+                auto vout = vertexShader( p, uv, vertexId );
                 transformedVerts.emplace_back( vout );
-                ++vertexId;
             }
             vertexShader.instanceId++;
         }
@@ -173,14 +182,14 @@ int main( int argc, char* argv[] )
             auto e01 = v1.position - v0.position;
             auto e02 = v2.position - v0.position;
 
-            auto z = e01.x * e02.y - e02.x * e01.y;
-            if ( z < 0.0f )
-                continue;
+            // auto z = e01.x * e02.y - e02.x * e01.y;
+            // if ( z < 0.0f )
+            //     continue;
 
             // Clip triangle.
             // Clip against the near clipping plane.
             // TODO: Do proper clipping.
-            const Plane near { { 0, 0, 1 }, 0 };
+            const Plane near { { 0, 0, 1 }, -1 };
             const Plane far { { 0, 0, -1 }, 1 };
 
             const float d0 = near.distance( v0.position );
@@ -197,6 +206,11 @@ int main( int argc, char* argv[] )
                 continue;
             }
 
+            // Store the w component before perspective divide.
+            float w0 = 1.0f / v0.position.w;
+            float w1 = 1.0f / v1.position.w;
+            float w2 = 1.0f / v2.position.w;
+
             for ( auto v: { std::ref( v0 ), std::ref( v1 ), std::ref( v2 ) } )
             {
                 auto& pos = v.get().position;
@@ -208,6 +222,12 @@ int main( int argc, char* argv[] )
                 pos.y = ( 1.0f - pos.y ) * viewport.w + viewport.y;  // Flip Y
             }
 
+            // Compute the area of the triangle in screen space.
+            // Source: OpenGL 4.6 Specification, 2022 (pp. 477)
+            auto a = -( ( v0.position.x * v1.position.y - v1.position.x * v0.position.y ) + ( v1.position.x * v2.position.y - v2.position.x * v1.position.y ) + ( v2.position.x * v0.position.y - v2.position.y * v0.position.x ) );
+            if ( a < 0.0f )
+                continue;
+
             auto aabb = AABB::fromTriangle( v0.position, v1.position, v2.position );
             // Clamp the triangle AABB to the AABB of the visibility buffer.
             aabb.clamp( visibilityBuffer.getAABB() );
@@ -218,17 +238,22 @@ int main( int argc, char* argv[] )
             {
                 for ( int x = static_cast<int>( aabb.min.x ); x <= static_cast<int>( aabb.max.x ); ++x )
                 {
-                    auto b = barycentric( v0.position, v1.position, v2.position, { x, y } );
-                    if ( barycentricInside( b ) )
+                    // Barycentric coordinates in screen space.
+                    auto bc = barycentric( v0.position, v1.position, v2.position, { static_cast<float>( x ) + 0.5f, static_cast<float>( y ) + 0.5f } );
+                    if ( barycentricInside( bc ) )
                     {
-                        // Compute depth.
-                        // TODO: Perspective correct projection.
-                        float  z = v0.position.z * b.x + v1.position.z * b.y + v2.position.z * b.z;
+                        // Compute depth
+                        float  z = v0.position.z * bc.x + v1.position.z * bc.y + v2.position.z * bc.z;
                         Color& d = depthBuffer( x, y );
-                        if ( z > 0.0f && z < 1.0f && z < d.depth )
+                        if ( z > -1.0f && z < 1.0f && z < d.depth )
                         {
+                            // Compute the perspective correct UV coordinates.
+                            // Source: OpenGL 4.6 Specification, 2022 (pp. 479).
+                            float correction = 1.0f / ( bc.x * w0 + bc.y * w1 + bc.z * w2 );
+                            auto  uv         = ( v0.uv * bc.x * w0 + v1.uv * bc.y * w1 + v2.uv * bc.z * w2 ) * correction;
+
                             visibilityBuffer( x, y )  = Color { v2.instanceId, v2.primitiveId };
-                            barycentricCoords( x, y ) = Color { static_cast<uint16_t>( b.x * 65535.0f ), static_cast<uint16_t>( b.y * 65535.0f ) };
+                            textureCoordinates( x, y ) = Color { static_cast<uint16_t>( uv.x * 65535.0f ), static_cast<uint16_t>( uv.y * 65535.0f ) };
                             d.depth                   = z;
                         }
                     }
@@ -254,16 +279,12 @@ int main( int argc, char* argv[] )
                 auto t1 = textureCoords[c.primitiveId * 3 + 1];
                 auto t2 = textureCoords[c.primitiveId * 3 + 2];
 
-                // Unpack barycentric coords.
-                Color       bc = barycentricCoords[i];
-                const float u  = static_cast<float>( bc.u ) / 65535.0f;
-                const float v  = static_cast<float>( bc.v ) / 65535.0f;
-                const float w  = 1.0f - u - v;
-                // Compute UV:
-                // TODO: Perspective correct projection.
-                const glm::vec2 uv = t0 * u + t1 * v + t2 * w;
+                // Unpack uv coords.
+                Color       uv = textureCoordinates[i];
+                const float u  = static_cast<float>( uv.u ) / 65535.0f;
+                const float v  = static_cast<float>( uv.v ) / 65535.0f;
                 // Sample diffuse texture.
-                colorBuffer[i] = mat->diffuseTexture->sample( glm::vec2 { uv.x, 1.0f - uv.y } );
+                colorBuffer[i] = mat->diffuseTexture->sample( glm::vec2 { u, v } );
             }
         }
 
