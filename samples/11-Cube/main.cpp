@@ -93,8 +93,12 @@ int main( int argc, char* argv[] )
     glm::vec4 viewport { 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT };
 
     Camera camera;
-    camera.setProjection( glm::radians( 60.0f ), static_cast<float>( WINDOW_WIDTH ) / WINDOW_HEIGHT, 1.0f, 100.0f );
-    camera.lookAt( { 0, 5, 0 }, { -1, 5, 0 }, { 0, 1, 0 } );
+    constexpr glm::vec3 eye { 0, 3, 0 };
+    constexpr glm::vec3 target { -10, 3, 0 };
+    constexpr glm::vec3 up { 0, 1, 0 };
+
+    camera.setProjection( glm::radians( 60.0f ), static_cast<float>( WINDOW_WIDTH ) / WINDOW_HEIGHT, 0.1f, 100.0f );
+    camera.lookAt( eye, target, up );
 
     // Setup vertex shader.
     VertexShader vertexShader {};
@@ -178,33 +182,9 @@ int main( int argc, char* argv[] )
             auto v1 = transformedVerts[i + 1];
             auto v2 = transformedVerts[i + 2];
 
-            // Backface culling
-            auto e01 = v1.position - v0.position;
-            auto e02 = v2.position - v0.position;
-
-            // auto z = e01.x * e02.y - e02.x * e01.y;
-            // if ( z < 0.0f )
-            //     continue;
-
-            // Clip triangle.
-            // Clip against the near clipping plane.
-            // TODO: Do proper clipping.
-            const Plane near { { 0, 0, 1 }, -1 };
-            const Plane far { { 0, 0, -1 }, 1 };
-
-            const float d0 = near.distance( v0.position );
-            const float d1 = near.distance( v1.position );
-            const float d2 = near.distance( v2.position );
-
-            // All vertices are outside the plane.
-            if ( d0 < 0.0f && d1 < 0.0f && d2 < 0.0f )
+            // TODO: Better clipping.
+            if (v0.position.z < -v0.position.w  || v1.position.z < -v1.position.w || v2.position.z < -v2.position.w )
                 continue;
-
-            if ( d0 < 0.0f || d1 < 0.0f || d2 < 0.0f )
-            {
-                // TODO: test all cases or figure out what cases I need to check.
-                continue;
-            }
 
             // Store the w component before perspective divide.
             float w0 = 1.0f / v0.position.w;
@@ -222,9 +202,10 @@ int main( int argc, char* argv[] )
                 pos.y = ( 1.0f - pos.y ) * viewport.w + viewport.y;  // Flip Y
             }
 
+            // Backface culling.
             // Compute the area of the triangle in screen space.
             // Source: OpenGL 4.6 Specification, 2022 (pp. 477)
-            auto a = -( ( v0.position.x * v1.position.y - v1.position.x * v0.position.y ) + ( v1.position.x * v2.position.y - v2.position.x * v1.position.y ) + ( v2.position.x * v0.position.y - v2.position.y * v0.position.x ) );
+            auto a = -( ( v0.position.x * v1.position.y - v1.position.x * v0.position.y ) + ( v1.position.x * v2.position.y - v2.position.x * v1.position.y ) + ( v2.position.x * v0.position.y - v0.position.x * v2.position.y ) );
             if ( a < 0.0f )
                 continue;
 
@@ -245,16 +226,17 @@ int main( int argc, char* argv[] )
                         // Compute depth
                         float  z = v0.position.z * bc.x + v1.position.z * bc.y + v2.position.z * bc.z;
                         Color& d = depthBuffer( x, y );
-                        if ( z > -1.0f && z < 1.0f && z < d.depth )
+                        if ( z < d.depth )
                         {
+                            bc = bc * glm::vec3 { w0, w1, w2 };
                             // Compute the perspective correct UV coordinates.
                             // Source: OpenGL 4.6 Specification, 2022 (pp. 479).
-                            float correction = 1.0f / ( bc.x * w0 + bc.y * w1 + bc.z * w2 );
-                            auto  uv         = ( v0.uv * bc.x * w0 + v1.uv * bc.y * w1 + v2.uv * bc.z * w2 ) * correction;
+                            float correction = 1.0f / ( bc.x + bc.y + bc.z );
+                            auto  uv         = ( v0.uv * bc.x + v1.uv * bc.y + v2.uv * bc.z ) * correction;
 
-                            visibilityBuffer( x, y )  = Color { v2.instanceId, v2.primitiveId };
+                            visibilityBuffer( x, y )   = Color { v2.instanceId, v2.primitiveId };
                             textureCoordinates( x, y ) = Color { static_cast<uint16_t>( uv.x * 65535.0f ), static_cast<uint16_t>( uv.y * 65535.0f ) };
-                            d.depth                   = z;
+                            d.depth                    = z;
                         }
                     }
                 }
@@ -304,13 +286,16 @@ int main( int argc, char* argv[] )
                 switch ( e.key.code )
                 {
                 case KeyCode::R:
-                    camera.lookAt( { 0, 50, 25 }, { 0, 0, 0 }, { 0, 1, 0 } );
+                    camera.lookAt( eye, target, up );
                     break;
                 case KeyCode::Escape:
                     window.destroy();
                     break;
                 case KeyCode::V:
                     window.toggleVSync();
+                    break;
+                case KeyCode::F11:
+                    window.toggleFullscreen();
                     break;
                 }
                 break;
