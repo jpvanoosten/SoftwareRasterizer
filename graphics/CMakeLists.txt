@@ -69,6 +69,8 @@ set( SRC_FILES
     src/TileMap.cpp
     src/Timer.cpp
     src/Window.cpp
+    src/WindowGLFW.hpp
+    src/WindowGLFW.cpp
 )
 
 if(WIN32)
@@ -109,7 +111,7 @@ target_include_directories( Graphics
 
 target_link_libraries( Graphics
     PUBLIC Math fmt::fmt
-    PRIVATE glad tinyobjloader
+    PRIVATE glad tinyobjloader glfw
 )
 
 if(SR_USE_OPENMP)

@@ -5,6 +5,17 @@ include(FetchContent)
 add_subdirectory(glad)
 add_subdirectory(tinyobjloader)
 
+option(GLFW_BUILD_EXAMPLES "Build the GLFW example programs" OFF)
+option(GLFW_BUILD_TESTS "Build the GLFW test programs" OFF)
+option(GLFW_BUILD_DOCS "Build the GLFW documentation" OFF)
+option(GLFW_INSTALL "Generate installation target" OFF)
+
+FetchContent_Declare(
+	glfw
+	GIT_REPOSITORY https://github.com/glfw/glfw.git
+	GIT_TAG 	   3.3.8
+)
+
 FetchContent_Declare(
   glm
   GIT_REPOSITORY https://github.com/g-truc/glm.git
@@ -16,6 +27,9 @@ FetchContent_Declare (
 	GIT_REPOSITORY https://github.com/fmtlib/fmt.git
 	GIT_TAG        9.1.0
 )
+
+message( STATUS "Fetching glfw..." )
+FetchContent_MakeAvailable(glfw)
 
 message( STATUS "Fetching glm..." )
 FetchContent_MakeAvailable(glm)
