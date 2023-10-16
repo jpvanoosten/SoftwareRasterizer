@@ -25,7 +25,7 @@ int main( int argc, char* argv[] )
     constexpr int SCREEN_WIDTH  = 480;
     constexpr int SCREEN_HEIGHT = 256;
 
-    Window window { L"07 - Game", SCREEN_WIDTH, SCREEN_HEIGHT };
+    Window window { "07 - Game", SCREEN_WIDTH, SCREEN_HEIGHT };
 
     // The game class.
     Game game { SCREEN_WIDTH, SCREEN_HEIGHT };

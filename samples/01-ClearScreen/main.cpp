@@ -14,7 +14,7 @@ int main( int argc, char* argv[] )
     const int WINDOW_WIDTH  = 800;
     const int WINDOW_HEIGHT = 600;
 
-    Window window { L"01-ClearScreen", WINDOW_WIDTH, WINDOW_HEIGHT };
+    Window window { "01-ClearScreen", WINDOW_WIDTH, WINDOW_HEIGHT };
 
     Image image { WINDOW_WIDTH, WINDOW_HEIGHT };
 

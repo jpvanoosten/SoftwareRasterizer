@@ -17,7 +17,7 @@ class SR_API Window
 {
 public:
     Window();
-    Window( std::wstring_view title, int width, int height );
+    Window( std::string_view title, int width, int height );
     ~Window();
 
     // Copies not allowed.
@@ -34,7 +34,7 @@ public:
     /// <param name="title">The title to display in the window's title bar.</param>
     /// <param name="width">The initial width of the window.</param>
     /// <param name="height">The initial height of the window.</param>
-    void create( std::wstring_view title, int width, int height );
+    void create( std::string_view title, int width, int height );
 
     /// <summary>
     /// Get an OS window handle.

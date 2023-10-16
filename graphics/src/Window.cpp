@@ -2,12 +2,15 @@
 
 using namespace Graphics;
 
-#if defined(_WIN32)
-#include "Win32/WindowWin32.hpp"
-using WindowType = WindowWin32;
-#endif
+//#if defined(_WIN32)
+//#include "Win32/WindowWin32.hpp"
+//using WindowType = WindowWin32;
+//#endif
 
-Window::Window(std::wstring_view title, int width, int height)
+#include "WindowGLFW.hpp"
+using WindowType = WindowGLFW;
+
+Window::Window(std::string_view title, int width, int height)
 {
     create(title, width, height);
 }
@@ -16,7 +19,7 @@ Window::~Window() = default;
 Window::Window(Window&&) noexcept = default;
 Window& Window::operator=(Window&&) noexcept = default;
 
-void Window::create(std::wstring_view title, int width, int height)
+void Window::create(std::string_view title, int width, int height)
 {
     pImpl = std::make_unique<WindowType>(title, width, height);
 }

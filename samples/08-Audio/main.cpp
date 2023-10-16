@@ -34,7 +34,7 @@ int main( int argc, char* argv[] )
     const int WINDOW_WIDTH  = 800;
     const int WINDOW_HEIGHT = 600;
 
-    Window window { L"08-Audio", WINDOW_WIDTH, WINDOW_HEIGHT };
+    Window window { "08-Audio", WINDOW_WIDTH, WINDOW_HEIGHT };
     Image  image { WINDOW_WIDTH, WINDOW_HEIGHT };
 
     window.show();

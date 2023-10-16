@@ -33,29 +33,6 @@ struct GLFW_context
         {
             throw std::runtime_error( "Failed to initialize GLFW." );
         }
-
-        // Create a temporary window so that we have an OpenGL context for extension loading.
-        glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 3 );
-        glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 2 );
-        glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
-#if _DEBUG
-        glfwWindowHint( GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE );
-#endif
-
-        auto window = glfwCreateWindow( 1, 1, "_TEMP", nullptr, nullptr );
-        glfwMakeContextCurrent( window );
-
-        int version = gladLoadGL( glfwGetProcAddress );
-        if ( version == 0 )
-        {
-            glfwDestroyWindow( window );
-            throw std::runtime_error( "Failed to initialize GLAD." );
-        }
-
-        fmt::print( "OpenGL Loaded: {}.{}\n", GLAD_VERSION_MAJOR( version ), GLAD_VERSION_MINOR( version ) );
-
-        // Destroy the temporary window.
-        glfwDestroyWindow( window );
     }
 
     ~GLFW_context()
@@ -76,7 +53,21 @@ WindowGLFW::WindowGLFW( std::string_view title, int width, int height )
     glfwWindowHint( GLFW_BLUE_BITS, mode->blueBits );
     glfwWindowHint( GLFW_REFRESH_RATE, mode->refreshRate );
 
+    glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 4 );
+    glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 5 );
+    glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
+
     window = glfwCreateWindow( width, height, title.data(), nullptr, nullptr );
+    makeCurrent();
+
+    int version = gladLoadGL( glfwGetProcAddress );
+    if ( version == 0 )
+    {
+        glfwDestroyWindow( window );
+        throw std::runtime_error( "Failed to initialize GLAD." );
+    }
+
+    fmt::print( "OpenGL Loaded: {}.{}\n", GLAD_VERSION_MAJOR( version ), GLAD_VERSION_MINOR( version ) );
 
     // Set the user pointer on the window to retrieve the window in callback functions.
     glfwSetWindowUserPointer( window, this );
@@ -90,8 +81,7 @@ WindowGLFW::WindowGLFW( std::string_view title, int width, int height )
     glfwSetMouseButtonCallback( window, mouseButtonCallback );
     glfwSetCursorPosCallback( window, mousePosCallback );
     glfwSetScrollCallback( window, scrollCallback );
-
-    makeCurrent();
+    glfwSetKeyCallback( window, keyCallback );
 
     // Create an OpenGL texture for pixel operations.
     glGenTextures( 1, &m_Texture );
@@ -278,7 +268,7 @@ int WindowGLFW::getHeight() const noexcept
     int width, height;
     glfwGetWindowSize( window, &width, &height );
 
-    return width;
+    return height;
 }
 
 glm::ivec2 WindowGLFW::getSize() const noexcept
@@ -537,6 +527,12 @@ static MouseButton DecodeMouseButton( int button )
     case GLFW_MOUSE_BUTTON_MIDDLE:
         mouseButton = MouseButton::Middle;
         break;
+    case GLFW_MOUSE_BUTTON_4:
+        mouseButton = MouseButton::XButton1;
+        break;
+    case GLFW_MOUSE_BUTTON_5:
+        mouseButton = MouseButton::XButton2;
+        break;
     }
 
     return mouseButton;
@@ -627,14 +623,431 @@ void WindowGLFW::scrollCallback( GLFWwindow* window, double xOffset, double yOff
         .screenY      = windowY + static_cast<int>( floor( clientY ) )
     };
 
-    if (xOffset != 0.0)
+    if ( xOffset != 0.0 )
     {
         e.wheelDelta = static_cast<float>( xOffset );
         w->onMouseHWheel( e );
     }
-    if (yOffset != 0.0)
+    if ( yOffset != 0.0 )
     {
         e.wheelDelta = static_cast<float>( yOffset );
         w->onMouseWheel( e );
+    }
+}
+
+static KeyCode DecodeKeyCode( int key )
+{
+    KeyCode code = KeyCode::None;
+
+    switch ( key )
+    {
+    case GLFW_KEY_SPACE:
+        code = KeyCode::Space;
+        break;
+    case GLFW_KEY_APOSTROPHE:
+        code = KeyCode::OemQuotes;
+        break;
+    case GLFW_KEY_COMMA:
+        code = KeyCode::OemComma;
+        break;
+    case GLFW_KEY_MINUS:
+        code = KeyCode::OemMinus;
+        break;
+    case GLFW_KEY_PERIOD:
+        code = KeyCode::OemPeriod;
+        break;
+    case GLFW_KEY_SLASH:
+        code = KeyCode::OemQuestion;
+        break;
+    case GLFW_KEY_0:
+        code = KeyCode::D0;
+        break;
+    case GLFW_KEY_1:
+        code = KeyCode::D1;
+        break;
+    case GLFW_KEY_2:
+        code = KeyCode::D2;
+        break;
+    case GLFW_KEY_3:
+        code = KeyCode::D3;
+        break;
+    case GLFW_KEY_4:
+        code = KeyCode::D4;
+        break;
+    case GLFW_KEY_5:
+        code = KeyCode::D5;
+        break;
+    case GLFW_KEY_6:
+        code = KeyCode::D6;
+        break;
+    case GLFW_KEY_7:
+        code = KeyCode::D7;
+        break;
+    case GLFW_KEY_8:
+        code = KeyCode::D8;
+        break;
+    case GLFW_KEY_9:
+        code = KeyCode::D9;
+        break;
+    case GLFW_KEY_SEMICOLON:
+        code = KeyCode::OemSemicolon;
+        break;
+    case GLFW_KEY_EQUAL:
+        code = KeyCode::OemPlus;
+        break;
+    case GLFW_KEY_A:
+        code = KeyCode::A;
+        break;
+    case GLFW_KEY_B:
+        code = KeyCode::B;
+        break;
+    case GLFW_KEY_C:
+        code = KeyCode::C;
+        break;
+    case GLFW_KEY_D:
+        code = KeyCode::D;
+        break;
+    case GLFW_KEY_E:
+        code = KeyCode::E;
+        break;
+    case GLFW_KEY_F:
+        code = KeyCode::F;
+        break;
+    case GLFW_KEY_G:
+        code = KeyCode::G;
+        break;
+    case GLFW_KEY_H:
+        code = KeyCode::H;
+        break;
+    case GLFW_KEY_I:
+        code = KeyCode::I;
+        break;
+    case GLFW_KEY_J:
+        code = KeyCode::J;
+        break;
+    case GLFW_KEY_K:
+        code = KeyCode::K;
+        break;
+    case GLFW_KEY_L:
+        code = KeyCode::L;
+        break;
+    case GLFW_KEY_M:
+        code = KeyCode::M;
+        break;
+    case GLFW_KEY_N:
+        code = KeyCode::N;
+        break;
+    case GLFW_KEY_O:
+        code = KeyCode::O;
+        break;
+    case GLFW_KEY_P:
+        code = KeyCode::P;
+        break;
+    case GLFW_KEY_Q:
+        code = KeyCode::Q;
+        break;
+    case GLFW_KEY_R:
+        code = KeyCode::R;
+        break;
+    case GLFW_KEY_S:
+        code = KeyCode::S;
+        break;
+    case GLFW_KEY_T:
+        code = KeyCode::T;
+        break;
+    case GLFW_KEY_U:
+        code = KeyCode::U;
+        break;
+    case GLFW_KEY_V:
+        code = KeyCode::V;
+        break;
+    case GLFW_KEY_W:
+        code = KeyCode::W;
+        break;
+    case GLFW_KEY_X:
+        code = KeyCode::X;
+        break;
+    case GLFW_KEY_Y:
+        code = KeyCode::Y;
+        break;
+    case GLFW_KEY_Z:
+        code = KeyCode::Z;
+        break;
+    case GLFW_KEY_LEFT_BRACKET:
+        code = KeyCode::OemOpenBrackets;
+        break;
+    case GLFW_KEY_BACKSLASH:
+        code = KeyCode::OemPipe;
+        break;
+    case GLFW_KEY_RIGHT_BRACKET:
+        code = KeyCode::OemCloseBrackets;
+        break;
+    case GLFW_KEY_GRAVE_ACCENT:
+        code = KeyCode::OemTilde;
+        break;
+    case GLFW_KEY_WORLD_1:
+    case GLFW_KEY_WORLD_2:
+        // Not used
+        break;
+    case GLFW_KEY_ESCAPE:
+        code = KeyCode::Escape;
+        break;
+    case GLFW_KEY_ENTER:
+        code = KeyCode::Enter;
+        break;
+    case GLFW_KEY_TAB:
+        code = KeyCode::Tab;
+        break;
+    case GLFW_KEY_BACKSPACE:
+        code = KeyCode::Back;
+        break;
+    case GLFW_KEY_INSERT:
+        code = KeyCode::Insert;
+        break;
+    case GLFW_KEY_DELETE:
+        code = KeyCode::Delete;
+        break;
+    case GLFW_KEY_RIGHT:
+        code = KeyCode::Right;
+        break;
+    case GLFW_KEY_LEFT:
+        code = KeyCode::Left;
+        break;
+    case GLFW_KEY_DOWN:
+        code = KeyCode::Down;
+        break;
+    case GLFW_KEY_UP:
+        code = KeyCode::Up;
+        break;
+    case GLFW_KEY_PAGE_UP:
+        code = KeyCode::PageUp;
+        break;
+    case GLFW_KEY_PAGE_DOWN:
+        code = KeyCode::PageDown;
+        break;
+    case GLFW_KEY_HOME:
+        code = KeyCode::Home;
+        break;
+    case GLFW_KEY_END:
+        code = KeyCode::End;
+        break;
+    case GLFW_KEY_CAPS_LOCK:
+        code = KeyCode::CapsLock;
+        break;
+    case GLFW_KEY_SCROLL_LOCK:
+        code = KeyCode::Scroll;
+        break;
+    case GLFW_KEY_NUM_LOCK:
+        code = KeyCode::NumLock;
+        break;
+    case GLFW_KEY_PRINT_SCREEN:
+        code = KeyCode::PrintScreen;
+        break;
+    case GLFW_KEY_PAUSE:
+        code = KeyCode::Pause;
+        break;
+    case GLFW_KEY_F1:
+        code = KeyCode::F1;
+        break;
+    case GLFW_KEY_F2:
+        code = KeyCode::F2;
+        break;
+    case GLFW_KEY_F3:
+        code = KeyCode::F3;
+        break;
+    case GLFW_KEY_F4:
+        code = KeyCode::F4;
+        break;
+    case GLFW_KEY_F5:
+        code = KeyCode::F5;
+        break;
+    case GLFW_KEY_F6:
+        code = KeyCode::F6;
+        break;
+    case GLFW_KEY_F7:
+        code = KeyCode::F7;
+        break;
+    case GLFW_KEY_F8:
+        code = KeyCode::F8;
+        break;
+    case GLFW_KEY_F9:
+        code = KeyCode::F9;
+        break;
+    case GLFW_KEY_F10:
+        code = KeyCode::F10;
+        break;
+    case GLFW_KEY_F11:
+        code = KeyCode::F11;
+        break;
+    case GLFW_KEY_F12:
+        code = KeyCode::F12;
+        break;
+    case GLFW_KEY_F13:
+        code = KeyCode::F13;
+        break;
+    case GLFW_KEY_F14:
+        code = KeyCode::F14;
+        break;
+    case GLFW_KEY_F15:
+        code = KeyCode::F15;
+        break;
+    case GLFW_KEY_F16:
+        code = KeyCode::F16;
+        break;
+    case GLFW_KEY_F17:
+        code = KeyCode::F17;
+        break;
+    case GLFW_KEY_F18:
+        code = KeyCode::F18;
+        break;
+    case GLFW_KEY_F19:
+        code = KeyCode::F19;
+        break;
+    case GLFW_KEY_F20:
+        code = KeyCode::F20;
+        break;
+    case GLFW_KEY_F21:
+        code = KeyCode::F21;
+        break;
+    case GLFW_KEY_F22:
+        code = KeyCode::F22;
+        break;
+    case GLFW_KEY_F23:
+        code = KeyCode::F23;
+        break;
+    case GLFW_KEY_F24:
+        code = KeyCode::F24;
+        break;
+    case GLFW_KEY_F25:
+        code = static_cast<KeyCode>( 0x88 );  // No matching keycode for this key.
+        break;
+    case GLFW_KEY_KP_0:
+        code = KeyCode::NumPad0;
+        break;
+    case GLFW_KEY_KP_1:
+        code = KeyCode::NumPad1;
+        break;
+    case GLFW_KEY_KP_2:
+        code = KeyCode::NumPad2;
+        break;
+    case GLFW_KEY_KP_3:
+        code = KeyCode::NumPad3;
+        break;
+    case GLFW_KEY_KP_4:
+        code = KeyCode::NumPad4;
+        break;
+    case GLFW_KEY_KP_5:
+        code = KeyCode::NumPad5;
+        break;
+    case GLFW_KEY_KP_6:
+        code = KeyCode::NumPad6;
+        break;
+    case GLFW_KEY_KP_7:
+        code = KeyCode::NumPad7;
+        break;
+    case GLFW_KEY_KP_8:
+        code = KeyCode::NumPad8;
+        break;
+    case GLFW_KEY_KP_9:
+        code = KeyCode::NumPad9;
+        break;
+    case GLFW_KEY_KP_DECIMAL:
+        code = KeyCode::Decimal;
+        break;
+    case GLFW_KEY_KP_DIVIDE:
+        code = KeyCode::Divide;
+        break;
+    case GLFW_KEY_KP_MULTIPLY:
+        code = KeyCode::Multiply;
+        break;
+    case GLFW_KEY_KP_SUBTRACT:
+        code = KeyCode::Subtract;
+        break;
+    case GLFW_KEY_KP_ADD:
+        code = KeyCode::Add;
+        break;
+    case GLFW_KEY_KP_ENTER:
+    case GLFW_KEY_KP_EQUAL:
+        // No matching KeyCode.
+        break;
+    case GLFW_KEY_LEFT_SHIFT:
+        code = KeyCode::LeftShift;
+        break;
+    case GLFW_KEY_LEFT_CONTROL:
+        code = KeyCode::LeftControl;
+        break;
+    case GLFW_KEY_LEFT_ALT:
+        code = KeyCode::LeftAlt;
+        break;
+    case GLFW_KEY_LEFT_SUPER:
+        code = KeyCode::LeftWindows;
+        break;
+    case GLFW_KEY_RIGHT_SHIFT:
+        code = KeyCode::RightShift;
+        break;
+    case GLFW_KEY_RIGHT_CONTROL:
+        code = KeyCode::RightControl;
+        break;
+    case GLFW_KEY_RIGHT_ALT:
+        code = KeyCode::RightAlt;
+        break;
+    case GLFW_KEY_RIGHT_SUPER:
+        code = KeyCode::RightWindows;
+        break;
+    case GLFW_KEY_MENU:
+        code = KeyCode::AltKey;
+        break;
+    default:
+        code = KeyCode::NoName;  // No matching name for this keycode.
+        break;
+    }
+
+    return code;
+}
+
+// Attempt to decode the glfw key and and scancode into a printable character.
+unsigned DecodeCharacter( int key, int scancode )
+{
+    unsigned c       = 0;
+    auto     keyName = glfwGetKeyName( key, scancode );
+    if ( keyName )
+    {
+        // TODO: Other platforms?
+#if defined( _WIN32 )
+        wchar_t wChar[5];
+        int     size = ::MultiByteToWideChar( CP_UTF8, 0, keyName, 5, wChar, sizeof( wChar ) );
+        if ( size > 0 )
+        {
+            c = static_cast<unsigned>( wChar[0] );
+        }
+#endif
+    }
+
+    return c;
+}
+
+void WindowGLFW::keyCallback( GLFWwindow* window, int key, int scancode, int action, int mods )
+{
+    const auto w = static_cast<WindowGLFW*>( glfwGetWindowUserPointer( window ) );
+
+    KeyEventArgs e {
+        .code      = DecodeKeyCode( key ),
+        .character = DecodeCharacter( key, scancode ),
+        .state     = action == GLFW_PRESS ? KeyState::Pressed : KeyState::Released,  // Note: Can also be GLFW_REPEAT
+        .ctrl      = ( mods & GLFW_MOD_CONTROL ) != 0,
+        .shift     = ( mods & GLFW_MOD_SHIFT ) != 0,
+        .alt       = ( mods & GLFW_MOD_ALT ) != 0,
+        .super     = ( mods & GLFW_MOD_SUPER ) != 0
+    };
+
+    switch ( action )
+    {
+    case GLFW_PRESS:
+        w->onKeyPressed( e );
+        break;
+    case GLFW_RELEASE:
+        w->onKeyReleased( e );
+        break;
+        // Can also be GLFW_REPEAT, but we don't send key repeat messages.
     }
 }

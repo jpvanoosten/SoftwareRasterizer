@@ -115,7 +115,7 @@ int main( int argc, char* argv[] )
 
     constexpr glm::vec2 WINDOW_CENTER { WINDOW_WIDTH * 0.5f, WINDOW_HEIGHT * 0.5f };
 
-    Window   window { L"10 - Camera", WINDOW_WIDTH, WINDOW_HEIGHT };
+    Window   window { "10 - Camera", WINDOW_WIDTH, WINDOW_HEIGHT };
     Image    image { WINDOW_WIDTH, WINDOW_HEIGHT };
     Camera2D camera{image.getRect()};
 

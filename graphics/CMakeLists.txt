@@ -79,8 +79,8 @@ if(WIN32)
         src/Win32/IncludeWin32.hpp
         src/Win32/KeyboardWin32.cpp
         src/Win32/MouseWin32.cpp
-        src/Win32/WindowWin32.hpp
-        src/Win32/WindowWin32.cpp
+#        src/Win32/WindowWin32.hpp
+#        src/Win32/WindowWin32.cpp
     )
 
 endif(WIN32)

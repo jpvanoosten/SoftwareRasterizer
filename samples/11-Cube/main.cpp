@@ -110,7 +110,7 @@ int main( int argc, char* argv[] )
     // Setup some random colors for debugging.
     auto randomColors = GenerateColors( 0xffff );
 
-    Window window { L"11 - Cube", WINDOW_WIDTH, WINDOW_HEIGHT };
+    Window window { "11 - Cube", WINDOW_WIDTH, WINDOW_HEIGHT };
     Image  colorBuffer { WINDOW_WIDTH, WINDOW_HEIGHT };
     Image  depthBuffer { WINDOW_WIDTH, WINDOW_HEIGHT };
     Image  visibilityBuffer { WINDOW_WIDTH, WINDOW_HEIGHT };
