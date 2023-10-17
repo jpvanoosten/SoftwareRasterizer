@@ -42,6 +42,11 @@ set_target_properties(
     PROPERTIES FOLDER externals
 )
 
+set_target_properties(
+	glfw update_mappings
+	PROPERTIES FOLDER externals/GLFW
+)
+
 if(BUILD_SHARED_LIBS)
 set_target_properties(
 	glm_shared
