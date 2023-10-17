@@ -116,7 +116,7 @@ target_include_directories( Graphics
 )
 
 target_link_libraries( Graphics
-    PUBLIC Math fmt::fmt
+    PUBLIC Math fmt::fmt imgui
     PRIVATE glad tinyobjloader
 )
 
