@@ -239,9 +239,37 @@ endif( IMGUI_BACKEND_WIN32 )
 add_library( imgui ${IMGUI_INC} ${IMGUI_SRC} )
 
 target_include_directories( imgui
-	PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
+	PUBLIC . backends
 )
 
 target_compile_definitions( imgui
 	PRIVATE IMGUI_USER_CONFIG="user_config.h"
 )
+
+if( BUILD_SHARED_LIBS )
+	target_compile_definitions( imgui
+		PRIVATE imgui_EXPORTS
+		INTERFACE imgui_IMPORTS
+	)
+endif(BUILD_SHARED_LIBS)
+
+if( IMGUI_BUILD_EXAMPLES )
+	if( IMGUI_BACKEND_ALLEGRO5 )
+		add_subdirectory( examples/example_allegro5 )
+		set_target_properties( example_allegro5 PROPERTIES FOLDER examples )
+	endif( IMGUI_BACKEND_ALLEGRO5 )
+
+	if( IMGUI_BACKEND_ANDROID )
+		# TODO: 
+	endif( IMGUI_BACKEND_ANDROID )
+
+	if( IMGUI_BACKEND_METAL )
+		# TODO: 
+	endif( IMGUI_BACKEND_METAL )
+
+	if( IMGUI_BACKEND_WIN32 AND IMGUI_BACKEND_OPENGL3 )
+		add_subdirectory( examples/example_win32_opengl3 )
+		set_target_properties( example_win32_opengl3 PROPERTIES FOLDER examples )
+	endif( IMGUI_BACKEND_WIN32 AND IMGUI_BACKEND_OPENGL3 )
+
+endif( IMGUI_BUILD_EXAMPLES )
