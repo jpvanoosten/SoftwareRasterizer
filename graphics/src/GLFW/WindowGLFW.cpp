@@ -1,23 +1,27 @@
 #include "WindowGLFW.hpp"
 
-#define GLFW_EXPOSE_NATIVE_WIN32
-#include <GLFW/glfw3native.h>
-
 #include <fmt/core.h>
 
+#include <cuchar>  // For mbrtoc32
 #include <iostream>
 
 using namespace Graphics;
 
 const char* g_VertexShader = {
-#include "VertexShader.glsl"
+#include "../VertexShader.glsl"
 };
 
 const char* g_FragmentShader = {
-#include "FragmentShader.glsl"
+#include "../FragmentShader.glsl"
 };
 
-// This struct ensure GLFW is initialized once and destroyed once.
+extern void Keyboard_ProcessMessage( const KeyEventArgs& e );
+extern void Mouse_ProcessMouseButton( const MouseButtonEventArgs& e );
+extern void Mouse_ProcessMouseMove( const MouseMovedEventArgs& e );
+extern void Mouse_ProcessVScroll( const MouseWheelEventArgs& e );
+extern void Mouse_ProcessHScroll( const MouseWheelEventArgs& e );
+
+    // This struct ensure GLFW is initialized once and destroyed once.
 struct GLFW_context
 {
     static void error_callback( int error, const char* description )
@@ -169,8 +173,7 @@ void WindowGLFW::show()
 
 WindowHandle WindowGLFW::getWindowHandle() const noexcept
 {
-    // TODO: Handle different platforms?
-    return glfwGetWin32Window( window );
+    return window;
 }
 
 void WindowGLFW::setVSync( bool enabled )
@@ -567,9 +570,11 @@ void WindowGLFW::mouseButtonCallback( GLFWwindow* window, int button, int action
     switch ( action )
     {
     case GLFW_PRESS:
+        Mouse_ProcessMouseButton( e );
         w->onMouseButtonPressed( e );
         break;
     case GLFW_RELEASE:
+        Mouse_ProcessMouseButton( e );
         w->onMouseButtonReleased( e );
         break;
     }
@@ -596,6 +601,7 @@ void WindowGLFW::mousePosCallback( GLFWwindow* window, double x, double y )
         .screenY      = windowY + static_cast<int>( floor( y ) )
     };
 
+    Mouse_ProcessMouseMove( e );
     w->onMouseMoved( e );
 }
 
@@ -626,11 +632,13 @@ void WindowGLFW::scrollCallback( GLFWwindow* window, double xOffset, double yOff
     if ( xOffset != 0.0 )
     {
         e.wheelDelta = static_cast<float>( xOffset );
+        Mouse_ProcessHScroll( e );
         w->onMouseHWheel( e );
     }
     if ( yOffset != 0.0 )
     {
         e.wheelDelta = static_cast<float>( yOffset );
+        Mouse_ProcessVScroll( e );
         w->onMouseWheel( e );
     }
 }
@@ -1010,17 +1018,15 @@ unsigned DecodeCharacter( int key, int scancode )
 {
     unsigned c       = 0;
     auto     keyName = glfwGetKeyName( key, scancode );
+
     if ( keyName )
     {
-        // TODO: Other platforms?
-#if defined( _WIN32 )
-        wchar_t wChar[5];
-        int     size = ::MultiByteToWideChar( CP_UTF8, 0, keyName, 5, wChar, sizeof( wChar ) );
-        if ( size > 0 )
+        std::mbstate_t state {};
+        char32_t       c32;
+        if ( mbrtoc32( &c32, keyName, 5, &state ) > 0 )
         {
-            c = static_cast<unsigned>( wChar[0] );
+            c = static_cast<unsigned>( c32 );
         }
-#endif
     }
 
     return c;
@@ -1043,9 +1049,11 @@ void WindowGLFW::keyCallback( GLFWwindow* window, int key, int scancode, int act
     switch ( action )
     {
     case GLFW_PRESS:
+        Keyboard_ProcessMessage( e );
         w->onKeyPressed( e );
         break;
     case GLFW_RELEASE:
+        Keyboard_ProcessMessage( e );
         w->onKeyReleased( e );
         break;
         // Can also be GLFW_REPEAT, but we don't send key repeat messages.

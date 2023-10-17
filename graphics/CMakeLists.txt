@@ -36,6 +36,7 @@ set( INC_FILES
     inc/Graphics/WindowHandle.hpp
     inc/Graphics/WindowImpl.hpp
     inc/aligned_unique_ptr.hpp
+    inc/hash.hpp
     inc/stb_easy_font.h
     inc/stb_image.h
     inc/stb_image_write.h
@@ -69,21 +70,26 @@ set( SRC_FILES
     src/TileMap.cpp
     src/Timer.cpp
     src/Window.cpp
-    src/WindowGLFW.hpp
-    src/WindowGLFW.cpp
 )
 
-if(WIN32)
+if(TARGET glfw)
+    list( APPEND SRC_FILES
+        src/GLFW/GamePadGLFW.cpp
+        src/GLFW/KeyboardGLFW.cpp
+        src/GLFW/MouseGLFW.cpp
+        src/GLFW/WindowGLFW.cpp
+        src/GLFW/WindowGLFW.hpp
+    )
+elseif(WIN32)
     list( APPEND SRC_FILES
         src/Win32/GamePadXInput.cpp
         src/Win32/IncludeWin32.hpp
         src/Win32/KeyboardWin32.cpp
         src/Win32/MouseWin32.cpp
-#        src/Win32/WindowWin32.hpp
-#        src/Win32/WindowWin32.cpp
+        src/Win32/WindowWin32.hpp
+        src/Win32/WindowWin32.cpp
     )
-
-endif(WIN32)
+endif(TARGET glfw)
 
 set( ALL_FILES 
     ${SRC_FILES} 
@@ -111,8 +117,17 @@ target_include_directories( Graphics
 
 target_link_libraries( Graphics
     PUBLIC Math fmt::fmt
-    PRIVATE glad tinyobjloader glfw
+    PRIVATE glad tinyobjloader
 )
+
+if(TARGET glfw)
+    target_link_libraries( Graphics
+        PRIVATE glfw
+    )
+    target_compile_definitions( Graphics
+        PRIVATE GLFW
+    )
+endif(TARGET glfw)
 
 if(SR_USE_OPENMP)
     find_package(OpenMP)

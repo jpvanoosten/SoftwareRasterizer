@@ -7,7 +7,7 @@ using namespace Graphics;
 //using WindowType = WindowWin32;
 //#endif
 
-#include "WindowGLFW.hpp"
+#include "GLFW/WindowGLFW.hpp"
 using WindowType = WindowGLFW;
 
 Window::Window(std::string_view title, int width, int height)
