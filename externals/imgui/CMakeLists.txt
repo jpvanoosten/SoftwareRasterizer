@@ -157,6 +157,8 @@ if( IMGUI_BACKEND_OSX )
 endif( IMGUI_BACKEND_OSX )
 
 if( IMGUI_BACKEND_SDL2 )
+	find_package( SDL 2...< REQUIRED )
+
 	list( APPEND IMGUI_INC
 		backends/imgui_impl_sdl2.h
 	)
@@ -166,6 +168,8 @@ if( IMGUI_BACKEND_SDL2 )
 endif( IMGUI_BACKEND_SDL2 )
 
 if( IMGUI_BACKEND_SDL3 )
+	find_package( SDL 3...< REQUIRED )
+
 	list( APPEND IMGUI_INC
 		backends/imgui_impl_sdl3.h
 	)
@@ -193,15 +197,17 @@ if( IMGUI_BACKEND_SDLRENDERER3 )
 endif( IMGUI_BACKEND_SDLRENDERER3 )
 
 if( IMGUI_BACKEND_VULKAN )
+	find_package( Vulkan REQUIRED COMPONENTS glslangValidator )
+
 	add_custom_command( 
 		OUTPUT backends/vulkan/glsl_shader.frag.u32
-		COMMAND glslangValidator -V -x -o glsl_shader.frag.u32 glsl_shader.frag
+		COMMAND Vulkan::glslangValidator -V -x -o glsl_shader.frag.u32 glsl_shader.frag
 		DEPENDS backends/vulkan/glsl_shader.frag
 		WORKING_DIRECTORY backends/vulkan
 	)
 	add_custom_command( 
 		OUTPUT backends/vulkan/glsl_shader.vert.u32
-		COMMAND glslangValidator -V -x -o glsl_shader.vert.u32 glsl_shader.frag
+		COMMAND Vulkan::glslangValidator -V -x -o glsl_shader.vert.u32 glsl_shader.frag
 		DEPENDS backends/vulkan/glsl_shader.vert
 		WORKING_DIRECTORY backends/vulkan
 	)

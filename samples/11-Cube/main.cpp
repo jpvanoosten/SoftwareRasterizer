@@ -1,3 +1,8 @@
+#include "Graphics/Keyboard.hpp"
+#include "Graphics/Mouse.hpp"
+
+#include <CameraController.hpp>
+
 #include <Graphics/Font.hpp>
 #include <Graphics/Image.hpp>
 #include <Graphics/Input.hpp>
@@ -54,8 +59,8 @@ struct FragmentShader
 
 struct Instance
 {
-    std::shared_ptr<Mesh> mesh;
-    glm::mat4             modelMatrix;
+    Mesh*     mesh;
+    glm::mat4 modelMatrix;
 };
 
 // Generate some random colors for debugging.
@@ -92,13 +97,8 @@ int main( int argc, char* argv[] )
     // Setup matrices.
     glm::vec4 viewport { 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT };
 
-    Camera camera;
-    constexpr glm::vec3 eye { 0, 3, 0 };
-    constexpr glm::vec3 target { -10, 3, 0 };
-    constexpr glm::vec3 up { 0, 1, 0 };
-
-    camera.setProjection( glm::radians( 60.0f ), static_cast<float>( WINDOW_WIDTH ) / WINDOW_HEIGHT, 0.1f, 100.0f );
-    camera.lookAt( eye, target, up );
+    CameraController camera { { 0, 3, 0 }, 0.0f, 90.0f };
+    camera.setPerspective( 60.0f, static_cast<float>( WINDOW_WIDTH ) / WINDOW_HEIGHT, 0.1f, 100.0f );
 
     // Setup vertex shader.
     VertexShader vertexShader {};
@@ -136,15 +136,7 @@ int main( int argc, char* argv[] )
         timer.tick();
         Input::update();
 
-        camera.translate( glm::vec3 { Input::getAxis( "Horizontal" ), 0, -Input::getAxis( "Vertical" ) } * static_cast<float>( timer.elapsedSeconds() ) * 5.0f );
-        if ( Input::getMouseButton( MouseButton::Right ) )
-        {
-            camera.rotateX( glm::radians( Input::getAxis( "Mouse Y" ) * timer.elapsedSeconds() ) );
-            camera.rotateY( glm::radians( Input::getAxis( "Mouse X" ) * timer.elapsedSeconds() ) );
-        }
-        float y = Input::getKey( "q" ) ? -1.0f : 0.0f;
-        y += Input::getKey( "e" ) ? 1.0f : 0.0f;
-        camera.translate( glm::vec3 { 0, y, 0 } * static_cast<float>( timer.elapsedSeconds() ) * 5.0f );
+        camera.update( static_cast<float>( timer.elapsedSeconds() ) );
 
         colorBuffer.clear( Color::Black );
         visibilityBuffer.clear( { 0xffffu, 0xffffu } );
@@ -157,7 +149,7 @@ int main( int argc, char* argv[] )
         vertexShader.instanceId                = 0;
         for ( const auto& mesh: cube.getMeshes() )
         {
-            instanceBuffer.emplace_back( mesh, modelMatrix );
+            instanceBuffer.emplace_back( mesh.get(), modelMatrix );
             auto indices   = mesh->getIndices().data();
             auto positions = mesh->getPositions().data();
             auto texCoords = mesh->getTexCoords().data();
@@ -183,7 +175,7 @@ int main( int argc, char* argv[] )
             auto v2 = transformedVerts[i + 2];
 
             // TODO: Better clipping.
-            if (v0.position.z < -v0.position.w  || v1.position.z < -v1.position.w || v2.position.z < -v2.position.w )
+            if ( v0.position.z < -v0.position.w || v1.position.z < -v1.position.w || v2.position.z < -v2.position.w )
                 continue;
 
             // Store the w component before perspective divide.
@@ -286,7 +278,7 @@ int main( int argc, char* argv[] )
                 switch ( e.key.code )
                 {
                 case KeyCode::R:
-                    camera.lookAt( eye, target, up );
+                    camera.reset();
                     break;
                 case KeyCode::Escape:
                     window.destroy();

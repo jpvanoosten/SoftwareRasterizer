@@ -20,7 +20,7 @@ set_target_properties( ${TARGET_NAME}
 )
 
 target_link_libraries( ${TARGET_NAME} 
-    PUBLIC Graphics Math
+    PUBLIC Graphics 00-Common
 )
 
 # Set Local Debugger Settings (Command Arguments and Environment Variables)

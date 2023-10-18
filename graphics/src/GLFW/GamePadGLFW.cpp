@@ -140,10 +140,10 @@ GamePadState GamePad::getState( int player, DeadZone deadZoneMode )
 
     // These deadzone values are based on Xinput's deadzone constants:
     constexpr float leftThumbDeadzone  = 7849.0f / 32767.0f;  // XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE
-    constexpr float rightThumbDeadzone = 8689.0f / 3276.0f;   // XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE
+    constexpr float rightThumbDeadzone = 8689.0f / 32767.0f;   // XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE
     constexpr float triggerThreshold   = 30.0f / 255.0f;      // XINPUT_GAMEPAD_TRIGGER_THRESHOLD
 
-    ApplyStickDeadZone( lx, ly, deadZoneMode, 1.0f, leftThumbDeadzone, state.thumbSticks.leftX, state.thumbSticks.rightX );
+    ApplyStickDeadZone( lx, ly, deadZoneMode, 1.0f, leftThumbDeadzone, state.thumbSticks.leftX, state.thumbSticks.leftY );
     ApplyStickDeadZone( rx, ry, deadZoneMode, 1.0f, rightThumbDeadzone, state.thumbSticks.rightX, state.thumbSticks.rightY );
 
     const auto lt = axis[GLFW_GAMEPAD_AXIS_LEFT_TRIGGER];

@@ -1,5 +1,6 @@
 cmake_minimum_required( VERSION 3.22.1 )
 
+add_subdirectory(00-Common)
 add_subdirectory(01-ClearScreen)
 add_subdirectory(02-Triangle)
 add_subdirectory(03-Sprites)
@@ -14,6 +15,7 @@ add_subdirectory(11-Cube)
 add_subdirectory(12-ImGui)
 
 set_target_properties( 
+	00-Common
 	01-ClearScreen 
 	02-Triangle
 	03-Sprites
