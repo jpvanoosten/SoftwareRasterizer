@@ -2,6 +2,10 @@
 
 #include <fmt/core.h>
 
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
+
 #include <cuchar>  // For mbrtoc32
 #include <iostream>
 
@@ -21,7 +25,7 @@ extern void Mouse_ProcessMouseMove( const MouseMovedEventArgs& e );
 extern void Mouse_ProcessVScroll( const MouseWheelEventArgs& e );
 extern void Mouse_ProcessHScroll( const MouseWheelEventArgs& e );
 
-    // This struct ensure GLFW is initialized once and destroyed once.
+// This struct ensure GLFW is initialized once and destroyed once.
 struct GLFW_context
 {
     static void error_callback( int error, const char* description )
@@ -42,6 +46,60 @@ struct GLFW_context
     ~GLFW_context()
     {
         glfwTerminate();
+    }
+};
+
+struct ImGui_context
+{
+    ImGui_context()
+    {
+        IMGUI_CHECKVERSION();
+        ImGui::CreateContext();
+
+        ImGuiIO& io = ImGui::GetIO();
+
+        io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
+        io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;   // Enable Gamepad Controls
+        io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;      // Enable Docking
+        io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;    // Enable Multi-Viewport / Platform Windows
+        // io.ConfigViewportsNoAutoMerge = true;
+        // io.ConfigViewportsNoTaskBarIcon = true;
+
+        // Setup Dear ImGui style
+        ImGui::StyleColorsDark();
+        // ImGui::StyleColorsLight();
+
+        // When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can look identical to regular ones.
+        ImGuiStyle& style = ImGui::GetStyle();
+        if ( io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable )
+        {
+            style.WindowRounding              = 0.0f;
+            style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+        }
+
+        // Load Fonts
+        // - If no fonts are loaded, dear imgui will use the default font. You can also load multiple fonts and use ImGui::PushFont()/PopFont() to select them.
+        // - AddFontFromFileTTF() will return the ImFont* so you can store it if you need to select the font among multiple.
+        // - If the file cannot be loaded, the function will return a nullptr. Please handle those errors in your application (e.g. use an assertion, or display an error and quit).
+        // - The fonts will be rasterized at a given size (w/ oversampling) and stored into a texture when calling ImFontAtlas::Build()/GetTexDataAsXXXX(), which ImGui_ImplXXXX_NewFrame below will call.
+        // - Use '#define IMGUI_ENABLE_FREETYPE' in your imconfig file to use Freetype for higher quality font rendering.
+        // - Read 'docs/FONTS.md' for more instructions and details.
+        // - Remember that in C/C++ if you want to include a backslash \ in a string literal you need to write a double backslash \\ !
+        // - Our Emscripten build process allows embedding fonts to be accessible at runtime from the "fonts/" folder. See Makefile.emscripten for details.
+        // io.Fonts->AddFontDefault();
+        // io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\segoeui.ttf", 18.0f);
+        // io.Fonts->AddFontFromFileTTF("../../misc/fonts/DroidSans.ttf", 16.0f);
+        // io.Fonts->AddFontFromFileTTF("../../misc/fonts/Roboto-Medium.ttf", 16.0f);
+        // io.Fonts->AddFontFromFileTTF("../../misc/fonts/Cousine-Regular.ttf", 15.0f);
+        // ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, nullptr, io.Fonts->GetGlyphRangesJapanese());
+        // IM_ASSERT(font != nullptr);
+    }
+
+    ~ImGui_context()
+    {
+        ImGui_ImplOpenGL3_Shutdown();
+        ImGui_ImplGlfw_Shutdown();
+        ImGui::DestroyContext();
     }
 };
 
@@ -86,6 +144,12 @@ WindowGLFW::WindowGLFW( std::string_view title, int width, int height )
     glfwSetCursorPosCallback( window, mousePosCallback );
     glfwSetScrollCallback( window, scrollCallback );
     glfwSetKeyCallback( window, keyCallback );
+
+    // Setup ImGui.
+    static ImGui_context _imgui;  // Ensure imgui is initialized once.
+
+    ImGui_ImplGlfw_InitForOpenGL( window, true );
+    ImGui_ImplOpenGL3_Init();
 
     // Create an OpenGL texture for pixel operations.
     glGenTextures( 1, &m_Texture );
@@ -158,6 +222,9 @@ WindowGLFW::WindowGLFW( std::string_view title, int width, int height )
     glDeleteShader( vertexShader );
     glDeleteShader( fragmentShader );
 
+    // Begin a new ImGui frame.
+    beginFrame();
+
     WindowGLFW::setVSync( vSync );
 }
 
@@ -193,6 +260,16 @@ bool WindowGLFW::isVSync() const noexcept
     return vSync;
 }
 
+void WindowGLFW::setClearColor( const Color& color ) noexcept
+{
+    clearColor = color;
+}
+
+Color WindowGLFW::getClearColor() const noexcept
+{
+    return clearColor;
+}
+
 void WindowGLFW::clear( const Color& color )
 {
     makeCurrent();
@@ -201,11 +278,18 @@ void WindowGLFW::clear( const Color& color )
     glBindFramebuffer( GL_FRONT_AND_BACK, 0 );
     glClearColor( static_cast<float>( color.r ) / 255.0f, static_cast<float>( color.g ) / 255.0f, static_cast<float>( color.b ) / 255.0f, static_cast<float>( color.a ) / 255.0f );
     glClear( GL_COLOR_BUFFER_BIT );
+
+    autoClear = false;
 }
 
 void WindowGLFW::present( const Image& image )
 {
     makeCurrent();
+
+    if ( autoClear )
+        clear( clearColor );
+
+    autoClear = true;
 
     // Copy the image data to the texture
     glBindTexture( GL_TEXTURE_2D, m_Texture );
@@ -239,9 +323,30 @@ void WindowGLFW::present( const Image& image )
     glBindVertexArray( m_VAO );
     glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, nullptr );
 
-    // TODO: ImGui
+    // Rendering.
+    ImGui::Render();
+    int fbWidth, fbHeight;
+    glfwGetFramebufferSize( window, &fbWidth, &fbHeight );
+    glViewport( 0, 0, fbWidth, fbHeight );
+    ImGui_ImplOpenGL3_RenderDrawData( ImGui::GetDrawData() );
+
+    const ImGuiIO& io = ImGui::GetIO();
+
+    // Update and Render additional Platform Windows
+    // (Platform functions may change the current OpenGL context, so we save/restore it to make it easier to paste this code elsewhere.
+    //  For this specific demo app we could also call glfwMakeContextCurrent(window) directly)
+    if ( io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable )
+    {
+        GLFWwindow* backup_current_context = glfwGetCurrentContext();
+        ImGui::UpdatePlatformWindows();
+        ImGui::RenderPlatformWindowsDefault();
+        glfwMakeContextCurrent( backup_current_context );
+    }
 
     glfwSwapBuffers( window );
+
+    // Begin a new frame.
+    beginFrame();
 }
 
 bool WindowGLFW::popEvent( Event& event )
@@ -452,6 +557,13 @@ void WindowGLFW::onMouseLeave()
 void WindowGLFW::makeCurrent()
 {
     glfwMakeContextCurrent( window );
+}
+
+void WindowGLFW::beginFrame()
+{
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
 }
 
 void WindowGLFW::closeCallback( GLFWwindow* window )

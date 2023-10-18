@@ -50,6 +50,18 @@ public:
     bool popEvent( Event& event );
 
     /// <summary>
+    /// Set the window's clear color.
+    /// </summary>
+    /// <param name="clearColor">The color to clear the window to during presentation.</param>
+    void setClearColor( const Color& clearColor ) noexcept;
+
+    /// <summary>
+    /// Get the color to clear the window to during presentation.
+    /// </summary>
+    /// <returns>The window's clear color.</returns>
+    Color getClearColor() const noexcept;
+
+    /// <summary>
     /// Show the window.
     /// </summary>
     void show();

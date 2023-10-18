@@ -34,6 +34,16 @@ bool Window::popEvent(Event& event)
     return pImpl && pImpl->popEvent(event);
 }
 
+void Window::setClearColor( const Color& clearColor ) noexcept
+{
+    pImpl->setClearColor( clearColor );
+}
+
+Color Window::getClearColor() const noexcept
+{
+    return pImpl->getClearColor();
+}
+
 void Window::show()
 {
     pImpl->show();

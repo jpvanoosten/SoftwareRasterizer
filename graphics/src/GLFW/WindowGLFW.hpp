@@ -29,6 +29,10 @@ public:
 
     bool isVSync() const noexcept override;
 
+    void setClearColor( const Color& color ) noexcept override;
+
+    Color getClearColor() const noexcept override;
+
     void clear( const Color& color ) override;
 
     void present( const Image& image ) override;
@@ -65,9 +69,10 @@ protected:
 
 private:
     void makeCurrent();
+    void beginFrame();
 
     // GLFW Window callback functions.
-    static void closeCallback( GLFWwindow* window);
+    static void closeCallback( GLFWwindow* window );
     static void sizeCallback( GLFWwindow* window, int width, int height );
     static void maximizeCallback( GLFWwindow* window, int maximized );
     static void iconifyCallback( GLFWwindow* window, int iconified );
@@ -85,11 +90,14 @@ private:
     GLuint            m_ShaderProgram;  ///< Shader program.
     std::queue<Event> m_eventQueue;
 
-    int  previousMouseX = 0;
-    int  previousMouseY = 0;
-    bool inClientRect   = false;
-    bool vSync          = true;
-    bool fullscreen     = false;
+    int   previousMouseX = 0;
+    int   previousMouseY = 0;
+    bool  inClientRect   = false;
+    bool  vSync          = true;
+    bool  fullscreen     = false;
+    // Auto clear is disabled if the window is manually cleared by the application.
+    bool  autoClear      = true;
+    Color clearColor     = Color::Black;
 };
 
 }  // namespace Graphics

@@ -11,6 +11,7 @@ add_subdirectory(08-Audio)
 add_subdirectory(09-Arkanoid)
 add_subdirectory(10-Camera)
 add_subdirectory(11-Cube)
+add_subdirectory(12-ImGui)
 
 set_target_properties( 
 	01-ClearScreen 
@@ -24,6 +25,7 @@ set_target_properties(
 	09-Arkanoid
 	10-Camera
 	11-Cube
+	12-ImGui
 	PROPERTIES
 		FOLDER samples
 )
