@@ -323,7 +323,7 @@ void WindowGLFW::present( const Image& image )
     glBindVertexArray( m_VAO );
     glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, nullptr );
 
-    // Rendering.
+    // ImGui Rendering.
     ImGui::Render();
     int fbWidth, fbHeight;
     glfwGetFramebufferSize( window, &fbWidth, &fbHeight );
@@ -334,7 +334,7 @@ void WindowGLFW::present( const Image& image )
 
     // Update and Render additional Platform Windows
     // (Platform functions may change the current OpenGL context, so we save/restore it to make it easier to paste this code elsewhere.
-    //  For this specific demo app we could also call glfwMakeContextCurrent(window) directly)
+    // For this specific demo app we could also call glfwMakeContextCurrent(window) directly)
     if ( io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable )
     {
         GLFWwindow* backup_current_context = glfwGetCurrentContext();
@@ -396,13 +396,11 @@ void WindowGLFW::setFullscreen( bool _fullscreen )
         if ( fullscreen )
         {
             glfwSetWindowAttrib( window, GLFW_DECORATED, GLFW_FALSE );
-            glfwSetWindowAttrib( window, GLFW_FLOATING, GLFW_TRUE );
             glfwMaximizeWindow( window );
         }
         else
         {
             glfwRestoreWindow( window );
-            glfwSetWindowAttrib( window, GLFW_FLOATING, GLFW_FALSE );
             glfwSetWindowAttrib( window, GLFW_DECORATED, GLFW_TRUE );
         }
     }
@@ -1126,19 +1124,14 @@ static KeyCode DecodeKeyCode( int key )
 }
 
 // Attempt to decode the glfw key and and scancode into a printable character.
-unsigned DecodeCharacter( int key, int scancode )
+char32_t DecodeCharacter( int key, int scancode )
 {
-    unsigned c       = 0;
-    auto     keyName = glfwGetKeyName( key, scancode );
+    char32_t c = 0;
 
-    if ( keyName )
+    if ( const auto keyName = glfwGetKeyName( key, scancode ) )
     {
         std::mbstate_t state {};
-        char32_t       c32;
-        if ( mbrtoc32( &c32, keyName, 5, &state ) > 0 )
-        {
-            c = static_cast<unsigned>( c32 );
-        }
+        std::ignore = mbrtoc32( &c, keyName, 5, &state );
     }
 
     return c;

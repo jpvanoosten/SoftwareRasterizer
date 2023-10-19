@@ -13,8 +13,8 @@ using namespace Graphics;
 
 int main( int argc, char* argv[] )
 {
-    const int WINDOW_WIDTH  = 800;
-    const int WINDOW_HEIGHT = 600;
+    constexpr int WINDOW_WIDTH  = 800;
+    constexpr int WINDOW_HEIGHT = 600;
 
     Window window { "12-ImGui", WINDOW_WIDTH, WINDOW_HEIGHT };
 
