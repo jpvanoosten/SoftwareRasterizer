@@ -109,7 +109,7 @@ int main( int argc, char* argv[] )
     // Setup some random colors for debugging.
     auto randomColors = GenerateColors( 0xffff );
 
-    Window window { "11 - Cube", WINDOW_WIDTH, WINDOW_HEIGHT };
+    Window window { "11 - Quad", WINDOW_WIDTH, WINDOW_HEIGHT };
     Image  colorBuffer { WINDOW_WIDTH, WINDOW_HEIGHT };
     Image  depthBuffer { WINDOW_WIDTH, WINDOW_HEIGHT };
     Image  visibilityBuffer { WINDOW_WIDTH, WINDOW_HEIGHT };
@@ -141,8 +141,8 @@ int main( int argc, char* argv[] )
         colorBuffer.clear( Color::Black );
         visibilityBuffer.clear( { 0xffffu, 0xffffu } );
         instanceBuffer.clear();
-        //depthBuffer.clear( Color { 1.0f } );
-        depthBuffer.clear( Color { FLT_MAX } );
+        depthBuffer.clear( Color { 1.0f } );
+        //depthBuffer.clear( Color { FLT_MAX } );
         transformedVerts.clear();
 
         // Draw the cube.

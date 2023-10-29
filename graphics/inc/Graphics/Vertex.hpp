@@ -6,7 +6,7 @@
 
 namespace Graphics
 {
-struct Vertex2D
+struct Vertex2D final
 {
     constexpr Vertex2D( const glm::vec2& position = glm::vec2 { 0 }, const glm::vec2& texCoord = glm::vec2 { 0 }, const Color& color = Color::White )
     : position { position }

@@ -4,7 +4,6 @@
 #include "Material.hpp"
 #include "Vertex.hpp"
 
-#include <filesystem>
 #include <span>
 #include <vector>
 

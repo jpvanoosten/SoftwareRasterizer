@@ -67,7 +67,7 @@ struct Plane
     {
         return intersect( l.p0, l.p1 );
     }
-
+    
     /// <summary>
     /// Plane normal.
     /// </summary>

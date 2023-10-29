@@ -4,6 +4,7 @@ option(SR_USE_OPENMP "Use OpenMP for parallel loops." OFF)
 
 set( INC_FILES
     inc/Graphics/BlendMode.hpp
+    inc/Graphics/Buffer.hpp
     inc/Graphics/Config.hpp
     inc/Graphics/Color.hpp
     inc/Graphics/Enums.hpp
@@ -25,6 +26,7 @@ set( INC_FILES
     inc/Graphics/Mouse.hpp
     inc/Graphics/MouseState.hpp
     inc/Graphics/MouseStateTracker.hpp
+    inc/Graphics/Rasterizer.hpp
     inc/Graphics/ResourceManager.hpp
     inc/Graphics/Sprite.hpp
     inc/Graphics/SpriteAnim.hpp
@@ -59,6 +61,7 @@ set( SRC_FILES
     src/Mesh.cpp
     src/Model.cpp
     src/Mouse.cpp
+    src/Rasterizer.cpp
     src/ResourceManager.cpp
     src/SpriteAnim.cpp
     src/SpriteSheet.cpp
