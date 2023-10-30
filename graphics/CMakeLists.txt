@@ -4,6 +4,7 @@ option(SR_USE_OPENMP "Use OpenMP for parallel loops." OFF)
 
 set( INC_FILES
     inc/Graphics/BlendMode.hpp
+    inc/Graphics/Buffer.hpp
     inc/Graphics/Config.hpp
     inc/Graphics/Color.hpp
     inc/Graphics/Enums.hpp
@@ -25,6 +26,7 @@ set( INC_FILES
     inc/Graphics/Mouse.hpp
     inc/Graphics/MouseState.hpp
     inc/Graphics/MouseStateTracker.hpp
+    inc/Graphics/Rasterizer.hpp
     inc/Graphics/ResourceManager.hpp
     inc/Graphics/Sprite.hpp
     inc/Graphics/SpriteAnim.hpp
@@ -36,6 +38,7 @@ set( INC_FILES
     inc/Graphics/WindowHandle.hpp
     inc/Graphics/WindowImpl.hpp
     inc/aligned_unique_ptr.hpp
+    inc/hash.hpp
     inc/stb_easy_font.h
     inc/stb_image.h
     inc/stb_image_write.h
@@ -58,6 +61,7 @@ set( SRC_FILES
     src/Mesh.cpp
     src/Model.cpp
     src/Mouse.cpp
+    src/Rasterizer.cpp
     src/ResourceManager.cpp
     src/SpriteAnim.cpp
     src/SpriteSheet.cpp
@@ -71,7 +75,15 @@ set( SRC_FILES
     src/Window.cpp
 )
 
-if(WIN32)
+if(TARGET glfw)
+    list( APPEND SRC_FILES
+        src/GLFW/GamePadGLFW.cpp
+        src/GLFW/KeyboardGLFW.cpp
+        src/GLFW/MouseGLFW.cpp
+        src/GLFW/WindowGLFW.cpp
+        src/GLFW/WindowGLFW.hpp
+    )
+elseif(WIN32)
     list( APPEND SRC_FILES
         src/Win32/GamePadXInput.cpp
         src/Win32/IncludeWin32.hpp
@@ -80,8 +92,7 @@ if(WIN32)
         src/Win32/WindowWin32.hpp
         src/Win32/WindowWin32.cpp
     )
-
-endif(WIN32)
+endif(TARGET glfw)
 
 set( ALL_FILES 
     ${SRC_FILES} 
@@ -108,9 +119,18 @@ target_include_directories( Graphics
 )
 
 target_link_libraries( Graphics
-    PUBLIC Math fmt::fmt
+    PUBLIC Math fmt::fmt imgui
     PRIVATE glad tinyobjloader
 )
+
+if(TARGET glfw)
+    target_link_libraries( Graphics
+        PRIVATE glfw
+    )
+    target_compile_definitions( Graphics
+        PRIVATE GLFW
+    )
+endif(TARGET glfw)
 
 if(SR_USE_OPENMP)
     find_package(OpenMP)

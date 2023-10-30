@@ -1,4 +1,5 @@
 #include <Graphics/Keyboard.hpp>
+#include <Graphics/Events.hpp>
 
 #include "IncludeWin32.hpp"
 

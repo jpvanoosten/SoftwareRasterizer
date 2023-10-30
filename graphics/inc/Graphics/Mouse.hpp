@@ -26,13 +26,14 @@ public:
     /// </summary>
     /// <returns>`true` if the mouse cursor is currently visible, `false`
     /// otherwise.</returns>
-    static bool isVisible();
+    static bool isVisible( const Window& window );
 
     /// <summary>
     /// Set the visibility of the mouse cursor.
     /// </summary>
+    /// <param name="window">The window to set the cursor visibility for.</param>
     /// <param name="visible">`true` to show the mouse cursor, `false` to hide it.</param>
-    static void setVisible( bool visible );
+    static void setVisible( const Window& window, bool visible );
 
     /// <summary>
     /// Lock the mouse cursor to the window.

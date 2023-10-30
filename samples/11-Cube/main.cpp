@@ -1,3 +1,8 @@
+#include "Graphics/Keyboard.hpp"
+#include "Graphics/Mouse.hpp"
+
+#include <CameraController.hpp>
+
 #include <Graphics/Font.hpp>
 #include <Graphics/Image.hpp>
 #include <Graphics/Input.hpp>
@@ -19,6 +24,7 @@ using namespace Math;
 struct VertexOut
 {
     glm::vec4 position;     // Vertex position in screen space.
+    glm::vec2 uv;           // Vertex texture coordinates.
     uint16_t  instanceId;   // Object instance ID.
     uint16_t  primitiveId;  // Triangle primitive ID.
 };
@@ -30,11 +36,12 @@ struct VertexShader
 
     uint16_t instanceId;
 
-    VertexOut operator()( const glm::vec3& position, uint16_t vertexId ) const
+    VertexOut operator()( const glm::vec3& position, const glm::vec2& uv, uint16_t vertexId ) const
     {
         VertexOut out {};
 
         out.position    = modelViewProjectionMatrix * glm::vec4 { position, 1 };
+        out.uv          = uv;
         out.instanceId  = instanceId;
         out.primitiveId = vertexId / 3;
 
@@ -52,8 +59,8 @@ struct FragmentShader
 
 struct Instance
 {
-    std::shared_ptr<Mesh> mesh;
-    glm::mat4             modelMatrix;
+    Mesh*     mesh;
+    glm::mat4 modelMatrix;
 };
 
 // Generate some random colors for debugging.
@@ -90,9 +97,8 @@ int main( int argc, char* argv[] )
     // Setup matrices.
     glm::vec4 viewport { 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT };
 
-    Camera camera;
-    camera.setProjection( glm::radians( 60.0f ), static_cast<float>( WINDOW_WIDTH ) / WINDOW_HEIGHT, 1.0f, 100.0f );
-    camera.lookAt( { 0, 50, 25 }, { 0, 0, 0 }, { 0, 1, 0 } );
+    CameraController camera { { 0, 3, 0 }, 0.0f, 90.0f };
+    camera.setPerspective( 60.0f, static_cast<float>( WINDOW_WIDTH ) / WINDOW_HEIGHT, 0.1f, 100.0f );
 
     // Setup vertex shader.
     VertexShader vertexShader {};
@@ -104,15 +110,16 @@ int main( int argc, char* argv[] )
     // Setup some random colors for debugging.
     auto randomColors = GenerateColors( 0xffff );
 
-    Window window { L"11 - Cube", WINDOW_WIDTH, WINDOW_HEIGHT };
+    Window window { "11 - Cube", WINDOW_WIDTH, WINDOW_HEIGHT };
     Image  colorBuffer { WINDOW_WIDTH, WINDOW_HEIGHT };
     Image  depthBuffer { WINDOW_WIDTH, WINDOW_HEIGHT };
     Image  visibilityBuffer { WINDOW_WIDTH, WINDOW_HEIGHT };
-    Image  barycentricCoords { WINDOW_WIDTH, WINDOW_HEIGHT };
+    Image  textureCoordinates { WINDOW_WIDTH, WINDOW_HEIGHT };
 
     Model cube { "assets/models/sponza.obj" };
 
     window.show();
+    window.setFullscreen( true );
 
     Timer       timer;
     double      totalTime  = 0.0;
@@ -129,16 +136,7 @@ int main( int argc, char* argv[] )
         timer.tick();
         Input::update();
 
-        camera.translate( glm::vec3 { Input::getAxis( "Horizontal" ), 0, -Input::getAxis( "Vertical" ) } * static_cast<float>( timer.elapsedSeconds() ) * 5.0f );
-        if ( Input::getMouseButton( MouseButton::Right ) )
-        {
-            camera.rotateX( glm::radians( -Input::getAxis( "Mouse Y" ) * timer.elapsedSeconds() ) );
-            camera.rotateY( glm::radians( Input::getAxis( "Mouse X" ) * timer.elapsedSeconds() ) );
-        }
-        float roll = Input::getKey( "q" ) ? -1.0f : 0.0f;
-        roll += Input::getKey( "e" ) ? 1.0f : 0.0f;
-
-        camera.rotateZ( glm::radians( roll ) * timer.elapsedSeconds() * 15.0f );
+        camera.update( static_cast<float>( timer.elapsedSeconds() ) );
 
         colorBuffer.clear( Color::Black );
         visibilityBuffer.clear( { 0xffffu, 0xffffu } );
@@ -151,12 +149,19 @@ int main( int argc, char* argv[] )
         vertexShader.instanceId                = 0;
         for ( const auto& mesh: cube.getMeshes() )
         {
-            instanceBuffer.emplace_back( mesh, modelMatrix );
-            for ( uint16_t vertexId = 0; const auto& p: mesh->getPositions() )
+            instanceBuffer.emplace_back( mesh.get(), modelMatrix );
+            auto indices   = mesh->getIndices().data();
+            auto positions = mesh->getPositions().data();
+            auto texCoords = mesh->getTexCoords().data();
+
+            for ( size_t i = 0; i < mesh->getNumIndices(); ++i )
             {
-                auto vout = vertexShader( p, vertexId );
+                auto vertexId = static_cast<uint16_t>( indices[i] );
+                auto p        = positions[vertexId];
+                auto uv       = texCoords[vertexId];
+
+                auto vout = vertexShader( p, uv, vertexId );
                 transformedVerts.emplace_back( vout );
-                ++vertexId;
             }
             vertexShader.instanceId++;
         }
@@ -169,33 +174,14 @@ int main( int argc, char* argv[] )
             auto v1 = transformedVerts[i + 1];
             auto v2 = transformedVerts[i + 2];
 
-            // Backface culling
-            auto e01 = v1.position - v0.position;
-            auto e02 = v2.position - v0.position;
-
-            auto z = e01.x * e02.y - e02.x * e01.y;
-            if ( z < 0.0f )
+            // TODO: Better clipping.
+            if ( v0.position.z < -v0.position.w || v1.position.z < -v1.position.w || v2.position.z < -v2.position.w )
                 continue;
 
-            // Clip triangle.
-            // Clip against the near clipping plane.
-            // TODO: Do proper clipping.
-            const Plane near { { 0, 0, 1 }, 0 };
-            const Plane far { { 0, 0, -1 }, 1 };
-
-            const float d0 = near.distance( v0.position );
-            const float d1 = near.distance( v1.position );
-            const float d2 = near.distance( v2.position );
-
-            // All vertices are outside the plane.
-            if ( d0 < 0.0f && d1 < 0.0f && d2 < 0.0f )
-                continue;
-
-            if ( d0 < 0.0f || d1 < 0.0f || d2 < 0.0f )
-            {
-                // TODO: test all cases or figure out what cases I need to check.
-                continue;
-            }
+            // Store the w component before perspective divide.
+            float w0 = 1.0f / v0.position.w;
+            float w1 = 1.0f / v1.position.w;
+            float w2 = 1.0f / v2.position.w;
 
             for ( auto v: { std::ref( v0 ), std::ref( v1 ), std::ref( v2 ) } )
             {
@@ -208,6 +194,13 @@ int main( int argc, char* argv[] )
                 pos.y = ( 1.0f - pos.y ) * viewport.w + viewport.y;  // Flip Y
             }
 
+            // Backface culling.
+            // Compute the area of the triangle in screen space.
+            // Source: OpenGL 4.6 Specification, 2022 (pp. 477)
+            auto a = -( ( v0.position.x * v1.position.y - v1.position.x * v0.position.y ) + ( v1.position.x * v2.position.y - v2.position.x * v1.position.y ) + ( v2.position.x * v0.position.y - v0.position.x * v2.position.y ) );
+            if ( a < 0.0f )
+                continue;
+
             auto aabb = AABB::fromTriangle( v0.position, v1.position, v2.position );
             // Clamp the triangle AABB to the AABB of the visibility buffer.
             aabb.clamp( visibilityBuffer.getAABB() );
@@ -218,18 +211,24 @@ int main( int argc, char* argv[] )
             {
                 for ( int x = static_cast<int>( aabb.min.x ); x <= static_cast<int>( aabb.max.x ); ++x )
                 {
-                    auto b = barycentric( v0.position, v1.position, v2.position, { x, y } );
-                    if ( barycentricInside( b ) )
+                    // Barycentric coordinates in screen space.
+                    auto bc = barycentric( v0.position, v1.position, v2.position, { static_cast<float>( x ) + 0.5f, static_cast<float>( y ) + 0.5f } );
+                    if ( barycentricInside( bc ) )
                     {
-                        // Compute depth.
-                        // TODO: Perspective correct projection.
-                        float  z = v0.position.z * b.x + v1.position.z * b.y + v2.position.z * b.z;
+                        // Compute depth
+                        float  z = v0.position.z * bc.x + v1.position.z * bc.y + v2.position.z * bc.z;
                         Color& d = depthBuffer( x, y );
-                        if ( z > 0.0f && z < 1.0f && z < d.depth )
+                        if ( z < d.depth )
                         {
-                            visibilityBuffer( x, y )  = Color { v2.instanceId, v2.primitiveId };
-                            barycentricCoords( x, y ) = Color { static_cast<uint16_t>( b.x * 65535.0f ), static_cast<uint16_t>( b.y * 65535.0f ) };
-                            d.depth                   = z;
+                            bc = bc * glm::vec3 { w0, w1, w2 };
+                            // Compute the perspective correct UV coordinates.
+                            // Source: OpenGL 4.6 Specification, 2022 (pp. 479).
+                            float correction = 1.0f / ( bc.x + bc.y + bc.z );
+                            auto  uv         = ( v0.uv * bc.x + v1.uv * bc.y + v2.uv * bc.z ) * correction;
+
+                            visibilityBuffer( x, y )   = Color { v2.instanceId, v2.primitiveId };
+                            textureCoordinates( x, y ) = Color { static_cast<uint16_t>( uv.x * 65535.0f ), static_cast<uint16_t>( uv.y * 65535.0f ) };
+                            d.depth                    = z;
                         }
                     }
                 }
@@ -254,16 +253,12 @@ int main( int argc, char* argv[] )
                 auto t1 = textureCoords[c.primitiveId * 3 + 1];
                 auto t2 = textureCoords[c.primitiveId * 3 + 2];
 
-                // Unpack barycentric coords.
-                Color       bc = barycentricCoords[i];
-                const float u  = static_cast<float>( bc.u ) / 65535.0f;
-                const float v  = static_cast<float>( bc.v ) / 65535.0f;
-                const float w  = 1.0f - u - v;
-                // Compute UV:
-                // TODO: Perspective correct projection.
-                const glm::vec2 uv = t0 * u + t1 * v + t2 * w;
+                // Unpack uv coords.
+                Color       uv = textureCoordinates[i];
+                const float u  = static_cast<float>( uv.u ) / 65535.0f;
+                const float v  = static_cast<float>( uv.v ) / 65535.0f;
                 // Sample diffuse texture.
-                colorBuffer[i] = mat->diffuseTexture->sample( glm::vec2 { uv.x, 1.0f - uv.y } );
+                colorBuffer[i] = mat->diffuseTexture->sample( glm::vec2 { u, v } );
             }
         }
 
@@ -283,13 +278,16 @@ int main( int argc, char* argv[] )
                 switch ( e.key.code )
                 {
                 case KeyCode::R:
-                    camera.lookAt( { 0, 50, 25 }, { 0, 0, 0 }, { 0, 1, 0 } );
+                    camera.reset();
                     break;
                 case KeyCode::Escape:
                     window.destroy();
                     break;
                 case KeyCode::V:
                     window.toggleVSync();
+                    break;
+                case KeyCode::F11:
+                    window.toggleFullscreen();
                     break;
                 }
                 break;

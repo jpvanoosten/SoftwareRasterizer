@@ -17,7 +17,7 @@ class SR_API Window
 {
 public:
     Window();
-    Window( std::wstring_view title, int width, int height );
+    Window( std::string_view title, int width, int height );
     ~Window();
 
     // Copies not allowed.
@@ -34,7 +34,7 @@ public:
     /// <param name="title">The title to display in the window's title bar.</param>
     /// <param name="width">The initial width of the window.</param>
     /// <param name="height">The initial height of the window.</param>
-    void create( std::wstring_view title, int width, int height );
+    void create( std::string_view title, int width, int height );
 
     /// <summary>
     /// Get an OS window handle.
@@ -48,6 +48,18 @@ public:
     /// <param name="event">A reference to an Event object that will be filled in with the next event in the event queue.</param>
     /// <returns>`true` if an event was popped from the event queue, or `false` if there are no events in the queue.</returns>
     bool popEvent( Event& event );
+
+    /// <summary>
+    /// Set the window's clear color.
+    /// </summary>
+    /// <param name="clearColor">The color to clear the window to during presentation.</param>
+    void setClearColor( const Color& clearColor ) noexcept;
+
+    /// <summary>
+    /// Get the color to clear the window to during presentation.
+    /// </summary>
+    /// <returns>The window's clear color.</returns>
+    Color getClearColor() const noexcept;
 
     /// <summary>
     /// Show the window.

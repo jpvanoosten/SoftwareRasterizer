@@ -29,7 +29,7 @@ int main( int argc, char* argv[] )
 
     Game game { WINDOW_WIDTH, WINDOW_HEIGHT };
 
-    Window window { L"09 - Breakout", WINDOW_WIDTH, WINDOW_HEIGHT };
+    Window window { "09 - Breakout", WINDOW_WIDTH, WINDOW_HEIGHT };
     window.show();
     window.setFullscreen( true );
 

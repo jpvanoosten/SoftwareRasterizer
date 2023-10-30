@@ -103,9 +103,9 @@ private:
     glm::vec3 translation { 0 };  // World-space position.
     glm::quat rotation {};        // Rotation quaternion.
 
-    glm::mat4 viewMatrix;
-    glm::mat4 projectionMatrix;
-    glm::mat4 viewProjectionMatrix;
+    glm::mat4 viewMatrix{1};
+    glm::mat4 projectionMatrix{1};
+    glm::mat4 viewProjectionMatrix{1};
 
     bool viewDirty           = true;
     bool viewProjectionDirty = true;

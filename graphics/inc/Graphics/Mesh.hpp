@@ -4,7 +4,6 @@
 #include "Material.hpp"
 #include "Vertex.hpp"
 
-#include <filesystem>
 #include <span>
 #include <vector>
 
@@ -50,6 +49,11 @@ public:
     bool hasIndices() const noexcept
     {
         return !indexBuffer.empty();
+    }
+
+    size_t getNumIndices() const noexcept
+    {
+        return indexBuffer.size();
     }
 
 private:

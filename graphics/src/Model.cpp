@@ -75,7 +75,7 @@ inline std::shared_ptr<Mesh> ParseMesh( const tinyobj::mesh_t& mesh, const tinyo
             if ( idx.texcoord_index >= 0 )
             {
                 vert.texCoord.x = attrib.texcoords[idx.texcoord_index * 2 + 0];
-                vert.texCoord.y = attrib.texcoords[idx.texcoord_index * 2 + 1];
+                vert.texCoord.y = 1.0f - attrib.texcoords[idx.texcoord_index * 2 + 1];
             }
 
             vert.color.r = static_cast<uint8_t>( attrib.colors[idx.vertex_index * 3 + 0] * 255u );
@@ -160,7 +160,7 @@ Model::Model( const std::filesystem::path& modelFile )
             }
         }
 
-        // Expend the AABB by the mesh's AABB.
+        // Expand the AABB by the mesh's AABB.
         aabb.expand( mesh->getAABB() );
 
         // Add the mesh to the model's meshes array.

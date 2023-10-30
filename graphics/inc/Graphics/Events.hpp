@@ -85,7 +85,7 @@ struct KeyEventArgs
     /// <summary>
     /// The 32-bit character code of the key that was pressed or released.
     /// </summary>
-    unsigned int character;
+    char32_t character;
     /// <summary>
     /// Was the key pressed or released?
     /// </summary>

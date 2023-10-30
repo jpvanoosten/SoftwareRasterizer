@@ -27,7 +27,7 @@ int main( int argc, char* argv[] )
     const int WINDOW_WIDTH  = 800;
     const int WINDOW_HEIGHT = 600;
 
-    Window window { L"06 - Fonts", WINDOW_WIDTH, WINDOW_HEIGHT };
+    Window window { "06 - Fonts", WINDOW_WIDTH, WINDOW_HEIGHT };
 
     // Image to render to.
     Image image { static_cast<uint32_t>( window.getWidth() ), static_cast<uint32_t>( window.getHeight() ) };

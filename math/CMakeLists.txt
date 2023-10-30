@@ -14,6 +14,7 @@ set( INC_FILES
     inc/Math/Space.hpp
     inc/Math/Sphere.hpp
     inc/Math/Transform2D.hpp
+    inc/Math/Viewport.hpp
 )
 
 set( SRC_FILES

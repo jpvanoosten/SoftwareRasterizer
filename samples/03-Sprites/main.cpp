@@ -29,7 +29,7 @@ int main( int argc, char* argv[] )
     const int WINDOW_WIDTH  = 800;
     const int WINDOW_HEIGHT = 600;
 
-    Window window { L"03 - Sprites", WINDOW_WIDTH, WINDOW_HEIGHT };
+    Window window { "03 - Sprites", WINDOW_WIDTH, WINDOW_HEIGHT };
 
     auto        monaLisa = ResourceManager::loadImage( "assets/textures/Mona_Lisa.jpg" );
     Sprite      sprite { monaLisa };
