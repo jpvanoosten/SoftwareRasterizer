@@ -15,6 +15,16 @@ namespace Graphics
 class SR_API Rasterizer
 {
 public:
+    enum class Plane
+    {
+        Left,
+        Right,
+        Top,
+        Bottom,
+        Near,
+        Far
+    };
+
     /// <summary>
     /// The input to the vertex shader.
     /// </summary>
@@ -23,7 +33,6 @@ public:
         glm::vec3 position;  // Position in object space.
         glm::vec3 normal;    // Normal in object space.
         glm::vec2 uv;        // Texture UV coordinates.
-        Color     color;     // Vertex color.
     };
 
     /// <summary>
@@ -34,7 +43,6 @@ public:
         glm::vec4 position;  // Position in clip-space.
         glm::vec3 normal;    // Normal in world-space.
         glm::vec2 uv;        // Texture coordinates.
-        Color     color;     // Vertex color.
     };
 
     Rasterizer();
@@ -88,6 +96,14 @@ protected:
     VertexOutput vertexShader( const VertexInput& in, const glm::mat4& modelMatrix, const glm::mat4& modelViewProjectionMatrix );
 
     /// <summary>
+    /// Compute the distance from the point to one of the clipping planes.
+    /// </summary>
+    /// <param name="p">The clipping plane.</param>
+    /// <param name="plane"></param>
+    /// <returns>The signed distance from p to the plane.</returns>
+    static float distance( const glm::vec4& p, Plane plane );
+
+    /// <summary>
     /// Clip a triangle against a single clipping plane.
     /// </summary>
     /// <param name="in">The input vertices.</param>
@@ -95,7 +111,7 @@ protected:
     /// <param name="out">The clipped triangles(s).</param>
     /// <param name="plane">The plane to clip the triangle against.</param>
     /// <returns>The number of resulting triangles.</returns>
-    static int clipTriangle( const VertexOutput* in, int n_in, VertexOutput* out, const Math::Plane& plane );
+    static int clipTriangle( const VertexOutput* in, int n_in, VertexOutput* out, Plane plane );
 
     /// <summary>
     /// Clip a triangle against the clipping planes.
@@ -123,7 +139,6 @@ inline Rasterizer::VertexOutput operator*( float lhs, const Rasterizer::VertexOu
         lhs * rhs.position,
         lhs * rhs.normal,
         lhs * rhs.uv,
-        lhs * rhs.color
     };
 }
 
@@ -133,7 +148,6 @@ inline Rasterizer::VertexOutput operator*( const Rasterizer::VertexOutput& lhs, 
         lhs.position * rhs,
         lhs.normal * rhs,
         lhs.uv * rhs,
-        lhs.color * rhs
     };
 }
 
@@ -143,7 +157,6 @@ inline Rasterizer::VertexOutput operator+( const Rasterizer::VertexOutput& lhs, 
         lhs.position + rhs.position,
         lhs.normal + rhs.normal,
         lhs.uv + rhs.uv,
-        lhs.color + rhs.color
     };
 }
 
@@ -153,7 +166,6 @@ inline Rasterizer::VertexOutput operator-( const Rasterizer::VertexOutput& lhs, 
         lhs.position - rhs.position,
         lhs.normal - rhs.normal,
         lhs.uv - rhs.uv,
-        lhs.color - rhs.color
     };
 }
 

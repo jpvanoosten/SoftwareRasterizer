@@ -50,9 +50,29 @@ inline Rasterizer::VertexOutput Rasterizer::vertexShader( const VertexInput& in,
     out.position = modelViewProjectionMatrix * glm::vec4 { in.position, 1.0f };
     out.normal   = modelMatrix * glm::vec4 { in.normal, 0.0f };
     out.uv       = in.uv;
-    out.color    = in.color;
 
     return out;
+}
+
+float Rasterizer::distance( const glm::vec4& p, Plane plane )
+{
+    switch ( plane )
+    {
+    case Plane::Left:
+        return p.x - p.w;
+    case Plane::Right:
+        return p.x + p.w;
+    case Plane::Top:
+        return p.y + p.w;
+    case Plane::Bottom:
+        return p.y - p.w;
+    case Plane::Near:
+        return p.z + p.w;
+    case Plane::Far:
+        return p.z - p.w;
+    }
+
+    return 0.0f; // This shouldn't happen.
 }
 
 void Rasterizer::triangleAssembly( const Mesh& mesh, const glm::mat4& modelMatrix )
@@ -87,7 +107,6 @@ void Rasterizer::triangleAssembly( const Mesh& mesh, const glm::mat4& modelMatri
             in.position = positions[vertexId];
             in.normal   = normals[vertexId];
             in.uv       = uvs[vertexId];
-            in.color    = colors[vertexId];
 
             tri[v] = vertexShader( in, modelMatrix, modelViewProjectionMatrix );
         }
@@ -96,7 +115,7 @@ void Rasterizer::triangleAssembly( const Mesh& mesh, const glm::mat4& modelMatri
     }
 }
 
-int Rasterizer::clipTriangle( const VertexOutput* in, int n_in, VertexOutput* out, const Math::Plane& plane )
+int Rasterizer::clipTriangle( const VertexOutput* in, int n_in, VertexOutput* out, Plane plane )
 {
     // Number of output vertices.
     int n_out = 0;
@@ -110,8 +129,8 @@ int Rasterizer::clipTriangle( const VertexOutput* in, int n_in, VertexOutput* ou
         VertexOutput P = in[i];
 
         // Compute the signed distance to the plane.
-        float dS = plane.distance( S.position );
-        float dP = plane.distance( P.position );
+        float dS = distance( S.position, plane );
+        float dP = distance( P.position, plane );
 
         if ( dP >= 0.0f )
         {
@@ -133,7 +152,7 @@ int Rasterizer::clipTriangle( const VertexOutput* in, int n_in, VertexOutput* ou
 
                 float a = dS / ( dS - dP );
 
-                out[n_out++] = a * S + ( 1.0f - a ) * P;
+                out[n_out++] = S + a * ( P - S );
                 out[n_out++] = P;
             }
         }
@@ -147,7 +166,7 @@ int Rasterizer::clipTriangle( const VertexOutput* in, int n_in, VertexOutput* ou
 
             float a = dS / ( dS - dP );
 
-            out[n_out++] = a * S + ( 1.0f - a ) * P;
+            out[n_out++] = S + a * ( P - S );
         }
 
         // Next edge...
