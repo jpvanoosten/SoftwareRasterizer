@@ -113,6 +113,7 @@ struct SR_API BlendMode
     static const BlendMode AlphaBlend;
     static const BlendMode AdditiveBlend;
     static const BlendMode SubtractiveBlend;
+    static const BlendMode MultiplicativeBlend;
 };
 
 /// <summary>
