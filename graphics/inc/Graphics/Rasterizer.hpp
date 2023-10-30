@@ -15,6 +15,9 @@ namespace Graphics
 class SR_API Rasterizer
 {
 public:
+    /// <summary>
+    /// The input to the vertex shader.
+    /// </summary>
     struct VertexInput
     {
         glm::vec3 position;  // Position in object space.
@@ -23,40 +26,15 @@ public:
         Color     color;     // Vertex color.
     };
 
+    /// <summary>
+    /// The output from the vertex shader.
+    /// </summary>
     struct VertexOutput
     {
         glm::vec4 position;  // Position in clip-space.
         glm::vec3 normal;    // Normal in world-space.
         glm::vec2 uv;        // Texture coordinates.
         Color     color;     // Vertex color.
-    };
-
-    struct Triangle
-    {
-        constexpr Triangle()
-        : v {}
-        {}
-
-        VertexOutput& operator[]( std::size_t i )
-        {
-            return v[i];
-        }
-
-        const VertexOutput& operator[]( std::size_t i ) const
-        {
-            return v[i];
-        }
-
-        union
-        {
-            VertexOutput v[3];
-            struct
-            {
-                VertexOutput v0;
-                VertexOutput v1;
-                VertexOutput v2;
-            };
-        };
     };
 
     Rasterizer();
@@ -110,22 +88,14 @@ protected:
     VertexOutput vertexShader( const VertexInput& in, const glm::mat4& modelMatrix, const glm::mat4& modelViewProjectionMatrix );
 
     /// <summary>
-    /// Compute the vertex at the intersection of a plane.
-    /// </summary>
-    /// <param name="v0">The first vertex.</param>
-    /// <param name="v1">The second vertex.</param>
-    /// <param name="plane">The dividing plane.</param>
-    /// <returns>The vertex that intersects the plane.</returns>
-    static VertexOutput getIntersection( const VertexOutput& v0, const VertexOutput& v1, const Math::Plane& plane );
-
-    /// <summary>
     /// Clip a triangle against a single clipping plane.
     /// </summary>
-    /// <param name="in">The input triangle to clip.</param>
-    /// <param name="plane">The plan to clip the triangle against.</param>
+    /// <param name="in">The input vertices.</param>
+    /// <param name="n_in">The number of input vertices.</param>
     /// <param name="out">The clipped triangles(s).</param>
+    /// <param name="plane">The plane to clip the triangle against.</param>
     /// <returns>The number of resulting triangles.</returns>
-    static int clipTriangle( const Triangle& in, const Math::Plane& plane, Triangle out[2] );
+    static int clipTriangle( const VertexOutput* in, int n_in, VertexOutput* out, const Math::Plane& plane );
 
     /// <summary>
     /// Clip a triangle against the clipping planes.
@@ -133,7 +103,7 @@ protected:
     /// <param name="in">The triangle to be clipped.</param>
     /// <param name="out">The clipped triangle(s).</param>
     /// <returns>The number of resulting triangles.</returns>
-    static int clipTriangle( const Triangle& in, Triangle out[12] );
+    static int clipTriangle( const VertexOutput* in, VertexOutput* out );
 
 private:
     std::size_t width  = 0u;
@@ -174,6 +144,16 @@ inline Rasterizer::VertexOutput operator+( const Rasterizer::VertexOutput& lhs, 
         lhs.normal + rhs.normal,
         lhs.uv + rhs.uv,
         lhs.color + rhs.color
+    };
+}
+
+inline Rasterizer::VertexOutput operator-( const Rasterizer::VertexOutput& lhs, const Rasterizer::VertexOutput& rhs )
+{
+    return {
+        lhs.position - rhs.position,
+        lhs.normal - rhs.normal,
+        lhs.uv - rhs.uv,
+        lhs.color - rhs.color
     };
 }
 

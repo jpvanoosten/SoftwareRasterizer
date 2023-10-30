@@ -77,7 +77,7 @@ void Rasterizer::triangleAssembly( const Mesh& mesh, const glm::mat4& modelMatri
 
     for ( std::size_t i = 0; i < numTris; ++i )
     {
-        Triangle tri;
+        VertexOutput tri[3];
         for ( std::size_t v = 0; v < 3; ++v )
         {
             int vertexId = indices[i * 3 + v];
@@ -91,28 +91,73 @@ void Rasterizer::triangleAssembly( const Mesh& mesh, const glm::mat4& modelMatri
 
             tri[v] = vertexShader( in, modelMatrix, modelViewProjectionMatrix );
         }
+
+        // TODO: Clip triangle.
     }
 }
 
-Rasterizer::VertexOutput Rasterizer::getIntersection( const VertexOutput& v0, const VertexOutput& v1, const Math::Plane& plane )
+int Rasterizer::clipTriangle( const VertexOutput* in, int n_in, VertexOutput* out, const Math::Plane& plane )
 {
-    const float t = plane.intersect( v0.position, v1.position );
-    return t * v0 + ( 1.0f - t ) * v1;
+    // Number of output vertices.
+    int n_out = 0;
+
+    // Start vertex.
+    VertexOutput S = in[n_in - 1];
+
+    for ( int i = 0; i < n_in; ++i )
+    {
+        // Terminal vertex.
+        VertexOutput P = in[i];
+
+        // Compute the signed distance to the plane.
+        float dS = plane.distance( S.position );
+        float dP = plane.distance( P.position );
+
+        if ( dP >= 0.0f )
+        {
+            if ( dS >= 0.0f )
+            {
+                // Case 1. Both p and s are on visible side of plane.
+                // If the edge is entirely on the visible side if the clipping plane,
+                // only its terminal vertex P, need be output since its initial vertex S
+                // will already have been output.
+
+                out[n_out++] = P;
+            }
+            else
+            {
+                // Case 4. Edge enters visible region (p is visible, s is not).
+                // If the edge enters the visible side of the clipping plane with P visible
+                // and S not, then two output vertices must be generated: the intersection
+                // of the edge and the clipping plane, followed by the terminal vertex P.
+
+                float a = dS / ( dS - dP );
+
+                out[n_out++] = a * S + ( 1.0f - a ) * P;
+                out[n_out++] = P;
+            }
+        }
+        else if ( dS >= 0.0f )
+        {
+            // Case 3. Edge leaves visible region (s is visible, p is not).
+            // If the edge leaves the visible side of the clipping plane, with S
+            // visible and P not, then only the intersection of the edge and the clipping
+            // plane need be output because the initial vertex S, will already have
+            // been output.
+
+            float a = dS / ( dS - dP );
+
+            out[n_out++] = a * S + ( 1.0f - a ) * P;
+        }
+
+        // Next edge...
+        S = P;
+    }
+
+    return n_out;
 }
 
-int Rasterizer::clipTriangle( const Triangle& in, const Math::Plane& plane, Triangle out[2] )
+int Rasterizer::clipTriangle( const VertexOutput* in, VertexOutput* out )
 {
-    int i = 0;
-    int n_tris = 0; // Number of resulting triangles.
-    int n_in = 0; // Number of vertices inside the plane.
 
-    // TODO: Triangle clipping algorithm.
-
-
-    return n_tris;
-}
-
-int Rasterizer::clipTriangle( const Triangle& in, Triangle out[12] )
-{
-    return 0;
 }
