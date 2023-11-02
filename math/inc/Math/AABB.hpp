@@ -5,6 +5,7 @@
 #include "OutCodes.hpp"
 #include "Rect.hpp"
 #include "Sphere.hpp"
+#include "Viewport.hpp"
 
 #include <glm/common.hpp>
 #include <glm/vec3.hpp>
@@ -617,6 +618,16 @@ struct AABB
     static AABB fromIntersect( const AABB& a, const AABB& b )
     {
         return fromMinMax( glm::max( a.min, b.min ), glm::min( a.max, b.max ) );
+    }
+
+    /// <summary>
+    /// Construct an AABB from a viewport.
+    /// </summary>
+    /// <param name="viewport">The Viewport to construct the AABB from.</param>
+    /// <returns>An AABB that covers the viewport.</returns>
+    static AABB fromViewport( const Viewport& viewport)
+    {
+        return fromMinMax( glm::vec3 { viewport.x, viewport.y, viewport.minDepth }, glm::vec3 { viewport.x + viewport.width, viewport.y + viewport.height, viewport.maxDepth } );
     }
 
     /// <summary>

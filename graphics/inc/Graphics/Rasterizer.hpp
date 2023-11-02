@@ -33,6 +33,7 @@ public:
         glm::vec3 position;  // Position in object space.
         glm::vec3 normal;    // Normal in object space.
         glm::vec2 uv;        // Texture UV coordinates.
+        Color     color;     // Vertex color.
     };
 
     /// <summary>
@@ -43,6 +44,7 @@ public:
         glm::vec4 position;  // Position in clip-space.
         glm::vec3 normal;    // Normal in world-space.
         glm::vec2 uv;        // Texture coordinates.
+        glm::vec4 color;     // Vertex color.
     };
 
     Rasterizer();
@@ -79,13 +81,6 @@ public:
     const Buffer<float>& getDepthBuffer() const noexcept;
 
 protected:
-    /// <summary>
-    /// Take the vertex data from the mesh and convert it into triangles.
-    /// </summary>
-    /// <param name="mesh">The mesh to be drawn.</param>
-    /// <param name="modelMatrix">The model transformation matrix.</param>
-    void triangleAssembly( const Mesh& mesh, const glm::mat4& modelMatrix );
-
     /// <summary>
     /// Transform the vertex by the model-view-projection matrix.
     /// </summary>
@@ -139,6 +134,7 @@ inline Rasterizer::VertexOutput operator*( float lhs, const Rasterizer::VertexOu
         lhs * rhs.position,
         lhs * rhs.normal,
         lhs * rhs.uv,
+        lhs * rhs.color
     };
 }
 
@@ -157,6 +153,7 @@ inline Rasterizer::VertexOutput operator+( const Rasterizer::VertexOutput& lhs, 
         lhs.position + rhs.position,
         lhs.normal + rhs.normal,
         lhs.uv + rhs.uv,
+        lhs.color + rhs.color
     };
 }
 
@@ -166,6 +163,7 @@ inline Rasterizer::VertexOutput operator-( const Rasterizer::VertexOutput& lhs, 
         lhs.position - rhs.position,
         lhs.normal - rhs.normal,
         lhs.uv - rhs.uv,
+        lhs.color - rhs.color
     };
 }
 
