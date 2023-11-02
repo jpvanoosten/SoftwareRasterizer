@@ -24,6 +24,8 @@ public:
 
     void update( float deltaTime );
 
+    const Math::Camera& getCamera() const noexcept;
+
     const glm::mat4& getViewMatrix() const noexcept;
 
     const glm::mat4& getProjectionMatrix() const noexcept;

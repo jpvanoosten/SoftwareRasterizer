@@ -156,6 +156,11 @@ void CameraController::update( float deltaTime )
     camera.translate( deltaPos );
 }
 
+const Camera& CameraController::getCamera() const noexcept
+{
+    return camera;
+}
+
 const glm::mat4& CameraController::getViewMatrix() const noexcept
 {
     return camera.getViewMatrix();

@@ -11,8 +11,7 @@ add_subdirectory(07-PixelAdventure)
 add_subdirectory(08-Audio)
 add_subdirectory(09-Arkanoid)
 add_subdirectory(10-Camera)
-add_subdirectory(11-Cube)
-add_subdirectory(11-Quad)
+add_subdirectory(11-Rasterizer)
 add_subdirectory(12-ImGui)
 
 set_target_properties( 
@@ -27,8 +26,7 @@ set_target_properties(
 	08-Audio
 	09-Arkanoid
 	10-Camera
-	11-Cube
-	11-Quad
+	11-Rasterizer
 	12-ImGui
 	PROPERTIES
 		FOLDER samples

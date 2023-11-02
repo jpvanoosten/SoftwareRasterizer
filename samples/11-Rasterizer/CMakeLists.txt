@@ -1,6 +1,6 @@
 cmake_minimum_required( VERSION 3.22.1 )
 
-set( TARGET_NAME 11-Cube )
+set( TARGET_NAME 11-Rasterizer )
 
 set( SRC_FILES
     main.cpp
