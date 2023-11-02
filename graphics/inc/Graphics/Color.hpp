@@ -18,8 +18,6 @@ struct SR_API alignas( 4 ) Color
     constexpr Color() noexcept;
     constexpr explicit Color( uint32_t argb ) noexcept;
     constexpr Color( uint8_t r, uint8_t g, uint8_t b, uint8_t a = 255u ) noexcept;
-    constexpr explicit Color( float depth ) noexcept;
-    constexpr Color( uint16_t instanceId, uint16_t primitiveId ) noexcept;
     constexpr ~Color() noexcept              = default;
     constexpr Color( const Color& ) noexcept = default;
     constexpr Color( Color&& ) noexcept      = default;
@@ -103,21 +101,6 @@ struct SR_API alignas( 4 ) Color
             uint8_t r;
             uint8_t a;
         };
-        // Visibility buffer.
-        struct  // NOLINT(clang-diagnostic-nested-anon-types)
-        {
-            uint16_t instanceId;
-            uint16_t primitiveId;
-        };
-        // Barycentric coordinates (32-bit packed)
-        struct // NOLINT(clang-diagnostic-nested-anon-types)
-        {
-            uint16_t u;
-            uint16_t v;
-            // w = 1 - u - v;
-        };
-        // Depth buffer.
-        float depth;
     };
 
     static const Color Black;
@@ -148,15 +131,6 @@ constexpr Color::Color( uint8_t r, uint8_t g, uint8_t b, uint8_t a ) noexcept  /
 , g { g }
 , r { r }
 , a { a }
-{}
-
-constexpr Color::Color( float d ) noexcept  // NOLINT(cppcoreguidelines-pro-type-member-init)
-: depth { d }
-{}
-
-constexpr Color::Color( uint16_t instanceId, uint16_t primitiveId ) noexcept  // NOLINT(cppcoreguidelines-pro-type-member-init)
-: instanceId { instanceId }
-, primitiveId { primitiveId }
 {}
 
 constexpr bool Color::operator==( const Color& rhs ) const noexcept

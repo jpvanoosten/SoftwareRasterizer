@@ -34,8 +34,8 @@ int main( int argc, char* argv[] )
         }
     }
 
-    const int WINDOW_WIDTH  = 800;
-    const int WINDOW_HEIGHT = 600;
+    const int WINDOW_WIDTH  = 1920;
+    const int WINDOW_HEIGHT = 1080;
 
     Viewport viewport { 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT };
     Image    image { WINDOW_WIDTH, WINDOW_HEIGHT };
@@ -47,9 +47,9 @@ int main( int argc, char* argv[] )
     rasterizer.setCamera( &camera.getCamera() );
     rasterizer.setViewport( viewport );
 
-    Model cube { "assets/models/sponza.obj" };
+    Model model { "assets/models/sponza.obj" };
 
-    Window window { "11 - Cube", WINDOW_WIDTH, WINDOW_HEIGHT };
+    Window window { "11 - Rasterizer", WINDOW_WIDTH, WINDOW_HEIGHT };
 
     window.show();
     window.setFullscreen( true );
@@ -72,7 +72,7 @@ int main( int argc, char* argv[] )
 
         const glm::mat4 modelMatrix = glm::scale( glm::vec3 { 0.01f } );
 
-        for ( const auto& mesh: cube.getMeshes() )
+        for ( const auto& mesh: model.getMeshes() )
         {
             rasterizer.draw( *mesh, modelMatrix );
         }

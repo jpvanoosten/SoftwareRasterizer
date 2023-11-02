@@ -29,12 +29,13 @@ inline std::shared_ptr<Material> ParseMaterial( const std::filesystem::path& bas
 
     // TODO: Check if we need to prefix with path to model file.
     auto diffuseTexture  = material.diffuse_texname.empty() ? nullptr : ResourceManager::loadImage( basePath / material.diffuse_texname );
+    auto alphaTexture  = material.alpha_texname.empty() ? nullptr : ResourceManager::loadImage( basePath / material.alpha_texname );
     auto specularTexture = material.specular_texname.empty() ? nullptr : ResourceManager::loadImage( basePath / material.specular_texname );
     auto normalTexture   = material.bump_texname.empty() ? nullptr : ResourceManager::loadImage( basePath / material.bump_texname );
     auto ambientTexture  = material.ambient_texname.empty() ? nullptr : ResourceManager::loadImage( basePath / material.ambient_texname );
     auto emissiveTexture = material.emissive_texname.empty() ? nullptr : ResourceManager::loadImage( basePath / material.emissive_texname );
 
-    return std::make_shared<Material>( diffuseColor, specularColor, ambientColor, emissiveColor, specularPower, diffuseTexture, specularTexture, normalTexture, ambientTexture, emissiveTexture );
+    return std::make_shared<Material>( diffuseColor, specularColor, ambientColor, emissiveColor, specularPower, diffuseTexture, alphaTexture, specularTexture, normalTexture, ambientTexture, emissiveTexture );
 }
 
 inline std::shared_ptr<Mesh> ParseMesh( const tinyobj::mesh_t& mesh, const tinyobj::attrib_t& attrib ) noexcept

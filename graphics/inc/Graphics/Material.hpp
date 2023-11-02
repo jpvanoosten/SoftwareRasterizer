@@ -14,6 +14,7 @@ struct SR_API Material final
         const Color& emissiveColor = Color::Black,
         float        specularPower = -1.0f,
         std::shared_ptr<Image> diffuseTexture = nullptr,
+        std::shared_ptr<Image> alphaTexture = nullptr,
         std::shared_ptr<Image> specularTexture = nullptr,
         std::shared_ptr<Image> normalTexture = nullptr,
         std::shared_ptr<Image> ambientTexture = nullptr,
@@ -33,6 +34,7 @@ struct SR_API Material final
     float specularPower;
 
     std::shared_ptr<Image> diffuseTexture;
+    std::shared_ptr<Image> alphaTexture;
     std::shared_ptr<Image> specularTexture;
     std::shared_ptr<Image> normalTexture;
     std::shared_ptr<Image> ambientTexture;

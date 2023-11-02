@@ -22,16 +22,20 @@ void Rasterizer::clear( const Color& color, float depth )
 void Rasterizer::draw( const Mesh& mesh, const glm::mat4& modelMatrix )
 {
     glm::mat4 modelViewProjectionMatrix = modelMatrix;
+    glm::mat4 modelViewMatrix           = modelMatrix;
     if ( camera )
     {
-        modelViewProjectionMatrix = camera->getViewProjectionMatrix() * modelViewProjectionMatrix;
+        modelViewMatrix           = camera->getViewMatrix() * modelMatrix;
+        modelViewProjectionMatrix = camera->getViewProjectionMatrix() * modelMatrix;
     }
 
     Material* material       = mesh.getMaterial().get();
+    Image*    alphaTexture   = material ? material->alphaTexture.get() : nullptr;
     Image*    diffuseTexture = material ? material->diffuseTexture.get() : nullptr;
     Color     diffuseColor   = material ? material->diffuseColor : Color::Magenta;
 
     AABB viewportAABB = AABB::fromViewport( viewport );
+    viewportAABB.max  = viewportAABB.max - glm::vec3( 1, 1, 0 );
 
     // Mesh must be triangulated.
     // TODO: Topology?
@@ -43,7 +47,6 @@ void Rasterizer::draw( const Mesh& mesh, const glm::mat4& modelMatrix )
     auto* positions = mesh.getPositions().data();
     auto* normals   = mesh.getNormals().data();
     auto* uvs       = mesh.getTexCoords().data();
-    auto* colors    = mesh.getColors().data();
 
     for ( std::size_t i = 0; i < numTris; ++i )
     {
@@ -57,64 +60,95 @@ void Rasterizer::draw( const Mesh& mesh, const glm::mat4& modelMatrix )
             in.position = positions[vertexId];
             in.normal   = normals[vertexId];
             in.uv       = uvs[vertexId];
-            in.color    = colors[vertexId];
 
-            tri[v] = vertexShader( in, modelMatrix, modelViewProjectionMatrix );
+            tri[v] = vertexShader( in, modelMatrix, modelViewMatrix, modelViewProjectionMatrix );
         }
 
-        // TODO: Clip triangle.
-        if ( tri[0].position.z < -tri[0].position.w || tri[1].position.z < -tri[1].position.w || tri[2].position.z < -tri[2].position.w )
-            continue;
+        VertexOutput out[4];
+        int          n_out = clipTriangle( tri, out );
 
-        // Store the w component before perspective divide.
-        float w0 = 1.0f / tri[0].position.w;
-        float w1 = 1.0f / tri[1].position.w;
-        float w2 = 1.0f / tri[2].position.w;
-
-        for ( auto& v: tri )
+        switch ( n_out )
         {
-            auto& pos = v.position;
-            pos       = pos / pos.w;  // Perspective divide.
-
-            // NDC -> screen space
-            pos   = pos * 0.5f + 0.5f;
-            pos.x = pos.x * viewport.width + viewport.x;
-            pos.y = ( 1.0f - pos.y ) * viewport.height + viewport.y;  // Flip Y
+        case 3:
+        {
+            rasterize( out, viewportAABB, alphaTexture, diffuseTexture, diffuseColor );
         }
-
-        // Backface culling.
-        // Compute the area of the triangle in screen space.
-        // Source: OpenGL 4.6 Specification, 2022 (pp. 477)
-        auto a = -( ( tri[0].position.x * tri[1].position.y - tri[1].position.x * tri[0].position.y ) + ( tri[1].position.x * tri[2].position.y - tri[2].position.x * tri[1].position.y ) + ( tri[2].position.x * tri[0].position.y - tri[0].position.x * tri[2].position.y ) );
-        if ( a < 0.0f )
-            continue;
-
-        auto aabb = Math::AABB::fromTriangle( tri[0].position, tri[1].position, tri[2].position );
-
-        // Clamp the triangle AABB to the AABB of the viewport.
-        aabb.clamp( viewportAABB );
-
-        for ( int y = static_cast<int>( aabb.min.y ); y <= static_cast<int>( aabb.max.y ); ++y )
+        break;
+        case 4:
         {
-            for ( int x = static_cast<int>( aabb.min.x ); x <= static_cast<int>( aabb.max.x ); ++x )
+            tri[0] = out[0];
+            tri[1] = out[1];
+            tri[2] = out[3];
+
+            rasterize( tri, viewportAABB, alphaTexture, diffuseTexture, diffuseColor );
+
+            tri[0] = out[1];
+            tri[1] = out[2];
+            tri[2] = out[3];
+
+            rasterize( tri, viewportAABB, alphaTexture, diffuseTexture, diffuseColor );
+        }
+        break;
+        }
+    }
+}
+
+void Rasterizer::rasterize( VertexOutput tri[3], const AABB& viewportAABB, const Image* alphaTexture, const Image* diffuseTexture, const Color& diffuseColor )
+{
+    // Store the w component before perspective divide.
+    float w0 = 1.0f / tri[0].position.w;
+    float w1 = 1.0f / tri[1].position.w;
+    float w2 = 1.0f / tri[2].position.w;
+
+    for ( int i = 0; i < 3; ++i )
+    {
+        auto& pos = tri[i].position;
+        pos       = pos / pos.w;  // Perspective divide.
+
+        // NDC -> screen space
+        pos   = pos * 0.5f + 0.5f;
+        pos.x = pos.x * viewport.width + viewport.x;
+        pos.y = ( 1.0f - pos.y ) * viewport.height + viewport.y;  // Flip Y
+    }
+
+    // Backface culling.
+    // Compute the area of the triangle in screen space.
+    // Source: OpenGL 4.6 Specification, 2022 (pp. 477)
+    auto a = -( ( tri[0].position.x * tri[1].position.y - tri[1].position.x * tri[0].position.y ) + ( tri[1].position.x * tri[2].position.y - tri[2].position.x * tri[1].position.y ) + ( tri[2].position.x * tri[0].position.y - tri[0].position.x * tri[2].position.y ) );
+    if ( a < 0.0f )
+        return;
+
+    auto aabb = Math::AABB::fromTriangle( tri[0].position, tri[1].position, tri[2].position );
+
+    // Clamp the triangle AABB to the AABB of the viewport.
+    aabb.clamp( viewportAABB );
+
+    for ( int y = static_cast<int>( aabb.min.y ); y <= static_cast<int>( aabb.max.y ); ++y )
+    {
+        for ( int x = static_cast<int>( aabb.min.x ); x <= static_cast<int>( aabb.max.x ); ++x )
+        {
+            // Barycentric coordinates in screen space.
+            auto bc = barycentric( tri[0].position, tri[1].position, tri[2].position, { static_cast<float>( x ) + 0.5f, static_cast<float>( y ) + 0.5f } );
+            if ( barycentricInside( bc ) )
             {
-                // Barycentric coordinates in screen space.
-                auto bc = barycentric( tri[0].position, tri[1].position, tri[2].position, { static_cast<float>( x ) + 0.5f, static_cast<float>( y ) + 0.5f } );
-                if ( barycentricInside( bc ) )
+                // Compute depth
+                float  z = tri[0].position.z * bc.x + tri[1].position.z * bc.y + tri[2].position.z * bc.z;
+                float& d = depthBuffer( x, y );
+                if ( z < d )
                 {
-                    // Compute depth
-                    float  z = tri[0].position.z * bc.x + tri[1].position.z * bc.y + tri[2].position.z * bc.z;
-                    float& d = depthBuffer( x, y );
-                    if ( z < d )
+                    bc = bc * glm::vec3 { w0, w1, w2 };
+                    // Compute the perspective correct attributes.
+                    // Source: OpenGL 4.6 Specification, 2022 (pp. 479).
+                    float correction = 1.0f / ( bc.x + bc.y + bc.z );
+                    auto  uv         = ( tri[0].uv * bc.x + tri[1].uv * bc.y + tri[2].uv * bc.z ) * correction;
+                    auto  normal         = ( tri[0].normal * bc.x + tri[1].normal * bc.y + tri[2].normal * bc.z ) * correction;
+                    normal           = glm::normalize( normal );
+
+                    auto  srcAlpha   = alphaTexture ? alphaTexture->sample( uv ) : Color::White;
+
+                    if ( srcAlpha.r > 0 )
                     {
-                        bc = bc * glm::vec3 { w0, w1, w2 };
-                        // Compute the perspective correct UV coordinates.
-                        // Source: OpenGL 4.6 Specification, 2022 (pp. 479).
-                        float correction = 1.0f / ( bc.x + bc.y + bc.z );
-                        auto  uv         = ( tri[0].uv * bc.x + tri[1].uv * bc.y + tri[2].uv * bc.z ) * correction;
-
-                        auto srcColor = diffuseTexture ? diffuseTexture->sample( uv ) : diffuseColor;
-
+                        auto srcColor        = diffuseTexture ? diffuseTexture->sample( uv ) : diffuseColor;
                         renderTarget( x, y ) = srcColor;
 
                         // Update the depth buffer.
@@ -146,14 +180,13 @@ const Buffer<float>& Rasterizer::getDepthBuffer() const noexcept
     return depthBuffer;
 }
 
-inline Rasterizer::VertexOutput Rasterizer::vertexShader( const VertexInput& in, const glm::mat4& modelMatrix, const glm::mat4& modelViewProjectionMatrix )
+inline Rasterizer::VertexOutput Rasterizer::vertexShader( const VertexInput& in, const glm::mat4& modelMatrix, const glm::mat4& modeViewMatrix, const glm::mat4& modelViewProjectionMatrix )
 {
     VertexOutput out {};
 
     out.position = modelViewProjectionMatrix * glm::vec4 { in.position, 1.0f };
-    out.normal   = modelMatrix * glm::vec4 { in.normal, 0.0f };
+    out.normal   = modeViewMatrix * glm::vec4 { in.normal, 0.0f };
     out.uv       = in.uv;
-    out.color    = glm::vec4( static_cast<float>( in.color.r ) / 255.0f, static_cast<float>( in.color.g ) / 255.0f, static_cast<float>( in.color.b ) / 255.0f, static_cast<float>( in.color.a ) / 255.0f );
 
     return out;
 }
@@ -237,6 +270,7 @@ int Rasterizer::clipTriangle( const VertexOutput* in, int n_in, VertexOutput* ou
     return n_out;
 }
 
-int Rasterizer::clipTriangle( const VertexOutput* in, VertexOutput* out )
+int Rasterizer::clipTriangle( const VertexOutput in[3], VertexOutput* out )
 {
+    return clipTriangle( in, 3, out, Plane::Near );
 }

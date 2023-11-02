@@ -33,7 +33,6 @@ public:
         glm::vec3 position;  // Position in object space.
         glm::vec3 normal;    // Normal in object space.
         glm::vec2 uv;        // Texture UV coordinates.
-        Color     color;     // Vertex color.
     };
 
     /// <summary>
@@ -44,7 +43,6 @@ public:
         glm::vec4 position;  // Position in clip-space.
         glm::vec3 normal;    // Normal in world-space.
         glm::vec2 uv;        // Texture coordinates.
-        glm::vec4 color;     // Vertex color.
     };
 
     Rasterizer();
@@ -86,9 +84,20 @@ protected:
     /// </summary>
     /// <param name="in">The incoming vertex position.</param>
     /// <param name="modelMatrix">The model matrix to transform the vertex normal.</param>
+    /// <param name="modelViewMatrix">The model-view matrix to transform the vertex normal.</param>
     /// <param name="modelViewProjectionMatrix">The model-view-projection matrix to transform the vertex position.</param>
     /// <returns>The transformed vertex.</returns>
-    VertexOutput vertexShader( const VertexInput& in, const glm::mat4& modelMatrix, const glm::mat4& modelViewProjectionMatrix );
+    VertexOutput vertexShader( const VertexInput& in, const glm::mat4& modelMatrix, const glm::mat4& modelViewMatrix, const glm::mat4& modelViewProjectionMatrix );
+
+    /// <summary>
+    /// Rasterize a single triangle to the color buffer.
+    /// </summary>
+    /// <param name="tri">The triangle to rasterize.</param>
+    /// <param name="viewportAABB">The AABB of the viewport.</param>
+    /// <param name="alphaTexture">Alpha texture (or null).</param>
+    /// <param name="diffuseTexture">Diffuse texture (or null).</param>
+    /// <param name="diffuseColor">Diffuse color.</param>
+    void rasterize( VertexOutput tri[3], const Math::AABB& viewportAABB, const Image* alphaTexture, const Image* diffuseTexture, const Color& diffuseColor );
 
     /// <summary>
     /// Compute the distance from the point to one of the clipping planes.
@@ -133,8 +142,7 @@ inline Rasterizer::VertexOutput operator*( float lhs, const Rasterizer::VertexOu
     return {
         lhs * rhs.position,
         lhs * rhs.normal,
-        lhs * rhs.uv,
-        lhs * rhs.color
+        lhs * rhs.uv
     };
 }
 
@@ -152,8 +160,7 @@ inline Rasterizer::VertexOutput operator+( const Rasterizer::VertexOutput& lhs, 
     return {
         lhs.position + rhs.position,
         lhs.normal + rhs.normal,
-        lhs.uv + rhs.uv,
-        lhs.color + rhs.color
+        lhs.uv + rhs.uv
     };
 }
 
@@ -162,8 +169,7 @@ inline Rasterizer::VertexOutput operator-( const Rasterizer::VertexOutput& lhs, 
     return {
         lhs.position - rhs.position,
         lhs.normal - rhs.normal,
-        lhs.uv - rhs.uv,
-        lhs.color - rhs.color
+        lhs.uv - rhs.uv
     };
 }
 
