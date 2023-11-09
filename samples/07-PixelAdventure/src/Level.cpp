@@ -72,15 +72,16 @@ Level::Level( const ldtk::Project& project, const ldtk::World& world, const ldtk
         auto& s      = e.getSize();
         auto& oneWay = e.getField<ldtk::FieldType::Bool>( "OneWay" );
         auto& trap   = e.getField<ldtk::FieldType::Bool>( "Trap" );
-        bool  isTrap = trap ? *trap : false;
+        bool  isTrap = trap.value_or( false );
 
         // Add a few pixels padding if it is a spike trap.
         int padding = isTrap ? 2 : 0;
 
-        Collider collider {
+        Collider collider
+        {
             .type     = ColliderType::Default,
             .aabb     = AABB { { p.x + padding, p.y + padding, 0.0 }, { p.x + s.x - 1 - padding, p.y + s.y - 1 - padding, 0.0f } },
-            .isOneWay = oneWay ? *oneWay : false,
+            .isOneWay = oneWay.value_or( false ),
             .isTrap   = isTrap
         };
 
@@ -95,7 +96,7 @@ Level::Level( const ldtk::Project& project, const ldtk::World& world, const ldtk
         auto& p    = e.getPosition();
         auto& type = e.getField<ldtk::FieldType::Enum>( "PickupType" );
 
-        auto&  fruitSprite = fruitSprites[type->name];
+        auto&  fruitSprite = fruitSprites[type.value().name];
         Sphere collider { { p.x, p.y, 0 }, 8.0f };
 
         allPickups.emplace_back( fruitSprite, collider );
@@ -109,7 +110,7 @@ Level::Level( const ldtk::Project& project, const ldtk::World& world, const ldtk
         auto& p    = e.getPosition();
         auto& type = e.getField<ldtk::FieldType::Enum>( "BoxType" );
 
-        Box newBox = boxPrefabs[type->name];
+        Box newBox = boxPrefabs[type.value().name];
         newBox.setPosition( { p.x, p.y } );
 
         auto b = boxes.emplace_back( std::make_shared<Box>( std::move( newBox ) ) );
@@ -159,7 +160,7 @@ Level::Level( const ldtk::Project& project, const ldtk::World& world, const ldtk
 
     // Load some background music.
     auto bgFilePath = level.getField<ldtk::FieldType::FilePath>( "bg_music" );
-    bgMusic.loadMusic( projectPath / bgFilePath->directory() / bgFilePath->filename() );
+    bgMusic.loadMusic( projectPath / bgFilePath.value().directory() / bgFilePath.value().filename() );
     bgMusic.setLooping( true );
     bgMusic.setVolume( 0.2f );
     bgMusic.play();
