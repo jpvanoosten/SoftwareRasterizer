@@ -3,6 +3,8 @@
 
 #include <GLFW/glfw3.h>
 
+#include <mutex>
+
 using namespace Graphics;
 
 static GLFWwindow* g_hWnd = nullptr;

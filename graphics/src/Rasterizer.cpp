@@ -21,6 +21,8 @@ void Rasterizer::clear( const Color& color, float depth )
 
 void Rasterizer::draw( const Mesh& mesh, const glm::mat4& modelMatrix )
 {
+    // TODO: View frustum culling.
+
     glm::mat4 modelViewProjectionMatrix = modelMatrix;
     glm::mat4 modelViewMatrix           = modelMatrix;
     if ( camera )

@@ -16,6 +16,8 @@
 #include <fmt/core.h>
 #include <iostream>
 
+#include <imgui.h>
+
 using namespace Graphics;
 using namespace Math;
 
