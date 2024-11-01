@@ -214,6 +214,7 @@ float Rasterizer::distance( const glm::vec4& p, Plane plane )
     return 0.0f;  // This shouldn't happen.
 }
 
+// Source: https://dl.acm.org/doi/pdf/10.1145/360767.360802
 int Rasterizer::clipTriangle( const VertexOutput* in, int n_in, VertexOutput* out, Plane plane )
 {
     // Number of output vertices.
