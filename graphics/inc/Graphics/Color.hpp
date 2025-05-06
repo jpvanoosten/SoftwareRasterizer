@@ -89,7 +89,6 @@ struct SR_API alignas( 4 ) Color
     /// <returns></returns>
     static inline Color fromHSV( float H, float S, float V ) noexcept;
 
-    // Yes, I know this union breaks strict aliasing rules.
     union
     {
         uint32_t argb;
