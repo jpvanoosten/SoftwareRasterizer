@@ -543,21 +543,21 @@ void Image::drawSprite( const Sprite& sprite, const glm::mat3& matrix, std::opti
     aabb.clamp( m_AABB );
 
     // Index buffer for the two triangles of the quad.
-    const uint32_t indicies[] = {
+    const uint32_t indices[] = {
         0, 1, 3,
         1, 2, 3
     };
 
-#pragma omp parallel for schedule( dynamic ) firstprivate( aabb, indicies, verts, color, blendMode )
+#pragma omp parallel for schedule( dynamic ) firstprivate( aabb, indices, verts, color, blendMode )
     for ( int y = static_cast<int>( aabb.min.y ); y <= static_cast<int>( aabb.max.y ); ++y )
     {
         for ( int x = static_cast<int>( aabb.min.x ); x <= static_cast<int>( aabb.max.x ); ++x )
         {
-            for ( uint32_t i = 0; i < std::size( indicies ); i += 3 )
+            for ( uint32_t i = 0; i < std::size( indices ); i += 3 )
             {
-                const uint32_t i0 = indicies[i + 0];
-                const uint32_t i1 = indicies[i + 1];
-                const uint32_t i2 = indicies[i + 2];
+                const uint32_t i0 = indices[i + 0];
+                const uint32_t i1 = indices[i + 1];
+                const uint32_t i2 = indices[i + 2];
 
                 glm::vec3 bc = barycentric( verts[i0].position, verts[i1].position, verts[i2].position, { x, y } );
                 if ( barycentricInside( bc ) )
