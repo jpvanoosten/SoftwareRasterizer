@@ -72,6 +72,9 @@ Image::Image( uint32_t width, uint32_t height )
 
 Image& Image::operator=( const Image& image )
 {
+    if ( this == &image )
+        return *this;
+
     resize( image.m_width, image.m_height );
     std::memcpy( data(), image.data(), static_cast<std::size_t>( image.m_width ) * image.m_height * sizeof( Color ) );
 
@@ -80,6 +83,9 @@ Image& Image::operator=( const Image& image )
 
 Image& Image::operator=( Image&& image ) noexcept
 {
+    if ( this == &image )
+        return *this;
+
     m_width  = image.m_width;
     m_height = image.m_height;
     m_AABB   = image.m_AABB;
