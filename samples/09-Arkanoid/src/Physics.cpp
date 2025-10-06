@@ -1,5 +1,6 @@
 #include <Physics.hpp>
 
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/projection.hpp>
 
 #include <array>

@@ -10,6 +10,7 @@
 
 #include <Math/Camera3D.hpp>
 
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtc/random.hpp>
 #include <glm/gtx/transform.hpp>
 

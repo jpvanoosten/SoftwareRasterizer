@@ -42,7 +42,7 @@ target_include_directories( Math
 )
 
 target_link_libraries( Math
-    PUBLIC glm
+    PUBLIC glm::glm
 )
 
 install(TARGETS Math)

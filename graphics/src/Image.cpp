@@ -15,6 +15,7 @@
 #include <optional>
 #include <cstring>
 
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/matrix_query.hpp> // isIdentity.
 
 using namespace Graphics;

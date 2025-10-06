@@ -230,7 +230,7 @@ WindowGLFW::WindowGLFW( std::string_view title, int width, int height )
 
 WindowGLFW::~WindowGLFW()
 {
-    //glfwDestroyWindow( window );
+    glfwDestroyWindow( window );
 }
 
 void WindowGLFW::show()

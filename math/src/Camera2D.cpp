@@ -1,5 +1,6 @@
 #include <Math/Camera2D.hpp>
 
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/transform.hpp>
 
 using namespace Math;
