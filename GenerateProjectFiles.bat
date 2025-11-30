@@ -42,12 +42,18 @@ FOR /F "usebackq delims=." %%i IN (`%VSWHERE% -latest -prerelease -requires Micr
     SET VS_VERSION=%%i
 )
 
-IF %VS_VERSION% == 17 (
+IF %VS_VERSION% == 18 (
+    SET CMAKE_PRESET="vs18"
+    SET CMAKE_BINARY_DIR=out\build\vs18
+	SET SOLUTION_FILE=SoftwareRasterizer.slnx
+) ELSE IF %VS_VERSION% == 17 (
     SET CMAKE_PRESET="vs17"
     SET CMAKE_BINARY_DIR=out\build\vs17
+	SET SOLUTION_FILE=SoftwareRasterizer.sln
 ) ELSE IF %VS_VERSION% == 16 (
     SET CMAKE_PRESET="vs16"
     SET CMAKE_BINARY_DIR=out\build\vs16
+	SET SOLUTION_FILE=SoftwareRasterizer.sln
 ) ELSE (
     ECHO.
     ECHO ***********************************************************************
@@ -70,7 +76,7 @@ IF %VS_VERSION% == 17 (
 IF %ERRORLEVEL% NEQ 0 (
     PAUSE
 ) ELSE (
-    START %CMAKE_BINARY_DIR%\SoftwareRasterizer.sln
+    START %CMAKE_BINARY_DIR%\%SOLUTION_FILE%
 )
 
 :Exit

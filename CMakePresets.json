@@ -19,6 +19,23 @@
             }
         },
         {
+            "name": "vs18",
+            "displayName": "Visual Studio 2026",
+            "description": "Generator for Visual Studio 2026",
+            "generator": "Visual Studio 18 2026",
+            "binaryDir": "${sourceDir}/out/build/${presetName}",
+            "installDir": "${sourceDir}/out/install/${presetName}",
+            "architecture": {
+                "value": "x64",
+                "strategy": "set"
+            },
+            "vendor": {
+                "microsoft.com/VisualStudioSettings/CMake/1.0": {
+                    "hostOS": "Windows"
+                }
+            }
+        },
+        {
             "name": "vs17",
             "displayName": "Visual Studio 2022",
             "description": "Generator for Visual Studio 2022",
